@@ -376,11 +376,15 @@ done
 ENCODED_TOKEN=$(kubectl get secret github-deployer-token \
   -n ecosystem-production \
   -o jsonpath='{.data.token}')
-SA_TOKEN=$(echo "$ENCODED_TOKEN" | base64 -d 2>/dev/null || echo "$ENCODED_TOKEN" | base64 -D)
 
-# Validate that the token was decoded successfully
-if [ -z "$SA_TOKEN" ]; then
-  echo "Error: Failed to decode service account token. Please verify that:"
+# Try Linux/GNU base64 first, then macOS/BSD base64
+if SA_TOKEN=$(echo "$ENCODED_TOKEN" | base64 -d 2>/dev/null) && [ -n "$SA_TOKEN" ]; then
+  : # Successfully decoded with -d flag
+elif SA_TOKEN=$(echo "$ENCODED_TOKEN" | base64 -D 2>/dev/null) && [ -n "$SA_TOKEN" ]; then
+  : # Successfully decoded with -D flag
+else
+  echo "Error: Failed to decode service account token with both 'base64 -d' and 'base64 -D'."
+  echo "Please verify that:"
   echo "  1. The github-deployer-token secret exists in the ecosystem-production namespace"
   echo "  2. The base64 command is available on your system"
   exit 1
@@ -393,7 +397,8 @@ fi
 # Get the API server URL and CA data for the eco-production cluster
 # Note: The actual cluster name in kubeconfig is typically gke_<project-id>_asia-east1_eco-production
 # JSONPath doesn't support wildcards, so we list all clusters and grep for the match
-CLUSTER_NAME=$(kubectl config view --raw -o jsonpath='{.clusters[*].name}' | tr ' ' '\n' | grep eco-production | head -n1)
+# Use grep with word boundary or end-of-line to ensure exact matching
+CLUSTER_NAME=$(kubectl config view --raw -o jsonpath='{.clusters[*].name}' | tr ' ' '\n' | grep 'eco-production$' | head -n1)
 
 # Validate that the cluster name was found
 if [ -z "$CLUSTER_NAME" ]; then

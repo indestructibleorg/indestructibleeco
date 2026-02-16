@@ -377,7 +377,7 @@ SA_TOKEN=$(kubectl get secret github-deployer-token \
   -o jsonpath='{.data.token}' | base64 -d)
 
 # Alternative: Use kubectl create token for short-lived tokens (valid for 1 hour by default)
-# For longer validity, adjust duration as needed (e.g., --duration=168h for 7 days/1 week)
+# For longer validity, adjust duration as needed (e.g., --duration=168h for 7 days)
 # SA_TOKEN=$(kubectl create token github-deployer -n ecosystem-production --duration=1h)
 
 # Get the API server URL and CA data for the eco-production cluster

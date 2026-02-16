@@ -111,6 +111,11 @@ jobs:
             --namespace=ecosystem-staging \
             --dry-run=client -o yaml | kubectl apply -f -
 
+      - name: Setup kustomize
+        run: |
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash -s -- 5.8.1
+          sudo mv kustomize /usr/local/bin/
+
       - name: Update image tags in kustomization
         run: |
           cd infrastructure/kustomize/overlays/staging
@@ -168,6 +173,11 @@ jobs:
             --from-literal=cloudflare-api-token="${{ secrets.CLOUDFLARE_API_TOKEN }}" \
             --namespace=ecosystem-production \
             --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Setup kustomize
+        run: |
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash -s -- 5.8.1
+          sudo mv kustomize /usr/local/bin/
 
       - name: Update image tags in kustomization
         run: |

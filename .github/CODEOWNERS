@@ -1,0 +1,12 @@
+# Default owners for everything in the repository
+* @IndestructibleAutoOps
+
+# Workflows and CI/CD
+/.github/ @IndestructibleAutoOps
+
+# Infrastructure and Kubernetes manifests
+/infrastructure/ @IndestructibleAutoOps
+
+# Documentation
+/docs/ @IndestructibleAutoOps
+*.md @IndestructibleAutoOps

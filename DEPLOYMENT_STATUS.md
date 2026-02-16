@@ -79,7 +79,7 @@ If you already have a Kubernetes cluster:
    ```
 2. Provide the staging cluster kubeconfig
 3. Provide the production cluster kubeconfig
-4. I'll add these as GitHub secrets
+4. Add these as GitHub secrets
 
 #### Option B: Provision New Kubernetes Clusters
 If you need to provision new clusters:
@@ -100,7 +100,7 @@ If you need to provision new clusters:
 
 3. **Provisioning Options**:
    - Manual provisioning via cloud console
-   - Terraform infrastructure as code (I can create this)
+   - Terraform infrastructure as code
    - Managed Kubernetes services
 
 ### Step 2: DNS Configuration
@@ -157,9 +157,10 @@ Use a managed Kubernetes service:
 
 ### Production Ready
 For production deployment:
-- **AWS EKS**: ~$70/month minimum
-- **GKE**: ~$70/month minimum
-- **Azure AKS**: ~$70/month minimum
+- **AWS EKS**: ~$70/month minimum (standard cluster with managed nodes)
+- **GKE Autopilot**: ~$30-50/month for staging, ~$100-200/month for production (pay per pod resource usage)
+- **GKE Standard**: ~$70/month minimum (standard cluster with managed nodes)
+- **Azure AKS**: ~$70/month minimum (standard cluster with managed nodes)
 
 ### Cost Optimization
 - Use spot instances for cost savings
@@ -187,7 +188,7 @@ Please let me know:
    - Custom certificates
 
 4. **ArgoCD**: Do you want to use ArgoCD for GitOps?
-   - If yes: I'll help set it up
+   - If yes: Setup assistance available
    - If no: Can use kubectl or Helm directly
 
 5. **Monitoring**: Do you need monitoring stack setup?
@@ -216,7 +217,7 @@ Please let me know:
 3. DNS hosting provider
 4. SSL preference
 
-**I can help with:**
+**Available assistance:**
 - Creating Terraform infrastructure code
 - Provisioning Kubernetes clusters
 - Configuring DNS and SSL

@@ -62,7 +62,6 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.1.0
         with:
           node-version: '20'
-          cache: 'pnpm'
 
       - name: Install pnpm
         # Using Corepack (Node.js built-in) instead of pnpm/action-setup for security compliance

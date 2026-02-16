@@ -122,7 +122,7 @@ jobs:
           CLIENT_TAG=$(echo "${{ needs.build-and-push.outputs.client-image-tag }}" | head -n1)
           SERVER_TAG=$(echo "${{ needs.build-and-push.outputs.server-image-tag }}" | head -n1)
           kustomize edit set image ghcr.io/machops/ecosystem/client=$CLIENT_TAG
-          kustomize edit set image ghcr.io/machops/ecosystem/server=$SERVER_TAG
+          kustomize edit set image ${SERVER_TAG}
 
       - name: Deploy to Kubernetes
         run: |

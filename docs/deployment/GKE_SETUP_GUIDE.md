@@ -101,7 +101,19 @@ kubectl config get-contexts
 
 Once clusters are Running and kubeconfigs are provided:
 
-### 1. Add GitHub Secrets
+### 1. Create Namespaces
+
+First, create the namespaces for staging and production:
+
+```bash
+# Staging
+kubectl create namespace ecosystem-staging --context=gke_<project-id>_asia-east1_eco-staging
+
+# Production
+kubectl create namespace ecosystem-production --context=gke_<project-id>_asia-east1_eco-production
+```
+
+### 2. Add GitHub Secrets
 
 **⚠️ Security Note**: For production environments, prefer using GitHub OIDC with GCP Workload Identity Federation instead of storing long-lived kubeconfig files. This provides short-lived credentials with better security. See the [Workload Identity Federation Guide](https://github.com/google-github-actions/auth#setup) for setup instructions.
 
@@ -119,7 +131,7 @@ kubectl create rolebinding github-deployer-binding \
   --namespace=ecosystem-staging
 ```
 
-### 2. Verify Cluster Access
+### 3. Verify Cluster Access
 ```bash
 # Test staging access
 kubectl get nodes --context=gke_<project-id>_asia-east1_eco-staging
@@ -128,7 +140,7 @@ kubectl get nodes --context=gke_<project-id>_asia-east1_eco-staging
 kubectl get nodes --context=gke_<project-id>_asia-east1_eco-production
 ```
 
-### 3. Create Namespaces
+### 4. Verify Namespaces
 ```bash
 # Staging
 kubectl create namespace ecosystem-staging --context=gke_<project-id>_asia-east1_eco-staging
@@ -137,12 +149,12 @@ kubectl create namespace ecosystem-staging --context=gke_<project-id>_asia-east1
 kubectl create namespace ecosystem-production --context=gke_<project-id>_asia-east1_eco-production
 ```
 
-### 4. Deploy to Staging
+### 5. Deploy to Staging
 - Push changes to main branch
 - CI/CD pipeline will automatically deploy to staging
 - Monitor deployment health
 
-### 5. Deploy to Production
+### 6. Deploy to Production
 - Manual approval in GitHub Actions
 - Deploy to production namespace
 - Verify production deployment
@@ -191,22 +203,47 @@ Free, automatic certificate renewal using cert-manager:
 # Install cert-manager
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
 
-# Create ClusterIssuer
-kubectl apply -f infrastructure/cert-manager/cluster-issuer.yaml
+# Create ClusterIssuer for Let's Encrypt
+cat << 'EOF' | kubectl apply -f -
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: admin@machops.io
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+EOF
 ```
 
 ### Option 2: Google Managed Certificates
-Google Cloud SSL certificate management:
+Google Cloud SSL certificate management.
+
+Save the following to a file (e.g., `managed-cert.yaml`) and apply it with: `kubectl apply -f managed-cert.yaml`
 
 ```yaml
 apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
 metadata:
   name: ecosystem-cert
+  namespace: ecosystem-production
 spec:
   domains:
     - ecosystem.machops.io
     - api.ecosystem.machops.io
+```
+
+After creating the ManagedCertificate, reference it in your Ingress annotation:
+```yaml
+metadata:
+  annotations:
+    networking.gke.io/managed-certificates: ecosystem-cert
 ```
 
 ---
@@ -219,7 +256,7 @@ GKE Autopilot integrates with:
 - **Cloud Trace**: Distributed tracing
 - **Error Reporting**: Error tracking
 
-I can set up:
+Additional monitoring options include:
 - Prometheus + Grafana (custom monitoring)
 - Loki for centralized logging
 - Custom dashboards for your ecosystem
@@ -230,14 +267,59 @@ I can set up:
 
 ### Recommended: GitHub OIDC + Workload Identity Federation
 
-For production deployments, use GitHub's OIDC provider with GCP Workload Identity Federation to avoid storing long-lived credentials:
+For production deployments, use GitHub's OIDC provider with GCP Workload Identity Federation to avoid storing long-lived credentials.
+
+#### Step 1: Set up Workload Identity Federation on GCP
+
+```bash
+# Set your GCP project ID
+export PROJECT_ID="your-project-id"
+export PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format="value(projectNumber)")
+export GITHUB_REPO="machops/ecosystem"
+
+# Create a Workload Identity Pool
+gcloud iam workload-identity-pools create "github-pool" \
+  --project="${PROJECT_ID}" \
+  --location="global" \
+  --display-name="GitHub Actions Pool"
+
+# Create a Workload Identity Provider
+gcloud iam workload-identity-pools providers create-oidc "github-provider" \
+  --project="${PROJECT_ID}" \
+  --location="global" \
+  --workload-identity-pool="github-pool" \
+  --display-name="GitHub Provider" \
+  --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository" \
+  --issuer-uri="https://token.actions.githubusercontent.com"
+
+# Create a service account for GitHub Actions
+gcloud iam service-accounts create github-actions \
+  --project="${PROJECT_ID}" \
+  --display-name="GitHub Actions Deployer"
+
+# Grant necessary permissions to the service account
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:github-actions@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/container.developer"
+
+# Allow the GitHub repository to impersonate the service account
+gcloud iam service-accounts add-iam-policy-binding "github-actions@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --project="${PROJECT_ID}" \
+  --role="roles/iam.workloadIdentityUser" \
+  --member="principalSet://iam.googleapis.com/projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/github-pool/attribute.repository/${GITHUB_REPO}"
+
+# Get the Workload Identity Provider resource name (save this for GitHub Actions)
+echo "projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+```
+
+#### Step 2: Configure GitHub Actions workflow
 
 ```yaml
 # In your GitHub Actions workflow:
 - name: Authenticate to Google Cloud
   uses: google-github-actions/auth@v2
   with:
-    workload_identity_provider: 'projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/POOL_NAME/providers/PROVIDER_NAME'
+    workload_identity_provider: 'projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
     service_account: 'github-actions@PROJECT_ID.iam.gserviceaccount.com'
 
 - name: Get GKE credentials
@@ -267,21 +349,124 @@ kubectl create rolebinding github-deployer-binding \
   --serviceaccount=ecosystem-production:github-deployer \
   --namespace=ecosystem-production
 
-# Get the service account token and create a restricted kubeconfig
-# This kubeconfig will only have access to the specific namespace
+# Get the service account secret name
+SA_SECRET_NAME=$(kubectl get serviceaccount github-deployer \
+  -n ecosystem-production \
+  -o jsonpath='{.secrets[0].name}')
+
+# Extract and decode the service account token
+SA_TOKEN=$(kubectl get secret "${SA_SECRET_NAME}" \
+  -n ecosystem-production \
+  -o jsonpath='{.data.token}' | base64 -d)
+
+# Get the API server URL and CA data for the eco-production cluster
+CLUSTER_SERVER=$(kubectl config view --raw \
+  -o jsonpath='{.clusters[?(@.name=="eco-production")].cluster.server}')
+CLUSTER_CA_DATA=$(kubectl config view --raw \
+  -o jsonpath='{.clusters[?(@.name=="eco-production")].cluster.certificate-authority-data}')
+
+# Create a restricted kubeconfig for the github-deployer service account
+cat <<EOF > kubeconfig-ecosystem-production-github-deployer
+apiVersion: v1
+kind: Config
+clusters:
+- name: eco-production
+  cluster:
+    server: ${CLUSTER_SERVER}
+    certificate-authority-data: ${CLUSTER_CA_DATA}
+contexts:
+- name: github-deployer@eco-production
+  context:
+    cluster: eco-production
+    namespace: ecosystem-production
+    user: github-deployer
+current-context: github-deployer@eco-production
+users:
+- name: github-deployer
+  user:
+    token: ${SA_TOKEN}
+EOF
+
+# (Optional) Encode the restricted kubeconfig for use as a GitHub secret
+cat kubeconfig-ecosystem-production-github-deployer | base64 | tr -d '\n' \
+  > kubeconfig-ecosystem-production-github-deployer-base64.txt
+
+# This kubeconfig is restricted to the ecosystem-production namespace
 ```
 
 ### Network Policies
+
+Enable network policy enforcement on both clusters (if not already enabled):
+
 ```bash
-# Enable network policy enforcement
-# Add network policies to restrict traffic
+gcloud container clusters update eco-staging --region asia-east1 --enable-network-policy
+gcloud container clusters update eco-production --region asia-east1 --enable-network-policy
+
+# Example: default deny all ingress traffic in the ecosystem-production namespace
+kubectl apply -n ecosystem-production -f - <<'EOF'
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-ingress
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+EOF
+
+# Example: allow ingress to pods labeled app=api from any pod in the same namespace
+kubectl apply -n ecosystem-production -f - <<'EOF'
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-from-namespace
+spec:
+  podSelector:
+    matchLabels:
+      app: api
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+EOF
 ```
 
 ### RBAC Configuration
+
+Example: namespace-scoped deployer service account for staging
+
 ```bash
-# Create service accounts
-# Configure role-based access control
-# Implement least privilege principle
+# 1. Create a service account in the staging namespace
+kubectl create serviceaccount deploy-bot -n ecosystem-staging
+
+# 2. Define a least-privilege Role allowing basic deployment operations
+cat << 'EOF' | kubectl apply -f -
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: deployer-role
+  namespace: ecosystem-staging
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments", "statefulsets", "replicasets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  - apiGroups: [""]
+    resources: ["pods", "services", "configmaps", "secrets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  - apiGroups: ["autoscaling"]
+    resources: ["horizontalpodautoscalers"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+EOF
+
+# 3. Bind the Role to the service account
+kubectl create rolebinding deploy-bot-binding \
+  --role=deployer-role \
+  --serviceaccount=ecosystem-staging:deploy-bot \
+  --namespace=ecosystem-staging
+
+# Repeat similar Role and RoleBinding definitions for the ecosystem-production namespace
+# with only the permissions required for your production workflows.
 ```
 
 ### Secrets Management
@@ -296,12 +481,12 @@ Consider using:
 
 ### Check Cluster Status:
 ```bash
-gcloud container clusters list --region asia-east1
+gcloud container clusters list --region asia-east1 --project <your-project-id>
 ```
 
 ### View Cluster Details:
 ```bash
-gcloud container clusters describe eco-staging --region asia-east1
+gcloud container clusters describe eco-staging --region asia-east1 --project <your-project-id>
 ```
 
 ### Check Pod Status:
@@ -316,13 +501,13 @@ kubectl logs -f deployment/client -n ecosystem-staging
 kubectl logs -f deployment/server -n ecosystem-production
 ```
 
-### Access Dashboard:
-```bash
-# Open GKE Console
-gcloud container clusters get-credentials eco-staging --region asia-east1
-kubectl proxy
-# Open http://localhost:8001/ui
-```
+### Access GKE Console:
+
+To view and manage your clusters using the GKE web console:
+
+- Open the Google Cloud Console in your browser: https://console.cloud.google.com/
+- Navigate to **Kubernetes Engine → Clusters**.
+- Select the `eco-staging` or `eco-production` cluster to view its details and workloads.
 
 ---
 
@@ -332,7 +517,7 @@ Once both clusters are Running:
 
 - [ ] Both clusters show "Running" status
 - [ ] Generate and provide base64 kubeconfigs
-- [ ] I add kubeconfigs as GitHub secrets
+- [ ] Add kubeconfigs as GitHub secrets
 - [ ] Verify cluster access
 - [ ] Create namespaces
 - [ ] Configure DNS records
@@ -344,7 +529,7 @@ Once both clusters are Running:
 
 ---
 
-## Questions?
+## Support Resources
 
 If you encounter any issues during cluster provisioning:
 1. Check GKE console for error messages
@@ -352,11 +537,10 @@ If you encounter any issues during cluster provisioning:
 3. Ensure quotas are sufficient
 4. Check network configuration
 
-I'm ready to help with:
-- Adding kubeconfig secrets
-- Configuring deployments
-- Setting up monitoring
-- Troubleshooting any issues
+For additional assistance, refer to:
+- [GKE Autopilot Documentation](https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview)
+- [Workload Identity Federation Guide](https://github.com/google-github-actions/auth#setup)
+- [Kubernetes Documentation](https://kubernetes.io/docs/home/)
 
 ---
 

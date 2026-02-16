@@ -379,9 +379,9 @@ ENCODED_TOKEN=$(kubectl get secret github-deployer-token \
 
 # Try Linux/GNU base64 first, then macOS/BSD base64
 if SA_TOKEN=$(echo "$ENCODED_TOKEN" | base64 -d 2>/dev/null) && [ -n "$SA_TOKEN" ]; then
-  : # Successfully decoded with -d flag
+  true  # Successfully decoded with -d flag (Linux/GNU)
 elif SA_TOKEN=$(echo "$ENCODED_TOKEN" | base64 -D 2>/dev/null) && [ -n "$SA_TOKEN" ]; then
-  : # Successfully decoded with -D flag
+  true  # Successfully decoded with -D flag (macOS/BSD)
 else
   echo "Error: Failed to decode service account token with both 'base64 -d' and 'base64 -D'."
   echo "Please verify that:"
@@ -397,7 +397,7 @@ fi
 # Get the API server URL and CA data for the eco-production cluster
 # Note: The actual cluster name in kubeconfig is typically gke_<project-id>_asia-east1_eco-production
 # JSONPath doesn't support wildcards, so we list all clusters and grep for the match
-# Use grep with word boundary or end-of-line to ensure exact matching
+# Use grep with end-of-line anchor to ensure exact matching of the cluster name suffix
 CLUSTER_NAME=$(kubectl config view --raw -o jsonpath='{.clusters[*].name}' | tr ' ' '\n' | grep 'eco-production$' | head -n1)
 
 # Validate that the cluster name was found

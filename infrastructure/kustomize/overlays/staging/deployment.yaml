@@ -132,6 +132,11 @@ spec:
             secretKeyRef:
               name: ecosystem-secrets
               key: jwt-secret
+        - name: CLOUDFLARE_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: ecosystem-secrets
+              key: cloudflare-api-token
         resources:
           requests:
             cpu: 100m

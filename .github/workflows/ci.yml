@@ -10,8 +10,8 @@ env:
   NODE_VERSION: '20'
 
 jobs:
-  ci/lint:
-    name: Lint Code
+  ci-lint:
+    name: ci-lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -34,8 +34,8 @@ jobs:
         run: pnpm run lint
         continue-on-error: true
 
-  ci/test:
-    name: Run Tests
+  ci-test:
+    name: ci-test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -63,10 +63,10 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         continue-on-error: true
 
-  ci/build:
-    name: Build Applications
+  ci-build:
+    name: ci-build
     runs-on: ubuntu-latest
-    needs: [ci/lint, ci/test]
+    needs: [ci-lint, ci-test]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -98,8 +98,8 @@ jobs:
             dist/public
             dist/index.js
 
-  ci/security-scan:
-    name: Security Scan
+  ci-security-scan:
+    name: ci-security-scan
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

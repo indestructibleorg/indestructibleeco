@@ -24,6 +24,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install pnpm
+        # Using Corepack (Node.js built-in) instead of pnpm/action-setup for security compliance
+        # pnpm/action-setup is not verified in GitHub Marketplace
         run: |
           corepack enable
           corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
@@ -48,6 +50,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install pnpm
+        # Using Corepack (Node.js built-in) instead of pnpm/action-setup for security compliance
+        # pnpm/action-setup is not verified in GitHub Marketplace
         run: |
           corepack enable
           corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
@@ -78,6 +82,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install pnpm
+        # Using Corepack (Node.js built-in) instead of pnpm/action-setup for security compliance
+        # pnpm/action-setup is not verified in GitHub Marketplace
         run: |
           corepack enable
           corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate

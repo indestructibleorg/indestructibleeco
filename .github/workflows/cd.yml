@@ -114,8 +114,10 @@ jobs:
       - name: Update image tags in kustomization
         run: |
           cd infrastructure/kustomize/overlays/staging
-          kustomize edit set image ghcr.io/machops/ecosystem/client=${{ needs.build-and-push.outputs.client-image-tag }}
-          kustomize edit set image ghcr.io/machops/ecosystem/server=${{ needs.build-and-push.outputs.server-image-tag }}
+          CLIENT_TAG=$(echo "${{ needs.build-and-push.outputs.client-image-tag }}" | head -n1)
+          SERVER_TAG=$(echo "${{ needs.build-and-push.outputs.server-image-tag }}" | head -n1)
+          kustomize edit set image ghcr.io/machops/ecosystem/client=$CLIENT_TAG
+          kustomize edit set image ghcr.io/machops/ecosystem/server=$SERVER_TAG
 
       - name: Deploy to Kubernetes
         run: |
@@ -170,8 +172,10 @@ jobs:
       - name: Update image tags in kustomization
         run: |
           cd infrastructure/kustomize/overlays/production
-          kustomize edit set image ghcr.io/machops/ecosystem/client=${{ needs.build-and-push.outputs.client-image-tag }}
-          kustomize edit set image ghcr.io/machops/ecosystem/server=${{ needs.build-and-push.outputs.server-image-tag }}
+          CLIENT_TAG=$(echo "${{ needs.build-and-push.outputs.client-image-tag }}" | head -n1)
+          SERVER_TAG=$(echo "${{ needs.build-and-push.outputs.server-image-tag }}" | head -n1)
+          kustomize edit set image ghcr.io/machops/ecosystem/client=$CLIENT_TAG
+          kustomize edit set image ghcr.io/machops/ecosystem/server=$SERVER_TAG
 
       - name: Deploy to Kubernetes
         run: |
@@ -191,11 +195,11 @@ jobs:
           sleep 30
           
           # Test API health endpoint
-          kubectl run --rm -i --restart=Never --image=curlimages/curl test-pod -n ecosystem-production -- \
+          kubectl run --rm -i --restart=Never --image=curlimages/curl test-pod-api -n ecosystem-production -- \
             curl -f https://api.autoecoops.io/health || exit 1
           
           # Test web frontend
-          kubectl run --rm -i --restart=Never --image=curlimages/curl test-pod -n ecosystem-production -- \
+          kubectl run --rm -i --restart=Never --image=curlimages/curl test-pod-web -n ecosystem-production -- \
             curl -f https://autoecoops.io || exit 1
           
           echo "✅ Production smoke tests passed"

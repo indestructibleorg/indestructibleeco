@@ -17,6 +17,14 @@ spec:
       - name: client
         image: ghcr.io/machops/ecosystem/client:IMAGE_TAG
         imagePullPolicy: Always
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1001
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
         ports:
         - containerPort: 3000
         resources:
@@ -59,9 +67,27 @@ spec:
       - name: server
         image: ghcr.io/machops/ecosystem/server:IMAGE_TAG
         imagePullPolicy: Always
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1001
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
         ports:
         - containerPort: 8080
         env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: ecosystem-config
+              key: NODE_ENV
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: ecosystem-config
+              key: LOG_LEVEL
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:

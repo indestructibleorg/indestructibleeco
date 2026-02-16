@@ -5,6 +5,7 @@ namespace: ecosystem-staging
 
 resources:
   - ../../base
+  - ingress.yaml
 
 commonLabels:
   environment: staging

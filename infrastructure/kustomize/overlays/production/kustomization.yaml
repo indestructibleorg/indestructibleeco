@@ -5,6 +5,7 @@ namespace: ecosystem-production
 
 resources:
   - ../../base
+  - ingress.yaml
 
 commonLabels:
   environment: production

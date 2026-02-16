@@ -189,7 +189,7 @@ Free, automatic certificate renewal using cert-manager:
 
 ```bash
 # Install cert-manager
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.16.0/cert-manager.yaml
 
 # Create ClusterIssuer
 kubectl apply -f infrastructure/cert-manager/cluster-issuer.yaml

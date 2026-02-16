@@ -148,14 +148,20 @@ spec:
             memory: 512Mi
         livenessProbe:
           httpGet:
-            path: /health
+            path: /api/trpc/system.health
             port: 8080
+            httpHeaders:
+            - name: Content-Type
+              value: application/json
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
           httpGet:
-            path: /health
+            path: /api/trpc/system.health
             port: 8080
+            httpHeaders:
+            - name: Content-Type
+              value: application/json
           initialDelaySeconds: 5
           periodSeconds: 5
       volumes:

@@ -43,7 +43,7 @@ COPY --from=builder /app/dist ./dist
 
 # Create non-root user for running the application
 RUN groupadd -r nodeapp && useradd -r -g nodeapp -s /bin/false nodeapp && \
-    chown -R nodeapp:nodeapp /app/dist /app/node_modules
+    chown -R nodeapp:nodeapp /app
 
 # Switch to non-root user
 USER nodeapp

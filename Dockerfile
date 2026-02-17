@@ -8,8 +8,9 @@ RUN corepack enable && corepack prepare pnpm@10.4.1 --activate
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files and patches directory for pnpm patchedDependencies
 COPY package.json pnpm-lock.yaml ./
+COPY patches ./patches
 
 # Install dependencies
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
@@ -29,8 +30,9 @@ RUN corepack enable && corepack prepare pnpm@10.4.1 --activate
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files and patches directory for pnpm patchedDependencies
 COPY package.json pnpm-lock.yaml ./
+COPY patches ./patches
 
 # Install production dependencies only
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
@@ -38,6 +40,13 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
 
 # Copy built artifacts from builder
 COPY --from=builder /app/dist ./dist
+
+# Create non-root user for running the application
+RUN groupadd -r nodeapp && useradd -r -g nodeapp -s /bin/false nodeapp && \
+    chown -R nodeapp:nodeapp /app
+
+# Switch to non-root user
+USER nodeapp
 
 # Expose port
 EXPOSE 8080

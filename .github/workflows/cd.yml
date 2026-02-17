@@ -96,8 +96,9 @@ jobs:
             IMAGE_TAGS="${{ needs.build-and-push.outputs.image-tag }}"
 
             if [ -n "$IMAGE_TAGS" ]; then
-              # Take the first image reference from the comma-separated list
-              FIRST_IMAGE="${IMAGE_TAGS%%,*}"
+              # docker/metadata-action outputs newline-separated tags
+              # Take the first line/tag from the output
+              FIRST_IMAGE=$(echo "$IMAGE_TAGS" | head -n1)
               # Extract the tag part after the last colon
               TAG="${FIRST_IMAGE##*:}"
 
@@ -107,27 +108,16 @@ jobs:
                 sed -i "s/newTag: IMAGE_TAG/newTag: ${TAG}/g" "$KUSTOMIZATION_FILE"
                 echo "Updated kustomization.yaml:"
                 cat "$KUSTOMIZATION_FILE"
-                sed -i "s/newTag: IMAGE_TAG/newTag: ${TAG}/" "$KUSTOMIZATION_FILE"
+                kubectl apply -k "$KUSTOMIZE_DIR"
               else
                 echo "Could not determine image tag from '$FIRST_IMAGE', skipping tag substitution"
+                exit 1
               fi
             else
               echo "No image tag from build step, skipping tag substitution"
+              exit 1
             fi
-
-            kubectl apply -k "$KUSTOMIZE_DIR"
           else
             echo "Kustomization file not found at $KUSTOMIZATION_FILE"
-            exit 1
-          fi
-
-      - name: Deploy to Kubernetes
-        if: steps.kubectl-config.outputs.configured == 'true'
-        run: |
-          KUSTOMIZE_DIR="infrastructure/kustomize/overlays/staging"
-          if [ -f "$KUSTOMIZE_DIR/kustomization.yaml" ]; then
-            echo "Kustomization found at $KUSTOMIZE_DIR/kustomization.yaml; deployment already handled in previous step."
-          else
-            echo "Manifests not found, skipping"
             exit 1
           fi

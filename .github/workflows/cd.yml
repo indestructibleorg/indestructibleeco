@@ -126,8 +126,7 @@ jobs:
         run: |
           KUSTOMIZE_DIR="infrastructure/kustomize/overlays/staging"
           if [ -f "$KUSTOMIZE_DIR/kustomization.yaml" ]; then
-            kubectl apply -k "$KUSTOMIZE_DIR"
-            echo "✅ Deployment completed successfully"
+            echo "Kustomization found at $KUSTOMIZE_DIR/kustomization.yaml; deployment already handled in previous step."
           else
             echo "Manifests not found, skipping"
             exit 1

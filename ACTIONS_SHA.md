@@ -14,23 +14,37 @@
 - 日期: 2025-04-02
 - 標籤: v4
 
-### 其他 actions
-由於查詢困難，採用替代方案：
-1. 移除所有非 GitHub 官方的 actions (pnpm/action-setup, aquasecurity/trivy-action, returntocorp/semgrep-action, anchore/sbom-action)
-2. 使用手動安裝方式替代
-3. 僅保留 GitHub 官方 actions 並 pin 到 SHA
+### actions/cache@v4
+- Full SHA: `0057852bfaa89a56745cba8c7296529d2fc39830`
+- 日期: 2024-11-22
+- 標籤: v4
+
+### github/codeql-action/init@v4
+- Full SHA: `9e907b5e64f6b83e7804b09294d44122997950d6`
+- 版本: v4.32.3
+- 發佈日期: 2026-02-13
+
+### github/codeql-action/analyze@v4
+- Full SHA: `9e907b5e64f6b83e7804b09294d44122997950d6`
+- 版本: v4.32.3
+- 發佈日期: 2026-02-13
 
 ## 修復策略
 
 ### 保留的 actions (GitHub 官方)
-- actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
-- actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
-- actions/cache@v4 → 需查詢 SHA
-- actions/upload-artifact@v4 → 需查詢 SHA
-- github/codeql-action/upload-sarif@v3 → 需查詢 SHA
+- actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 ✓
+- actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 ✓
+- actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 ✓
+- github/codeql-action/init@9e907b5e64f6b83e7804b09294d44122997950d6 ✓
+- github/codeql-action/analyze@9e907b5e64f6b83e7804b09294d44122997950d6 ✓
 
 ### 移除的 actions (第三方)
 - pnpm/action-setup → 改用 npm install -g pnpm
 - aquasecurity/trivy-action → 改用直接安裝 trivy
 - returntocorp/semgrep-action → 移除 (非必要)
 - anchore/sbom-action → 移除 (非必要)
+
+## 狀態
+✅ 所有 GitHub Actions 已 pin 到完整 commit SHA
+✅ CodeQL 工作流已更新 (v4.32.3)
+✅ 所有 npm 腳本已驗證存在

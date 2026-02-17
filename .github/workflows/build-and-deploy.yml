@@ -34,12 +34,20 @@ jobs:
 
       - name: Validate commit message format
         run: |
-          COMMITS=$(git log --oneline -n 10)
-          echo "Recent commits:"
-          echo "$COMMITS"
-          
-          # Check if any commit message doesn't follow Conventional Commits
-          if git log --oneline -n 1 | grep -qvE '^[a-f0-9]{7} (feat|fix|docs|style|refactor|test|chore)(\(.+\))?:'; then
+          # Skip commit message validation for pull_request events to avoid
+          # checking synthetic merge commits created by GitHub.
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "ℹ️ Skipping commit message validation for pull_request event"
+            exit 0
+          fi
+
+          # Get the latest commit subject line only (no hash) and validate it
+          COMMIT_SUBJECT="$(git log -1 --pretty=%s)"
+          echo "Latest commit subject:"
+          echo "$COMMIT_SUBJECT"
+
+          # Check if the commit message follows Conventional Commits
+          if ! echo "$COMMIT_SUBJECT" | grep -qE '^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?:'; then
             echo "❌ Commit message does not follow Conventional Commits format"
             echo "Expected format: type(scope): description"
             echo "Valid types: feat, fix, docs, style, refactor, test, chore"

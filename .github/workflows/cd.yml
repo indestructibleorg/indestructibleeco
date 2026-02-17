@@ -5,13 +5,11 @@ on:
     branches: [main]
   workflow_dispatch:
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+permissions:
+  contents: read
 
 jobs:
-  build-and-push:
-    name: Build and Push Docker Images
+  deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: read

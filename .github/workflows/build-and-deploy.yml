@@ -17,8 +17,6 @@ on:
       - develop
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
   NODE_VERSION: '20'
   PNPM_VERSION: '10.4.1'
 
@@ -57,7 +55,7 @@ jobs:
         run: pnpm run build
 
       - name: Upload build artifacts
-        if: always()
+        if: success()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: build-artifacts

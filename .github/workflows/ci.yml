@@ -4,5 +4,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - run: |
+          git init
+          git remote add origin https://github.com/machops/ecosystem.git
+          git fetch --depth 1 origin ${{ github.sha }}
+          git checkout FETCH_HEAD
       - run: ls -la

@@ -103,6 +103,7 @@ jobs:
 
               if [ -n "$TAG" ] && [ "$TAG" != "$FIRST_IMAGE" ]; then
                 echo "Setting IMAGE_TAG in kustomization.yaml to '$TAG'"
+                # Use /g flag to replace all IMAGE_TAG occurrences (both client and server)
                 sed -i "s/newTag: IMAGE_TAG/newTag: ${TAG}/g" "$KUSTOMIZATION_FILE"
                 echo "Updated kustomization.yaml:"
                 cat "$KUSTOMIZATION_FILE"

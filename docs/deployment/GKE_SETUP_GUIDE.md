@@ -191,8 +191,23 @@ Free, automatic certificate renewal using cert-manager:
 # Install cert-manager
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.16.0/cert-manager.yaml
 
-# Create ClusterIssuer
-kubectl apply -f infrastructure/cert-manager/cluster-issuer.yaml
+# Create ClusterIssuer (example for Let's Encrypt staging)
+cat << 'EOF' | kubectl apply -f -
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    email: <your-email@example.com>
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
+EOF
 ```
 
 ### Option 2: Google Managed Certificates

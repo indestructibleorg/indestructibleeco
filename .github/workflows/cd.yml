@@ -50,9 +50,7 @@ jobs:
         with:
           name: build-artifacts
           path: |
-            client/dist
-            server/dist
-
+            dist/
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest

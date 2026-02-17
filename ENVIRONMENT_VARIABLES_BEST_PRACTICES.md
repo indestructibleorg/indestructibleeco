@@ -13,26 +13,26 @@ const apiKey = process.env.GITHUB_API_KEY
 
 ### 2. Use Environment-Specific Prefixes
 ```bash
-# Browser-safe (NEXT_PUBLIC_*)
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_your_anon_key_here
+# Browser-safe (VITE_* - exposed to client)
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your_public_anon_key_here
 
-# Server-side only
-SUPABASE_SECRET_KEY=sb_secret_your_secret_key_here
-GITHUB_TOKEN=ghp_your_actual_token_here
+# Server-side only (not exposed to client)
+SUPABASE_SECRET_KEY=your_secret_key_here
+GITHUB_TOKEN=your_github_token_here
 ```
 
 ### 3. Validation and Defaults
 ```typescript
 // config/env.ts
 const env = {
-  NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL || '',
   SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY || '',
 }
 
 // Validate
-if (!env.NEXT_PUBLIC_SUPABASE_URL) {
-  throw new Error('NEXT_PUBLIC_SUPABASE_URL is required')
+if (!env.VITE_SUPABASE_URL) {
+  throw new Error('VITE_SUPABASE_URL is required')
 }
 ```
 
@@ -44,10 +44,10 @@ if (!env.NEXT_PUBLIC_SUPABASE_URL) {
 jobs:
   build:
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - name: Setup environment
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         run: |
           echo "Environment configured"
@@ -56,16 +56,17 @@ jobs:
 ### Strategy 2: .env Files with Validation
 ```bash
 # .env.example (committed to git)
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
 SUPABASE_SECRET_KEY=
 GITHUB_TOKEN=
 
 # .env.local (not committed - in .gitignore)
-NEXT_PUBLIC_SUPABASE_URL=https://yrfxijooswpvdpdseswy.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_rhTyBa4IqqV14nV_B87S7g_zKzDSYTd
-SUPABASE_SECRET_KEY=sb_secret_your_secret_key_here
-GITHUB_TOKEN=ghp_your_actual_token_here
+# IMPORTANT: Never paste real credentials into documentation or commit them to git
+VITE_SUPABASE_URL=https://example-project.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example_token_here
+SUPABASE_SECRET_KEY=example_secret_key_value_replace_with_real
+GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 ### Strategy 3: TypeScript Environment Schema
@@ -74,15 +75,15 @@ GITHUB_TOKEN=ghp_your_actual_token_here
 import { z } from 'zod'
 
 const envSchema = z.object({
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
+  VITE_SUPABASE_URL: z.string().url(),
+  VITE_SUPABASE_ANON_KEY: z.string(),
   SUPABASE_SECRET_KEY: z.string(),
   GITHUB_TOKEN: z.string().startsWith('ghp_'),
 })
 
 export const env = envSchema.parse({
-  NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
+  VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
   SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY,
   GITHUB_TOKEN: process.env.GITHUB_TOKEN,
 })
@@ -106,9 +107,11 @@ credentials/
 ### GitHub Actions Secrets Setup
 ```bash
 # Set secrets via GitHub CLI
-gh secret set NEXT_PUBLIC_SUPABASE_URL -b "https://your-project.supabase.co"
-gh secret set SUPABASE_SECRET_KEY -b "sb_secret_your_secret_key_here"
-gh secret set GITHUB_TOKEN -b "ghp_your_actual_token_here"
+gh secret set VITE_SUPABASE_URL -b "https://your-project.supabase.co"
+gh secret set SUPABASE_SECRET_KEY -b "your_secret_key_here"
+
+# For custom PAT (not the auto-provisioned GITHUB_TOKEN)
+gh secret set GH_PAT -b "ghp_your_personal_access_token_here"
 
 # List secrets
 gh secret list
@@ -116,6 +119,8 @@ gh secret list
 # Remove secrets
 gh secret remove OLD_SECRET
 ```
+
+**Note**: `GITHUB_TOKEN` is automatically provisioned in GitHub Actions workflows via `${{ github.token }}`. Only create a separate PAT secret (e.g., `GH_PAT`) if you need additional permissions beyond what the default token provides.
 
 ### Workflow Configuration
 ```yaml
@@ -132,10 +137,10 @@ jobs:
   lint-and-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '20'
           
@@ -152,17 +157,19 @@ jobs:
         run: pnpm run test
 ```
 
+**Note**: This repository requires pinning GitHub Actions to full commit SHAs per security policy (see ACTIONS_SHA.md).
+
 ## 📊 Environment File Templates
 
 ### Development (.env.development)
 ```bash
 NODE_ENV=development
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_your_anon_key_here
-SUPABASE_SECRET_KEY=sb_secret_your_secret_key_here
-GITHUB_TOKEN=ghp_your_actual_token_here
-ANTHROPIC_API_KEY=sk-ant-your_anthropic_key_here
-GROQ_API_KEY=gsk_your_groq_key_here
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your_public_anon_key_here
+SUPABASE_SECRET_KEY=your_secret_key_here
+GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 CLOUDFLARE_API_TOKEN=your_cloudflare_token_here
 ```
 
@@ -178,7 +185,8 @@ NODE_ENV=production
 - [ ] Use GitHub Actions Secrets for CI/CD
 - [ ] Rotate secrets regularly
 - [ ] Use principle of least privilege
-- [ ] Implement secret scanning (Dependabot)
+- [ ] Enable GitHub Secret Scanning for repository
+- [ ] Enable Dependabot alerts for dependency vulnerabilities
 - [ ] Validate environment variables at startup
 - [ ] Use environment-specific configurations
 - [ ] Document required environment variables in README
@@ -204,9 +212,9 @@ NODE_ENV=production
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| NEXT_PUBLIC_SUPABASE_URL | Supabase project URL | https://your-project.supabase.co |
-| SUPABASE_SECRET_KEY | Supabase secret key | sb_secret_your_key_here |
-| GITHUB_TOKEN | GitHub personal access token | ghp_your_token_here |
+| VITE_SUPABASE_URL | Supabase project URL (client-exposed) | https://your-project.supabase.co |
+| SUPABASE_SECRET_KEY | Supabase secret key (server-only) | your_secret_key_here |
+| GITHUB_TOKEN | GitHub personal access token (server-only) | ghp_xxxxxxxxxxxx |
 
 ## Setup Instructions
 

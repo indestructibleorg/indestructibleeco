@@ -1,0 +1,36 @@
+# Identity Consistency Rules
+# URI: indestructibleeco://tools/ci-validator/rules/identity
+
+stale_patterns:
+  - pattern: '\bsuperai\b'
+    replacement: indestructibleeco
+    description: "stale identity reference 'superai'"
+  - pattern: '\bSUPERAI_'
+    replacement: 'ECO_'
+    description: "stale env var prefix 'SUPERAI_'"
+  - pattern: '\bsuperai-platform\b'
+    replacement: indestructibleeco
+    description: "stale project name 'superai-platform'"
+
+excluded_files:
+  - tools/ci-validator/validate.py
+  - tools/ci-validator/rules/identity.yaml
+
+scan_extensions:
+  - .py
+  - .js
+  - .ts
+  - .tsx
+  - .jsx
+  - .yaml
+  - .yml
+  - .qyaml
+  - .json
+  - .toml
+  - .sh
+  - .sql
+  - .md
+  - .tpl
+  - .proto
+  - .html
+  - .css

@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "github-actions-repair-pro input",
+  "type": "object",
+  "required": ["repository", "run_id", "github_token"],
+  "properties": {
+    "repository": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+$",
+      "description": "GitHub repository (owner/repo)"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[0-9]+$",
+      "description": "Failed workflow run ID"
+    },
+    "github_token": {
+      "type": "string",
+      "minLength": 1,
+      "description": "GitHub PAT with actions and contents scope"
+    },
+    "branch": {
+      "type": "string",
+      "default": "main",
+      "description": "Target branch"
+    },
+    "workflow_file": {
+      "type": "string",
+      "default": "ci.yaml",
+      "description": "Workflow filename for re-trigger"
+    },
+    "commit_message": {
+      "type": "string",
+      "default": "fix: automated CI/CD repair",
+      "description": "Commit message for fix"
+    }
+  }
+}

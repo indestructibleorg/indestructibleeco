@@ -1,0 +1,17 @@
+# Workflow Validation Rules
+# URI: indestructibleeco://tools/ci-validator/rules/workflow
+
+required_top_level:
+  - name
+  - "on"
+  - jobs
+
+prohibited_patterns:
+  - pattern: 'python3?\s+-c\s+"'
+    message: "Inline python -c with quotes — use heredoc"
+    fix_strategy: heredoc-replacement
+  - pattern: 'continue-on-error'
+    message: "continue-on-error is prohibited — failures must halt"
+    fix_strategy: remove-continue-on-error
+
+required_checkout_method: "git clone --depth 1"

@@ -1,12 +1,12 @@
 {
   "name": "@indestructibleeco/skill-creator",
   "version": "1.0.0",
-  "description": "Skill definition, build, test, and validation toolchain",
+  "description": "Skill authoring, validation, and lifecycle management for IndestructibleEco platform automation units",
   "scripts": {
-    "build": "node scripts/build.js",
+    "init": "python3 scripts/init_skill.py",
     "validate": "node scripts/validate.js",
-    "test": "node scripts/test.js",
-    "list": "node scripts/list.js"
+    "validate:all": "node scripts/validate.js skills",
+    "validate:py": "python3 scripts/quick_validate.py"
   },
-  "license": "MIT"
+  "license": "Apache-2.0"
 }

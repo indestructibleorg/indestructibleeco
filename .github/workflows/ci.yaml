@@ -25,29 +25,30 @@ jobs:
         python3 -m py_compile backend/shared/utils/__init__.py
         echo "Python lint passed"
 
-    - name: YAML lint
+    - name: YAML governance lint
       run: |
-        echo "Validating .qyaml governance blocks..."
+        FAIL=0
         for f in $(find backend/k8s -name "*.qyaml" -type f); do
           echo "Checking $f"
           for block in document_metadata governance_info registry_binding vector_alignment_map; do
             if ! grep -q "${block}:" "$f"; then
               echo "FAIL: Missing $block in $f"
-              exit 1
+              FAIL=1
             fi
           done
           for field in unique_id uri urn target_system schema_version generated_by; do
             if ! grep -q "${field}:" "$f"; then
               echo "FAIL: Missing $field in $f"
-              exit 1
+              FAIL=1
             fi
           done
           if grep -q "%YAML" "$f"; then
             echo "FAIL: GKE-incompatible %YAML directive in $f"
-            exit 1
+            FAIL=1
           fi
           echo "  PASS: $f"
         done
+        if [ "$FAIL" -eq 1 ]; then exit 1; fi
         echo "All .qyaml files passed governance validation"
 
     - name: JS syntax check
@@ -66,35 +67,64 @@ jobs:
 
     - name: Python tests
       run: |
-        cd backend/ai
-        python3 -c "
-from src.config import Settings
-s = Settings()
-assert s.http_port == 8001
-assert s.grpc_port == 8000
-assert s.vector_dim == 1024
-assert s.alignment_model == 'quantum-bert-xxl-v1'
-assert 'v1' not in s.schema_version if hasattr(s, 'schema_version') else True
-print('Config tests passed')
-"
-        python3 -c "
-from src.governance import GovernanceEngine
-g = GovernanceEngine()
-engine = g.resolve_engine('vllm-default')
-assert engine == 'vllm_adapter'
-engine = g.resolve_engine('ollama-chat')
-assert engine == 'ollama_adapter'
-stamp = g.stamp_governance('test-svc', 'indestructibleeco', 'Deployment')
-assert stamp['document_metadata']['schema_version'] == 'v1'
-assert stamp['document_metadata']['generated_by'] == 'yaml-toolkit-v1'
-assert 'indestructibleeco://' in stamp['document_metadata']['uri']
-assert 'urn:indestructibleeco:' in stamp['document_metadata']['urn']
-assert stamp['vector_alignment_map']['alignment_model'] == 'quantum-bert-xxl-v1'
-log = g.get_audit_log()
-assert len(log) >= 2
-print('Governance engine tests passed')
-"
-        echo "All Python tests passed"
+        cat > /tmp/test_config.py << 'PYEOF'
+        import sys
+        sys.path.insert(0, '.')
+        from src.config import Settings
+        s = Settings()
+        assert s.http_port == 8001
+        assert s.grpc_port == 8000
+        assert s.vector_dim == 1024
+        assert s.alignment_model == 'quantum-bert-xxl-v1'
+        print('Config tests passed')
+        PYEOF
+        cd backend/ai && python3 /tmp/test_config.py
+
+    - name: Governance engine tests
+      run: |
+        cat > /tmp/test_governance.py << 'PYEOF'
+        import sys
+        sys.path.insert(0, '.')
+        from src.governance import GovernanceEngine
+        g = GovernanceEngine()
+        engine = g.resolve_engine('vllm-default')
+        assert engine == 'vllm_adapter', f'Expected vllm_adapter, got {engine}'
+        engine = g.resolve_engine('ollama-chat')
+        assert engine == 'ollama_adapter', f'Expected ollama_adapter, got {engine}'
+        stamp = g.stamp_governance('test-svc', 'indestructibleeco', 'Deployment')
+        assert stamp['document_metadata']['schema_version'] == 'v1'
+        assert stamp['document_metadata']['generated_by'] == 'yaml-toolkit-v1'
+        assert 'indestructibleeco://' in stamp['document_metadata']['uri']
+        assert 'urn:indestructibleeco:' in stamp['document_metadata']['urn']
+        assert stamp['vector_alignment_map']['alignment_model'] == 'quantum-bert-xxl-v1'
+        log = g.get_audit_log()
+        assert len(log) >= 2
+        print('Governance engine tests passed')
+        PYEOF
+        cd backend/ai && python3 /tmp/test_governance.py
+
+    - name: Shared utils tests
+      run: |
+        cat > /tmp/test_utils.py << 'PYEOF'
+        import sys
+        sys.path.insert(0, '.')
+        from backend.shared.utils import new_uuid, new_uuid_str, build_uri, build_urn, build_k8s_uri, build_k8s_urn, governance_stamp, build_qyaml_metadata
+        uid = new_uuid()
+        assert uid.version == 1
+        uri = build_uri('k8s', 'deployment', 'test')
+        assert uri == 'indestructibleeco://k8s/deployment/test'
+        urn = build_urn('k8s', 'deployment', 'test', uid)
+        assert 'urn:indestructibleeco:' in urn
+        stamp = governance_stamp()
+        assert stamp['schema_version'] == 'v1'
+        meta = build_qyaml_metadata('api', 'indestructibleeco', 'Deployment', 'gke-production')
+        assert 'document_metadata' in meta
+        assert 'governance_info' in meta
+        assert 'registry_binding' in meta
+        assert 'vector_alignment_map' in meta
+        print('Shared utils tests passed')
+        PYEOF
+        python3 /tmp/test_utils.py
 
     - name: YAML Toolkit tests
       run: |
@@ -103,26 +133,6 @@ print('Governance engine tests passed')
         node tools/yaml-toolkit/bin/cli.js gen --input=/tmp/toolkit-test/module.json --output=/tmp/toolkit-test
         node tools/yaml-toolkit/bin/cli.js validate /tmp/toolkit-test/test-svc.qyaml
         echo "YAML Toolkit tests passed"
-
-    - name: Shared models tests
-      run: |
-        python3 -c "
-from backend.shared.utils import new_uuid, new_uuid_str, build_uri, build_urn, build_k8s_uri, build_k8s_urn, governance_stamp, build_qyaml_metadata
-uid = new_uuid()
-assert uid.version == 1
-uri = build_uri('k8s', 'deployment', 'test')
-assert uri == 'indestructibleeco://k8s/deployment/test'
-urn = build_urn('k8s', 'deployment', 'test', uid)
-assert 'urn:indestructibleeco:' in urn
-stamp = governance_stamp()
-assert stamp['schema_version'] == 'v1'
-meta = build_qyaml_metadata('api', 'indestructibleeco', 'Deployment', 'gke-production')
-assert 'document_metadata' in meta
-assert 'governance_info' in meta
-assert 'registry_binding' in meta
-assert 'vector_alignment_map' in meta
-print('Shared utils tests passed')
-"
 
   build:
     runs-on: ubuntu-latest

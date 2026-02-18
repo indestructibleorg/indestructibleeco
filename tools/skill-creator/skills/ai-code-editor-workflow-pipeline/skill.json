@@ -1,0 +1,291 @@
+{
+  "id": "ai-code-editor-workflow-pipeline",
+  "name": "AI Code Editor Workflow Pipeline",
+  "version": "1.0.0",
+  "description": "End-to-end workflow pipeline for AI code editors implementing the 7-phase remediation cycle: Understand, Retrieve, Analyze, Reason, Remediate (Consolidate then Integrate), Validate, and Audit. Enforces root cause elimination, recursive validation, SLSA Level 3 compliance, SBOM signing, immutable audit trails, and AutoEcoOps ecosystem integration. Use when analyzing and permanently fixing AI-generated or human-written code issues with enterprise-grade traceability.",
+  "category": "code-analysis",
+  "triggers": [
+    {
+      "type": "event",
+      "config": {
+        "source": "code-review",
+        "event_type": "issue.detected",
+        "filter": "severity in ['critical', 'high', 'medium']"
+      }
+    },
+    {
+      "type": "webhook",
+      "config": {
+        "event": "pull_request.opened",
+        "filter": "contains_ai_generated_code == true"
+      }
+    },
+    {
+      "type": "event",
+      "config": {
+        "source": "monitoring",
+        "event_type": "slo.violation",
+        "filter": "service in scope"
+      }
+    },
+    {
+      "type": "manual",
+      "config": {
+        "description": "Manually trigger code analysis and remediation pipeline"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "understand",
+      "name": "Phase 1: Understand — Build Mental Model",
+      "type": "shell",
+      "config": {
+        "command": "bash actions/understand.sh",
+        "env": {
+          "TARGET_PATH": "{{ .target_path }}",
+          "PROBLEM_DESCRIPTION": "{{ .problem_description }}"
+        },
+        "timeout_seconds": 60
+      },
+      "depends_on": [],
+      "retry": { "max_attempts": 2, "backoff_ms": 1000 }
+    },
+    {
+      "id": "retrieve-code",
+      "name": "Phase 2a: Retrieve — Code Repository & Dependencies",
+      "type": "shell",
+      "config": {
+        "command": "bash actions/retrieve-code.sh",
+        "env": {
+          "TARGET_PATH": "{{ .target_path }}",
+          "REPO": "{{ .repository }}"
+        },
+        "timeout_seconds": 30
+      },
+      "depends_on": ["understand"],
+      "retry": { "max_attempts": 3, "backoff_ms": 2000 }
+    },
+    {
+      "id": "retrieve-knowledge",
+      "name": "Phase 2b: Retrieve — Knowledge Base & Documentation",
+      "type": "api",
+      "config": {
+        "method": "POST",
+        "url": "{{ .memory_hub_url }}/api/v1/search",
+        "headers": {
+          "Authorization": "Bearer {{ .auth_token }}",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "query": "{{ .problem_description }}",
+          "top_k": 10,
+          "filters": { "type": ["incident", "fix", "runbook"] }
+        },
+        "expected_status": [200]
+      },
+      "depends_on": ["understand"],
+      "retry": { "max_attempts": 2, "backoff_ms": 2000 }
+    },
+    {
+      "id": "analyze",
+      "name": "Phase 3: Analyze — Root Cause Identification",
+      "type": "shell",
+      "config": {
+        "command": "bash actions/analyze.sh",
+        "env": {
+          "TARGET_PATH": "{{ .target_path }}",
+          "UNDERSTAND_OUTPUT": "{{ .understand.output }}",
+          "RETRIEVE_OUTPUT": "{{ .retrieve-code.output }}"
+        },
+        "timeout_seconds": 120
+      },
+      "depends_on": ["retrieve-code", "retrieve-knowledge"],
+      "retry": { "max_attempts": 2, "backoff_ms": 3000 }
+    },
+    {
+      "id": "reason",
+      "name": "Phase 4: Reason — Solution Derivation",
+      "type": "shell",
+      "config": {
+        "command": "bash actions/reason.sh",
+        "env": {
+          "ANALYSIS_OUTPUT": "{{ .analyze.output }}"
+        },
+        "timeout_seconds": 60
+      },
+      "depends_on": ["analyze"],
+      "retry": { "max_attempts": 1, "backoff_ms": 1000 }
+    },
+    {
+      "id": "consolidate",
+      "name": "Phase 5a: Remediate — Consolidate Changes",
+      "type": "shell",
+      "config": {
+        "command": "bash actions/consolidate.sh",
+        "env": {
+          "SOLUTION_PLAN": "{{ .reason.output }}",
+          "TARGET_PATH": "{{ .target_path }}"
+        },
+        "timeout_seconds": 60
+      },
+      "depends_on": ["reason"],
+      "retry": { "max_attempts": 2, "backoff_ms": 2000 }
+    },
+    {
+      "id": "integrate",
+      "name": "Phase 5b: Remediate — Integrate into System",
+      "type": "shell",
+      "config": {
+        "command": "bash actions/integrate.sh",
+        "env": {
+          "CONSOLIDATED_PATCH": "{{ .consolidate.output }}",
+          "BRANCH": "{{ .branch }}",
+          "COMMIT_MSG": "{{ .commit_message }}"
+        },
+        "timeout_seconds": 60
+      },
+      "depends_on": ["consolidate"],
+      "retry": { "max_attempts": 1, "backoff_ms": 1000 }
+    },
+    {
+      "id": "validate",
+      "name": "Phase 6: Validate — Recursive Multi-Layer Verification",
+      "type": "shell",
+      "config": {
+        "command": "bash actions/validate.sh",
+        "env": {
+          "TARGET_PATH": "{{ .target_path }}",
+          "REPO": "{{ .repository }}"
+        },
+        "timeout_seconds": 180
+      },
+      "depends_on": ["integrate"],
+      "retry": { "max_attempts": 3, "backoff_ms": 5000 }
+    },
+    {
+      "id": "audit",
+      "name": "Phase 7: Audit — Compliance & Immutable Trail",
+      "type": "shell",
+      "config": {
+        "command": "bash actions/audit.sh",
+        "env": {
+          "REPO": "{{ .repository }}",
+          "COMMIT_SHA": "{{ .integrate.commit_sha }}",
+          "COMPLIANCE_MODE": "{{ .compliance_mode }}"
+        },
+        "timeout_seconds": 60
+      },
+      "depends_on": ["validate"],
+      "retry": { "max_attempts": 2, "backoff_ms": 2000 }
+    }
+  ],
+  "inputs": [
+    {
+      "name": "repository",
+      "type": "string",
+      "required": true,
+      "description": "Target repository (owner/repo)"
+    },
+    {
+      "name": "target_path",
+      "type": "string",
+      "required": true,
+      "description": "Path to the code file or directory under analysis"
+    },
+    {
+      "name": "problem_description",
+      "type": "string",
+      "required": true,
+      "description": "Description of the code issue or SLO violation"
+    },
+    {
+      "name": "auth_token",
+      "type": "string",
+      "required": true,
+      "description": "JWT token for AutoEcoOps service authentication"
+    },
+    {
+      "name": "branch",
+      "type": "string",
+      "required": false,
+      "default": "main",
+      "description": "Target branch for fix integration"
+    },
+    {
+      "name": "compliance_mode",
+      "type": "string",
+      "required": false,
+      "default": "enterprise",
+      "description": "Compliance level: enterprise (SLSA L3, SBOM, audit) or lightweight"
+    },
+    {
+      "name": "memory_hub_url",
+      "type": "string",
+      "required": false,
+      "default": "http://memory-hub.indestructibleeco.svc.cluster.local:8080",
+      "description": "Memory Hub service URL for RAG retrieval"
+    },
+    {
+      "name": "commit_message",
+      "type": "string",
+      "required": false,
+      "default": "fix: automated code remediation via ai-code-editor-workflow-pipeline",
+      "description": "Commit message for the fix"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "root_cause",
+      "type": "string",
+      "required": true,
+      "description": "Identified root cause of the code issue"
+    },
+    {
+      "name": "fix_applied",
+      "type": "boolean",
+      "required": true,
+      "description": "Whether the fix was successfully applied and integrated"
+    },
+    {
+      "name": "verification_status",
+      "type": "string",
+      "required": true,
+      "description": "Recursive validation result: success | failure | timeout"
+    },
+    {
+      "name": "audit_trail",
+      "type": "object",
+      "required": true,
+      "description": "Complete audit record with signatures and compliance tags"
+    },
+    {
+      "name": "patch_diff",
+      "type": "string",
+      "required": false,
+      "description": "Applied patch in unified diff format"
+    },
+    {
+      "name": "sbom",
+      "type": "object",
+      "required": false,
+      "description": "CycloneDX SBOM of affected components"
+    }
+  ],
+  "governance": {
+    "owner": "platform-team",
+    "approval_chain": ["platform-team", "security-team"],
+    "compliance_tags": ["slsa-l3", "sbom", "soc2", "audit-trail", "zero-trust"],
+    "lifecycle_policy": "active"
+  },
+  "metadata": {
+    "unique_id": "a1b2c3d4-e5f6-1a2b-8c3d-4e5f6a7b8c9d",
+    "uri": "indestructibleeco://skills/ai-code-editor-workflow-pipeline",
+    "urn": "urn:indestructibleeco:skills:ai-code-editor-workflow-pipeline:a1b2c3d4-e5f6-1a2b-8c3d-4e5f6a7b8c9d",
+    "schema_version": "1.0.0",
+    "target_system": "indestructibleeco-platform",
+    "generated_by": "skill-creator-v1",
+    "created_at": "2026-02-18T21:00:00Z",
+    "updated_at": "2026-02-18T21:00:00Z"
+  }
+}

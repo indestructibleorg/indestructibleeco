@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ai-code-editor-workflow-pipeline output",
+  "type": "object",
+  "required": ["root_cause", "fix_applied", "verification_status", "audit_trail"],
+  "properties": {
+    "root_cause": {
+      "type": "string",
+      "description": "Identified root cause of the code issue"
+    },
+    "fix_applied": {
+      "type": "boolean",
+      "description": "Whether the fix was successfully applied and integrated"
+    },
+    "verification_status": {
+      "type": "string",
+      "enum": ["success", "failure", "timeout"],
+      "description": "Recursive validation result"
+    },
+    "audit_trail": {
+      "type": "object",
+      "required": ["trace_id", "timestamp", "actor", "commit_sha", "compliance_tags", "governance_stamp"],
+      "properties": {
+        "trace_id": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "actor": { "type": "string" },
+        "action": { "type": "string" },
+        "repository": { "type": "string" },
+        "commit_sha": { "type": "string" },
+        "content_hash": { "type": "string", "pattern": "^sha256:" },
+        "changed_files": { "type": "array", "items": { "type": "string" } },
+        "compliance_mode": { "type": "string", "enum": ["enterprise", "lightweight"] },
+        "compliance_tags": { "type": "array", "items": { "type": "string" } },
+        "governance_stamp": {
+          "type": "object",
+          "required": ["uri", "urn", "schema_version", "generated_by"],
+          "properties": {
+            "uri": { "type": "string", "pattern": "^indestructibleeco://" },
+            "urn": { "type": "string", "pattern": "^urn:indestructibleeco:" },
+            "schema_version": { "type": "string" },
+            "generated_by": { "type": "string" }
+          }
+        },
+        "immutable_storage": {
+          "type": "object",
+          "properties": {
+            "target": { "type": "string" },
+            "retention_years": { "type": "integer", "minimum": 1 }
+          }
+        }
+      }
+    },
+    "patch_diff": {
+      "type": "string",
+      "description": "Applied patch in unified diff format"
+    },
+    "sbom": {
+      "type": "object",
+      "description": "CycloneDX SBOM of affected components",
+      "properties": {
+        "format": { "type": "string", "enum": ["CycloneDX"] },
+        "version": { "type": "string" },
+        "components": { "type": "array" }
+      }
+    }
+  }
+}

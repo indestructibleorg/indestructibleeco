@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ai-code-editor-workflow-pipeline input",
+  "type": "object",
+  "required": ["repository", "target_path", "problem_description", "auth_token"],
+  "properties": {
+    "repository": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+$",
+      "description": "GitHub repository (owner/repo)"
+    },
+    "target_path": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Path to the code file or directory under analysis"
+    },
+    "problem_description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Description of the code issue or SLO violation"
+    },
+    "auth_token": {
+      "type": "string",
+      "minLength": 1,
+      "description": "JWT token for AutoEcoOps service authentication"
+    },
+    "branch": {
+      "type": "string",
+      "default": "main",
+      "description": "Target branch for fix integration"
+    },
+    "compliance_mode": {
+      "type": "string",
+      "enum": ["enterprise", "lightweight"],
+      "default": "enterprise",
+      "description": "Compliance level"
+    },
+    "memory_hub_url": {
+      "type": "string",
+      "format": "uri",
+      "default": "http://memory-hub.indestructibleeco.svc.cluster.local:8080",
+      "description": "Memory Hub service URL for RAG retrieval"
+    },
+    "commit_message": {
+      "type": "string",
+      "default": "fix: automated code remediation via ai-code-editor-workflow-pipeline",
+      "description": "Commit message for the fix"
+    }
+  }
+}

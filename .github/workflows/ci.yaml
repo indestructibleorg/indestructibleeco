@@ -191,9 +191,9 @@ jobs:
 
     - name: Skill creator tests
       run: |
-        python3 -m pytest tools/skill-creator/skills/github-actions-repair-pro/tests/ -v --tb=short 2>/dev/null || {
+        python3 -m pytest tools/skill-creator/skills/ -v --tb=short 2>/dev/null || {
           pip install pytest -q 2>/dev/null
-          python3 -m pytest tools/skill-creator/skills/github-actions-repair-pro/tests/ -v --tb=short
+          python3 -m pytest tools/skill-creator/skills/ -v --tb=short
         }
         echo "Skill creator tests passed"
 

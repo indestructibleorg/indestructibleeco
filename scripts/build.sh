@@ -10,6 +10,18 @@ echo "╔═══════════════════════�
 echo "║     IndestructibleEco v1.0 — Build v${VERSION}              ║"
 echo "╚══════════════════════════════════════════════════════════╝"
 
+# ── Pre-build validation ──────────────────────────────────────
+echo "[0/5] Running CI Validator Engine (pre-build gate)..."
+if ! python3 tools/ci-validator/validate.py; then
+  echo "╔══════════════════════════════════════════════════════════╗"
+  echo "║  BUILD ABORTED — Validation failed                      ║"
+  echo "║  Fix all errors before building.                        ║"
+  echo "╚══════════════════════════════════════════════════════════╝"
+  exit 1
+fi
+echo "  Pre-build validation passed"
+echo ""
+
 echo "[1/5] Building API Gateway image..."
 docker build \
   -t "${REGISTRY}/api:${VERSION}" \

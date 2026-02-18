@@ -51,15 +51,26 @@ indestructibleeco/
 │   └── templates/
 ├── tools/                   # Internal tooling
 │   ├── yaml-toolkit/        # YAML Governance Toolkit v1
-│   └── skill-creator/       # Skill authoring tool
+│   ├── ci-validator/        # Centralized CI Validation Engine (7 validators)
+│   │   ├── validate.py      # Main engine — YAML, governance, identity, Dockerfile, schema, workflow, cross-ref
+│   │   ├── schemas/         # JSON schemas for artifact validation
+│   │   └── rules/           # Rule definitions (identity, governance, workflow)
+│   └── skill-creator/       # Skill authoring & lifecycle management
+│       ├── SKILL.md         # Skill definition spec
+│       ├── scripts/         # init_skill.py, quick_validate.py, validate.js
+│       ├── references/      # Workflow, output, and disclosure patterns
+│       └── skills/          # Skill manifests (github-actions-repair-pro)
 ├── scripts/                 # Build & deploy scripts
-│   ├── build.sh
-│   └── deploy.sh
+│   ├── build.sh             # Docker image build (with pre-build validation)
+│   └── deploy.sh            # K8s deployment (with pre-deploy validation)
 ├── tests/                   # Test suites
 │   ├── unit/
 │   ├── integration/
 │   └── e2e/
-├── .github/workflows/       # Per-platform CI/CD pipelines
+├── .github/workflows/       # CI/CD pipelines
+│   ├── ci.yaml              # Unified 4-gate pipeline (validate → lint → test → build)
+│   └── auto-repair.yaml     # Self-healing automation (triggered on CI failure)
+├── .circleci/config.yml     # Secondary CI pipeline (validate → lint → test)
 ├── docker-compose.yml       # Local dev stack
 └── package.json             # Workspace root
 ```
@@ -107,9 +118,43 @@ Every `.qyaml` manifest must contain these 4 mandatory blocks:
 3. **registry_binding** — service_endpoint, discovery_protocol, health_check_path, registry_ttl
 4. **vector_alignment_map** — alignment_model, coherence_vector_dim, function_keyword, contextual_binding
 
+## CI/CD Architecture
+
+### Unified 4-Gate Pipeline (`.github/workflows/ci.yaml`)
+
+| Gate | Job | Description |
+|------|-----|-------------|
+| 1 | `validate` | CI Validator Engine — 7 validators with JSON report |
+| 2 | `lint` | Python compile, JS syntax, YAML governance, skill manifests |
+| 3 | `test` | Config, governance engine, shared utils, YAML toolkit, skill tests |
+| 4 | `build` | Docker image build + repository structure verification |
+
+### CI Validator Engine (`tools/ci-validator/validate.py`)
+
+| Validator | Scope | Auto-fixable |
+|-----------|-------|-------------|
+| YAML Syntax | `*.yaml`, `*.yml`, `*.qyaml` | %YAML directives, tabs, inline python |
+| Governance Blocks | `*.qyaml` | Missing blocks/fields |
+| Identity Consistency | All source files | Stale `superai`/`SUPERAI_` references |
+| Dockerfile Paths | `Dockerfile*` | COPY path mismatches |
+| Schema Compliance | `skill.json` | Structure violations |
+| Workflow Syntax | `.github/workflows/*.yaml` | Inline `python -c`, `continue-on-error` |
+| Cross-References | `kustomization.yaml` | Missing file references |
+
+### Self-Healing Automation (`.github/workflows/auto-repair.yaml`)
+
+Triggered automatically on CI failure. Runs diagnosis via CI Validator Engine, fetches failure logs, and generates structured repair reports.
+
+### Secondary Pipeline (`.circleci/config.yml`)
+
+Mirrors GitHub Actions logic: validate → lint → test.
+
 ## Quick Start
 
 ```bash
+# Validate repository (run CI Validator Engine locally)
+python3 tools/ci-validator/validate.py
+
 # Start backend + dependencies (local dev)
 docker compose up
 
@@ -125,23 +170,15 @@ npm run dev:web
 # Validate all .qyaml manifests
 npm run yaml:lint
 
+# Validate skill manifests
+npm run skill:validate
+
 # Build all Docker images
 ./scripts/build.sh 1.0.0
 
 # Deploy to K8s
 ./scripts/deploy.sh
 ```
-
-## CI/CD Pipelines
-
-| Workflow | Trigger | Target |
-|----------|---------|--------|
-| `ci.yaml` | push/PR to main | Lint + Test + Build |
-| `deploy-backend.yml` | push main — backend/** | GKE via kubectl |
-| `deploy-web.yml` | push main — platforms/web/** | Cloudflare Pages |
-| `deploy-desktop.yml` | tag v*.*.* | GitHub Releases |
-| `deploy-im-integration.yml` | push main — platforms/im-integration/** | Cloudflare Workers + K8s |
-| `yaml-lint.yml` | PR — **.qyaml | Governance validation |
 
 ## API Endpoints
 

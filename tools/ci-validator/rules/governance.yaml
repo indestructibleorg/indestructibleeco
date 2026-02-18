@@ -1,0 +1,42 @@
+# Governance Validation Rules
+# URI: indestructibleeco://tools/ci-validator/rules/governance
+
+required_blocks:
+  - document_metadata
+  - governance_info
+  - registry_binding
+  - vector_alignment_map
+
+required_fields:
+  document_metadata:
+    - unique_id
+    - uri
+    - urn
+    - target_system
+    - schema_version
+    - generated_by
+    - created_at
+  governance_info:
+    - owner
+    - approval_chain
+    - compliance_tags
+    - lifecycle_policy
+  registry_binding:
+    - service_endpoint
+    - discovery_protocol
+    - health_check_path
+    - registry_ttl
+  vector_alignment_map:
+    - alignment_model
+    - coherence_vector_dim
+    - function_keyword
+    - contextual_binding
+
+uri_scheme: "indestructibleeco://"
+urn_scheme: "urn:indestructibleeco:"
+schema_version: v1
+generated_by: yaml-toolkit-v1
+
+prohibited:
+  - "%YAML directive (GKE incompatible)"
+  - "schema_version > v1"

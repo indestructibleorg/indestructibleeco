@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IndestructibleEco Skill Manifest Schema",
+  "description": "Schema for skill.json manifests within the IndestructibleEco platform",
+  "type": "object",
+  "required": ["id", "name", "version", "description", "category", "triggers", "actions", "inputs", "outputs", "governance", "metadata"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$",
+      "maxLength": 64,
+      "description": "Unique kebab-case identifier"
+    },
+    "name": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+" },
+    "description": { "type": "string", "minLength": 1 },
+    "category": {
+      "type": "string",
+      "enum": ["ci-cd-repair", "code-generation", "code-analysis", "deployment", "monitoring", "security", "testing"]
+    },
+    "triggers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": { "type": "string", "enum": ["webhook", "schedule", "event", "manual"] },
+          "config": { "type": "object" }
+        }
+      }
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "type"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "name": { "type": "string" },
+          "type": { "type": "string", "enum": ["shell", "api", "transform", "validate", "deploy"] },
+          "config": { "type": "object" },
+          "depends_on": { "type": "array", "items": { "type": "string" } },
+          "retry": {
+            "type": "object",
+            "properties": {
+              "max_attempts": { "type": "integer", "minimum": 0 },
+              "backoff_ms": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type"],
+        "properties": {
+          "name": { "type": "string" },
+          "type": { "type": "string", "enum": ["string", "number", "boolean", "object", "array"] },
+          "required": { "type": "boolean" },
+          "default": {},
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type"],
+        "properties": {
+          "name": { "type": "string" },
+          "type": { "type": "string", "enum": ["string", "number", "boolean", "object", "array"] },
+          "required": { "type": "boolean" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "required": ["owner", "approval_chain", "compliance_tags", "lifecycle_policy"],
+      "properties": {
+        "owner": { "type": "string", "minLength": 1 },
+        "approval_chain": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "compliance_tags": { "type": "array", "items": { "type": "string" } },
+        "lifecycle_policy": { "type": "string", "enum": ["active", "deprecated", "sunset", "archived"] }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["unique_id", "uri", "urn", "schema_version", "generated_by", "created_at"],
+      "properties": {
+        "unique_id": { "type": "string" },
+        "uri": { "type": "string", "pattern": "^indestructibleeco://" },
+        "urn": { "type": "string", "pattern": "^urn:indestructibleeco:" },
+        "schema_version": { "type": "string" },
+        "target_system": { "type": "string" },
+        "generated_by": { "type": "string" },
+        "created_at": { "type": "string" },
+        "updated_at": { "type": "string" }
+      }
+    }
+  }
+}

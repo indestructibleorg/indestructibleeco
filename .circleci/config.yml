@@ -1,18 +1,30 @@
 # IndestructibleEco v1.0 — CircleCI Configuration
 # URI: indestructibleeco://ci/circleci
-# Note: Primary CI/CD is GitHub Actions (.github/workflows/ci.yaml)
-#       This CircleCI config is a secondary/fallback pipeline.
+# Secondary pipeline — mirrors GitHub Actions validation logic
 
 version: 2.1
 
 jobs:
-  lint-and-test:
+  validate:
     docker:
       - image: cimg/python:3.11-node
     steps:
       - checkout
       - run:
-          name: "Python lint"
+          name: "CI Validator Engine"
+          command: |
+            python3 tools/ci-validator/validate.py --report=/tmp/validation-report.json
+      - store_artifacts:
+          path: /tmp/validation-report.json
+          destination: validation-report.json
+
+  lint:
+    docker:
+      - image: cimg/python:3.11-node
+    steps:
+      - checkout
+      - run:
+          name: "Python compile check"
           command: |
             python3 -m py_compile backend/ai/src/app.py
             python3 -m py_compile backend/ai/src/config.py
@@ -20,11 +32,13 @@ jobs:
             python3 -m py_compile backend/ai/src/governance.py
             python3 -m py_compile backend/shared/models/__init__.py
             python3 -m py_compile backend/shared/utils/__init__.py
-            echo "Python lint passed"
+            python3 -m py_compile tools/ci-validator/validate.py
+            echo "Python compile check passed"
       - run:
           name: "JS syntax check"
           command: |
             node --check tools/yaml-toolkit/bin/cli.js
+            node --check tools/skill-creator/scripts/validate.js
             echo "JS syntax check passed"
       - run:
           name: "YAML governance lint"
@@ -34,15 +48,87 @@ jobs:
               echo "Checking $f"
               for block in document_metadata governance_info registry_binding vector_alignment_map; do
                 if ! grep -q "${block}:" "$f"; then
-                  echo "FAIL: Missing $block in $f"
+                  echo "  FAIL: Missing $block in $f"
                   FAIL=1
                 fi
               done
             done
             if [ "$FAIL" -eq 1 ]; then exit 1; fi
             echo "All .qyaml files passed governance validation"
+      - run:
+          name: "Skill manifest validation"
+          command: |
+            node tools/skill-creator/scripts/validate.js tools/skill-creator/skills
+            echo "Skill manifest validation passed"
+
+  test:
+    docker:
+      - image: cimg/python:3.11-node
+    steps:
+      - checkout
+      - run:
+          name: "Config tests"
+          command: |
+            cat > /tmp/test_config.py << 'PYEOF'
+            import sys
+            sys.path.insert(0, '.')
+            from src.config import Settings
+            s = Settings()
+            assert s.http_port == 8001
+            assert s.grpc_port == 8000
+            assert s.vector_dim == 1024
+            assert s.alignment_model == 'quantum-bert-xxl-v1'
+            print('Config tests passed')
+            PYEOF
+            cd backend/ai && python3 /tmp/test_config.py
+      - run:
+          name: "Governance engine tests"
+          command: |
+            cat > /tmp/test_governance.py << 'PYEOF'
+            import sys
+            sys.path.insert(0, '.')
+            from src.governance import GovernanceEngine
+            g = GovernanceEngine()
+            engine = g.resolve_engine('vllm-default')
+            assert engine == 'vllm_adapter', f'Expected vllm_adapter, got {engine}'
+            stamp = g.stamp_governance('test-svc', 'indestructibleeco', 'Deployment')
+            assert stamp['document_metadata']['schema_version'] == 'v1'
+            assert 'indestructibleeco://' in stamp['document_metadata']['uri']
+            print('Governance engine tests passed')
+            PYEOF
+            cd backend/ai && python3 /tmp/test_governance.py
+      - run:
+          name: "Shared utils tests"
+          command: |
+            cat > /tmp/test_utils.py << 'PYEOF'
+            import sys
+            sys.path.insert(0, '.')
+            from backend.shared.utils import new_uuid, build_uri, build_urn, governance_stamp, build_qyaml_metadata
+            uid = new_uuid()
+            assert uid.version == 1
+            uri = build_uri('k8s', 'deployment', 'test')
+            assert uri == 'indestructibleeco://k8s/deployment/test'
+            stamp = governance_stamp()
+            assert stamp['schema_version'] == 'v1'
+            meta = build_qyaml_metadata('api', 'indestructibleeco', 'Deployment', 'gke-production')
+            assert 'document_metadata' in meta
+            print('Shared utils tests passed')
+            PYEOF
+            python3 /tmp/test_utils.py
+      - run:
+          name: "YAML Toolkit tests"
+          command: |
+            mkdir -p /tmp/toolkit-test
+            echo '{"name":"test-svc","image":"ghcr.io/test:v1","replicas":2,"ports":[3000],"depends_on":["redis"]}' > /tmp/toolkit-test/module.json
+            node tools/yaml-toolkit/bin/cli.js gen --input=/tmp/toolkit-test/module.json --output=/tmp/toolkit-test
+            node tools/yaml-toolkit/bin/cli.js validate /tmp/toolkit-test/test-svc.qyaml
+            echo "YAML Toolkit tests passed"
 
 workflows:
   indestructibleeco-ci:
     jobs:
-      - lint-and-test
+      - validate
+      - lint:
+          requires: [validate]
+      - test:
+          requires: [lint]

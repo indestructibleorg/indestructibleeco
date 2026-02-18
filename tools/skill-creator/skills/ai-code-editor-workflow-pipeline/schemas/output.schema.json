@@ -1,0 +1,138 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ai-code-editor-workflow-pipeline output",
+  "type": "object",
+  "required": ["root_cause", "fix_applied", "verification_status", "audit_trail"],
+  "minProperties": 4,
+  "properties": {
+    "root_cause": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identified root cause of the code issue"
+    },
+    "fix_applied": {
+      "type": "boolean",
+      "description": "Whether the fix was successfully applied and integrated"
+    },
+    "verification_status": {
+      "type": "string",
+      "enum": ["success", "failure", "timeout"],
+      "description": "Recursive validation result"
+    },
+    "audit_trail": {
+      "type": "object",
+      "description": "Complete audit record with signatures and compliance tags",
+      "required": ["trace_id", "timestamp", "actor", "commit_sha", "compliance_tags", "governance_stamp"],
+      "properties": {
+        "trace_id": {
+          "type": "string",
+          "description": "Unique trace identifier for the remediation run"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of the audit record"
+        },
+        "actor": {
+          "type": "string",
+          "description": "Identity of the actor that performed the remediation"
+        },
+        "action": {
+          "type": "string",
+          "description": "Action performed during remediation"
+        },
+        "repository": {
+          "type": "string",
+          "description": "Target repository (owner/repo)"
+        },
+        "commit_sha": {
+          "type": "string",
+          "description": "Git commit SHA of the applied fix"
+        },
+        "content_hash": {
+          "type": "string",
+          "pattern": "^sha256:",
+          "description": "SHA-256 content hash of the patch"
+        },
+        "changed_files": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of files modified by the fix"
+        },
+        "compliance_mode": {
+          "type": "string",
+          "enum": ["enterprise", "lightweight"],
+          "description": "Compliance level used for this run"
+        },
+        "compliance_tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Compliance tags applied to this audit record"
+        },
+        "governance_stamp": {
+          "type": "object",
+          "description": "Governance identity stamp for traceability",
+          "required": ["uri", "urn", "schema_version", "generated_by"],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "pattern": "^indestructibleeco://",
+              "description": "IndestructibleEco URI for this skill"
+            },
+            "urn": {
+              "type": "string",
+              "pattern": "^urn:indestructibleeco:",
+              "description": "IndestructibleEco URN for this skill"
+            },
+            "schema_version": {
+              "type": "string",
+              "description": "Schema version of the governance stamp"
+            },
+            "generated_by": {
+              "type": "string",
+              "description": "Tool that generated this governance stamp"
+            }
+          }
+        },
+        "immutable_storage": {
+          "type": "object",
+          "description": "Immutable storage configuration for audit retention",
+          "properties": {
+            "target": {
+              "type": "string",
+              "description": "Storage target for immutable audit records"
+            },
+            "retention_years": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Number of years to retain audit records"
+            }
+          }
+        }
+      }
+    },
+    "patch_diff": {
+      "type": "string",
+      "description": "Applied patch in unified diff format"
+    },
+    "sbom": {
+      "type": "object",
+      "description": "CycloneDX SBOM of affected components",
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": ["CycloneDX"],
+          "description": "SBOM format identifier"
+        },
+        "version": {
+          "type": "string",
+          "description": "SBOM specification version"
+        },
+        "components": {
+          "type": "array",
+          "description": "List of affected software components"
+        }
+      }
+    }
+  }
+}

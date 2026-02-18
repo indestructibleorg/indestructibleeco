@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "github-actions-repair-pro output",
+  "type": "object",
+  "required": ["root_cause", "fix_applied", "verification_status"],
+  "properties": {
+    "root_cause": {
+      "type": "string",
+      "description": "Identified root cause of failure"
+    },
+    "fix_applied": {
+      "type": "boolean",
+      "description": "Whether fix was successfully applied"
+    },
+    "verification_status": {
+      "type": "string",
+      "enum": ["success", "failure", "timeout"],
+      "description": "Post-fix verification result"
+    },
+    "patch_diff": {
+      "type": "string",
+      "description": "Applied patch in unified diff format"
+    },
+    "commit_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{7,40}$",
+      "description": "SHA of the fix commit"
+    },
+    "error_taxonomy": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": ["yaml-syntax", "dockerfile-path", "identity-drift", "governance-missing", "schema-violation", "dependency-resolution", "runner-compatibility"]
+        },
+        "severity": { "type": "string", "enum": ["error", "warning"] },
+        "file": { "type": "string" },
+        "line": { "type": "integer", "minimum": 1 },
+        "message": { "type": "string" },
+        "auto_fixable": { "type": "boolean" },
+        "fix_strategy": { "type": "string" }
+      }
+    }
+  }
+}

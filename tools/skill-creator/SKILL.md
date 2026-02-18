@@ -1,10 +1,25 @@
-# Skill Definition Format v1.0
+---
+name: skill-creator
+description: Skill authoring, validation, and lifecycle management for IndestructibleEco platform automation units. Use when creating, updating, or validating skills that extend platform CI/CD, governance, inference routing, or deployment capabilities.
+license: Apache-2.0
+---
 
-## Overview
+# Skill Creator
 
-A **Skill** is a self-contained, declarative automation unit within the IndestructibleEco platform. Each skill defines triggers, actions, inputs, outputs, and governance metadata in a single JSON manifest.
+Skill authoring and lifecycle management for IndestructibleEco platform automation units.
 
-## File Structure
+## About Skills
+
+Skills are modular, self-contained automation packages within the IndestructibleEco platform. Each skill defines triggers, actions, inputs, outputs, and governance metadata in a single JSON manifest (`skill.json`). Skills execute as DAGs — actions run in dependency order with retry, rollback, and audit trail.
+
+### What Skills Provide
+
+1. **Automated workflows** — Multi-step procedures triggered by events, schedules, or manual dispatch
+2. **Tool integrations** — Shell commands, API calls, data transforms, schema validation, deployment operations
+3. **Governance compliance** — Every skill carries UUID v1 identifiers, URI/URN dual identification, and compliance tags
+4. **Self-healing loops** — Skills can detect failures, diagnose root causes, apply patches, and verify fixes
+
+## Skill Structure
 
 ```
 skills/<skill-name>/
@@ -16,9 +31,8 @@ skills/<skill-name>/
 ├── schemas/            # Input/output JSON schemas
 │   ├── input.schema.json
 │   └── output.schema.json
-├── tests/              # Skill test cases
-│   └── test_skill.py
-└── README.md           # Skill documentation
+└── tests/              # Skill test cases
+    └── test_skill.py
 ```
 
 ## Manifest Schema (skill.json)
@@ -71,9 +85,11 @@ skills/<skill-name>/
   },
   "metadata": {
     "unique_id": "UUID v1",
+    "uri": "indestructibleeco://skills/<skill-id>",
+    "urn": "urn:indestructibleeco:skills:<skill-id>:<uuid>",
     "schema_version": "1.0.0",
     "target_system": "string",
-    "generated_by": "string",
+    "generated_by": "skill-creator-v1",
     "created_at": "ISO 8601",
     "updated_at": "ISO 8601"
   }
@@ -98,9 +114,75 @@ skills/<skill-name>/
 4. Outputs are captured and stored as artifacts
 5. Governance metadata is attached to all artifacts
 
+## Skill Creation Process
+
+1. Define skill scope and action DAG
+2. Initialize skill directory (`scripts/init_skill.py <skill-name>`)
+3. Implement action scripts in `actions/`
+4. Define input/output schemas in `schemas/`
+5. Write `skill.json` manifest
+6. Validate (`scripts/quick_validate.py <skill-name>`)
+7. Test with real inputs
+8. Iterate until all actions pass end-to-end
+
+## Design Patterns
+
+### Sequential Workflows
+
+For multi-step processes, define explicit dependency chains:
+
+```json
+{
+  "actions": [
+    { "id": "understand", "depends_on": [] },
+    { "id": "retrieve", "depends_on": ["understand"] },
+    { "id": "analyze", "depends_on": ["retrieve"] },
+    { "id": "reason", "depends_on": ["analyze"] },
+    { "id": "repair", "depends_on": ["reason"] },
+    { "id": "verify", "depends_on": ["repair"] }
+  ]
+}
+```
+
+### Parallel Retrieval
+
+When multiple data sources are independent, parallelize:
+
+```json
+{
+  "actions": [
+    { "id": "understand", "depends_on": [] },
+    { "id": "retrieve-logs", "depends_on": ["understand"] },
+    { "id": "retrieve-workflow", "depends_on": ["understand"] },
+    { "id": "analyze", "depends_on": ["retrieve-logs", "retrieve-workflow"] }
+  ]
+}
+```
+
+### Self-Healing Loop
+
+For automated repair skills, include verification:
+
+```json
+{
+  "actions": [
+    { "id": "diagnose", "depends_on": [] },
+    { "id": "patch", "depends_on": ["diagnose"] },
+    { "id": "verify", "depends_on": ["patch"] },
+    { "id": "monitor", "depends_on": ["verify"] }
+  ]
+}
+```
+
+## References
+
+- `references/workflows.md` — Sequential and conditional workflow patterns
+- `references/output-patterns.md` — Template and example output patterns
+- `references/progressive-disclosure-patterns.md` — Content splitting strategies
+
 ## Lifecycle
 
-- `active`: Skill is available for execution
-- `deprecated`: Skill works but users should migrate
-- `sunset`: Skill will be removed in next major version
-- `archived`: Skill is read-only, cannot be executed
+- `active` — Skill is available for execution
+- `deprecated` — Skill works but users should migrate
+- `sunset` — Skill will be removed in next major version
+- `archived` — Skill is read-only, cannot be executed

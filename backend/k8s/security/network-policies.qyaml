@@ -1,0 +1,115 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: indestructibleeco
+  labels:
+    generated-by: yaml-toolkit-v1
+    unique-id: "6ba7b819-9dad-11d1-80b4-00c04fd430c8"
+  annotations:
+    indestructibleeco/uri: "indestructibleeco://k8s/indestructibleeco/networkpolicy/default-deny-all"
+    indestructibleeco/urn: "urn:indestructibleeco:k8s:indestructibleeco:networkpolicy:default-deny-all:6ba7b819-9dad-11d1-80b4-00c04fd430c8"
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-ingress
+  namespace: indestructibleeco
+  labels:
+    generated-by: yaml-toolkit-v1
+spec:
+  podSelector:
+    matchLabels:
+      app: api
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-to-ai
+  namespace: indestructibleeco
+  labels:
+    generated-by: yaml-toolkit-v1
+spec:
+  podSelector:
+    matchLabels:
+      app: ai
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: api
+    ports:
+    - protocol: TCP
+      port: 8000
+    - protocol: TCP
+      port: 8001
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-dns-redis
+  namespace: indestructibleeco
+  labels:
+    generated-by: yaml-toolkit-v1
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  - to:
+    - podSelector:
+        matchLabels:
+          app: redis
+    ports:
+    - protocol: TCP
+      port: 6379
+---
+# YAML Toolkit v1 — Governance Block (auto-generated, manual editing prohibited)
+document_metadata:
+  unique_id: "6ba7b819-9dad-11d1-80b4-00c04fd430c8"
+  uri: "indestructibleeco://k8s/indestructibleeco/networkpolicy/default-deny-all"
+  urn: "urn:indestructibleeco:k8s:indestructibleeco:networkpolicy:default-deny-all:6ba7b819-9dad-11d1-80b4-00c04fd430c8"
+  target_system: gke-production
+  cross_layer_binding: [api-service, ai-service, redis, ingress-nginx]
+  schema_version: v1
+  generated_by: yaml-toolkit-v1
+  created_at: "2025-02-18T00:00:00.000Z"
+governance_info:
+  owner: security-team
+  approval_chain: [security-team, platform-team]
+  compliance_tags: [zero-trust, soc2, network-isolation]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "n/a"
+  discovery_protocol: k8s-dns
+  health_check_path: "n/a"
+  registry_ttl: 0
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [network-policy, zero-trust, isolation, deny-all]
+  contextual_binding: "network-policies -> [api-service, ai-service, redis, ingress-nginx]"

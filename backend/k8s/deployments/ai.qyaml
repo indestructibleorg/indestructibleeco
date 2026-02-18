@@ -1,0 +1,121 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-service
+  namespace: indestructibleeco
+  labels:
+    app: ai
+    tier: backend
+    generated-by: yaml-toolkit-v1
+    unique-id: "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
+  annotations:
+    indestructibleeco/uri: "indestructibleeco://k8s/indestructibleeco/deployment/ai-service"
+    indestructibleeco/urn: "urn:indestructibleeco:k8s:indestructibleeco:deployment:ai-service:6ba7b811-9dad-11d1-80b4-00c04fd430c8"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ai
+  template:
+    metadata:
+      labels:
+        app: ai
+        version: v1.0.0
+    spec:
+      serviceAccountName: ai-sa
+      containers:
+      - name: ai
+        image: ghcr.io/indestructibleorg/ai:v1.0.0
+        ports:
+        - containerPort: 8000
+          name: grpc
+        - containerPort: 8001
+          name: http
+        env:
+        - name: AI_MODELS
+          valueFrom:
+            configMapKeyRef:
+              name: ai-config
+              key: models
+        - name: REDIS_URL
+          value: "redis://redis-svc.indestructibleeco.svc.cluster.local:6379"
+        - name: VECTOR_DIM
+          value: "1024"
+        - name: ALIGNMENT_MODEL
+          value: "quantum-bert-xxl-v1"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: "2"
+            memory: 4Gi
+            nvidia.com/gpu: "1"
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ai-service-hpa
+  namespace: indestructibleeco
+  labels:
+    generated-by: yaml-toolkit-v1
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ai-service
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 60
+  - type: Pods
+    pods:
+      metric:
+        name: ai_queue_depth
+      target:
+        type: AverageValue
+        averageValue: "5"
+---
+# YAML Toolkit v1 — Governance Block (auto-generated, manual editing prohibited)
+document_metadata:
+  unique_id: "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
+  uri: "indestructibleeco://k8s/indestructibleeco/deployment/ai-service"
+  urn: "urn:indestructibleeco:k8s:indestructibleeco:deployment:ai-service:6ba7b811-9dad-11d1-80b4-00c04fd430c8"
+  target_system: gke-production
+  cross_layer_binding: [redis, supabase, vllm, ollama]
+  schema_version: v1
+  generated_by: yaml-toolkit-v1
+  created_at: "2025-02-18T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team, ml-team]
+  compliance_tags: [zero-trust, soc2, internal, gpu-workload]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "http://ai-service.indestructibleeco.svc.cluster.local:8001"
+  discovery_protocol: consul
+  health_check_path: "/health"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [ai, inference, generation, vector-alignment, grpc]
+  contextual_binding: "ai-service -> [redis, supabase, vllm, ollama]"

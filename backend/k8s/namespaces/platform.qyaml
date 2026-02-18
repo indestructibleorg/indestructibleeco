@@ -1,0 +1,71 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: indestructibleeco
+  labels:
+    generated-by: yaml-toolkit-v1
+    unique-id: "550e8400-e29b-41d4-a716-446655440000"
+  annotations:
+    indestructibleeco/uri: "indestructibleeco://k8s/cluster/namespace/indestructibleeco"
+    indestructibleeco/urn: "urn:indestructibleeco:k8s:cluster:namespace:indestructibleeco:550e8400-e29b-41d4-a716-446655440000"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: platform-quota
+  namespace: indestructibleeco
+  labels:
+    generated-by: yaml-toolkit-v1
+spec:
+  hard:
+    requests.cpu: "16"
+    requests.memory: 32Gi
+    limits.cpu: "32"
+    limits.memory: 64Gi
+    pods: "100"
+    services: "20"
+    persistentvolumeclaims: "20"
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: platform-limits
+  namespace: indestructibleeco
+  labels:
+    generated-by: yaml-toolkit-v1
+spec:
+  limits:
+  - default:
+      cpu: 500m
+      memory: 512Mi
+    defaultRequest:
+      cpu: 100m
+      memory: 256Mi
+    type: Container
+---
+# YAML Toolkit v1 — Governance Block (auto-generated, manual editing prohibited)
+document_metadata:
+  unique_id: "550e8400-e29b-41d4-a716-446655440000"
+  uri: "indestructibleeco://k8s/cluster/namespace/indestructibleeco"
+  urn: "urn:indestructibleeco:k8s:cluster:namespace:indestructibleeco:550e8400-e29b-41d4-a716-446655440000"
+  target_system: gke-production
+  cross_layer_binding: []
+  schema_version: v1
+  generated_by: yaml-toolkit-v1
+  created_at: "2025-02-18T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team]
+  compliance_tags: [zero-trust, soc2, internal]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "http://indestructibleeco.default.svc.cluster.local"
+  discovery_protocol: consul
+  health_check_path: "/health"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [namespace, platform, cluster]
+  contextual_binding: "indestructibleeco -> []"

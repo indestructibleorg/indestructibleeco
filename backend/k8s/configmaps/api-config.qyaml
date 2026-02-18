@@ -1,0 +1,75 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-config
+  namespace: indestructibleeco
+  labels:
+    generated-by: yaml-toolkit-v1
+    unique-id: "6ba7b815-9dad-11d1-80b4-00c04fd430c8"
+  annotations:
+    indestructibleeco/uri: "indestructibleeco://k8s/indestructibleeco/configmap/api-config"
+    indestructibleeco/urn: "urn:indestructibleeco:k8s:indestructibleeco:configmap:api-config:6ba7b815-9dad-11d1-80b4-00c04fd430c8"
+data:
+  NODE_ENV: "production"
+  PORT: "3000"
+  LOG_LEVEL: "info"
+  LOG_FORMAT: "json"
+  CORS_ORIGINS: "https://app.indestructibleeco.io,https://indestructibleeco.io"
+  RATE_LIMIT_AUTHENTICATED: "100"
+  RATE_LIMIT_PUBLIC: "10"
+  RATE_LIMIT_WINDOW_MS: "60000"
+  AI_SERVICE_GRPC: "ai-svc.indestructibleeco.svc.cluster.local:8000"
+  AI_SERVICE_HTTP: "http://ai-svc.indestructibleeco.svc.cluster.local:8001"
+  CONSUL_ENDPOINT: "http://consul.indestructibleeco.svc.cluster.local:8500"
+  JAEGER_ENDPOINT: "http://jaeger.indestructibleeco.svc.cluster.local:14268/api/traces"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ai-config
+  namespace: indestructibleeco
+  labels:
+    generated-by: yaml-toolkit-v1
+    unique-id: "6ba7b816-9dad-11d1-80b4-00c04fd430c8"
+  annotations:
+    indestructibleeco/uri: "indestructibleeco://k8s/indestructibleeco/configmap/ai-config"
+    indestructibleeco/urn: "urn:indestructibleeco:k8s:indestructibleeco:configmap:ai-config:6ba7b816-9dad-11d1-80b4-00c04fd430c8"
+data:
+  models: "vllm,ollama,tgi,sglang"
+  VECTOR_DIM: "1024"
+  ALIGNMENT_MODEL: "quantum-bert-xxl-v1"
+  ALIGNMENT_TOLERANCE: "0.001"
+  CELERY_BROKER: "redis://redis-svc.indestructibleeco.svc.cluster.local:6379/0"
+  CELERY_BACKEND: "redis://redis-svc.indestructibleeco.svc.cluster.local:6379/1"
+  GRPC_PORT: "8000"
+  HTTP_PORT: "8001"
+  LOG_LEVEL: "info"
+  CONSUL_ENDPOINT: "http://consul.indestructibleeco.svc.cluster.local:8500"
+  JAEGER_ENDPOINT: "http://jaeger.indestructibleeco.svc.cluster.local:14268/api/traces"
+---
+# YAML Toolkit v1 — Governance Block (auto-generated, manual editing prohibited)
+document_metadata:
+  unique_id: "6ba7b815-9dad-11d1-80b4-00c04fd430c8"
+  uri: "indestructibleeco://k8s/indestructibleeco/configmap/api-config"
+  urn: "urn:indestructibleeco:k8s:indestructibleeco:configmap:api-config:6ba7b815-9dad-11d1-80b4-00c04fd430c8"
+  target_system: gke-production
+  cross_layer_binding: [api-service, ai-service, consul, jaeger]
+  schema_version: v1
+  generated_by: yaml-toolkit-v1
+  created_at: "2025-02-18T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team]
+  compliance_tags: [zero-trust, internal]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "http://api-config.indestructibleeco.svc.cluster.local"
+  discovery_protocol: consul
+  health_check_path: "/health"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [configmap, configuration, environment]
+  contextual_binding: "api-config -> [api-service, ai-service, consul, jaeger]"

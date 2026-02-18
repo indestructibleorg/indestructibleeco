@@ -1,0 +1,116 @@
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+  labels:
+    generated-by: yaml-toolkit-v1
+    unique-id: "6ba7b81c-9dad-11d1-80b4-00c04fd430c8"
+  annotations:
+    indestructibleeco/uri: "indestructibleeco://k8s/cluster/clusterissuer/letsencrypt-prod"
+    indestructibleeco/urn: "urn:indestructibleeco:k8s:cluster:clusterissuer:letsencrypt-prod:6ba7b81c-9dad-11d1-80b4-00c04fd430c8"
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: platform-team@indestructibleeco.io
+    privateKeySecretRef:
+      name: letsencrypt-prod-key
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: indestructibleeco-mtls-ca
+  namespace: indestructibleeco
+  labels:
+    generated-by: yaml-toolkit-v1
+  annotations:
+    indestructibleeco/uri: "indestructibleeco://k8s/indestructibleeco/certificate/mtls-ca"
+spec:
+  isCA: true
+  commonName: indestructibleeco-mtls-ca
+  secretName: mtls-ca-secret
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
+  duration: 8760h
+  renewBefore: 720h
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: api-service-mtls
+  namespace: indestructibleeco
+  labels:
+    generated-by: yaml-toolkit-v1
+    app: api
+spec:
+  secretName: api-mtls-cert
+  duration: 2160h
+  renewBefore: 360h
+  commonName: api-service.indestructibleeco.svc.cluster.local
+  dnsNames:
+  - api-service
+  - api-service.indestructibleeco
+  - api-service.indestructibleeco.svc
+  - api-service.indestructibleeco.svc.cluster.local
+  - api-svc.indestructibleeco.svc.cluster.local
+  issuerRef:
+    name: indestructibleeco-mtls-ca
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ai-service-mtls
+  namespace: indestructibleeco
+  labels:
+    generated-by: yaml-toolkit-v1
+    app: ai
+spec:
+  secretName: ai-mtls-cert
+  duration: 2160h
+  renewBefore: 360h
+  commonName: ai-service.indestructibleeco.svc.cluster.local
+  dnsNames:
+  - ai-service
+  - ai-service.indestructibleeco
+  - ai-service.indestructibleeco.svc
+  - ai-service.indestructibleeco.svc.cluster.local
+  - ai-svc.indestructibleeco.svc.cluster.local
+  issuerRef:
+    name: indestructibleeco-mtls-ca
+    kind: Issuer
+---
+# YAML Toolkit v1 — Governance Block (auto-generated, manual editing prohibited)
+document_metadata:
+  unique_id: "6ba7b81c-9dad-11d1-80b4-00c04fd430c8"
+  uri: "indestructibleeco://k8s/cluster/clusterissuer/letsencrypt-prod"
+  urn: "urn:indestructibleeco:k8s:cluster:clusterissuer:letsencrypt-prod:6ba7b81c-9dad-11d1-80b4-00c04fd430c8"
+  target_system: gke-production
+  cross_layer_binding: [cert-manager, api-service, ai-service, ingress-nginx]
+  schema_version: v1
+  generated_by: yaml-toolkit-v1
+  created_at: "2025-02-18T00:00:00.000Z"
+governance_info:
+  owner: security-team
+  approval_chain: [security-team, platform-team]
+  compliance_tags: [zero-trust, soc2, mtls, encryption-in-transit]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "n/a"
+  discovery_protocol: k8s-dns
+  health_check_path: "n/a"
+  registry_ttl: 0
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [mtls, certificate, tls, encryption, cert-manager, spiffe]
+  contextual_binding: "mtls -> [cert-manager, api-service, ai-service, ingress-nginx]"

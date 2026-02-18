@@ -1,154 +1,83 @@
+# IndestructibleEco v1.0 — Local Development Stack
+# URI: indestructibleeco://root/docker-compose
+# Usage: docker compose up
+
 version: "3.9"
 
 services:
-  # ── Core Data Stores ──────────────────────────────────────
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: indestructibleeco
-      POSTGRES_USER: eco_admin
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-eco_dev_secret}
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U eco_admin -d indestructibleeco"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:7-alpine
-    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
-    ports:
-      - "6379:6379"
-    volumes:
-      - redisdata:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # ── Search & Index ────────────────────────────────────────
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ports:
-      - "9200:9200"
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
-      interval: 15s
-      timeout: 10s
-      retries: 5
-
-  neo4j:
-    image: neo4j:5-community
-    environment:
-      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-eco_graph_secret}
-      NEO4J_PLUGINS: '["apoc"]'
-    ports:
-      - "7474:7474"
-      - "7687:7687"
-    volumes:
-      - neo4jdata:/data
-    healthcheck:
-      test: ["CMD-SHELL", "cypher-shell -u neo4j -p ${NEO4J_PASSWORD:-eco_graph_secret} 'RETURN 1' || exit 1"]
-      interval: 15s
-      timeout: 10s
-      retries: 5
-
-  # ── Message Queue ─────────────────────────────────────────
-  kafka:
-    image: confluentinc/cp-kafka:7.7.0
-    environment:
-      KAFKA_NODE_ID: 1
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:29093
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:29093
-      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      CLUSTER_ID: "indestructibleeco-kafka-001"
-    ports:
-      - "9092:9092"
-    volumes:
-      - kafkadata:/var/lib/kafka/data
-
-  # ── Backend Services ──────────────────────────────────────
+  # ─── Backend API (Node.js Express) ───
   api:
     build:
-      context: .
-      dockerfile: backend/services/api/Dockerfile
+      context: ./backend/api
+      dockerfile: Dockerfile
+    container_name: eco-api
     ports:
       - "3000:3000"
     environment:
       NODE_ENV: development
-      DATABASE_URL: postgresql://eco_admin:${POSTGRES_PASSWORD:-eco_dev_secret}@postgres:5432/indestructibleeco
+      PORT: "3000"
       REDIS_URL: redis://redis:6379
-      ELASTICSEARCH_URL: http://elasticsearch:9200
-      NEO4J_URL: bolt://neo4j:7687
-      KAFKA_BROKERS: kafka:9092
+      AI_SERVICE_GRPC: ai:8000
+      AI_SERVICE_HTTP: http://ai:8001
+      SUPABASE_URL: ${SUPABASE_URL:-}
+      SUPABASE_KEY: ${SUPABASE_KEY:-}
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
+      CONSUL_ENDPOINT: http://consul:8500
+      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - redis
+      - ai
+    restart: unless-stopped
 
+  # ─── Backend AI (Python FastAPI) ───
   ai:
     build:
-      context: .
-      dockerfile: backend/services/ai/Dockerfile
+      context: ./backend/ai
+      dockerfile: Dockerfile
+    container_name: eco-ai
     ports:
       - "8000:8000"
+      - "8001:8001"
     environment:
-      ENVIRONMENT: development
-      DATABASE_URL: postgresql://eco_admin:${POSTGRES_PASSWORD:-eco_dev_secret}@postgres:5432/indestructibleeco
+      HTTP_PORT: "8001"
+      GRPC_PORT: "8000"
       REDIS_URL: redis://redis:6379
-      ELASTICSEARCH_URL: http://elasticsearch:9200
-      NEO4J_URI: bolt://neo4j:7687
-      KAFKA_BROKERS: kafka:9092
-      FAISS_INDEX_PATH: /data/faiss
-    volumes:
-      - faissdata:/data/faiss
+      CELERY_BROKER: redis://redis:6379/0
+      CELERY_BACKEND: redis://redis:6379/1
+      VECTOR_DIM: "1024"
+      ALIGNMENT_MODEL: quantum-bert-xxl-v1
+      AI_MODELS: vllm,ollama,tgi,sglang
+      CONSUL_ENDPOINT: http://consul:8500
+      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - redis
+    restart: unless-stopped
 
-  worker:
-    build:
-      context: .
-      dockerfile: backend/services/worker/Dockerfile
+  # ─── Redis ───
+  redis:
+    image: redis:7-alpine
+    container_name: eco-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    restart: unless-stopped
+
+  # ─── PostgreSQL (Supabase local) ───
+  postgres:
+    image: postgres:16-alpine
+    container_name: eco-postgres
+    ports:
+      - "5432:5432"
     environment:
-      NODE_ENV: development
-      DATABASE_URL: postgresql://eco_admin:${POSTGRES_PASSWORD:-eco_dev_secret}@postgres:5432/indestructibleeco
-      REDIS_URL: redis://redis:6379
-      KAFKA_BROKERS: kafka:9092
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      kafka:
-        condition: service_started
+      POSTGRES_DB: indestructibleeco
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
 
 volumes:
-  pgdata:
-  redisdata:
-  esdata:
-  neo4jdata:
-  kafkadata:
-  faissdata:
-
-networks:
-  default:
-    name: indestructibleeco-network
+  redis-data:
+  postgres-data:

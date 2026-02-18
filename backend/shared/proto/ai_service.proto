@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package indestructibleeco.ai;
+
+option go_package = "github.com/indestructibleorg/indestructibleeco/backend/shared/proto";
+
+service AIService {
+  rpc GenerateContent (GenerateRequest) returns (GenerateResponse);
+  rpc StreamGenerate  (GenerateRequest) returns (stream GenerateChunk);
+  rpc VectorAlign     (VectorRequest)   returns (VectorResponse);
+  rpc HealthCheck     (Empty)           returns (HealthStatus);
+}
+
+message Empty {}
+
+message GenerateRequest {
+  string prompt         = 1;
+  string model_id       = 2;
+  map<string,string> params = 3;
+  int32 max_tokens      = 4;
+  float temperature     = 5;
+  float top_p           = 6;
+}
+
+message GenerateResponse {
+  string request_id     = 1;
+  string content        = 2;
+  string model_id       = 3;
+  UsageInfo usage       = 4;
+  string finish_reason  = 5;
+}
+
+message GenerateChunk {
+  string request_id     = 1;
+  string delta          = 2;
+  int32 index           = 3;
+  string finish_reason  = 4;
+}
+
+message VectorRequest {
+  repeated string tokens = 1;
+  int32 target_dim       = 2;
+  string alignment_model = 3;
+  float tolerance        = 4;
+}
+
+message VectorResponse {
+  repeated float coherence_vector = 1;
+  int32 dimension                 = 2;
+  string alignment_model          = 3;
+  float alignment_score           = 4;
+  repeated string function_keywords = 5;
+}
+
+message UsageInfo {
+  int32 prompt_tokens     = 1;
+  int32 completion_tokens = 2;
+  int32 total_tokens      = 3;
+}
+
+message HealthStatus {
+  string service_name = 1;
+  string status       = 2;
+  string version      = 3;
+  int64 uptime_seconds = 4;
+  map<string,string> components = 5;
+}

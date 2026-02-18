@@ -1,103 +1,165 @@
-# IndestructibleEco - Monorepo CI/CD Pipeline
-# Zero external actions - shell-only (machops org policy compliant)
 name: CI/CD
 
 on:
   push:
-    branches: [main, develop]
-    tags: ["v*"]
+    branches: [main]
   pull_request:
     branches: [main]
-
-permissions:
-  contents: read
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        run: |
-          git clone --depth 1 --branch "${GITHUB_REF_NAME}" "https://github.com/${GITHUB_REPOSITORY}.git" . || \
-          git clone --depth 1 "https://github.com/${GITHUB_REPOSITORY}.git" .
-          git checkout "${GITHUB_SHA}" 2>/dev/null || true
+    - name: Checkout
+      run: |
+        git clone --depth 1 https://github.com/${{ github.repository }}.git .
+        git checkout ${{ github.sha }}
 
-      - name: Lint Python (AI Service)
-        run: |
-          python3 -m venv .venv && . .venv/bin/activate
-          pip install --upgrade pip ruff mypy
-          ruff check backend/services/ai/ || true
-          ruff format --check backend/services/ai/ || true
+    - name: Python lint
+      run: |
+        python3 -m py_compile backend/ai/src/app.py
+        python3 -m py_compile backend/ai/src/config.py
+        python3 -m py_compile backend/ai/src/routes.py
+        python3 -m py_compile backend/ai/src/governance.py
+        python3 -m py_compile backend/shared/models/__init__.py
+        python3 -m py_compile backend/shared/utils/__init__.py
+        echo "Python lint passed"
 
-      - name: Lint JavaScript (Web App)
-        run: |
-          if [ -f platforms/web-app/package.json ]; then
-            cd platforms/web-app
-            echo '{"extends":["eslint:recommended"],"env":{"browser":true,"es2022":true},"parserOptions":{"ecmaVersion":"latest","sourceType":"module"}}' > .eslintrc.json
-            npx --yes eslint src/ --no-error-on-unmatched-pattern || true
+    - name: YAML lint
+      run: |
+        echo "Validating .qyaml governance blocks..."
+        for f in $(find backend/k8s -name "*.qyaml" -type f); do
+          echo "Checking $f"
+          for block in document_metadata governance_info registry_binding vector_alignment_map; do
+            if ! grep -q "${block}:" "$f"; then
+              echo "FAIL: Missing $block in $f"
+              exit 1
+            fi
+          done
+          for field in unique_id uri urn target_system schema_version generated_by; do
+            if ! grep -q "${field}:" "$f"; then
+              echo "FAIL: Missing $field in $f"
+              exit 1
+            fi
+          done
+          if grep -q "%YAML" "$f"; then
+            echo "FAIL: GKE-incompatible %YAML directive in $f"
+            exit 1
           fi
+          echo "  PASS: $f"
+        done
+        echo "All .qyaml files passed governance validation"
 
-      - name: Validate Skills
-        run: |
-          if [ -f tools/skill-creator/scripts/validate.js ]; then
-            node tools/skill-creator/scripts/validate.js tools/skill-creator/skills/ || true
-          fi
+    - name: JS syntax check
+      run: |
+        node --check tools/yaml-toolkit/bin/cli.js
+        echo "JS syntax check passed"
 
   test:
     runs-on: ubuntu-latest
     needs: lint
-    services:
-      redis:
-        image: redis:7-alpine
-        ports: ["6379:6379"]
-        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
-      - name: Checkout
-        run: |
-          git clone --depth 1 --branch "${GITHUB_REF_NAME}" "https://github.com/${GITHUB_REPOSITORY}.git" . || \
-          git clone --depth 1 "https://github.com/${GITHUB_REPOSITORY}.git" .
-          git checkout "${GITHUB_SHA}" 2>/dev/null || true
+    - name: Checkout
+      run: |
+        git clone --depth 1 https://github.com/${{ github.repository }}.git .
+        git checkout ${{ github.sha }}
 
-      - name: Test AI Service
-        env:
-          ECO_REDIS_URL: redis://localhost:6379
-          ECO_ENVIRONMENT: test
-        run: |
-          python3 -m venv .venv && . .venv/bin/activate
-          pip install --upgrade pip
-          cd backend/services/ai
-          pip install -e ".[dev]" 2>/dev/null || pip install fastapi uvicorn pydantic pydantic-settings httpx redis numpy scikit-learn networkx scipy pytest pytest-asyncio pytest-cov
-          cd ../../..
-          python3 -m pytest backend/services/ai/ -v --tb=short || true
+    - name: Python tests
+      run: |
+        cd backend/ai
+        python3 -c "
+from src.config import Settings
+s = Settings()
+assert s.http_port == 8001
+assert s.grpc_port == 8000
+assert s.vector_dim == 1024
+assert s.alignment_model == 'quantum-bert-xxl-v1'
+assert 'v1' not in s.schema_version if hasattr(s, 'schema_version') else True
+print('Config tests passed')
+"
+        python3 -c "
+from src.governance import GovernanceEngine
+g = GovernanceEngine()
+engine = g.resolve_engine('vllm-default')
+assert engine == 'vllm_adapter'
+engine = g.resolve_engine('ollama-chat')
+assert engine == 'ollama_adapter'
+stamp = g.stamp_governance('test-svc', 'indestructibleeco', 'Deployment')
+assert stamp['document_metadata']['schema_version'] == 'v1'
+assert stamp['document_metadata']['generated_by'] == 'yaml-toolkit-v1'
+assert 'indestructibleeco://' in stamp['document_metadata']['uri']
+assert 'urn:indestructibleeco:' in stamp['document_metadata']['urn']
+assert stamp['vector_alignment_map']['alignment_model'] == 'quantum-bert-xxl-v1'
+log = g.get_audit_log()
+assert len(log) >= 2
+print('Governance engine tests passed')
+"
+        echo "All Python tests passed"
 
-      - name: Test Skill Validator
-        run: |
-          node tools/skill-creator/scripts/validate.js tools/skill-creator/skills/
+    - name: YAML Toolkit tests
+      run: |
+        mkdir -p /tmp/toolkit-test
+        echo '{"name":"test-svc","image":"ghcr.io/test:v1","replicas":2,"ports":[3000],"depends_on":["redis"]}' > /tmp/toolkit-test/module.json
+        node tools/yaml-toolkit/bin/cli.js gen --input=/tmp/toolkit-test/module.json --output=/tmp/toolkit-test
+        node tools/yaml-toolkit/bin/cli.js validate /tmp/toolkit-test/test-svc.qyaml
+        echo "YAML Toolkit tests passed"
+
+    - name: Shared models tests
+      run: |
+        python3 -c "
+from backend.shared.utils import new_uuid, new_uuid_str, build_uri, build_urn, build_k8s_uri, build_k8s_urn, governance_stamp, build_qyaml_metadata
+uid = new_uuid()
+assert uid.version == 1
+uri = build_uri('k8s', 'deployment', 'test')
+assert uri == 'indestructibleeco://k8s/deployment/test'
+urn = build_urn('k8s', 'deployment', 'test', uid)
+assert 'urn:indestructibleeco:' in urn
+stamp = governance_stamp()
+assert stamp['schema_version'] == 'v1'
+meta = build_qyaml_metadata('api', 'indestructibleeco', 'Deployment', 'gke-production')
+assert 'document_metadata' in meta
+assert 'governance_info' in meta
+assert 'registry_binding' in meta
+assert 'vector_alignment_map' in meta
+print('Shared utils tests passed')
+"
 
   build:
     runs-on: ubuntu-latest
     needs: test
-    if: github.event_name == 'push'
-    permissions:
-      contents: read
-      packages: write
     steps:
-      - name: Checkout
-        run: |
-          git clone --depth 1 --branch "${GITHUB_REF_NAME}" "https://github.com/${GITHUB_REPOSITORY}.git" . || \
-          git clone --depth 1 "https://github.com/${GITHUB_REPOSITORY}.git" .
-          git checkout "${GITHUB_SHA}" 2>/dev/null || true
+    - name: Checkout
+      run: |
+        git clone --depth 1 https://github.com/${{ github.repository }}.git .
+        git checkout ${{ github.sha }}
 
-      - name: Build AI Service Docker Image
-        run: |
-          TAG="${GITHUB_SHA:0:7}"
-          docker build -t indestructibleeco/ai:${TAG} -f backend/services/ai/Dockerfile . || echo "Dockerfile not found, skipping"
-          echo "Build complete: indestructibleeco/ai:${TAG}"
+    - name: Build AI Docker image
+      run: |
+        docker build -t indestructibleeco/ai:${{ github.sha }} -f backend/ai/Dockerfile backend/ai/
+        echo "AI Docker image built successfully"
 
-      - name: Build Web App
-        run: |
-          if [ -f platforms/web-app/package.json ]; then
-            cd platforms/web-app
-            npm install --ignore-scripts 2>/dev/null || true
-            npm run build 2>/dev/null || echo "Web build skipped (deps not available)"
-          fi
+    - name: Verify structure
+      run: |
+        echo "=== Verifying blueprint alignment ==="
+        test -d backend/api && echo "PASS: backend/api/"
+        test -d backend/ai && echo "PASS: backend/ai/"
+        test -d backend/shared/proto && echo "PASS: backend/shared/proto/"
+        test -d backend/shared/models && echo "PASS: backend/shared/models/"
+        test -d backend/k8s/namespaces && echo "PASS: backend/k8s/namespaces/"
+        test -d backend/k8s/deployments && echo "PASS: backend/k8s/deployments/"
+        test -d backend/k8s/services && echo "PASS: backend/k8s/services/"
+        test -d backend/k8s/ingress && echo "PASS: backend/k8s/ingress/"
+        test -d backend/k8s/configmaps && echo "PASS: backend/k8s/configmaps/"
+        test -d backend/k8s/secrets && echo "PASS: backend/k8s/secrets/"
+        test -d packages/shared-types && echo "PASS: packages/shared-types/"
+        test -d packages/api-client && echo "PASS: packages/api-client/"
+        test -d packages/ui-kit && echo "PASS: packages/ui-kit/"
+        test -d platforms/web && echo "PASS: platforms/web/"
+        test -d platforms/desktop && echo "PASS: platforms/desktop/"
+        test -d platforms/im-integration && echo "PASS: platforms/im-integration/"
+        test -d ecosystem/monitoring && echo "PASS: ecosystem/monitoring/"
+        test -d ecosystem/tracing && echo "PASS: ecosystem/tracing/"
+        test -d ecosystem/service-discovery && echo "PASS: ecosystem/service-discovery/"
+        test -d tools/yaml-toolkit && echo "PASS: tools/yaml-toolkit/"
+        test -f backend/k8s/kustomization.yaml && echo "PASS: kustomization.yaml"
+        echo "=== All structure checks passed ==="

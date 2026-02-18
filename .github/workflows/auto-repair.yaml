@@ -1,0 +1,80 @@
+name: Auto-Repair on CI Failure
+
+on:
+  workflow_run:
+    workflows: ["IndestructibleEco CI/CD"]
+    types: [completed]
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  diagnose-and-repair:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.head_branch == 'main' }}
+    steps:
+    - name: Checkout
+      run: |
+        git clone https://github.com/${{ github.repository }}.git .
+        git checkout main
+
+    - name: Configure git
+      run: |
+        git config user.name "eco-auto-repair[bot]"
+        git config user.email "auto-repair@indestructibleeco.io"
+
+    - name: Run CI Validator Engine (diagnostic mode)
+      id: diagnose
+      run: |
+        python3 tools/ci-validator/validate.py --report=/tmp/diagnosis.json 2>&1 || true
+        if [ -f /tmp/diagnosis.json ]; then
+          cat > /tmp/extract_errors.py << 'PYEOF'
+        import json
+        d = json.load(open("/tmp/diagnosis.json"))
+        print(d["error_count"])
+        PYEOF
+          ERROR_COUNT=$(python3 /tmp/extract_errors.py)
+          echo "error_count=${ERROR_COUNT}" >> "$GITHUB_OUTPUT"
+          echo "Diagnosis complete: ${ERROR_COUNT} errors found"
+          cat > /tmp/extract_fixable.py << 'PYEOF'
+        import json
+        d = json.load(open("/tmp/diagnosis.json"))
+        fixable = [f for f in d["findings"] if f.get("auto_fixable") and f["severity"] == "error"]
+        print(f"Auto-fixable errors: {len(fixable)}")
+        for f in fixable:
+            print(f"  [{f['category']}] {f['file']}:L{f['line']} -- {f['message']} (strategy: {f['fix_strategy']})")
+        PYEOF
+          python3 /tmp/extract_fixable.py 2>/dev/null || echo "No auto-fixable errors detected"
+        else
+          echo "error_count=0" >> "$GITHUB_OUTPUT"
+          echo "Validator did not produce a report — CI failure may be in build/test phase"
+        fi
+
+    - name: Fetch failure logs
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        RUN_ID=${{ github.event.workflow_run.id }}
+        echo "Fetching logs for run ${RUN_ID}..."
+        gh api "repos/${{ github.repository }}/actions/runs/${RUN_ID}/jobs" \
+          --jq '.jobs[] | select(.conclusion=="failure") | {name, conclusion, steps: [.steps[] | select(.conclusion=="failure") | {name, conclusion, number}]}' \
+          > /tmp/failed-jobs.json 2>/dev/null || echo "[]" > /tmp/failed-jobs.json
+        echo "=== Failed Jobs ==="
+        cat /tmp/failed-jobs.json
+
+    - name: Generate repair report
+      if: always()
+      run: |
+        cat > /tmp/repair-report.json << REPORTEOF
+        {
+          "trigger_run_id": "${{ github.event.workflow_run.id }}",
+          "trigger_sha": "${{ github.event.workflow_run.head_sha }}",
+          "trigger_branch": "${{ github.event.workflow_run.head_branch }}",
+          "diagnosis_errors": ${{ steps.diagnose.outputs.error_count || 0 }},
+          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "status": "diagnosed"
+        }
+        REPORTEOF
+        echo "=== Repair Report ==="
+        cat /tmp/repair-report.json | python3 -m json.tool

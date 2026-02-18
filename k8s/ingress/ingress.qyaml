@@ -1,12 +1,12 @@
-# SuperAI Platform - Ingress & TLS
+# IndestructibleEco v1.0 - Ingress & TLS
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: superai-ingress
-  namespace: superai
+  name: eco-ingress
+  namespace: indestructibleeco
   labels:
-    app.kubernetes.io/name: superai-ingress
-    app.kubernetes.io/part-of: superai
+    app.kubernetes.io/name: eco-ingress
+    app.kubernetes.io/part-of: indestructibleeco
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "100m"
@@ -34,21 +34,21 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - api.superai.platform
-        - grafana.superai.platform
-      secretName: superai-tls
+        - api.indestructibleeco.io
+        - grafana.indestructibleeco.io
+      secretName: eco-tls
   rules:
-    - host: api.superai.platform
+    - host: api.indestructibleeco.io
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: superai-api-svc
+                name: eco-api-svc
                 port:
                   number: 8000
-    - host: grafana.superai.platform
+    - host: grafana.indestructibleeco.io
       http:
         paths:
           - path: /
@@ -63,12 +63,12 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: superai-network-policy
-  namespace: superai
+  name: eco-network-policy
+  namespace: indestructibleeco
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/part-of: superai
+      app.kubernetes.io/part-of: indestructibleeco
   policyTypes:
     - Ingress
     - Egress
@@ -76,7 +76,7 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: superai
+              kubernetes.io/metadata.name: indestructibleeco
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: ingress-nginx
@@ -84,7 +84,7 @@ spec:
     - to:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: superai
+              kubernetes.io/metadata.name: indestructibleeco
     - to: # Allow external access for model downloads
         - ipBlock:
             cidr: 0.0.0.0/0
@@ -97,3 +97,29 @@ spec:
           protocol: TCP
         - port: 80
           protocol: TCP
+---
+# YAML Toolkit v1 — Governance Block (auto-generated, manual editing prohibited)
+document_metadata:
+  unique_id: "eco-ig-0001-0001-000000000001"
+  uri: "indestructibleeco://k8s/indestructibleeco/ingress/main-ingress"
+  urn: "urn:indestructibleeco:k8s:indestructibleeco:ingress:main-ingress:eco-ig-0001-0001-000000000001"
+  target_system: gke-production
+  cross_layer_binding: [api-gateway, grafana, cert-manager]
+  schema_version: v1
+  generated_by: yaml-toolkit-v1
+  created_at: "2025-02-18T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team, security-team]
+  compliance_tags: [zero-trust, soc2, tls-required, edge]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "https://api.indestructibleeco.io"
+  discovery_protocol: consul
+  health_check_path: "/health"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [ingress, tls, routing, nginx, edge, cors]
+  contextual_binding: "main-ingress -> [api-gateway, grafana, cert-manager]"

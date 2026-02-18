@@ -1,5 +1,7 @@
-# ── SuperAI Platform - Docker Compose ────────────────────────────
-# Full stack: API Gateway + Engines + Infrastructure
+# IndestructibleEco v1.0 — Full Production Stack
+# URI: indestructibleeco://docker/compose/production
+# Usage: cd docker && docker compose up
+# Context: repository root (..)
 
 version: "3.9"
 
@@ -12,28 +14,28 @@ x-common: &common
       max-file: "5"
 
 services:
-  # ── API Gateway ──────────────────────────────────────────────
+  # ── API Gateway (Python FastAPI) ────────────────────────────────────
   api-gateway:
     <<: *common
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    container_name: superai-api
+    container_name: eco-api-gateway
     ports:
       - "8000:8000"
     environment:
-      - SUPERAI_ENVIRONMENT=production
-      - SUPERAI_LOG_LEVEL=INFO
-      - SUPERAI_REDIS_HOST=redis
-      - SUPERAI_POSTGRES_HOST=postgres
-      - SUPERAI_VLLM_HOST=vllm
-      - SUPERAI_VLLM_PORT=8001
-      - SUPERAI_TGI_HOST=tgi
-      - SUPERAI_TGI_PORT=8002
-      - SUPERAI_SGLANG_HOST=sglang
-      - SUPERAI_SGLANG_PORT=8003
-      - SUPERAI_OLLAMA_HOST=ollama
-      - SUPERAI_OLLAMA_PORT=11434
+      - ECO_ENVIRONMENT=production
+      - ECO_LOG_LEVEL=INFO
+      - ECO_REDIS_HOST=redis
+      - ECO_POSTGRES_HOST=postgres
+      - ECO_VLLM_HOST=vllm
+      - ECO_VLLM_PORT=8001
+      - ECO_TGI_HOST=tgi
+      - ECO_TGI_PORT=8002
+      - ECO_SGLANG_HOST=sglang
+      - ECO_SGLANG_PORT=8003
+      - ECO_OLLAMA_HOST=ollama
+      - ECO_OLLAMA_PORT=11434
     env_file:
       - ../.env
     depends_on:
@@ -42,7 +44,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - superai-net
+      - eco-net
     healthcheck:
       test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/health').raise_for_status()"]
       interval: 30s
@@ -50,14 +52,14 @@ services:
       retries: 3
       start_period: 30s
 
-  # ── vLLM Engine ──────────────────────────────────────────────
+  # ── vLLM Engine ─────────────────────────────────────────────────────
   vllm:
     <<: *common
     build:
       context: ..
       dockerfile: docker/Dockerfile.gpu
       target: vllm
-    container_name: superai-vllm
+    container_name: eco-vllm
     ports:
       - "8001:8001"
     volumes:
@@ -73,13 +75,13 @@ services:
               count: 1
               capabilities: [gpu]
     networks:
-      - superai-net
+      - eco-net
 
-  # ── TGI Engine ───────────────────────────────────────────────
+  # ── TGI Engine ──────────────────────────────────────────────────────
   tgi:
     <<: *common
     image: ghcr.io/huggingface/text-generation-inference:2.4.1
-    container_name: superai-tgi
+    container_name: eco-tgi
     ports:
       - "8002:8002"
     volumes:
@@ -99,16 +101,16 @@ services:
               count: 1
               capabilities: [gpu]
     networks:
-      - superai-net
+      - eco-net
 
-  # ── SGLang Engine ────────────────────────────────────────────
+  # ── SGLang Engine ───────────────────────────────────────────────────
   sglang:
     <<: *common
     build:
       context: ..
       dockerfile: docker/Dockerfile.gpu
       target: sglang
-    container_name: superai-sglang
+    container_name: eco-sglang
     ports:
       - "8003:8003"
     volumes:
@@ -123,13 +125,13 @@ services:
               count: 1
               capabilities: [gpu]
     networks:
-      - superai-net
+      - eco-net
 
-  # ── Ollama Engine ────────────────────────────────────────────
+  # ── Ollama Engine ───────────────────────────────────────────────────
   ollama:
     <<: *common
     image: ollama/ollama:latest
-    container_name: superai-ollama
+    container_name: eco-ollama
     ports:
       - "11434:11434"
     volumes:
@@ -142,13 +144,13 @@ services:
               count: 1
               capabilities: [gpu]
     networks:
-      - superai-net
+      - eco-net
 
-  # ── Redis ────────────────────────────────────────────────────
+  # ── Redis ───────────────────────────────────────────────────────────
   redis:
     <<: *common
     image: redis:7-alpine
-    container_name: superai-redis
+    container_name: eco-redis
     ports:
       - "6379:6379"
     volumes:
@@ -160,34 +162,34 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - superai-net
+      - eco-net
 
-  # ── PostgreSQL ───────────────────────────────────────────────
+  # ── PostgreSQL ──────────────────────────────────────────────────────
   postgres:
     <<: *common
     image: postgres:16-alpine
-    container_name: superai-postgres
+    container_name: eco-postgres
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=superai
-      - POSTGRES_PASSWORD=superai_secret
-      - POSTGRES_DB=superai
+      - POSTGRES_USER=indestructibleeco
+      - POSTGRES_PASSWORD=${ECO_POSTGRES_PASSWORD:-eco_secret}
+      - POSTGRES_DB=indestructibleeco
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U superai"]
+      test: ["CMD-SHELL", "pg_isready -U indestructibleeco"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - superai-net
+      - eco-net
 
-  # ── Prometheus ───────────────────────────────────────────────
+  # ── Prometheus ──────────────────────────────────────────────────────
   prometheus:
     <<: *common
     image: prom/prometheus:v2.54.0
-    container_name: superai-prometheus
+    container_name: eco-prometheus
     ports:
       - "9090:9090"
     volumes:
@@ -198,24 +200,24 @@ services:
       - "--storage.tsdb.retention.time=30d"
       - "--web.enable-lifecycle"
     networks:
-      - superai-net
+      - eco-net
 
-  # ── Grafana ──────────────────────────────────────────────────
+  # ── Grafana ─────────────────────────────────────────────────────────
   grafana:
     <<: *common
     image: grafana/grafana:11.2.0
-    container_name: superai-grafana
+    container_name: eco-grafana
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=superai_admin
+      - GF_SECURITY_ADMIN_PASSWORD=${ECO_SECRET_KEY:-eco_admin}
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
     networks:
-      - superai-net
+      - eco-net
 
 volumes:
   model-cache:
@@ -232,7 +234,7 @@ volumes:
     driver: local
 
 networks:
-  superai-net:
+  eco-net:
     driver: bridge
     ipam:
       config:

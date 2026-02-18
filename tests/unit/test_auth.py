@@ -23,7 +23,7 @@ class TestAuthMiddleware:
             role=UserRole.DEVELOPER,
             rate_limit_per_minute=100,
         ))
-        assert result.key.startswith("sk-superai-")
+        assert result.key.startswith("sk-eco-")
         assert result.info.name == "test-key"
         assert result.info.role == UserRole.DEVELOPER
         assert result.info.is_active is True
@@ -35,7 +35,7 @@ class TestAuthMiddleware:
         assert key_data["name"] == "validate-test"
 
     def test_validate_invalid_key(self, auth):
-        key_data = auth.validate_api_key("sk-superai-invalid-key-12345")
+        key_data = auth.validate_api_key("sk-eco-invalid-key-12345")
         assert key_data is None
 
     def test_revoke_api_key(self, auth):

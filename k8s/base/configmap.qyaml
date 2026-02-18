@@ -1,61 +1,87 @@
-# SuperAI Platform - ConfigMaps
+# IndestructibleEco v1.0 - ConfigMaps
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: superai-config
-  namespace: superai
+  name: eco-config
+  namespace: indestructibleeco
   labels:
-    app.kubernetes.io/name: superai-platform
+    app.kubernetes.io/name: indestructibleeco-platform
 data:
-  SUPERAI_ENVIRONMENT: "production"
-  SUPERAI_LOG_LEVEL: "INFO"
-  SUPERAI_HOST: "0.0.0.0"
-  SUPERAI_PORT: "8000"
-  SUPERAI_WORKERS: "4"
-  SUPERAI_DEFAULT_ENGINE: "vllm"
-  SUPERAI_ENGINE_TIMEOUT_SECONDS: "120"
-  SUPERAI_MAX_CONCURRENT_REQUESTS: "256"
-  SUPERAI_REQUEST_QUEUE_SIZE: "4096"
-  SUPERAI_VLLM_HOST: "vllm-svc"
-  SUPERAI_VLLM_PORT: "8001"
-  SUPERAI_VLLM_GPU_MEMORY_UTILIZATION: "0.90"
-  SUPERAI_VLLM_MAX_MODEL_LEN: "32768"
-  SUPERAI_VLLM_TENSOR_PARALLEL_SIZE: "1"
-  SUPERAI_TGI_HOST: "tgi-svc"
-  SUPERAI_TGI_PORT: "8002"
-  SUPERAI_SGLANG_HOST: "sglang-svc"
-  SUPERAI_SGLANG_PORT: "8003"
-  SUPERAI_OLLAMA_HOST: "ollama-svc"
-  SUPERAI_OLLAMA_PORT: "11434"
-  SUPERAI_TENSORRT_HOST: "tensorrt-svc"
-  SUPERAI_TENSORRT_PORT: "8004"
-  SUPERAI_LMDEPLOY_HOST: "lmdeploy-svc"
-  SUPERAI_LMDEPLOY_PORT: "8005"
-  SUPERAI_REDIS_HOST: "redis-svc"
-  SUPERAI_REDIS_PORT: "6379"
-  SUPERAI_POSTGRES_HOST: "postgres-svc"
-  SUPERAI_POSTGRES_PORT: "5432"
-  SUPERAI_POSTGRES_DB: "superai"
-  SUPERAI_MODEL_CACHE_DIR: "/models"
-  SUPERAI_DEFAULT_MODEL: "meta-llama/Llama-3.1-8B-Instruct"
-  SUPERAI_VISION_MODEL: "Qwen/Qwen2.5-VL-7B-Instruct"
-  SUPERAI_WHISPER_MODEL: "openai/whisper-large-v3-turbo"
-  SUPERAI_EMBEDDING_MODEL: "BAAI/bge-large-en-v1.5"
-  SUPERAI_VECTOR_DB_HOST: "milvus-svc"
-  SUPERAI_VECTOR_DB_PORT: "19530"
-  SUPERAI_ENABLE_TRACING: "true"
+  ECO_ENVIRONMENT: "production"
+  ECO_LOG_LEVEL: "INFO"
+  ECO_HOST: "0.0.0.0"
+  ECO_PORT: "8000"
+  ECO_WORKERS: "4"
+  ECO_DEFAULT_ENGINE: "vllm"
+  ECO_ENGINE_TIMEOUT_SECONDS: "120"
+  ECO_MAX_CONCURRENT_REQUESTS: "256"
+  ECO_REQUEST_QUEUE_SIZE: "4096"
+  ECO_VLLM_HOST: "vllm-svc"
+  ECO_VLLM_PORT: "8001"
+  ECO_VLLM_GPU_MEMORY_UTILIZATION: "0.90"
+  ECO_VLLM_MAX_MODEL_LEN: "32768"
+  ECO_VLLM_TENSOR_PARALLEL_SIZE: "1"
+  ECO_TGI_HOST: "tgi-svc"
+  ECO_TGI_PORT: "8002"
+  ECO_SGLANG_HOST: "sglang-svc"
+  ECO_SGLANG_PORT: "8003"
+  ECO_OLLAMA_HOST: "ollama-svc"
+  ECO_OLLAMA_PORT: "11434"
+  ECO_TENSORRT_HOST: "tensorrt-svc"
+  ECO_TENSORRT_PORT: "8004"
+  ECO_LMDEPLOY_HOST: "lmdeploy-svc"
+  ECO_LMDEPLOY_PORT: "8005"
+  ECO_REDIS_HOST: "redis-svc"
+  ECO_REDIS_PORT: "6379"
+  ECO_POSTGRES_HOST: "postgres-svc"
+  ECO_POSTGRES_PORT: "5432"
+  ECO_POSTGRES_DB: "indestructibleeco"
+  ECO_MODEL_CACHE_DIR: "/models"
+  ECO_DEFAULT_MODEL: "meta-llama/Llama-3.1-8B-Instruct"
+  ECO_VISION_MODEL: "Qwen/Qwen2.5-VL-7B-Instruct"
+  ECO_WHISPER_MODEL: "openai/whisper-large-v3-turbo"
+  ECO_EMBEDDING_MODEL: "BAAI/bge-large-en-v1.5"
+  ECO_VECTOR_DB_HOST: "milvus-svc"
+  ECO_VECTOR_DB_PORT: "19530"
+  ECO_ENABLE_TRACING: "true"
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: superai-secrets
-  namespace: superai
+  name: eco-secrets
+  namespace: indestructibleeco
   labels:
-    app.kubernetes.io/name: superai-platform
+    app.kubernetes.io/name: indestructibleeco-platform
 type: Opaque
 stringData:
-  SUPERAI_SECRET_KEY: "k8s-production-change-me-openssl-rand-hex-32"
-  SUPERAI_POSTGRES_USER: "superai"
-  SUPERAI_POSTGRES_PASSWORD: "superai_secret_k8s"
-  SUPERAI_REDIS_PASSWORD: ""
+  ECO_SECRET_KEY: "k8s-production-change-me-openssl-rand-hex-32"
+  ECO_POSTGRES_USER: "indestructibleeco"
+  ECO_POSTGRES_PASSWORD: "eco_secret_k8s"
+  ECO_REDIS_PASSWORD: ""
   HF_TOKEN: ""
+---
+# YAML Toolkit v1 — Governance Block (auto-generated, manual editing prohibited)
+document_metadata:
+  unique_id: "eco-cm-0001-0001-000000000001"
+  uri: "indestructibleeco://k8s/indestructibleeco/configmap/eco-config"
+  urn: "urn:indestructibleeco:k8s:indestructibleeco:configmap:eco-config:eco-cm-0001-0001-000000000001"
+  target_system: gke-production
+  cross_layer_binding: [api-gateway, ai-service, vllm, tgi, sglang, ollama]
+  schema_version: v1
+  generated_by: yaml-toolkit-v1
+  created_at: "2025-02-18T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team]
+  compliance_tags: [zero-trust, soc2, internal]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "http://eco-config.indestructibleeco.svc.cluster.local"
+  discovery_protocol: consul
+  health_check_path: "/health"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [configmap, configuration, environment, secrets]
+  contextual_binding: "eco-config -> [api-gateway, ai-service, vllm, tgi, sglang, ollama]"

@@ -1,6 +1,8 @@
+# IndestructibleEco v1.0 — Helm Chart
+# URI: indestructibleeco://helm/chart
 apiVersion: v2
-name: superai-platform
-description: Enterprise AI Inference Platform with multi-engine routing
+name: indestructibleeco-platform
+description: "IndestructibleEco v1.0 — Enterprise Cloud-Native AI Platform with Multi-Engine Inference Routing"
 type: application
 version: 1.0.0
 appVersion: "1.0.0"
@@ -9,7 +11,12 @@ keywords:
   - inference
   - llm
   - vllm
+  - sglang
+  - tgi
+  - ollama
   - kubernetes
+  - governance
+  - qyaml
 maintainers:
-  - name: SuperAI Engineering
-    email: eng@superai.platform
+  - name: IndestructibleEco Platform Team
+    email: platform-team@indestructibleeco.io

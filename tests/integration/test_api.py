@@ -47,7 +47,7 @@ class TestMetricsEndpoint:
     def test_prometheus_metrics(self, client):
         resp = client.get("/metrics")
         assert resp.status_code == 200
-        assert "superai_" in resp.text or "python_" in resp.text
+        assert "eco_" in resp.text or "python_" in resp.text
 
 
 class TestChatCompletionValidation:

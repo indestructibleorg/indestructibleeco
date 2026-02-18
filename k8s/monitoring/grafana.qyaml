@@ -1,13 +1,13 @@
-# SuperAI Platform - Grafana Dashboard
+# IndestructibleEco v1.0 - Grafana Dashboard
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: grafana
-  namespace: superai
+  namespace: indestructibleeco
   labels:
     app.kubernetes.io/name: grafana
     app.kubernetes.io/component: monitoring
-    app.kubernetes.io/part-of: superai
+    app.kubernetes.io/part-of: indestructibleeco
 spec:
   replicas: 1
   selector:
@@ -27,12 +27,12 @@ spec:
             - name: GF_SECURITY_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: superai-secrets
-                  key: SUPERAI_SECRET_KEY
+                  name: eco-secrets
+                  key: ECO_SECRET_KEY
             - name: GF_USERS_ALLOW_SIGN_UP
               value: "false"
             - name: GF_SERVER_ROOT_URL
-              value: "https://grafana.superai.platform"
+              value: "https://grafana.indestructibleeco.io"
           resources:
             requests:
               cpu: "100m"
@@ -62,7 +62,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: grafana-datasources
-  namespace: superai
+  namespace: indestructibleeco
 data:
   datasources.yaml: |
     apiVersion: 1
@@ -78,14 +78,14 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: grafana-dashboards
-  namespace: superai
+  namespace: indestructibleeco
 data:
   dashboards.yaml: |
     apiVersion: 1
     providers:
       - name: default
         orgId: 1
-        folder: SuperAI
+        folder: IndestructibleEco
         type: file
         disableDeletion: false
         editable: true
@@ -97,7 +97,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: grafana-data
-  namespace: superai
+  namespace: indestructibleeco
 spec:
   accessModes: ["ReadWriteOnce"]
   storageClassName: standard
@@ -109,7 +109,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: grafana-svc
-  namespace: superai
+  namespace: indestructibleeco
 spec:
   type: ClusterIP
   ports:
@@ -117,3 +117,29 @@ spec:
       targetPort: 3000
   selector:
     app.kubernetes.io/name: grafana
+---
+# YAML Toolkit v1 — Governance Block (auto-generated, manual editing prohibited)
+document_metadata:
+  unique_id: "eco-gf-0001-0001-000000000001"
+  uri: "indestructibleeco://k8s/indestructibleeco/deployment/grafana"
+  urn: "urn:indestructibleeco:k8s:indestructibleeco:deployment:grafana:eco-gf-0001-0001-000000000001"
+  target_system: gke-production
+  cross_layer_binding: [prometheus]
+  schema_version: v1
+  generated_by: yaml-toolkit-v1
+  created_at: "2025-02-18T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team]
+  compliance_tags: [zero-trust, soc2, internal, monitoring, dashboard]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "http://grafana-svc.indestructibleeco.svc.cluster.local:3000"
+  discovery_protocol: k8s-dns
+  health_check_path: "/api/health"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [grafana, dashboard, monitoring, visualization]
+  contextual_binding: "grafana -> [prometheus]"

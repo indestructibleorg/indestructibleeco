@@ -1,1 +1,1 @@
-"""SuperAI Platform Tests."""
+"""IndestructibleEco Platform Tests."""

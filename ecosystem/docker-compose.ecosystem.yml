@@ -1,12 +1,12 @@
-# IndestructibleEco Ecosystem — Local Development Stack
+# IndestructibleEco v1.0 — Ecosystem Observability Stack
 # URI: indestructibleeco://ecosystem/docker-compose
-# Usage: docker compose -f docker-compose.ecosystem.yml up
+# Usage: docker compose -f ecosystem/docker-compose.ecosystem.yml up
 
 version: "3.9"
 
 services:
   prometheus:
-    image: prom/prometheus:v2.49.0
+    image: prom/prometheus:v2.54.0
     container_name: eco-prometheus
     ports:
       - "9090:9090"
@@ -29,13 +29,13 @@ services:
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:10.3.0
+    image: grafana/grafana:11.2.0
     container_name: eco-grafana
     ports:
       - "3001:3000"
     environment:
       GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${ECO_SECRET_KEY:-admin}
       GF_USERS_ALLOW_SIGN_UP: "false"
     volumes:
       - grafana-data:/var/lib/grafana

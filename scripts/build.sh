@@ -1,43 +1,54 @@
 #!/usr/bin/env bash
-# SuperAI Platform - Build Script
+# IndestructibleEco v1.0 — Build Script
+# URI: indestructibleeco://scripts/build
 set -euo pipefail
 
 VERSION="${1:-1.0.0}"
-REGISTRY="${DOCKER_REGISTRY:-ghcr.io/superai-platform}"
+REGISTRY="${DOCKER_REGISTRY:-ghcr.io/indestructibleorg}"
 
 echo "╔══════════════════════════════════════════════════════════╗"
-echo "║           SuperAI Platform - Build v${VERSION}              ║"
+echo "║     IndestructibleEco v1.0 — Build v${VERSION}              ║"
 echo "╚══════════════════════════════════════════════════════════╝"
 
-echo "[1/4] Building API Gateway image..."
+echo "[1/5] Building API Gateway image..."
 docker build \
   -t "${REGISTRY}/api:${VERSION}" \
   -t "${REGISTRY}/api:latest" \
   -f docker/Dockerfile \
   .
 
-echo "[2/4] Building vLLM engine image..."
+echo "[2/5] Building AI Service image..."
+docker build \
+  -t "${REGISTRY}/ai:${VERSION}" \
+  -t "${REGISTRY}/ai:latest" \
+  -f backend/ai/Dockerfile \
+  backend/ai/
+
+echo "[3/5] Building vLLM engine image..."
 docker build \
   -t "${REGISTRY}/vllm:${VERSION}" \
   -f docker/Dockerfile.gpu \
   --target vllm \
   .
 
-echo "[3/4] Building SGLang engine image..."
+echo "[4/5] Building SGLang engine image..."
 docker build \
   -t "${REGISTRY}/sglang:${VERSION}" \
   -f docker/Dockerfile.gpu \
   --target sglang \
   .
 
-echo "[4/4] Pushing images..."
+echo "[5/5] Pushing images..."
 docker push "${REGISTRY}/api:${VERSION}"
 docker push "${REGISTRY}/api:latest"
+docker push "${REGISTRY}/ai:${VERSION}"
+docker push "${REGISTRY}/ai:latest"
 docker push "${REGISTRY}/vllm:${VERSION}"
 docker push "${REGISTRY}/sglang:${VERSION}"
 
 echo ""
 echo "Build complete. Images:"
 echo "  ${REGISTRY}/api:${VERSION}"
+echo "  ${REGISTRY}/ai:${VERSION}"
 echo "  ${REGISTRY}/vllm:${VERSION}"
 echo "  ${REGISTRY}/sglang:${VERSION}"

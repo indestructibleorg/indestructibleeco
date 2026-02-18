@@ -1,6 +1,6 @@
 # IndestructibleEco v1.0
 
-Enterprise cloud-native platform built on a mono-repository architecture.
+Enterprise cloud-native AI platform built on a mono-repository architecture with YAML-governed Kubernetes manifests, multi-engine inference routing, and quantum-bert vector alignment.
 
 ## Architecture
 
@@ -26,21 +26,39 @@ indestructibleeco/
 │   │   ├── secrets/
 │   │   ├── security/        # NetworkPolicies, RBAC, mTLS
 │   │   └── kustomization.yaml
-│   ├── supabase/            # DB migrations + RLS policies
-│   └── cloudflare/          # Workers + Pages routing
+│   └── supabase/            # DB migrations + RLS policies
 ├── platforms/               # User-facing applications
 │   ├── web/                 # React 18 + Vite + React Router 6
 │   ├── desktop/             # Electron 29 + Vite renderer
-│   ├── im-integration/      # WhatsApp / Telegram / LINE / Messenger
-│   └── chrome-extension/    # Browser extension
+│   └── im-integration/     # WhatsApp / Telegram / LINE / Messenger
+├── k8s/                     # Infrastructure K8s manifests (.qyaml)
+│   ├── base/                # Core services (api-gateway, engines, redis, postgres)
+│   ├── ingress/             # Ingress + NetworkPolicy
+│   └── monitoring/          # Prometheus + Grafana
+├── docker/                  # Docker images & production compose
+│   ├── Dockerfile           # API Gateway image
+│   ├── Dockerfile.gpu       # GPU engine images (vLLM, SGLang, TGI)
+│   ├── docker-compose.yml   # Full production stack
+│   └── prometheus.yml       # Prometheus scrape config
 ├── ecosystem/               # Cross-platform observability
 │   ├── monitoring/          # Prometheus + Grafana + Alertmanager
 │   ├── tracing/             # Jaeger + OpenTelemetry
 │   ├── service-discovery/   # Consul
 │   └── docker-compose.ecosystem.yml
+├── helm/                    # Helm chart for K8s deployment
+│   ├── Chart.yaml
+│   ├── values.yaml
+│   └── templates/
 ├── tools/                   # Internal tooling
 │   ├── yaml-toolkit/        # YAML Governance Toolkit v1
 │   └── skill-creator/       # Skill authoring tool
+├── scripts/                 # Build & deploy scripts
+│   ├── build.sh
+│   └── deploy.sh
+├── tests/                   # Test suites
+│   ├── unit/
+│   ├── integration/
+│   └── e2e/
 ├── .github/workflows/       # Per-platform CI/CD pipelines
 ├── docker-compose.yml       # Local dev stack
 └── package.json             # Workspace root
@@ -48,20 +66,41 @@ indestructibleeco/
 
 ## Core Policies
 
-| Policy | Standard |
-|--------|----------|
-| UUID | v1 (time-based, sortable, traceable) |
-| URI | `indestructibleeco://{domain}/{kind}/{name}` |
-| URN | `urn:indestructibleeco:{domain}:{kind}:{name}:{uuid}` |
-| Schema Version | v1 |
-| YAML Toolkit | v1 |
-| Manifests | `.qyaml` extension, 4 mandatory governance blocks |
-| Vector Alignment | quantum-bert-xxl-v1, dim 1024–4096 |
-| Security | Zero-trust, mTLS, Sealed Secrets, RBAC, RLS |
+| Policy | Standard | Weight |
+|--------|----------|--------|
+| UUID | v1 (time-based, sortable, traceable) | 1.0 |
+| URI | `indestructibleeco://{domain}/{kind}/{name}` | 1.0 |
+| URN | `urn:indestructibleeco:{domain}:{kind}:{name}:{uuid}` | 1.0 |
+| Schema Version | v1 | 1.0 |
+| YAML Toolkit | v1 | 1.0 |
+| Manifests | `.qyaml` extension, 4 mandatory governance blocks | 1.0 |
+| Vector Alignment | quantum-bert-xxl-v1, dim 1024–4096, tol 0.0001–0.005 | 1.0 |
+| Security | Zero-trust, mTLS, Sealed Secrets, RBAC, RLS, NetworkPolicy | 1.0 |
+| Env Vars | `ECO_*` prefix for all configuration variables | 1.0 |
+| Namespace | `indestructibleeco` (K8s, Docker, Helm) | 1.0 |
+| Container Naming | `eco-*` prefix for all containers | 1.0 |
+| Registry | `ghcr.io/indestructibleorg/*` | 1.0 |
+
+## Environment Variables (ECO_* Prefix)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `ECO_ENVIRONMENT` | `development` | Runtime environment |
+| `ECO_LOG_LEVEL` | `INFO` | Log verbosity |
+| `ECO_AI_HTTP_PORT` | `8001` | AI service HTTP port |
+| `ECO_AI_GRPC_PORT` | `8000` | AI service gRPC port |
+| `ECO_AI_MODELS` | `vllm,ollama,tgi,sglang` | Enabled inference engines |
+| `ECO_REDIS_URL` | `redis://localhost:6379` | Redis connection |
+| `ECO_VECTOR_DIM` | `1024` | Vector alignment dimension |
+| `ECO_ALIGNMENT_MODEL` | `quantum-bert-xxl-v1` | Alignment model identifier |
+| `ECO_CONSUL_ENDPOINT` | `http://localhost:8500` | Service discovery |
+| `ECO_JAEGER_ENDPOINT` | `http://localhost:14268/api/traces` | Distributed tracing |
+
+See `.env.example` for the complete variable reference.
 
 ## .qyaml Governance Blocks
 
-Every `.qyaml` manifest must contain:
+Every `.qyaml` manifest must contain these 4 mandatory blocks:
 
 1. **document_metadata** — unique_id (UUID v1), uri, urn, target_system, cross_layer_binding, schema_version, generated_by, created_at
 2. **governance_info** — owner, approval_chain, compliance_tags, lifecycle_policy
@@ -71,8 +110,11 @@ Every `.qyaml` manifest must contain:
 ## Quick Start
 
 ```bash
-# Start backend + dependencies
+# Start backend + dependencies (local dev)
 docker compose up
+
+# Start full production stack
+cd docker && docker compose up
 
 # Start ecosystem (monitoring, tracing, discovery)
 npm run ecosystem:up
@@ -82,18 +124,24 @@ npm run dev:web
 
 # Validate all .qyaml manifests
 npm run yaml:lint
+
+# Build all Docker images
+./scripts/build.sh 1.0.0
+
+# Deploy to K8s
+./scripts/deploy.sh
 ```
 
 ## CI/CD Pipelines
 
 | Workflow | Trigger | Target |
 |----------|---------|--------|
-| ci.yaml | push/PR to main | Lint + Test + Build |
-| deploy-backend.yml | push main — backend/** | GKE via kubectl |
-| deploy-web.yml | push main — platforms/web/** | Cloudflare Pages |
-| deploy-desktop.yml | tag v*.*.* | GitHub Releases |
-| deploy-im-integration.yml | push main — platforms/im-integration/** | Cloudflare Workers + K8s |
-| yaml-lint.yml | PR — **.qyaml | Governance validation |
+| `ci.yaml` | push/PR to main | Lint + Test + Build |
+| `deploy-backend.yml` | push main — backend/** | GKE via kubectl |
+| `deploy-web.yml` | push main — platforms/web/** | Cloudflare Pages |
+| `deploy-desktop.yml` | tag v*.*.* | GitHub Releases |
+| `deploy-im-integration.yml` | push main — platforms/im-integration/** | Cloudflare Workers + K8s |
+| `yaml-lint.yml` | PR — **.qyaml | Governance validation |
 
 ## API Endpoints
 
@@ -123,6 +171,23 @@ npm run yaml:lint
 - `POST /api/v1/ai/vector/align` — Vector alignment
 - `GET /api/v1/ai/models` — List models
 
+## Version Matrix
+
+| Component | Version | Image |
+|-----------|---------|-------|
+| API Gateway | 1.0.0 | `ghcr.io/indestructibleorg/api:v1.0.0` |
+| AI Service | 1.0.0 | `ghcr.io/indestructibleorg/ai:v1.0.0` |
+| vLLM | 0.6.6 | `vllm/vllm-openai:v0.6.6` |
+| SGLang | 0.3.6 | `lmsysorg/sglang:v0.3.6-cu124` |
+| TGI | 2.4.1 | `ghcr.io/huggingface/text-generation-inference:2.4.1` |
+| Ollama | latest | `ollama/ollama:latest` |
+| Redis | 7 | `redis:7-alpine` |
+| PostgreSQL | 16 | `postgres:16-alpine` |
+| Prometheus | 2.54.0 | `prom/prometheus:v2.54.0` |
+| Grafana | 11.2.0 | `grafana/grafana:11.2.0` |
+| Node.js | ≥20.x | — |
+| Python | ≥3.11 | — |
+
 ---
 
-**indestructibleeco v1.0 · Architecture Blueprint · CONFIDENTIAL · INTERNAL USE ONLY**
+**IndestructibleEco v1.0 · Architecture Blueprint · CONFIDENTIAL · INTERNAL USE ONLY**

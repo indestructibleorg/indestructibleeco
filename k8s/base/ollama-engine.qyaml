@@ -1,13 +1,13 @@
-# SuperAI Platform - Ollama Engine StatefulSet
+# IndestructibleEco v1.0 - Ollama Engine StatefulSet
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: ollama
-  namespace: superai
+  namespace: indestructibleeco
   labels:
     app.kubernetes.io/name: ollama
     app.kubernetes.io/component: inference-engine
-    app.kubernetes.io/part-of: superai
+    app.kubernetes.io/part-of: indestructibleeco
 spec:
   serviceName: ollama-svc
   replicas: 1
@@ -20,7 +20,7 @@ spec:
         app.kubernetes.io/name: ollama
         app.kubernetes.io/component: inference-engine
     spec:
-      serviceAccountName: superai-sa
+      serviceAccountName: eco-sa
       terminationGracePeriodSeconds: 60
       containers:
         - name: ollama
@@ -72,7 +72,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: ollama-svc
-  namespace: superai
+  namespace: indestructibleeco
   labels:
     app.kubernetes.io/name: ollama
 spec:
@@ -83,3 +83,29 @@ spec:
       targetPort: 11434
   selector:
     app.kubernetes.io/name: ollama
+---
+# YAML Toolkit v1 — Governance Block (auto-generated, manual editing prohibited)
+document_metadata:
+  unique_id: "eco-ol-0001-0001-000000000001"
+  uri: "indestructibleeco://k8s/indestructibleeco/statefulset/ollama"
+  urn: "urn:indestructibleeco:k8s:indestructibleeco:statefulset:ollama:eco-ol-0001-0001-000000000001"
+  target_system: gke-production
+  cross_layer_binding: [api-gateway, ai-service]
+  schema_version: v1
+  generated_by: yaml-toolkit-v1
+  created_at: "2025-02-18T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team, ml-team]
+  compliance_tags: [zero-trust, soc2, internal, gpu-workload, inference]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "http://ollama-svc.indestructibleeco.svc.cluster.local:11434"
+  discovery_protocol: consul
+  health_check_path: "/"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [ollama, inference, gpu, embedding, local-models]
+  contextual_binding: "ollama -> [api-gateway, ai-service]"

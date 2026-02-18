@@ -1,13 +1,13 @@
-# SuperAI Platform - PostgreSQL StatefulSet
+# IndestructibleEco v1.0 - PostgreSQL StatefulSet
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: postgres
-  namespace: superai
+  namespace: indestructibleeco
   labels:
     app.kubernetes.io/name: postgres
     app.kubernetes.io/component: database
-    app.kubernetes.io/part-of: superai
+    app.kubernetes.io/part-of: indestructibleeco
 spec:
   serviceName: postgres-svc
   replicas: 1
@@ -30,15 +30,15 @@ spec:
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: superai-secrets
-                  key: SUPERAI_POSTGRES_USER
+                  name: eco-secrets
+                  key: ECO_POSTGRES_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: superai-secrets
-                  key: SUPERAI_POSTGRES_PASSWORD
+                  name: eco-secrets
+                  key: ECO_POSTGRES_PASSWORD
             - name: POSTGRES_DB
-              value: "superai"
+              value: "indestructibleeco"
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
           resources:
@@ -53,12 +53,12 @@ spec:
               mountPath: /var/lib/postgresql/data
           readinessProbe:
             exec:
-              command: ["pg_isready", "-U", "superai"]
+              command: ["pg_isready", "-U", "indestructibleeco"]
             initialDelaySeconds: 10
             periodSeconds: 10
           livenessProbe:
             exec:
-              command: ["pg_isready", "-U", "superai"]
+              command: ["pg_isready", "-U", "indestructibleeco"]
             initialDelaySeconds: 30
             periodSeconds: 30
   volumeClaimTemplates:
@@ -75,7 +75,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres-svc
-  namespace: superai
+  namespace: indestructibleeco
   labels:
     app.kubernetes.io/name: postgres
 spec:
@@ -86,3 +86,29 @@ spec:
       targetPort: 5432
   selector:
     app.kubernetes.io/name: postgres
+---
+# YAML Toolkit v1 — Governance Block (auto-generated, manual editing prohibited)
+document_metadata:
+  unique_id: "eco-pg-0001-0001-000000000001"
+  uri: "indestructibleeco://k8s/indestructibleeco/statefulset/postgres"
+  urn: "urn:indestructibleeco:k8s:indestructibleeco:statefulset:postgres:eco-pg-0001-0001-000000000001"
+  target_system: gke-production
+  cross_layer_binding: [api-gateway]
+  schema_version: v1
+  generated_by: yaml-toolkit-v1
+  created_at: "2025-02-18T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team, security-team]
+  compliance_tags: [zero-trust, soc2, internal, stateful, database]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "postgres://postgres-svc.indestructibleeco.svc.cluster.local:5432"
+  discovery_protocol: k8s-dns
+  health_check_path: "n/a"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [postgres, database, persistence, supabase]
+  contextual_binding: "postgres -> [api-gateway]"

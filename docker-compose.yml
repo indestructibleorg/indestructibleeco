@@ -16,14 +16,14 @@ services:
     environment:
       NODE_ENV: development
       PORT: "3000"
-      REDIS_URL: redis://redis:6379
-      AI_SERVICE_GRPC: ai:8000
-      AI_SERVICE_HTTP: http://ai:8001
-      SUPABASE_URL: ${SUPABASE_URL:-}
-      SUPABASE_KEY: ${SUPABASE_KEY:-}
-      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
-      CONSUL_ENDPOINT: http://consul:8500
-      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+      ECO_REDIS_URL: redis://redis:6379
+      ECO_AI_SERVICE_GRPC: ai:8000
+      ECO_AI_SERVICE_HTTP: http://ai:8001
+      ECO_SUPABASE_URL: ${ECO_SUPABASE_URL:-}
+      ECO_SUPABASE_KEY: ${ECO_SUPABASE_KEY:-}
+      ECO_JWT_SECRET: ${ECO_JWT_SECRET:-dev-secret-change-in-production}
+      ECO_CONSUL_ENDPOINT: http://consul:8500
+      ECO_JAEGER_ENDPOINT: http://jaeger:14268/api/traces
     depends_on:
       - redis
       - ai
@@ -39,16 +39,16 @@ services:
       - "8000:8000"
       - "8001:8001"
     environment:
-      HTTP_PORT: "8001"
-      GRPC_PORT: "8000"
-      REDIS_URL: redis://redis:6379
-      CELERY_BROKER: redis://redis:6379/0
-      CELERY_BACKEND: redis://redis:6379/1
-      VECTOR_DIM: "1024"
-      ALIGNMENT_MODEL: quantum-bert-xxl-v1
-      AI_MODELS: vllm,ollama,tgi,sglang
-      CONSUL_ENDPOINT: http://consul:8500
-      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+      ECO_AI_HTTP_PORT: "8001"
+      ECO_AI_GRPC_PORT: "8000"
+      ECO_REDIS_URL: redis://redis:6379
+      ECO_CELERY_BROKER: redis://redis:6379/0
+      ECO_CELERY_BACKEND: redis://redis:6379/1
+      ECO_VECTOR_DIM: "1024"
+      ECO_ALIGNMENT_MODEL: quantum-bert-xxl-v1
+      ECO_AI_MODELS: vllm,ollama,tgi,sglang
+      ECO_CONSUL_ENDPOINT: http://consul:8500
+      ECO_JAEGER_ENDPOINT: http://jaeger:14268/api/traces
     depends_on:
       - redis
     restart: unless-stopped
@@ -64,7 +64,7 @@ services:
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     restart: unless-stopped
 
-  # ─── PostgreSQL (Supabase local) ───
+  # ─── PostgreSQL ───
   postgres:
     image: postgres:16-alpine
     container_name: eco-postgres
@@ -72,8 +72,8 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_DB: indestructibleeco
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_USER: indestructibleeco
+      POSTGRES_PASSWORD: ${ECO_POSTGRES_PASSWORD:-eco_secret}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     restart: unless-stopped

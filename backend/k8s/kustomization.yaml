@@ -1,15 +1,23 @@
+# IndestructibleEco v1.0 — Kustomization Manifest
+# URI: indestructibleeco://k8s/indestructibleeco/kustomization
+# Usage: kubectl apply -k backend/k8s/
+
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 namespace: indestructibleeco
 
 resources:
-  # Namespaces
+  # Namespaces & Resource Quotas
   - namespaces/platform.qyaml
   # ConfigMaps
   - configmaps/api-config.qyaml
   # Secrets (Sealed)
   - secrets/sealed-secrets.qyaml
+  # Security — RBAC, NetworkPolicies, mTLS
+  - security/rbac.qyaml
+  - security/network-policies.qyaml
+  - security/mtls.qyaml
   # Deployments
   - deployments/api.qyaml
   - deployments/ai.qyaml
@@ -22,3 +30,4 @@ resources:
 commonLabels:
   platform: indestructibleeco
   managed-by: yaml-toolkit-v1
+  schema-version: v1

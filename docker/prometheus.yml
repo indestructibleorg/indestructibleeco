@@ -1,31 +1,40 @@
-# SuperAI Platform - Prometheus Configuration
+# IndestructibleEco v1.0 — Prometheus Scrape Configuration
+# URI: indestructibleeco://monitoring/prometheus/config
+# Used by: docker/docker-compose.yml → prometheus service
+
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
   scrape_timeout: 10s
 
 scrape_configs:
-  - job_name: "superai-api"
+  - job_name: "eco-api-gateway"
     static_configs:
-      - targets: ["api-gateway:8000"]
+      - targets: ["eco-api-gateway:8000"]
     metrics_path: /metrics
     scrape_interval: 10s
 
-  - job_name: "vllm"
+  - job_name: "eco-ai-service"
     static_configs:
-      - targets: ["vllm:8001"]
+      - targets: ["eco-ai:8001"]
+    metrics_path: /metrics
+    scrape_interval: 10s
+
+  - job_name: "eco-vllm"
+    static_configs:
+      - targets: ["eco-vllm:8001"]
     metrics_path: /metrics
     scrape_interval: 15s
 
-  - job_name: "tgi"
+  - job_name: "eco-tgi"
     static_configs:
-      - targets: ["tgi:8002"]
+      - targets: ["eco-tgi:8002"]
     metrics_path: /metrics
     scrape_interval: 15s
 
-  - job_name: "sglang"
+  - job_name: "eco-sglang"
     static_configs:
-      - targets: ["sglang:8003"]
+      - targets: ["eco-sglang:8003"]
     metrics_path: /metrics
     scrape_interval: 15s
 

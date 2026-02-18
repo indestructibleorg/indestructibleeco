@@ -7,7 +7,9 @@ workflows:
   test-and-build:
     jobs:
       - lint-and-test
-      - build
+      - build:
+          requires:
+            - lint-and-test
 
 jobs:
   lint-and-test:
@@ -18,7 +20,7 @@ jobs:
       - checkout
       - node/install-packages:
           pkg-manager: pnpm
-          override-ci-command: pnpm install --no-frozen-lockfile
+          override-ci-command: pnpm install --frozen-lockfile
       - run:
           name: Run linter
           command: pnpm run lint
@@ -37,7 +39,7 @@ jobs:
       - checkout
       - node/install-packages:
           pkg-manager: pnpm
-          override-ci-command: pnpm install --no-frozen-lockfile
+          override-ci-command: pnpm install --frozen-lockfile
       - run:
           name: Build application
           command: pnpm run build

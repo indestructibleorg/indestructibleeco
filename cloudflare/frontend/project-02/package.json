@@ -11,12 +11,11 @@
     "deploy:production": "wrangler deploy --env production",
     "format": "prettier --write ."
   },
-  "dependencies": {
-    "wrangler": "^4.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240605.0",
     "prettier": "^3.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "wrangler": "^4.0.0"
   }
 }

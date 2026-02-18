@@ -16,7 +16,7 @@ Complete guide to setting up and using Supabase in the ecosystem application.
 
 The Supabase configuration is organized as follows:
 
-```
+```text
 ecosystem/
 ├── supabase/                              # Supabase configuration
 │   ├── config.toml                       # Local development config

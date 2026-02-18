@@ -51,16 +51,26 @@ export function useAuth() {
     // Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (session?.user?.id) {
-          const { data: userData } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
+        try {
+          if (session?.user?.id) {
+            const { data: userData, error: userError } = await supabase
+              .from('users')
+              .select('*')
+              .eq('id', session.user.id)
+              .single();
 
-          setUser(userData as User);
-        } else {
-          setUser(null);
+            if (userError) {
+              setError(userError);
+            } else {
+              setUser(userData as User);
+              setError(null);
+            }
+          } else {
+            setUser(null);
+            setError(null);
+          }
+        } catch (err) {
+          setError(err instanceof Error ? err : new Error('Unknown error'));
         }
       }
     );

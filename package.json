@@ -1,0 +1,39 @@
+{
+  "name": "indestructibleeco",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Indestructible Ecosystem - AI-Driven Cloud-Native Platform Monorepo",
+  "workspaces": [
+    "packages/*",
+    "backend/services/*",
+    "backend/libs/*",
+    "platforms/*",
+    "tools/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "clean": "npm run clean --workspaces --if-present",
+    "dev:web": "npm run dev --workspace=platforms/web-app",
+    "dev:api": "npm run dev --workspace=backend/services/api",
+    "dev:ai": "npm run dev --workspace=backend/services/ai",
+    "build:web": "npm run build --workspace=platforms/web-app",
+    "skill:build": "npm run build --workspace=tools/skill-creator",
+    "skill:validate": "npm run validate --workspace=tools/skill-creator",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "k8s:apply": "kubectl apply -k backend/k8s/base",
+    "k8s:monitoring": "kubectl apply -k backend/k8s/monitoring"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/machops/ecosystem.git"
+  },
+  "license": "MIT"
+}

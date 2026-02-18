@@ -1,0 +1,17 @@
+{
+  "name": "@indestructibleeco/yaml-toolkit",
+  "version": "1.0.0",
+  "description": "IndestructibleEco YAML Governance Toolkit v1 — generate, validate, lint .qyaml manifests",
+  "bin": {
+    "yaml-toolkit": "./bin/cli.js"
+  },
+  "scripts": {
+    "generate": "node bin/cli.js gen",
+    "validate": "node bin/cli.js validate",
+    "lint": "node bin/cli.js lint",
+    "test": "node --test tests/"
+  },
+  "keywords": ["yaml", "governance", "kubernetes", "qyaml"],
+  "license": "UNLICENSED",
+  "private": true
+}

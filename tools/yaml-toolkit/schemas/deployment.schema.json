@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IndestructibleEco .qyaml Deployment Schema",
+  "description": "Schema for YAML Toolkit v1 generated Kubernetes Deployment manifests",
+  "type": "object",
+  "required": ["document_metadata", "governance_info", "registry_binding", "vector_alignment_map"],
+  "properties": {
+    "document_metadata": {
+      "type": "object",
+      "required": ["unique_id", "uri", "urn", "target_system", "cross_layer_binding", "schema_version", "generated_by", "created_at"],
+      "properties": {
+        "unique_id": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-1[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$", "description": "UUID v1 (time-based)" },
+        "uri": { "type": "string", "pattern": "^indestructibleeco://" },
+        "urn": { "type": "string", "pattern": "^urn:indestructibleeco:" },
+        "target_system": { "type": "string" },
+        "cross_layer_binding": { "type": "array", "items": { "type": "string" } },
+        "schema_version": { "type": "string", "const": "v1" },
+        "generated_by": { "type": "string", "const": "yaml-toolkit-v1" },
+        "created_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "governance_info": {
+      "type": "object",
+      "required": ["owner", "approval_chain", "compliance_tags", "lifecycle_policy"],
+      "properties": {
+        "owner": { "type": "string" },
+        "approval_chain": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "compliance_tags": { "type": "array", "items": { "type": "string" } },
+        "lifecycle_policy": { "type": "string", "enum": ["active", "deprecated", "archived"] }
+      }
+    },
+    "registry_binding": {
+      "type": "object",
+      "required": ["service_endpoint", "discovery_protocol", "health_check_path", "registry_ttl"],
+      "properties": {
+        "service_endpoint": { "type": "string" },
+        "discovery_protocol": { "type": "string", "enum": ["consul", "etcd", "k8s-dns"] },
+        "health_check_path": { "type": "string" },
+        "registry_ttl": { "type": "integer", "minimum": 5 }
+      }
+    },
+    "vector_alignment_map": {
+      "type": "object",
+      "required": ["alignment_model", "coherence_vector_dim", "function_keyword", "contextual_binding"],
+      "properties": {
+        "alignment_model": { "type": "string" },
+        "coherence_vector_dim": { "type": "integer", "minimum": 1024, "maximum": 4096 },
+        "function_keyword": { "type": "array", "items": { "type": "string" } },
+        "contextual_binding": { "type": "string" }
+      }
+    }
+  }
+}

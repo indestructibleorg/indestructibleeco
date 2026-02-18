@@ -1,0 +1,48 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-svc
+  namespace: indestructibleeco
+  labels:
+    app: api
+    generated-by: yaml-toolkit-v1
+    unique-id: "6ba7b812-9dad-11d1-80b4-00c04fd430c8"
+  annotations:
+    indestructibleeco/uri: "indestructibleeco://k8s/indestructibleeco/service/api-svc"
+    indestructibleeco/urn: "urn:indestructibleeco:k8s:indestructibleeco:service:api-svc:6ba7b812-9dad-11d1-80b4-00c04fd430c8"
+spec:
+  type: ClusterIP
+  selector:
+    app: api
+  ports:
+  - name: http
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+---
+# YAML Toolkit v1 — Governance Block (auto-generated, manual editing prohibited)
+document_metadata:
+  unique_id: "6ba7b812-9dad-11d1-80b4-00c04fd430c8"
+  uri: "indestructibleeco://k8s/indestructibleeco/service/api-svc"
+  urn: "urn:indestructibleeco:k8s:indestructibleeco:service:api-svc:6ba7b812-9dad-11d1-80b4-00c04fd430c8"
+  target_system: gke-production
+  cross_layer_binding: [api-service]
+  schema_version: v1
+  generated_by: yaml-toolkit-v1
+  created_at: "2025-02-18T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team]
+  compliance_tags: [zero-trust, soc2, internal]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "http://api-svc.indestructibleeco.svc.cluster.local:3000"
+  discovery_protocol: consul
+  health_check_path: "/health"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [service, api, networking]
+  contextual_binding: "api-svc -> [api-service]"

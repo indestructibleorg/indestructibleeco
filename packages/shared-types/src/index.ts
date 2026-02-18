@@ -1,254 +1,278 @@
 /**
- * IndestructibleEco - Shared Type Definitions
- * Cross-platform type contracts for all services and platforms
+ * @indestructibleeco/shared-types
+ *
+ * Single source of truth for TypeScript interfaces and enums.
+ * Type-only (no runtime code) — zero bundle cost.
+ * UUID v1 policy: all identifiers are time-based UUIDs.
+ * URI/URN policy: all resources carry dual identification.
  */
 
-// ── UUID v1 Governance Types ───────────────────────────────
-export interface DocumentMetadata {
+// ─── Core Identifiers ───
+
+export interface ResourceIdentifier {
+  id: string;          // UUID v1
+  uri: string;         // indestructibleeco://{domain}/{kind}/{name}
+  urn: string;         // urn:indestructibleeco:{domain}:{kind}:{name}:{uuid}
+}
+
+// ─── Auth ───
+
+export type UserRole = "admin" | "member" | "viewer";
+
+export interface User extends ResourceIdentifier {
+  email: string;
+  role: UserRole;
+  createdAt: string;
+  updatedAt: string;
+  metadata: Record<string, unknown>;
+}
+
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface SignupRequest {
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+}
+
+// ─── Platform ───
+
+export type PlatformStatus = "active" | "inactive" | "deploying" | "error" | "maintenance";
+
+export interface Platform extends ResourceIdentifier {
+  name: string;
+  slug: string;
+  status: PlatformStatus;
+  config: Record<string, unknown>;
+  capabilities: string[];
+  k8sNamespace: string;
+  deployTarget: string;
+  ownerId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreatePlatformRequest {
+  name: string;
+  slug: string;
+  config?: Record<string, unknown>;
+  capabilities?: string[];
+  deployTarget?: string;
+}
+
+export interface UpdatePlatformRequest {
+  name?: string;
+  status?: PlatformStatus;
+  config?: Record<string, unknown>;
+  capabilities?: string[];
+  deployTarget?: string;
+}
+
+// ─── AI ───
+
+export type JobStatus = "pending" | "running" | "completed" | "failed" | "cancelled";
+
+export interface AIJob extends ResourceIdentifier {
+  userId: string;
+  modelId: string;
+  prompt: string;
+  status: JobStatus;
+  result: string | null;
+  error: string | null;
+  progress: number;
+  params: Record<string, unknown>;
+  usage: TokenUsage | null;
+  createdAt: string;
+  completedAt: string | null;
+}
+
+export interface TokenUsage {
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+}
+
+export interface GenerateRequest {
+  prompt: string;
+  model_id?: string;
+  params?: Record<string, unknown>;
+  max_tokens?: number;
+  temperature?: number;
+  top_p?: number;
+}
+
+export interface GenerateResponse {
+  requestId: string;
+  content: string;
+  modelId: string;
+  uri: string;
+  urn: string;
+  usage: TokenUsage;
+  finishReason: string;
+  createdAt: string;
+}
+
+export interface ModelInfo extends ResourceIdentifier {
+  name: string;
+  provider: string;
+  status: string;
+  capabilities: string[];
+}
+
+// ─── Vector Alignment ───
+
+export interface VectorAlignRequest {
+  tokens: string[];
+  target_dim?: number;
+  alignment_model?: string;
+  tolerance?: number;
+}
+
+export interface VectorAlignResponse {
+  coherenceVector: number[];
+  dimension: number;
+  alignmentModel: string;
+  alignmentScore: number;
+  functionKeywords: string[];
+  uri: string;
+  urn: string;
+}
+
+// ─── YAML Governance ───
+
+export interface QYAMLDocumentMetadata {
   unique_id: string;
+  uri: string;
+  urn: string;
+  target_system: string;
+  cross_layer_binding: string[];
   schema_version: string;
-  target_system: TargetSystem;
-  cross_layer_binding: CrossLayerBinding;
   generated_by: string;
   created_at: string;
-  updated_at: string;
 }
 
-export type TargetSystem = "kubernetes" | "docker-compose" | "helm" | "nomad" | "cloudflare" | "vercel";
-
-export interface CrossLayerBinding {
-  source_layer: LayerType;
-  target_layer: LayerType;
-  binding_type: "direct" | "event" | "query" | "stream";
-  protocol: "rest" | "grpc" | "graphql" | "kafka" | "redis-stream";
-}
-
-export type LayerType = "input" | "process" | "core" | "governance" | "output" | "validate";
-
-// ── Governance Info ────────────────────────────────────────
-export interface GovernanceInfo {
+export interface QYAMLGovernanceInfo {
   owner: string;
   approval_chain: string[];
   compliance_tags: string[];
-  lifecycle_policy: LifecyclePolicy;
+  lifecycle_policy: "active" | "deprecated" | "archived";
 }
 
-export type LifecyclePolicy = "active" | "deprecated" | "sunset" | "archived";
-
-// ── Registry Binding ───────────────────────────────────────
-export interface RegistryBinding {
+export interface QYAMLRegistryBinding {
   service_endpoint: string;
-  discovery_protocol: "consul" | "eureka" | "etcd" | "kubernetes";
+  discovery_protocol: "consul" | "etcd" | "k8s-dns";
   health_check_path: string;
   registry_ttl: number;
-  contextual_binding: Record<string, string>;
 }
 
-// ── Vector Alignment Map ───────────────────────────────────
-export interface VectorAlignmentMap {
-  coherence_vector: number[];
+export interface QYAMLVectorAlignment {
+  alignment_model: string;
+  coherence_vector_dim: number;
   function_keyword: string[];
-  contextual_binding: Record<string, number>;
-  model: string;
-  dimensions: number;
-  tolerance: number;
+  contextual_binding: string;
 }
 
-// ── Code Folding Engine Types ──────────────────────────────
-export interface FoldingRequest {
-  content: string;
-  content_type: "source_code" | "document" | "config" | "log";
-  language?: string;
-  strategy: FoldingStrategy;
-  target_dimensions?: number;
+export interface QYAMLGovernanceBlock {
+  document_metadata: QYAMLDocumentMetadata;
+  governance_info: QYAMLGovernanceInfo;
+  registry_binding: QYAMLRegistryBinding;
+  vector_alignment_map: QYAMLVectorAlignment;
 }
 
-export type FoldingStrategy = "vector" | "graph" | "hybrid";
-
-export interface FoldingResult {
-  id: string;
-  vector?: number[];
-  graph?: GraphNode[];
-  metadata: Record<string, unknown>;
-  folding_time_ms: number;
-}
-
-export interface GraphNode {
-  id: string;
-  label: string;
-  type: string;
-  properties: Record<string, unknown>;
-  edges: GraphEdge[];
-}
-
-export interface GraphEdge {
-  target: string;
-  relation: string;
-  weight: number;
-}
-
-// ── Compute Engine Types ───────────────────────────────────
-export interface SimilarityRequest {
-  query_vector: number[];
-  top_k: number;
-  metric: "cosine" | "euclidean" | "dot_product";
-  threshold?: number;
-  filters?: Record<string, unknown>;
-}
-
-export interface SimilarityResult {
-  id: string;
-  score: number;
-  metadata: Record<string, unknown>;
-}
-
-export interface ClusterRequest {
-  vectors: number[][];
-  algorithm: "kmeans" | "dbscan" | "hierarchical";
-  params: Record<string, number>;
-}
-
-export interface ClusterResult {
-  cluster_id: number;
-  members: string[];
-  centroid?: number[];
-  density?: number;
-}
-
-export interface InferenceQuery {
-  start_node: string;
-  relation_path: string[];
-  max_depth: number;
-  reasoning_type: "deductive" | "inductive" | "abductive";
-}
-
-export interface InferenceResult {
-  path: GraphNode[];
-  confidence: number;
-  explanation: string;
-}
-
-export interface RankingRequest {
-  query: string;
-  candidates: RankCandidate[];
-  strategy: "bm25" | "vector" | "hybrid";
-}
-
-export interface RankCandidate {
-  id: string;
-  text: string;
-  vector?: number[];
-  metadata?: Record<string, unknown>;
-}
-
-export interface RankResult {
-  id: string;
-  score: number;
-  rank: number;
-}
-
-// ── Index Engine Types ─────────────────────────────────────
-export type IndexType = "faiss" | "neo4j" | "elasticsearch" | "hybrid";
-
-export interface IndexEntry {
-  id: string;
-  vector?: number[];
-  text?: string;
-  graph_data?: GraphNode;
-  metadata: Record<string, unknown>;
-}
-
-export interface IndexQuery {
-  index_type: IndexType;
-  query_vector?: number[];
-  query_text?: string;
-  graph_query?: string;
-  top_k: number;
-  filters?: Record<string, unknown>;
-}
-
-export interface IndexResult {
-  entries: IndexEntry[];
-  total_count: number;
-  query_time_ms: number;
-  index_type: IndexType;
-}
-
-// ── Service Engine Types ───────────────────────────────────
-export interface ServiceHealth {
-  service: string;
-  status: "healthy" | "degraded" | "unhealthy";
-  uptime_seconds: number;
-  version: string;
-  checks: HealthCheck[];
-}
-
-export interface HealthCheck {
+export interface GenerateQYAMLRequest {
   name: string;
-  status: "pass" | "fail" | "warn";
-  latency_ms: number;
-  message?: string;
-}
-
-// ── Skill System Types ─────────────────────────────────────
-export interface SkillDefinition {
-  id: string;
-  name: string;
-  version: string;
-  description: string;
-  category: SkillCategory;
-  triggers: SkillTrigger[];
-  actions: SkillAction[];
-  inputs: SkillParam[];
-  outputs: SkillParam[];
-  governance: GovernanceInfo;
-  metadata: DocumentMetadata;
-}
-
-export type SkillCategory =
-  | "ci-cd-repair"
-  | "code-generation"
-  | "code-analysis"
-  | "deployment"
-  | "monitoring"
-  | "security"
-  | "testing";
-
-export interface SkillTrigger {
-  type: "webhook" | "schedule" | "event" | "manual";
-  config: Record<string, unknown>;
-}
-
-export interface SkillAction {
-  id: string;
-  name: string;
-  type: "shell" | "api" | "transform" | "validate" | "deploy";
-  config: Record<string, unknown>;
+  image?: string;
+  replicas?: number;
+  ports?: number[];
   depends_on?: string[];
-  retry?: { max_attempts: number; backoff_ms: number };
+  target_system?: string;
+  kind?: string;
 }
 
-export interface SkillParam {
-  name: string;
-  type: "string" | "number" | "boolean" | "object" | "array";
-  required: boolean;
-  default?: unknown;
-  description: string;
+export interface ValidateQYAMLRequest {
+  qyaml_content: string;
 }
 
-// ── QYAML Template Types ───────────────────────────────────
-export interface QYAMLTemplate {
-  template_id: string;
-  target_system: TargetSystem;
-  variables: Record<string, QYAMLVariable>;
-  body: string;
-  schema_ref: string;
+export interface ValidateQYAMLResponse {
+  valid: boolean;
+  errors: Array<{ path: string; message: string; severity: string }>;
 }
 
-export interface QYAMLVariable {
-  name: string;
-  type: "string" | "number" | "boolean" | "list" | "map";
-  default?: unknown;
-  required: boolean;
-  description: string;
+// ─── Service Registry ───
+
+export type ServiceHealth = "healthy" | "degraded" | "unhealthy" | "unknown";
+
+export interface ServiceRegistration extends ResourceIdentifier {
+  serviceName: string;
+  endpoint: string;
+  discoveryProtocol: string;
+  healthCheckPath: string;
+  health: ServiceHealth;
+  registryTtl: number;
+  registeredAt: string;
+  lastHeartbeat: string | null;
+}
+
+// ─── WebSocket Events ───
+
+export interface PlatformStatusEvent {
+  platformId: string;
+  status: string;
+  timestamp: string;
+}
+
+export interface AIJobProgressEvent {
+  jobId: string;
+  progress: number;
+  partial_result: string | null;
+}
+
+export interface AIJobCompleteEvent {
+  jobId: string;
+  result: string;
+  qyaml_uri: string | null;
+}
+
+export interface YAMLGeneratedEvent {
+  serviceId: string;
+  qyaml_content: string;
+  valid: boolean;
+}
+
+export interface IMMessageEvent {
+  channel: string;
+  userId: string;
+  text: string;
+  intent: string;
+}
+
+export interface PlatformRegisterEvent {
+  platformId: string;
+  capabilities: string[];
+}
+
+// ─── Health ───
+
+export interface HealthResponse {
+  status: "healthy" | "degraded" | "unhealthy";
+  service: string;
+  version: string;
+  uri: string;
+  timestamp: string;
+  components?: Record<string, { status: string; latencyMs?: number; message?: string }>;
 }

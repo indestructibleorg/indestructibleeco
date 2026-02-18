@@ -1,0 +1,68 @@
+name: YAML Governance Lint
+
+on:
+  pull_request:
+    paths:
+      - "**.qyaml"
+      - "backend/k8s/**"
+      - "tools/yaml-toolkit/**"
+
+jobs:
+  yaml-lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      run: |
+        git clone --depth 1 https://github.com/${{ github.repository }}.git .
+        git checkout ${{ github.sha }}
+
+    - name: Lint all .qyaml files
+      run: |
+        node tools/yaml-toolkit/bin/cli.js lint backend/k8s/
+
+    - name: Validate governance blocks
+      run: |
+        FAIL=0
+        for f in $(find . -name "*.qyaml" -type f ! -path './.git/*'); do
+          echo "Validating: $f"
+
+          # Check mandatory blocks
+          for block in document_metadata governance_info registry_binding vector_alignment_map; do
+            if ! grep -q "${block}:" "$f"; then
+              echo "  ERROR: Missing block '$block'"
+              FAIL=1
+            fi
+          done
+
+          # Check UUID v1 presence
+          if ! grep -q "unique_id:" "$f" && ! grep -q "unique-id:" "$f"; then
+            echo "  ERROR: No UUID v1 identifier"
+            FAIL=1
+          fi
+
+          # Check URI/URN
+          if ! grep -q "indestructibleeco://" "$f"; then
+            echo "  WARNING: No URI found"
+          fi
+          if ! grep -q "urn:indestructibleeco:" "$f"; then
+            echo "  WARNING: No URN found"
+          fi
+
+          # Check GKE compatibility
+          if grep -q "%YAML" "$f"; then
+            echo "  ERROR: GKE-incompatible %YAML directive"
+            FAIL=1
+          fi
+
+          # Check version is v1
+          if grep -q "schema_version: v[2-9]" "$f" || grep -q "yaml-toolkit-v[2-9]" "$f"; then
+            echo "  ERROR: Schema version must be v1"
+            FAIL=1
+          fi
+        done
+
+        if [ "$FAIL" -eq 1 ]; then
+          echo "YAML governance lint FAILED"
+          exit 1
+        fi
+        echo "All .qyaml files passed governance lint"

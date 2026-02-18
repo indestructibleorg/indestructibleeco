@@ -1,0 +1,95 @@
+# IndestructibleEco SLO Alert Rules
+# URI: indestructibleeco://ecosystem/monitoring/alerts/slo
+
+groups:
+- name: api-slo
+  rules:
+  - alert: APIHighLatency
+    expr: histogram_quantile(0.99, rate(http_request_duration_seconds_bucket{service="api"}[5m])) > 1.0
+    for: 5m
+    labels:
+      severity: warning
+      service: api
+      tier: backend
+    annotations:
+      summary: "API p99 latency above 1s"
+      uri: "indestructibleeco://backend/api"
+
+  - alert: APIHighErrorRate
+    expr: rate(http_requests_total{service="api",status=~"5.."}[5m]) / rate(http_requests_total{service="api"}[5m]) > 0.01
+    for: 5m
+    labels:
+      severity: critical
+      service: api
+      tier: backend
+    annotations:
+      summary: "API error rate above 1%"
+
+  - alert: APIDown
+    expr: up{job="api-service"} == 0
+    for: 1m
+    labels:
+      severity: critical
+      service: api
+      tier: backend
+    annotations:
+      summary: "API service is down"
+
+- name: ai-slo
+  rules:
+  - alert: AIQueueDepthHigh
+    expr: ai_queue_depth > 50
+    for: 5m
+    labels:
+      severity: warning
+      service: ai
+      tier: backend
+    annotations:
+      summary: "AI inference queue depth above 50"
+
+  - alert: AIInferenceLatencyHigh
+    expr: histogram_quantile(0.95, rate(ai_inference_duration_seconds_bucket[5m])) > 30
+    for: 5m
+    labels:
+      severity: warning
+      service: ai
+      tier: backend
+    annotations:
+      summary: "AI inference p95 latency above 30s"
+
+  - alert: AIServiceDown
+    expr: up{job="ai-service"} == 0
+    for: 1m
+    labels:
+      severity: critical
+      service: ai
+      tier: backend
+    annotations:
+      summary: "AI service is down"
+
+  - alert: AIGPUMemoryHigh
+    expr: nvidia_gpu_memory_used_bytes / nvidia_gpu_memory_total_bytes > 0.9
+    for: 5m
+    labels:
+      severity: warning
+      service: ai
+    annotations:
+      summary: "GPU memory usage above 90%"
+
+- name: platform-slo
+  rules:
+  - alert: PodCrashLooping
+    expr: rate(kube_pod_container_status_restarts_total{namespace="indestructibleeco"}[15m]) > 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Pod crash looping in indestructibleeco namespace"
+
+  - alert: PersistentVolumeSpaceLow
+    expr: kubelet_volume_stats_available_bytes{namespace="indestructibleeco"} / kubelet_volume_stats_capacity_bytes < 0.1
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "PV space below 10%"

@@ -1,0 +1,46 @@
+# IndestructibleEco Alertmanager Configuration
+# URI: indestructibleeco://ecosystem/monitoring/alertmanager
+
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ["alertname", "service"]
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: "platform-team"
+  routes:
+  - match:
+      severity: critical
+    receiver: "platform-team-critical"
+    repeat_interval: 5m
+  - match:
+      tier: backend
+    receiver: "platform-team"
+  - match:
+      service: ai
+    receiver: "ml-team"
+
+receivers:
+- name: "platform-team"
+  webhook_configs:
+  - url: "http://api-svc.indestructibleeco.svc.cluster.local:3000/api/v1/alerts"
+    send_resolved: true
+
+- name: "platform-team-critical"
+  webhook_configs:
+  - url: "http://api-svc.indestructibleeco.svc.cluster.local:3000/api/v1/alerts/critical"
+    send_resolved: true
+
+- name: "ml-team"
+  webhook_configs:
+  - url: "http://api-svc.indestructibleeco.svc.cluster.local:3000/api/v1/alerts/ml"
+    send_resolved: true
+
+inhibit_rules:
+- source_match:
+    severity: critical
+  target_match:
+    severity: warning
+  equal: ["alertname", "service"]

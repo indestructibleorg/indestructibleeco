@@ -1,127 +1,128 @@
-# IndestructibleEco v1.0.0
+# IndestructibleEco v1.0
 
-Enterprise-grade AI Inference Backend with multi-engine routing, code folding/indexing engines, governance automation, and Kubernetes-native deployment.
+Enterprise cloud-native platform built on a mono-repository architecture.
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Ingress (NGINX + TLS)                    │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │
-┌──────────────────────────────▼──────────────────────────────────┐
-│                     API Gateway (FastAPI)                        │
-│  ┌──────────┐ ┌───────────┐ ┌──────────┐ ┌──────────────────┐  │
-│  │   Auth   │ │Rate Limit │ │ Metrics  │ │  Error Handler   │  │
-│  └──────────┘ └───────────┘ └──────────┘ └──────────────────┘  │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │
-┌──────────────────────────────▼──────────────────────────────────┐
-│                    Inference Router                              │
-│  Model Registry │ Load Balancer │ Request Queue │ Health Check  │
-└───┬──────┬──────┬──────┬──────┬──────┬──────┬───────────────────┘
-    │      │      │      │      │      │      │
-    ▼      ▼      ▼      ▼      ▼      ▼      ▼
-┌──────┐┌─────┐┌──────┐┌──────┐┌────────┐┌────────┐┌──────────┐
-│ vLLM ││ TGI ││SGLang││Ollama││TRT-LLM ││LMDeploy││DeepSpeed │
-└──────┘└─────┘└──────┘└──────┘└────────┘└────────┘└──────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│                    Engine Subsystems                             │
-│  ┌──────────────┐ ┌──────────────┐ ┌──────────────────────────┐│
-│  │Code Folding  │ │  Compute     │ │  Index Engine            ││
-│  │• Vector      │ │• Similarity  │ │• FAISS (vector)          ││
-│  │• Graph       │ │• Clustering  │ │• Neo4j (graph)           ││
-│  │• Hybrid      │ │• Reasoning   │ │• Elasticsearch (text)    ││
-│  │• Realtime    │ │• Ranking     │ │• Hybrid Router           ││
-│  └──────────────┘ └──────────────┘ └──────────────────────────┘│
-└─────────────────────────────────────────────────────────────────┘
-```
-
-## Monorepo Structure
-
-```
 indestructibleeco/
-├── packages/                    # Shared libraries
-│   ├── ui-kit/                  # UI component library
-│   ├── api-client/              # Backend API client SDK
-│   ├── shared-types/            # Cross-platform TypeScript types
-│   └── templates/               # Page templates
-├── backend/
-│   ├── services/
-│   │   ├── api/                 # Main API service (Node.js)
-│   │   ├── ai/                  # AI engine service (Python/FastAPI)
-│   │   └── worker/              # Background task service
-│   ├── libs/database/           # Shared DB models & migrations
-│   └── k8s/                     # Kubernetes manifests
-├── platforms/
-│   ├── web-app/                 # React concept map & dashboard
-│   ├── desktop-app/             # Electron app
-│   └── *-bot/                   # Chat platform bots
-├── ecosystem/                   # Monitoring, tracing, service discovery
-├── tools/
-│   └── skill-creator/           # Skill definition & validation toolchain
-└── .github/workflows/           # CI/CD (shell-only, no third-party actions)
+├── packages/                # Shared libraries
+│   ├── ui-kit/              # React component library (Tailwind + Radix UI)
+│   ├── api-client/          # Auto-generated API SDK (fetch + socket.io)
+│   └── shared-types/        # TypeScript interfaces (zero runtime cost)
+├── backend/                 # Server services
+│   ├── api/                 # REST + WebSocket API (Node.js Express 5)
+│   ├── ai/                  # AI inference service (Python FastAPI)
+│   ├── shared/              # Proto definitions, DB models, utilities
+│   │   ├── proto/           # gRPC service definitions
+│   │   ├── models/          # Shared data models (UUID v1)
+│   │   └── utils/           # URI/URN builders, governance stamps
+│   ├── k8s/                 # YAML-governed Kubernetes manifests (.qyaml)
+│   │   ├── namespaces/
+│   │   ├── deployments/
+│   │   ├── services/
+│   │   ├── ingress/
+│   │   ├── configmaps/
+│   │   ├── secrets/
+│   │   ├── security/        # NetworkPolicies, RBAC, mTLS
+│   │   └── kustomization.yaml
+│   ├── supabase/            # DB migrations + RLS policies
+│   └── cloudflare/          # Workers + Pages routing
+├── platforms/               # User-facing applications
+│   ├── web/                 # React 18 + Vite + React Router 6
+│   ├── desktop/             # Electron 29 + Vite renderer
+│   ├── im-integration/      # WhatsApp / Telegram / LINE / Messenger
+│   └── chrome-extension/    # Browser extension
+├── ecosystem/               # Cross-platform observability
+│   ├── monitoring/          # Prometheus + Grafana + Alertmanager
+│   ├── tracing/             # Jaeger + OpenTelemetry
+│   ├── service-discovery/   # Consul
+│   └── docker-compose.ecosystem.yml
+├── tools/                   # Internal tooling
+│   ├── yaml-toolkit/        # YAML Governance Toolkit v1
+│   └── skill-creator/       # Skill authoring tool
+├── .github/workflows/       # Per-platform CI/CD pipelines
+├── docker-compose.yml       # Local dev stack
+└── package.json             # Workspace root
 ```
 
-## Engine Subsystems
+## Core Policies
 
-### Multi-Engine Inference (7 backends)
-- **vLLM**: PagedAttention, continuous batching, prefix caching
-- **TGI**: HuggingFace ecosystem, Flash Attention 2
-- **SGLang**: RadixAttention, structured generation, 6.4x throughput
-- **Ollama**: One-command local deployment, GGUF quantization
-- **TensorRT-LLM**: NVIDIA FP8/FP4, kernel fusion
-- **LMDeploy**: Dual-engine TurboMind + PyTorch, KV-cache quantization
-- **DeepSpeed**: ZeRO optimization, distributed inference
+| Policy | Standard |
+|--------|----------|
+| UUID | v1 (time-based, sortable, traceable) |
+| URI | `indestructibleeco://{domain}/{kind}/{name}` |
+| URN | `urn:indestructibleeco:{domain}:{kind}:{name}:{uuid}` |
+| Schema Version | v1 |
+| YAML Toolkit | v1 |
+| Manifests | `.qyaml` extension, 4 mandatory governance blocks |
+| Vector Alignment | quantum-bert-xxl-v1, dim 1024–4096 |
+| Security | Zero-trust, mTLS, Sealed Secrets, RBAC, RLS |
 
-### Code Folding Engine
-- **Vector Folding**: Embedding + dimensionality reduction
-- **Graph Folding**: Knowledge graph construction from code/docs
-- **Hybrid Folding**: Combined vector + graph features
-- **Realtime Index**: Incremental updates with LRU cache
+## .qyaml Governance Blocks
 
-### Compute Engine
-- **Similarity**: Cosine, euclidean, dot product metrics
-- **Clustering**: K-Means, DBSCAN, hierarchical with auto-k
-- **Reasoning**: Deductive, inductive, abductive over graphs
-- **Ranking**: BM25, vector reranking, RRF hybrid fusion
+Every `.qyaml` manifest must contain:
 
-### Index Engine
-- **FAISS**: High-performance vector similarity search
-- **Neo4j**: Graph pattern matching and traversal
-- **Elasticsearch**: Full-text search with code-aware tokenization
-- **Hybrid Router**: Auto-routing with Reciprocal Rank Fusion
+1. **document_metadata** — unique_id (UUID v1), uri, urn, target_system, cross_layer_binding, schema_version, generated_by, created_at
+2. **governance_info** — owner, approval_chain, compliance_tags, lifecycle_policy
+3. **registry_binding** — service_endpoint, discovery_protocol, health_check_path, registry_ttl
+4. **vector_alignment_map** — alignment_model, coherence_vector_dim, function_keyword, contextual_binding
 
 ## Quick Start
 
 ```bash
-# Local development
-docker compose up -d
-cd backend/services/ai && pip install -e ".[dev]"
-uvicorn src.app:app --reload --port 8000
+# Start backend + dependencies
+docker compose up
 
-# Kubernetes
-kubectl apply -k backend/k8s/base
+# Start ecosystem (monitoring, tracing, discovery)
+npm run ecosystem:up
 
-# Validate skills
-node tools/skill-creator/scripts/validate.js tools/skill-creator/skills/
+# Start web dev server
+npm run dev:web
+
+# Validate all .qyaml manifests
+npm run yaml:lint
 ```
+
+## CI/CD Pipelines
+
+| Workflow | Trigger | Target |
+|----------|---------|--------|
+| ci.yaml | push/PR to main | Lint + Test + Build |
+| deploy-backend.yml | push main — backend/** | GKE via kubectl |
+| deploy-web.yml | push main — platforms/web/** | Cloudflare Pages |
+| deploy-desktop.yml | tag v*.*.* | GitHub Releases |
+| deploy-im-integration.yml | push main — platforms/im-integration/** | Cloudflare Workers + K8s |
+| yaml-lint.yml | PR — **.qyaml | Governance validation |
 
 ## API Endpoints
 
-| Endpoint | Description |
-|----------|-------------|
-| `POST /v1/folding/fold` | Code folding (vector/graph/hybrid) |
-| `POST /v1/compute/similarity` | Similarity computation |
-| `POST /v1/compute/cluster` | Clustering analysis |
-| `POST /v1/compute/reason` | Graph reasoning |
-| `POST /v1/compute/rank` | Result ranking |
-| `POST /v1/index/ingest` | Multi-backend ingestion |
-| `POST /v1/index/search` | Hybrid search |
-| `GET /health` | Service health |
-| `GET /metrics` | Prometheus metrics |
+### Authentication
+- `POST /auth/signup` — Register
+- `POST /auth/login` — Login → JWT
+- `POST /auth/refresh` — Refresh token
+- `POST /auth/logout` — Invalidate session
+- `GET /auth/me` — Current user
 
-## License
+### Platforms
+- `GET /api/v1/platforms` — List platforms
+- `POST /api/v1/platforms` — Register platform (admin)
+- `GET /api/v1/platforms/:id` — Platform detail
+- `PATCH /api/v1/platforms/:id` — Update (admin)
+- `DELETE /api/v1/platforms/:id` — Deregister (admin)
 
-Apache-2.0
+### YAML Governance
+- `POST /api/v1/yaml/generate` — Generate .qyaml
+- `POST /api/v1/yaml/validate` — Validate .qyaml
+- `GET /api/v1/yaml/registry` — Service registry
+- `GET /api/v1/yaml/vector/:id` — Vector alignment
+
+### AI Generation
+- `POST /api/v1/ai/generate` — Submit job (async)
+- `GET /api/v1/ai/jobs/:jobId` — Poll status
+- `POST /api/v1/ai/vector/align` — Vector alignment
+- `GET /api/v1/ai/models` — List models
+
+---
+
+**indestructibleeco v1.0 · Architecture Blueprint · CONFIDENTIAL · INTERNAL USE ONLY**

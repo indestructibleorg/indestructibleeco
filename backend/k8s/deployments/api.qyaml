@@ -1,0 +1,121 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-service
+  namespace: indestructibleeco
+  labels:
+    app: api
+    tier: backend
+    generated-by: yaml-toolkit-v1
+    unique-id: "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+  annotations:
+    indestructibleeco/uri: "indestructibleeco://k8s/indestructibleeco/deployment/api-service"
+    indestructibleeco/urn: "urn:indestructibleeco:k8s:indestructibleeco:deployment:api-service:6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+        version: v1.0.0
+    spec:
+      serviceAccountName: api-sa
+      containers:
+      - name: api
+        image: ghcr.io/indestructibleorg/api:v1.0.0
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: production
+        - name: PORT
+          value: "3000"
+        - name: SUPABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: api-secrets
+              key: supabase-url
+        - name: SUPABASE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-secrets
+              key: supabase-key
+        - name: REDIS_URL
+          value: "redis://redis-svc.indestructibleeco.svc.cluster.local:6379"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-service-hpa
+  namespace: indestructibleeco
+  labels:
+    generated-by: yaml-toolkit-v1
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-service
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+---
+# YAML Toolkit v1 — Governance Block (auto-generated, manual editing prohibited)
+document_metadata:
+  unique_id: "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+  uri: "indestructibleeco://k8s/indestructibleeco/deployment/api-service"
+  urn: "urn:indestructibleeco:k8s:indestructibleeco:deployment:api-service:6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+  target_system: gke-production
+  cross_layer_binding: [supabase, redis, ai-service]
+  schema_version: v1
+  generated_by: yaml-toolkit-v1
+  created_at: "2025-02-18T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team]
+  compliance_tags: [zero-trust, soc2, internal]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "http://api-service.indestructibleeco.svc.cluster.local:3000"
+  discovery_protocol: consul
+  health_check_path: "/health"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [api, backend, rest, authentication, websocket]
+  contextual_binding: "api-service -> [supabase, redis, ai-service]"

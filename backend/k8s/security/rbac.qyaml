@@ -1,0 +1,117 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: api-sa
+  namespace: indestructibleeco
+  labels:
+    app: api
+    generated-by: yaml-toolkit-v1
+    unique-id: "6ba7b81a-9dad-11d1-80b4-00c04fd430c8"
+  annotations:
+    indestructibleeco/uri: "indestructibleeco://k8s/indestructibleeco/serviceaccount/api-sa"
+    indestructibleeco/urn: "urn:indestructibleeco:k8s:indestructibleeco:serviceaccount:api-sa:6ba7b81a-9dad-11d1-80b4-00c04fd430c8"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ai-sa
+  namespace: indestructibleeco
+  labels:
+    app: ai
+    generated-by: yaml-toolkit-v1
+    unique-id: "6ba7b81b-9dad-11d1-80b4-00c04fd430c8"
+  annotations:
+    indestructibleeco/uri: "indestructibleeco://k8s/indestructibleeco/serviceaccount/ai-sa"
+    indestructibleeco/urn: "urn:indestructibleeco:k8s:indestructibleeco:serviceaccount:ai-sa:6ba7b81b-9dad-11d1-80b4-00c04fd430c8"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: api-role
+  namespace: indestructibleeco
+  labels:
+    generated-by: yaml-toolkit-v1
+spec: {}
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: ["api-secrets"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: api-role-binding
+  namespace: indestructibleeco
+  labels:
+    generated-by: yaml-toolkit-v1
+subjects:
+- kind: ServiceAccount
+  name: api-sa
+  namespace: indestructibleeco
+roleRef:
+  kind: Role
+  name: api-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ai-role
+  namespace: indestructibleeco
+  labels:
+    generated-by: yaml-toolkit-v1
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: ["ai-secrets"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ai-role-binding
+  namespace: indestructibleeco
+  labels:
+    generated-by: yaml-toolkit-v1
+subjects:
+- kind: ServiceAccount
+  name: ai-sa
+  namespace: indestructibleeco
+roleRef:
+  kind: Role
+  name: ai-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# YAML Toolkit v1 — Governance Block (auto-generated, manual editing prohibited)
+document_metadata:
+  unique_id: "6ba7b81a-9dad-11d1-80b4-00c04fd430c8"
+  uri: "indestructibleeco://k8s/indestructibleeco/rbac/service-accounts"
+  urn: "urn:indestructibleeco:k8s:indestructibleeco:rbac:service-accounts:6ba7b81a-9dad-11d1-80b4-00c04fd430c8"
+  target_system: gke-production
+  cross_layer_binding: [api-service, ai-service]
+  schema_version: v1
+  generated_by: yaml-toolkit-v1
+  created_at: "2025-02-18T00:00:00.000Z"
+governance_info:
+  owner: security-team
+  approval_chain: [security-team, platform-team]
+  compliance_tags: [zero-trust, soc2, least-privilege, rbac]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "n/a"
+  discovery_protocol: k8s-dns
+  health_check_path: "n/a"
+  registry_ttl: 0
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [rbac, service-account, least-privilege, security]
+  contextual_binding: "rbac -> [api-service, ai-service]"

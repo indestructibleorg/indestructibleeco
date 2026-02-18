@@ -1,6 +1,6 @@
-# SuperAI Platform
+# IndestructibleEco v1.0.0
 
-Enterprise-grade AI Inference Backend with multi-engine routing, OpenAI-compatible API, multimodal pipelines, and Kubernetes-native deployment.
+Enterprise-grade AI Inference Backend with multi-engine routing, code folding/indexing engines, governance automation, and Kubernetes-native deployment.
 
 ## Architecture
 
@@ -25,121 +25,102 @@ Enterprise-grade AI Inference Backend with multi-engine routing, OpenAI-compatib
 ┌──────┐┌─────┐┌──────┐┌──────┐┌────────┐┌────────┐┌──────────┐
 │ vLLM ││ TGI ││SGLang││Ollama││TRT-LLM ││LMDeploy││DeepSpeed │
 └──────┘└─────┘└──────┘└──────┘└────────┘└────────┘└──────────┘
-    │      │      │      │      │      │      │
-    └──────┴──────┴──────┴──────┴──────┴──────┘
-                       │
-              ┌────────▼────────┐
-              │   GPU Cluster   │
-              │  (NVIDIA A100)  │
-              └─────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                    Engine Subsystems                             │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────────────────┐│
+│  │Code Folding  │ │  Compute     │ │  Index Engine            ││
+│  │• Vector      │ │• Similarity  │ │• FAISS (vector)          ││
+│  │• Graph       │ │• Clustering  │ │• Neo4j (graph)           ││
+│  │• Hybrid      │ │• Reasoning   │ │• Elasticsearch (text)    ││
+│  │• Realtime    │ │• Ranking     │ │• Hybrid Router           ││
+│  └──────────────┘ └──────────────┘ └──────────────────────────┘│
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-## Features
+## Monorepo Structure
 
-### Multi-Engine Inference Routing
-- **vLLM**: PagedAttention, continuous batching, prefix caching (68.7k★)
-- **TGI**: HuggingFace ecosystem, Flash Attention 2, production-grade
-- **SGLang**: RadixAttention, structured generation, 6.4x throughput boost
+```
+indestructibleeco/
+├── packages/                    # Shared libraries
+│   ├── ui-kit/                  # UI component library
+│   ├── api-client/              # Backend API client SDK
+│   ├── shared-types/            # Cross-platform TypeScript types
+│   └── templates/               # Page templates
+├── backend/
+│   ├── services/
+│   │   ├── api/                 # Main API service (Node.js)
+│   │   ├── ai/                  # AI engine service (Python/FastAPI)
+│   │   └── worker/              # Background task service
+│   ├── libs/database/           # Shared DB models & migrations
+│   └── k8s/                     # Kubernetes manifests
+├── platforms/
+│   ├── web-app/                 # React concept map & dashboard
+│   ├── desktop-app/             # Electron app
+│   └── *-bot/                   # Chat platform bots
+├── ecosystem/                   # Monitoring, tracing, service discovery
+├── tools/
+│   └── skill-creator/           # Skill definition & validation toolchain
+└── .github/workflows/           # CI/CD (shell-only, no third-party actions)
+```
+
+## Engine Subsystems
+
+### Multi-Engine Inference (7 backends)
+- **vLLM**: PagedAttention, continuous batching, prefix caching
+- **TGI**: HuggingFace ecosystem, Flash Attention 2
+- **SGLang**: RadixAttention, structured generation, 6.4x throughput
 - **Ollama**: One-command local deployment, GGUF quantization
-- **TensorRT-LLM**: NVIDIA deep optimization, FP8/FP4, kernel fusion
-- **LMDeploy**: Dual-engine (TurboMind + PyTorch), KV-cache quantization
-- **DeepSpeed**: ZeRO optimization, large-scale distributed inference
+- **TensorRT-LLM**: NVIDIA FP8/FP4, kernel fusion
+- **LMDeploy**: Dual-engine TurboMind + PyTorch, KV-cache quantization
+- **DeepSpeed**: ZeRO optimization, distributed inference
 
-### OpenAI-Compatible API
-- `/v1/chat/completions` - Chat completion (streaming + non-streaming)
-- `/v1/completions` - Text completion
-- `/v1/embeddings` - Text embeddings
-- `/v1/models` - Model management
-- `/v1/audio/transcriptions` - Speech-to-text (Whisper)
-- `/v1/audio/speech` - Text-to-speech
-- `/v1/images/generations` - Image generation
+### Code Folding Engine
+- **Vector Folding**: Embedding + dimensionality reduction
+- **Graph Folding**: Knowledge graph construction from code/docs
+- **Hybrid Folding**: Combined vector + graph features
+- **Realtime Index**: Incremental updates with LRU cache
 
-### Multimodal Pipelines
-- **Vision-Language**: Qwen2.5-VL (256K context), LLaVA-NeXT, InternVL3.5
-- **Image Generation**: Stable Diffusion XL, FLUX via ComfyUI/diffusers
-- **Audio**: Whisper V3 Turbo (sub-second ASR), CosyVoice TTS
-- **Video**: Frame sampling + VLM analysis, temporal reasoning
+### Compute Engine
+- **Similarity**: Cosine, euclidean, dot product metrics
+- **Clustering**: K-Means, DBSCAN, hierarchical with auto-k
+- **Reasoning**: Deductive, inductive, abductive over graphs
+- **Ranking**: BM25, vector reranking, RRF hybrid fusion
 
-### Specialized Scenarios
-- **Code Generation**: DeepSeek-Coder, FIM completion, code review
-- **RAG Pipeline**: Chunking, embedding, vector search, cited generation
-- **Agent/Function Calling**: ReAct loop, Plan-and-Execute, tool orchestration
-- **Batch Inference**: Async parallel processing, priority scheduling
-
-### Enterprise Features
-- JWT + API Key authentication
-- Sliding window rate limiting (Redis-backed)
-- Prometheus metrics + Grafana dashboards
-- Structured JSON logging for k8s log aggregation
-- Health checks with engine-level granularity
-- HPA autoscaling based on request load
+### Index Engine
+- **FAISS**: High-performance vector similarity search
+- **Neo4j**: Graph pattern matching and traversal
+- **Elasticsearch**: Full-text search with code-aware tokenization
+- **Hybrid Router**: Auto-routing with Reciprocal Rank Fusion
 
 ## Quick Start
 
-### Docker Compose
 ```bash
-cp .env.example .env
-# Edit .env with your HF_TOKEN and settings
-cd docker && docker compose up -d
+# Local development
+docker compose up -d
+cd backend/services/ai && pip install -e ".[dev]"
+uvicorn src.app:app --reload --port 8000
+
+# Kubernetes
+kubectl apply -k backend/k8s/base
+
+# Validate skills
+node tools/skill-creator/scripts/validate.js tools/skill-creator/skills/
 ```
 
-### Kubernetes
-```bash
-chmod +x scripts/deploy.sh
-./scripts/deploy.sh
-```
+## API Endpoints
 
-### Helm
-```bash
-helm install superai ./helm \
-  --namespace superai \
-  --create-namespace \
-  --set secrets.hfToken=$HF_TOKEN
-```
-
-### Local Development
-```bash
-pip install -r requirements.txt
-SUPERAI_ENVIRONMENT=development SUPERAI_DEBUG=true \
-  uvicorn src.app:app --reload --port 8000
-```
-
-## API Usage
-
-```bash
-# Chat completion
-curl -X POST http://localhost:8000/v1/chat/completions \
-  -H "Authorization: Bearer sk-superai-..." \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "llama-3.1-8b-instruct",
-    "messages": [{"role": "user", "content": "Hello!"}],
-    "temperature": 0.7,
-    "max_tokens": 2048
-  }'
-
-# Streaming
-curl -X POST http://localhost:8000/v1/chat/completions \
-  -H "Authorization: Bearer sk-superai-..." \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "llama-3.1-8b-instruct",
-    "messages": [{"role": "user", "content": "Write a poem"}],
-    "stream": true
-  }'
-
-# RAG query
-curl -X POST http://localhost:8000/v1/rag/query \
-  -H "Authorization: Bearer sk-superai-..." \
-  -d '{"collection_name": "docs", "question": "What is PagedAttention?"}'
-```
-
-## Testing
-
-```bash
-pip install pytest pytest-asyncio pytest-cov
-pytest tests/ -v --cov=src
-```
+| Endpoint | Description |
+|----------|-------------|
+| `POST /v1/folding/fold` | Code folding (vector/graph/hybrid) |
+| `POST /v1/compute/similarity` | Similarity computation |
+| `POST /v1/compute/cluster` | Clustering analysis |
+| `POST /v1/compute/reason` | Graph reasoning |
+| `POST /v1/compute/rank` | Result ranking |
+| `POST /v1/index/ingest` | Multi-backend ingestion |
+| `POST /v1/index/search` | Hybrid search |
+| `GET /health` | Service health |
+| `GET /metrics` | Prometheus metrics |
 
 ## License
 

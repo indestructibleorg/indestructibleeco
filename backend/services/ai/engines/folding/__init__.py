@@ -1,0 +1,1 @@
+"""Code Folding Engine - Vector, Graph, Hybrid, Real-time Index."""

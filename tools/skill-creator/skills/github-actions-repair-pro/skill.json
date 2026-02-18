@@ -1,0 +1,195 @@
+{
+  "id": "github-actions-repair-pro",
+  "name": "GitHub Actions Repair Pro",
+  "version": "1.0.0",
+  "description": "End-to-end automated diagnosis and repair of GitHub Actions CI/CD pipeline failures. Implements the full Understanding → Retrieval → Analysis → Reasoning → One-Stop Repair cycle with root cause elimination and regression prevention.",
+  "category": "ci-cd-repair",
+  "triggers": [
+    {
+      "type": "webhook",
+      "config": {
+        "event": "workflow_run.completed",
+        "filter": "conclusion == 'failure'",
+        "branches": ["main", "develop"]
+      }
+    },
+    {
+      "type": "event",
+      "config": {
+        "source": "github",
+        "event_type": "check_run.completed",
+        "filter": "conclusion == 'failure'"
+      }
+    },
+    {
+      "type": "manual",
+      "config": {
+        "description": "Manually trigger repair for a specific workflow run"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "understand",
+      "name": "Understanding - Build Mental Model",
+      "type": "shell",
+      "config": {
+        "command": "gh api repos/${REPO}/actions/runs/${RUN_ID}/jobs --jq '.jobs[] | select(.conclusion==&quot;failure&quot;) | {name, conclusion, steps: [.steps[] | select(.conclusion==&quot;failure&quot;) | {name, conclusion}]}'",
+        "env": {
+          "REPO": "{{ .repository }}",
+          "RUN_ID": "{{ .run_id }}"
+        },
+        "timeout_seconds": 30
+      },
+      "retry": { "max_attempts": 2, "backoff_ms": 1000 }
+    },
+    {
+      "id": "retrieve-logs",
+      "name": "Retrieval - Fetch Failure Logs",
+      "type": "api",
+      "config": {
+        "method": "GET",
+        "url": "https://api.github.com/repos/{{ .repository }}/actions/runs/{{ .run_id }}/logs",
+        "headers": { "Authorization": "Bearer {{ .github_token }}", "Accept": "application/vnd.github+json" },
+        "expected_status": [200, 302]
+      },
+      "depends_on": ["understand"],
+      "retry": { "max_attempts": 3, "backoff_ms": 2000 }
+    },
+    {
+      "id": "retrieve-workflow",
+      "name": "Retrieval - Fetch Workflow Definition",
+      "type": "shell",
+      "config": {
+        "command": "gh api repos/${REPO}/actions/runs/${RUN_ID} --jq '.path' | xargs -I{} gh api repos/${REPO}/contents/{} --jq '.content' | base64 -d",
+        "env": { "REPO": "{{ .repository }}", "RUN_ID": "{{ .run_id }}" },
+        "timeout_seconds": 15
+      },
+      "depends_on": ["understand"]
+    },
+    {
+      "id": "analyze",
+      "name": "Analysis - Root Cause Identification",
+      "type": "transform",
+      "config": {
+        "input_path": "retrieve-logs.output",
+        "output_path": "analysis.json",
+        "jq_filter": ".[] | {error_pattern: (. | test(&quot;error|fail|fatal|exception&quot;; &quot;i&quot;)), line: .}",
+        "rules": [
+          "Match error patterns against known failure taxonomy",
+          "Identify dependency resolution failures",
+          "Detect environment/runner compatibility issues",
+          "Check for third-party action policy violations",
+          "Verify secret and permission configurations"
+        ]
+      },
+      "depends_on": ["retrieve-logs", "retrieve-workflow"]
+    },
+    {
+      "id": "reason",
+      "name": "Reasoning - Solution Derivation",
+      "type": "transform",
+      "config": {
+        "input_path": "analysis.json",
+        "output_path": "solution.json",
+        "rules": [
+          "Map root cause to repair strategy",
+          "Evaluate side effects of proposed changes",
+          "Select minimal-impact fix path",
+          "Generate concrete file modifications"
+        ]
+      },
+      "depends_on": ["analyze"]
+    },
+    {
+      "id": "consolidate",
+      "name": "One-Stop Repair - Consolidate Changes",
+      "type": "transform",
+      "config": {
+        "input_path": "solution.json",
+        "output_path": "consolidated_patch.diff",
+        "rules": [
+          "Merge all modifications into unified patch",
+          "Resolve conflicts between changes",
+          "Eliminate redundant modifications",
+          "Ensure consistent formatting"
+        ]
+      },
+      "depends_on": ["reason"]
+    },
+    {
+      "id": "integrate",
+      "name": "One-Stop Repair - Apply & Integrate",
+      "type": "shell",
+      "config": {
+        "command": "git apply consolidated_patch.diff && git add -A && git commit -m &quot;fix: ${COMMIT_MSG}&quot; && git push origin ${BRANCH}",
+        "env": {
+          "COMMIT_MSG": "{{ .commit_message }}",
+          "BRANCH": "{{ .branch }}"
+        },
+        "timeout_seconds": 60
+      },
+      "depends_on": ["consolidate"]
+    },
+    {
+      "id": "validate-fix",
+      "name": "One-Stop Repair - Verify Fix",
+      "type": "api",
+      "config": {
+        "method": "POST",
+        "url": "https://api.github.com/repos/{{ .repository }}/actions/workflows/{{ .workflow_file }}/dispatches",
+        "headers": { "Authorization": "Bearer {{ .github_token }}" },
+        "body": { "ref": "{{ .branch }}" },
+        "expected_status": [204]
+      },
+      "depends_on": ["integrate"],
+      "retry": { "max_attempts": 1, "backoff_ms": 5000 }
+    },
+    {
+      "id": "monitor",
+      "name": "One-Stop Repair - Monitor Re-run",
+      "type": "shell",
+      "config": {
+        "command": "for i in $(seq 1 30); do STATUS=$(gh api repos/${REPO}/actions/runs --jq '.workflow_runs[0].conclusion // &quot;pending&quot;'); if [ &quot;$STATUS&quot; = &quot;success&quot; ]; then echo 'VERIFIED: Fix confirmed'; exit 0; elif [ &quot;$STATUS&quot; = &quot;failure&quot; ]; then echo 'FAILED: Fix did not resolve issue'; exit 1; fi; sleep 10; done; echo 'TIMEOUT: Verification timed out'; exit 1",
+        "env": { "REPO": "{{ .repository }}" },
+        "timeout_seconds": 360
+      },
+      "depends_on": ["validate-fix"]
+    }
+  ],
+  "inputs": [
+    { "name": "repository", "type": "string", "required": true, "description": "GitHub repository (owner/repo)" },
+    { "name": "run_id", "type": "string", "required": true, "description": "Failed workflow run ID" },
+    { "name": "github_token", "type": "string", "required": true, "description": "GitHub PAT with actions and contents scope" },
+    { "name": "branch", "type": "string", "required": false, "default": "main", "description": "Target branch" },
+    { "name": "workflow_file", "type": "string", "required": false, "default": "ci.yaml", "description": "Workflow filename for re-trigger" },
+    { "name": "commit_message", "type": "string", "required": false, "default": "automated CI/CD repair", "description": "Commit message for fix" }
+  ],
+  "outputs": [
+    { "name": "root_cause", "type": "string", "required": true, "description": "Identified root cause of failure" },
+    { "name": "fix_applied", "type": "boolean", "required": true, "description": "Whether fix was successfully applied" },
+    { "name": "verification_status", "type": "string", "required": true, "description": "Post-fix verification result: success|failure|timeout" },
+    { "name": "patch_diff", "type": "string", "required": false, "description": "Applied patch in unified diff format" },
+    { "name": "commit_sha", "type": "string", "required": false, "description": "SHA of the fix commit" }
+  ],
+  "governance": {
+    "owner": "machops/platform-engineering",
+    "approval_chain": ["tech-lead", "devops-lead"],
+    "compliance_tags": ["ci-cd", "automation", "self-healing"],
+    "lifecycle_policy": "active"
+  },
+  "metadata": {
+    "unique_id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+    "schema_version": "1.0.0",
+    "target_system": "github-actions",
+    "generated_by": "skill-creator-v1",
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-01-01T00:00:00Z",
+    "cross_layer_binding": {
+      "source_layer": "input",
+      "target_layer": "validate",
+      "binding_type": "event",
+      "protocol": "rest"
+    }
+  }
+}

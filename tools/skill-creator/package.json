@@ -1,0 +1,12 @@
+{
+  "name": "@indestructibleeco/skill-creator",
+  "version": "1.0.0",
+  "description": "Skill definition, build, test, and validation toolchain",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "validate": "node scripts/validate.js",
+    "test": "node scripts/test.js",
+    "list": "node scripts/list.js"
+  },
+  "license": "MIT"
+}

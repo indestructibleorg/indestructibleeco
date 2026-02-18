@@ -19,9 +19,43 @@ jobs:
       # Checkout the code as the first step.
       - checkout
       - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
+          name: "Run build and tests (if configured)"
+          command: |
+            set -e
 
+            echo "Starting CI tasks..."
+
+            # Node.js projects
+            if [ -f "package.json" ] && command -v npm >/dev/null 2>&1; then
+              echo "Detected Node.js project. Running 'npm test'..."
+              npm test
+              exit 0
+            fi
+
+            # Python projects
+            if { [ -f "pyproject.toml" ] || [ -f "setup.py" ]; } && command -v pytest >/dev/null 2>&1; then
+              echo "Detected Python project. Running 'pytest'..."
+              pytest
+              exit 0
+            fi
+
+            # Maven projects
+            if [ -f "pom.xml" ] && command -v mvn >/dev/null 2>&1; then
+              echo "Detected Maven project. Running 'mvn test'..."
+              mvn test -B
+              exit 0
+            fi
+
+            # Gradle projects
+            if { [ -f "build.gradle" ] || [ -f "build.gradle.kts" ]; } && [ -x "./gradlew" ]; then
+              echo "Detected Gradle project. Running './gradlew test'..."
+              ./gradlew test
+              exit 0
+            fi
+
+            echo "No recognized build configuration found."
+            echo "Please customize .circleci/config.yml with project-specific build/test steps."
+            exit 0
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/guides/orchestrate/workflows/ & https://circleci.com/docs/reference/configuration-reference/#workflows
 workflows:

@@ -32,6 +32,7 @@ jobs:
       - node/install-packages:
           # If you are using yarn, change the line below from "npm" to "yarn"
           pkg-manager: npm
+          override-ci-command: npm ci --legacy-peer-deps
       - run:
           name: Run tests
           command: npm test

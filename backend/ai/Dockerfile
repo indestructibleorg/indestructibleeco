@@ -10,4 +10,4 @@ RUN poetry config virtualenvs.create false \
 COPY src ./src
 COPY engines ./engines
 EXPOSE 8000 8001
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8001"]

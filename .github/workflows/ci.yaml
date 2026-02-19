@@ -60,14 +60,13 @@ jobs:
         python3 -m py_compile backend/ai/src/config.py
         python3 -m py_compile backend/ai/src/routes.py
         python3 -m py_compile backend/ai/src/governance.py
-        python3 -m py_compile backend/ai/src/routes/health.py
-        python3 -m py_compile backend/ai/src/routes/generate.py
-        python3 -m py_compile backend/ai/src/routes/models.py
         python3 -m py_compile backend/shared/models/__init__.py
         python3 -m py_compile backend/shared/utils/__init__.py
         python3 -m py_compile tools/ci-validator/validate.py
+        python3 -m py_compile tools/ci-validator/auto-fix.py
         python3 -m py_compile tools/skill-creator/scripts/init_skill.py
         python3 -m py_compile tools/skill-creator/scripts/quick_validate.py
+        python3 -m py_compile src/app.py
         echo "Python compile check passed"
 
     - name: JS syntax check

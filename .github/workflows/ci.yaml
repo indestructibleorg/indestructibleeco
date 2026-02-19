@@ -131,7 +131,7 @@ jobs:
 
     - name: Core module tests (schemas, auth, queue, registry, API)
       run: |
-        pip install pytest pytest-asyncio pydantic -q 2>/dev/null
+        pip install pytest pytest-asyncio pydantic fastapi httpx -q 2>/dev/null
         PYTHONPATH=. python3 -m pytest tests/ -v --tb=short
 
     - name: Config tests

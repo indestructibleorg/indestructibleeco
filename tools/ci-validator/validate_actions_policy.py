@@ -6,6 +6,7 @@ Validates that all GitHub Actions used in workflows comply with repository polic
 1. All actions must be from approved organizations (e.g., indestructibleorg)
 2. All actions must be pinned to full-length commit SHAs (40 characters)
 3. No tag references allowed (e.g., @v1, @v2, @main)
+4. Docker actions must be pinned to immutable SHA256 digests
 """
 
 import os

@@ -1,38 +1,284 @@
-openapi: "3.1.0"
+openapi: "3.0.3"
 info:
-  title: indestructibleeco API
+  title: IndestructibleEco API
   version: "1.0.0"
-  description: Primary REST + WebSocket API for the indestructibleeco platform
+  description: |
+    Enterprise cloud-native AI platform API.
+    URI: indestructibleeco://backend/api/openapi
 servers:
   - url: http://localhost:3000
     description: Local development
+  - url: https://api.indestructibleeco.io
+    description: Production
+
 paths:
   /health:
     get:
-      summary: Liveness check
+      summary: Liveness probe
+      tags: [Health]
       responses:
-        "200": { description: OK }
-  /auth/login:
+        "200":
+          description: Service is alive
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: healthy }
+                  service: { type: string, example: api }
+                  version: { type: string, example: "1.0.0" }
+
+  /ready:
+    get:
+      summary: Readiness probe (checks dependencies)
+      tags: [Health]
+      responses:
+        "200":
+          description: All dependencies healthy
+        "503":
+          description: One or more dependencies unhealthy
+
+  /auth/signup:
     post:
-      summary: Email/password login
+      summary: Create account
+      tags: [Auth]
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
-              properties:
-                email: { type: string }
-                password: { type: string }
               required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 6 }
+                display_name: { type: string }
+      responses:
+        "201":
+          description: Account created
+        "409":
+          description: Email already registered
+
+  /auth/login:
+    post:
+      summary: Sign in
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
       responses:
         "200":
-          description: JWT token pair
+          description: Login successful, returns session tokens
+        "401":
+          description: Invalid credentials
+
+  /auth/refresh:
+    post:
+      summary: Refresh session token
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token: { type: string }
+      responses:
+        "200":
+          description: New session tokens
+        "401":
+          description: Invalid or expired refresh token
+
+  /auth/logout:
+    post:
+      summary: Sign out
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Logged out
+
+  /auth/me:
+    get:
+      summary: Get current user profile
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User profile
+        "401":
+          description: Not authenticated
+
+  /api/v1/platforms:
+    get:
+      summary: List platforms
+      tags: [Platforms]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Platform list
+    post:
+      summary: Register platform (admin only)
+      tags: [Platforms]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, slug]
+              properties:
+                name: { type: string }
+                slug: { type: string }
+                capabilities: { type: array, items: { type: string } }
+                deployTarget: { type: string }
+      responses:
+        "201":
+          description: Platform created
+        "403":
+          description: Admin access required
+
+  /api/v1/ai/generate:
+    post:
+      summary: Generate AI content
+      tags: [AI]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [prompt]
+              properties:
+                prompt: { type: string }
+                model_id: { type: string, default: "default" }
+                max_tokens: { type: integer, default: 2048 }
+                temperature: { type: number, default: 0.7 }
+      responses:
+        "200":
+          description: Generated content
+        "504":
+          description: AI service timeout
+
+  /api/v1/ai/chat/completions:
+    post:
+      summary: OpenAI-compatible chat completions
+      tags: [AI]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [messages]
+              properties:
+                model: { type: string, default: "default" }
+                messages:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      role: { type: string, enum: [system, user, assistant] }
+                      content: { type: string }
+                temperature: { type: number }
+                max_tokens: { type: integer }
+      responses:
+        "200":
+          description: Chat completion response
+
+  /api/v1/ai/models:
+    get:
+      summary: List available AI models
+      tags: [AI]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Model list
+
+  /api/v1/ai/vector/align:
+    post:
+      summary: Compute vector alignment
+      tags: [AI]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tokens]
+              properties:
+                tokens: { type: array, items: { type: string } }
+                target_dim: { type: integer, default: 1024 }
+                alignment_model: { type: string, default: "quantum-bert-xxl-v1" }
+      responses:
+        "200":
+          description: Vector alignment result
+
   /api/v1/yaml/generate:
     post:
-      summary: Generate .qyaml from module descriptor
-      security: [{ bearerAuth: [] }]
+      summary: Generate .qyaml governance manifest
+      tags: [YAML]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [module]
+              properties:
+                module:
+                  type: object
+                  properties:
+                    name: { type: string }
+                    ports: { type: array, items: { type: integer } }
+                    depends_on: { type: array, items: { type: string } }
+                target: { type: string, default: "k8s" }
       responses:
-        "200": { description: Generated qyaml document }
+        "200":
+          description: Generated .qyaml content
+
+  /api/v1/yaml/validate:
+    post:
+      summary: Validate .qyaml governance compliance
+      tags: [YAML]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content: { type: string }
+      responses:
+        "200":
+          description: Validation result
+
 components:
   securitySchemes:
     bearerAuth:

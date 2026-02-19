@@ -73,7 +73,15 @@ pnpm --filter @indestructibleeco/web dev
 │   ├── ingress/           # Ingress rules
 │   ├── monitoring/        # Grafana + Prometheus
 │   └── argocd/            # Argo CD GitOps applications & config
-├── src/                   # API Gateway entry point (root-level)
+├── src/                   # Core business modules (root-level)
+│   ├── schemas/           # Pydantic schemas (auth, inference, models)
+│   ├── middleware/         # Auth middleware (API key + JWT)
+│   ├── core/              # Registry, queue, app factory
+│   └── app.py             # FastAPI application factory
+├── tests/                 # Test suites (51 unit + 7 integration)
+│   ├── unit/              # Schemas, auth, queue, registry
+│   ├── integration/       # API endpoint tests
+│   └── e2e/               # End-to-end tests
 ├── docs/                  # Architecture guides & operational docs
 ├── helm/                  # Helm chart for platform deployment
 ├── docker/                # Docker build files (standard + GPU)

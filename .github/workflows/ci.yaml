@@ -67,6 +67,12 @@ jobs:
         python3 -m py_compile tools/skill-creator/scripts/init_skill.py
         python3 -m py_compile tools/skill-creator/scripts/quick_validate.py
         python3 -m py_compile src/app.py
+        python3 -m py_compile src/schemas/auth.py
+        python3 -m py_compile src/schemas/inference.py
+        python3 -m py_compile src/schemas/models.py
+        python3 -m py_compile src/middleware/auth.py
+        python3 -m py_compile src/core/queue.py
+        python3 -m py_compile src/core/registry.py
         echo "Python compile check passed"
 
     - name: JS syntax check
@@ -122,6 +128,11 @@ jobs:
       run: |
         git clone --depth 1 https://github.com/${{ github.repository }}.git .
         git checkout ${{ github.sha }}
+
+    - name: Core module tests (schemas, auth, queue, registry, API)
+      run: |
+        pip install pytest pytest-asyncio pydantic -q 2>/dev/null
+        PYTHONPATH=. python3 -m pytest tests/ -v --tb=short
 
     - name: Config tests
       run: |
@@ -229,7 +240,7 @@ jobs:
           ecosystem/logging ecosystem/gateway \
           tools/yaml-toolkit tools/skill-creator tools/ci-validator \
           k8s/base k8s/ingress k8s/monitoring k8s/argocd \
-          src docs; do
+          src src/schemas src/middleware src/core docs; do
           if [ -d "$dir" ]; then
             echo "  PASS: $dir"
           else

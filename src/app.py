@@ -1,139 +1,226 @@
-# IndestructibleEco v1.0 — API Gateway Application
-# URI: indestructibleeco://src/app
-#
-# This is the root-level API Gateway entry point used by docker/Dockerfile.
-# It proxies requests to backend services (AI, API) and provides health/status endpoints.
-#
-# Build: docker build -t ghcr.io/indestructibleorg/api:v1.0.0 -f docker/Dockerfile .
-# Run:   docker run -p 8000:8000 ghcr.io/indestructibleorg/api:v1.0.0
+"""IndestructibleEco v1.0 — Application Factory.
+
+URI: indestructibleeco://src/app
+
+Provides:
+- create_app() factory for FastAPI application
+- /health, /metrics, /v1/models, /v1/chat/completions endpoints
+- API key authentication middleware
+- Standalone HTTP server fallback
+
+Contracts defined by: tests/integration/test_api.py
+"""
+
+from __future__ import annotations
 
 import os
 import time
-import json
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse
+import uuid
+import resource
+from contextlib import asynccontextmanager
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
 
-# ── Configuration ────────────────────────────────────────────
-HOST = os.getenv("ECO_HOST", "0.0.0.0")
-PORT = int(os.getenv("ECO_PORT", "8000"))
-ENVIRONMENT = os.getenv("ECO_ENVIRONMENT", "production")
+from fastapi import FastAPI, HTTPException, Request, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, PlainTextResponse
+from pydantic import BaseModel
+
+from .middleware.auth import AuthMiddleware
+from .core.registry import ModelRegistry
+from .core.queue import RequestQueue
+from .schemas.auth import UserRole
+from .schemas.inference import (
+    ChatCompletionRequest,
+    ChatCompletionResponse,
+    ChatCompletionChoice,
+    ChatMessage,
+    ChatRole,
+    UsageInfo,
+)
+from .schemas.models import ModelStatus
+
+# ── Configuration ────────────────────────────────────────────────────
+
 VERSION = "1.0.0"
-START_TIME = time.time()
-
-# ── Upstream service endpoints ───────────────────────────────
-AI_SERVICE_URL = os.getenv("ECO_AI_SERVICE_URL", "http://localhost:8001")
-API_SERVICE_URL = os.getenv("ECO_API_SERVICE_URL", "http://localhost:3000")
+ENVIRONMENT = os.getenv("ECO_ENVIRONMENT", "development")
 
 
-class GatewayHandler(BaseHTTPRequestHandler):
-    """Minimal API Gateway request handler."""
+# ── Application Factory ─────────────────────────────────────────────
 
-    def do_GET(self):
-        path = urlparse(self.path).path
-
-        if path == "/health":
-            self._respond(200, {
-                "status": "healthy",
-                "service": "api-gateway",
-                "version": VERSION,
-                "environment": ENVIRONMENT,
-                "uptime_seconds": round(time.time() - START_TIME, 2),
-            })
-        elif path == "/ready":
-            self._respond(200, {"ready": True})
-        elif path == "/":
-            self._respond(200, {
-                "service": "IndestructibleEco API Gateway",
-                "version": VERSION,
-                "endpoints": {
-                    "health": "/health",
-                    "ready": "/ready",
-                    "ai": "/api/v1/ai/*",
-                    "platform": "/api/v1/platform/*",
-                },
-            })
-        else:
-            self._respond(404, {"error": "not_found", "path": path})
-
-    def do_POST(self):
-        self._respond(501, {"error": "not_implemented", "message": "Proxy routing not yet configured"})
-
-    def _respond(self, status: int, body: dict):
-        self.send_response(status)
-        self.send_header("Content-Type", "application/json")
-        self.send_header("X-Service", "indestructibleeco-gateway")
-        self.send_header("X-Version", VERSION)
-        self.end_headers()
-        self.wfile.write(json.dumps(body, indent=2).encode())
-
-    def log_message(self, format, *args):
-        """Structured logging."""
-        print(f"[gateway] {self.address_string()} - {format % args}")
+def _init_state(app: FastAPI) -> None:
+    """Initialize application state (idempotent)."""
+    if not hasattr(app.state, "start_time"):
+        app.state.start_time = time.time()
+        app.state.auth = AuthMiddleware()
+        app.state.registry = ModelRegistry()
+        app.state.queue = RequestQueue()
 
 
-# ── ASGI/WSGI compatibility shim ────────────────────────────
-# When run via uvicorn (as in Dockerfile CMD), provide an ASGI app object.
-# For standalone mode, use the built-in HTTP server.
-try:
-    from starlette.applications import Starlette
-    from starlette.responses import JSONResponse
-    from starlette.routing import Route
+def create_app() -> FastAPI:
+    """Create and configure the FastAPI application."""
 
-    async def health(request):
-        return JSONResponse({
-            "status": "healthy",
-            "service": "api-gateway",
-            "version": VERSION,
-            "environment": ENVIRONMENT,
-            "uptime_seconds": round(time.time() - START_TIME, 2),
-        })
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        _init_state(app)
+        yield
 
-    async def ready(request):
-        return JSONResponse({"ready": True})
-
-    async def root(request):
-        return JSONResponse({
-            "service": "IndestructibleEco API Gateway",
-            "version": VERSION,
-            "endpoints": {
-                "health": "/health",
-                "ready": "/ready",
-                "ai": "/api/v1/ai/*",
-                "platform": "/api/v1/platform/*",
-            },
-        })
-
-    async def not_found(request):
-        return JSONResponse(
-            {"error": "not_found", "path": request.url.path},
-            status_code=404,
-        )
-
-    app = Starlette(
-        routes=[
-            Route("/", root),
-            Route("/health", health),
-            Route("/ready", ready),
-        ],
-        debug=(ENVIRONMENT != "production"),
+    app = FastAPI(
+        title="IndestructibleEco AI Service",
+        version=VERSION,
+        docs_url="/docs" if ENVIRONMENT != "production" else None,
+        lifespan=lifespan,
     )
 
-except ImportError:
-    # Starlette not available — provide a minimal WSGI-compatible app
-    app = None
+    # Eagerly initialize state so TestClient works even if lifespan
+    # is not triggered by older Starlette versions.
+    _init_state(app)
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    # ── Auth dependency ──────────────────────────────────────────
+
+    async def require_auth(request: Request) -> Dict[str, Any]:
+        auth_header = request.headers.get("Authorization", "")
+        if not auth_header.startswith("Bearer "):
+            raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
+
+        token = auth_header[7:]
+        auth: AuthMiddleware = request.app.state.auth
+
+        # Try API key first
+        key_data = auth.validate_api_key(token)
+        if key_data is not None:
+            return key_data
+
+        # Try JWT
+        payload = auth.verify_jwt_token(token)
+        if payload is not None:
+            return {"sub": payload["sub"], "role": payload.get("role", "viewer")}
+
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    # ── Health ───────────────────────────────────────────────────
+
+    @app.get("/health")
+    async def health(request: Request):
+        uptime = time.time() - request.app.state.start_time
+        registry: ModelRegistry = request.app.state.registry
+        engines = list({
+            engine
+            for m in (await registry.list_models())
+            for engine in m.compatible_engines
+        })
+        return {
+            "status": "healthy",
+            "service": "ai",
+            "version": VERSION,
+            "engines": sorted(engines),
+            "uri": "indestructibleeco://backend/ai/health",
+            "urn": f"urn:indestructibleeco:backend:ai:health:{uuid.uuid1()}",
+            "uptime_seconds": round(uptime, 2),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+
+    # ── Metrics ──────────────────────────────────────────────────
+
+    @app.get("/metrics")
+    async def metrics(request: Request):
+        uptime = time.time() - request.app.state.start_time
+        mem = resource.getrusage(resource.RUSAGE_SELF)
+        registry: ModelRegistry = request.app.state.registry
+        model_count = registry.count
+        lines = [
+            "# HELP eco_uptime_seconds Service uptime in seconds",
+            "# TYPE eco_uptime_seconds gauge",
+            f"eco_uptime_seconds {uptime:.2f}",
+            "# HELP eco_memory_maxrss_bytes Maximum resident set size",
+            "# TYPE eco_memory_maxrss_bytes gauge",
+            f"eco_memory_maxrss_bytes {mem.ru_maxrss * 1024}",
+            "# HELP eco_models_registered Total registered models",
+            "# TYPE eco_models_registered gauge",
+            f"eco_models_registered {model_count}",
+        ]
+        return PlainTextResponse(
+            "\n".join(lines) + "\n",
+            media_type="text/plain; version=0.0.4",
+        )
+
+    # ── Models ───────────────────────────────────────────────────
+
+    @app.get("/v1/models")
+    async def list_models(request: Request, user: Dict = Depends(require_auth)):
+        registry: ModelRegistry = request.app.state.registry
+        models = await registry.list_models()
+        return {
+            "object": "list",
+            "data": [
+                {
+                    "id": m.model_id,
+                    "object": "model",
+                    "source": m.source,
+                    "capabilities": [c.value for c in m.capabilities],
+                    "compatible_engines": m.compatible_engines,
+                    "context_length": m.context_length,
+                    "status": m.status.value,
+                }
+                for m in models
+            ],
+        }
+
+    # ── Chat Completions ─────────────────────────────────────────
+
+    @app.post("/v1/chat/completions")
+    async def chat_completions(
+        req: ChatCompletionRequest,
+        request: Request,
+        user: Dict = Depends(require_auth),
+    ):
+        registry: ModelRegistry = request.app.state.registry
+        model = await registry.resolve_model(req.model)
+        if model is None:
+            raise HTTPException(status_code=404, detail=f"Model '{req.model}' not found")
+
+        # Simulate inference (production: route to engine adapter)
+        request_id = f"chatcmpl-{uuid.uuid4().hex[:12]}"
+        prompt_tokens = sum(len(m.content.split()) for m in req.messages)
+        completion_tokens = min(req.max_tokens, max(1, prompt_tokens))
+
+        response = ChatCompletionResponse(
+            id=request_id,
+            model=model.model_id,
+            choices=[
+                ChatCompletionChoice(
+                    index=0,
+                    message=ChatMessage(
+                        role=ChatRole.ASSISTANT,
+                        content=f"[{model.model_id}] Response to: {req.messages[-1].content[:100]}",
+                    ),
+                    finish_reason="stop",
+                )
+            ],
+            usage=UsageInfo(
+                prompt_tokens=prompt_tokens,
+                completion_tokens=completion_tokens,
+                total_tokens=prompt_tokens + completion_tokens,
+            ),
+        )
+        return response
+
+    return app
 
 
-def main():
-    """Standalone HTTP server mode."""
-    server = HTTPServer((HOST, PORT), GatewayHandler)
-    print(f"[gateway] IndestructibleEco API Gateway v{VERSION}")
-    print(f"[gateway] Listening on {HOST}:{PORT} ({ENVIRONMENT})")
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        print("\n[gateway] Shutting down...")
-        server.shutdown()
+# ── Standalone mode ──────────────────────────────────────────────────
 
+app = create_app()
 
 if __name__ == "__main__":
-    main()
+    import uvicorn
+    port = int(os.getenv("ECO_PORT", "8000"))
+    uvicorn.run("src.app:app", host="0.0.0.0", port=port, reload=(ENVIRONMENT == "development"))

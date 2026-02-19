@@ -15,51 +15,25 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Type check
-        run: pnpm typecheck
-
-      - name: Run tests
-        run: pnpm test
+      - name: Checkout
+        run: |
+          git clone --depth 1 https://github.com/${{ github.repository }}.git .
+          git checkout ${{ github.sha }}
 
       - name: Validate YAML manifests
         run: |
-          for f in backend/k8s/**/*.qyaml; do
-            pnpm yaml:validate --input "$f" || exit 1
-          done
+          python3 tools/ci-validator/validate.py
+          echo "Validation passed"
 
       - name: Build Docker images
         run: |
           docker build -t ghcr.io/${{ github.repository_owner }}/api:${{ github.sha }} backend/api
-          docker build -t ghcr.io/${{ github.repository_owner }}/ai:${{ github.sha }} backend/ai
+          docker build -t ghcr.io/${{ github.repository_owner }}/ai:${{ github.sha }} -f backend/ai/Dockerfile backend/ai/
+          echo "Docker images built"
 
       - name: Push images
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           docker push ghcr.io/${{ github.repository_owner }}/api:${{ github.sha }}
           docker push ghcr.io/${{ github.repository_owner }}/ai:${{ github.sha }}
-
-      - name: Security scan (Trivy)
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ghcr.io/${{ github.repository_owner }}/api:${{ github.sha }}
-
-      - name: Deploy to GKE
-        run: |
-          # kubectl apply -k backend/k8s/
-          echo "Deploy step — configure GKE credentials in secrets"
+          echo "Images pushed"

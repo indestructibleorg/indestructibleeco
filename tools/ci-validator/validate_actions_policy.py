@@ -80,7 +80,6 @@ class ActionsPolicyValidator:
         total_violations = 0
         
         # Get enforcement level
-        
         for workflow_file in workflow_files:
             # Extract actions using shared function
             actions = actions_policy_core.extract_actions_from_workflow(

@@ -1,7 +1,8 @@
 import { type Request, type Response, type NextFunction, type RequestHandler } from "express";
 import { createClient } from "@supabase/supabase-js";
+import { config } from "../config";
 
-// ── Types ───────────────────────────────────────────────────────────
+// ── Types ───────────────────────────────────────────────────────────────
 
 export interface AuthenticatedRequest extends Request {
   user?: {
@@ -12,16 +13,16 @@ export interface AuthenticatedRequest extends Request {
   };
 }
 
-// ── Supabase Client ─────────────────────────────────────────────────
+// ── Supabase Client ─────────────────────────────────────────────────────
 
 const supabase = createClient(
-  process.env.SUPABASE_URL || "",
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ""
+  config.supabaseUrl,
+  config.supabaseServiceRoleKey || config.supabaseKey
 );
 
-// ── requireAuth — validates Bearer token via Supabase ───────────────
+// ── authMiddleware — validates Bearer token via Supabase ────────────────
 
-export const requireAuth: RequestHandler = async (
+export const authMiddleware: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -42,12 +43,16 @@ export const requireAuth: RequestHandler = async (
     id: data.user.id,
     email: data.user.email || "",
     role: data.user.role || "member",
-    urn: `urn:indestructibleeco:user:${data.user.id}`,
+    urn: `urn:indestructibleeco:iam:user:${data.user.id}`,
   };
   next();
 };
 
-// ── adminOnly — restricts to admin role ─────────────────────────────
+// ── requireAuth — alias for route-level usage ───────────────────────────
+
+export const requireAuth: RequestHandler = authMiddleware;
+
+// ── adminOnly — restricts to admin role ─────────────────────────────────
 
 export const adminOnly: RequestHandler = async (
   req: Request,

@@ -3,9 +3,11 @@
   "title": "github-actions-repair-pro output",
   "type": "object",
   "required": ["root_cause", "fix_applied", "verification_status"],
+  "minProperties": 3,
   "properties": {
     "root_cause": {
       "type": "string",
+      "minLength": 1,
       "description": "Identified root cause of failure"
     },
     "fix_applied": {
@@ -28,17 +30,39 @@
     },
     "error_taxonomy": {
       "type": "object",
+      "description": "Classified error details with category, severity, file, line",
       "properties": {
         "category": {
           "type": "string",
-          "enum": ["yaml-syntax", "dockerfile-path", "identity-drift", "governance-missing", "schema-violation", "dependency-resolution", "runner-compatibility"]
+          "enum": ["yaml-syntax", "dockerfile-path", "identity-drift", "governance-missing", "schema-violation", "dependency-resolution", "runner-compatibility"],
+          "description": "Error classification category"
         },
-        "severity": { "type": "string", "enum": ["error", "warning"] },
-        "file": { "type": "string" },
-        "line": { "type": "integer", "minimum": 1 },
-        "message": { "type": "string" },
-        "auto_fixable": { "type": "boolean" },
-        "fix_strategy": { "type": "string" }
+        "severity": {
+          "type": "string",
+          "enum": ["error", "warning"],
+          "description": "Error severity level"
+        },
+        "file": {
+          "type": "string",
+          "description": "File path where the error was detected"
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Line number of the error"
+        },
+        "message": {
+          "type": "string",
+          "description": "Human-readable error message"
+        },
+        "auto_fixable": {
+          "type": "boolean",
+          "description": "Whether this error can be automatically repaired"
+        },
+        "fix_strategy": {
+          "type": "string",
+          "description": "Repair strategy identifier for auto-fix"
+        }
       }
     }
   }

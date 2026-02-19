@@ -2,7 +2,7 @@
   "id": "github-actions-repair-pro",
   "name": "GitHub Actions Repair Pro",
   "version": "1.0.0",
-  "description": "End-to-end automated diagnosis and repair of GitHub Actions CI/CD pipeline failures. Implements Understanding → Retrieval → Analysis → Reasoning → One-Stop Repair with root cause elimination and regression prevention.",
+  "description": "End-to-end automated diagnosis and repair of GitHub Actions CI/CD pipeline failures. Implements Understanding \u2192 Retrieval \u2192 Analysis \u2192 Reasoning \u2192 One-Stop Repair with root cause elimination and regression prevention.",
   "category": "ci-cd-repair",
   "triggers": [
     {
@@ -10,7 +10,10 @@
       "config": {
         "event": "workflow_run.completed",
         "filter": "conclusion == 'failure'",
-        "branches": ["main", "develop"]
+        "branches": [
+          "main",
+          "develop"
+        ]
       }
     },
     {
@@ -31,7 +34,7 @@
   "actions": [
     {
       "id": "understand",
-      "name": "Understanding — Build Mental Model",
+      "name": "Understanding \u2014 Build Mental Model",
       "type": "shell",
       "config": {
         "command": "bash actions/understand.sh",
@@ -42,11 +45,14 @@
         "timeout_seconds": 30
       },
       "depends_on": [],
-      "retry": { "max_attempts": 2, "backoff_ms": 1000 }
+      "retry": {
+        "max_attempts": 2,
+        "backoff_ms": 1000
+      }
     },
     {
       "id": "retrieve-logs",
-      "name": "Retrieval — Fetch Failure Logs",
+      "name": "Retrieval \u2014 Fetch Failure Logs",
       "type": "api",
       "config": {
         "method": "GET",
@@ -55,14 +61,22 @@
           "Authorization": "Bearer {{ .github_token }}",
           "Accept": "application/vnd.github+json"
         },
-        "expected_status": [200, 302]
+        "expected_status": [
+          200,
+          302
+        ]
       },
-      "depends_on": ["understand"],
-      "retry": { "max_attempts": 3, "backoff_ms": 2000 }
+      "depends_on": [
+        "understand"
+      ],
+      "retry": {
+        "max_attempts": 3,
+        "backoff_ms": 2000
+      }
     },
     {
       "id": "retrieve-workflow",
-      "name": "Retrieval — Fetch Workflow Definition",
+      "name": "Retrieval \u2014 Fetch Workflow Definition",
       "type": "shell",
       "config": {
         "command": "bash actions/retrieve-workflow.sh",
@@ -72,12 +86,17 @@
         },
         "timeout_seconds": 15
       },
-      "depends_on": ["understand"],
-      "retry": { "max_attempts": 2, "backoff_ms": 1000 }
+      "depends_on": [
+        "understand"
+      ],
+      "retry": {
+        "max_attempts": 2,
+        "backoff_ms": 1000
+      }
     },
     {
       "id": "retrieve-dockerfile",
-      "name": "Retrieval — Fetch Dockerfile & Build Context",
+      "name": "Retrieval \u2014 Fetch Dockerfile & Build Context",
       "type": "shell",
       "config": {
         "command": "bash actions/retrieve-dockerfile.sh",
@@ -86,12 +105,17 @@
         },
         "timeout_seconds": 15
       },
-      "depends_on": ["understand"],
-      "retry": { "max_attempts": 2, "backoff_ms": 1000 }
+      "depends_on": [
+        "understand"
+      ],
+      "retry": {
+        "max_attempts": 2,
+        "backoff_ms": 1000
+      }
     },
     {
       "id": "analyze",
-      "name": "Analysis — Root Cause Identification",
+      "name": "Analysis \u2014 Root Cause Identification",
       "type": "transform",
       "config": {
         "input_path": "retrieve-logs.output",
@@ -106,34 +130,46 @@
           "Detect environment/runner compatibility issues"
         ]
       },
-      "depends_on": ["retrieve-logs", "retrieve-workflow", "retrieve-dockerfile"],
-      "retry": { "max_attempts": 1, "backoff_ms": 1000 }
+      "depends_on": [
+        "retrieve-logs",
+        "retrieve-workflow",
+        "retrieve-dockerfile"
+      ],
+      "retry": {
+        "max_attempts": 1,
+        "backoff_ms": 1000
+      }
     },
     {
       "id": "reason",
-      "name": "Reasoning — Solution Derivation",
+      "name": "Reasoning \u2014 Solution Derivation",
       "type": "transform",
       "config": {
         "input_path": "analysis.json",
         "output_path": "solution.json",
         "rules": [
           "Map each root cause to a specific repair strategy",
-          "yaml-syntax → heredoc replacement for inline code blocks",
-          "dockerfile-path → rewrite COPY paths relative to build context",
-          "identity-drift → global search-replace with verification",
-          "governance-missing → inject 4-block governance stamp",
-          "schema-violation → regenerate from schema template",
+          "yaml-syntax \u2192 heredoc replacement for inline code blocks",
+          "dockerfile-path \u2192 rewrite COPY paths relative to build context",
+          "identity-drift \u2192 global search-replace with verification",
+          "governance-missing \u2192 inject 4-block governance stamp",
+          "schema-violation \u2192 regenerate from schema template",
           "Evaluate side effects of each proposed change",
           "Select minimal-impact fix path",
           "Generate concrete file modifications as unified diff"
         ]
       },
-      "depends_on": ["analyze"],
-      "retry": { "max_attempts": 1, "backoff_ms": 1000 }
+      "depends_on": [
+        "analyze"
+      ],
+      "retry": {
+        "max_attempts": 1,
+        "backoff_ms": 1000
+      }
     },
     {
       "id": "consolidate",
-      "name": "One-Stop Repair — Consolidate Changes",
+      "name": "One-Stop Repair \u2014 Consolidate Changes",
       "type": "transform",
       "config": {
         "input_path": "solution.json",
@@ -146,12 +182,17 @@
           "Validate patch applies cleanly to current HEAD"
         ]
       },
-      "depends_on": ["reason"],
-      "retry": { "max_attempts": 1, "backoff_ms": 1000 }
+      "depends_on": [
+        "reason"
+      ],
+      "retry": {
+        "max_attempts": 1,
+        "backoff_ms": 1000
+      }
     },
     {
       "id": "integrate",
-      "name": "One-Stop Repair — Apply & Integrate",
+      "name": "One-Stop Repair \u2014 Apply & Integrate",
       "type": "shell",
       "config": {
         "command": "bash actions/integrate.sh",
@@ -161,12 +202,17 @@
         },
         "timeout_seconds": 60
       },
-      "depends_on": ["consolidate"],
-      "retry": { "max_attempts": 1, "backoff_ms": 2000 }
+      "depends_on": [
+        "consolidate"
+      ],
+      "retry": {
+        "max_attempts": 1,
+        "backoff_ms": 2000
+      }
     },
     {
       "id": "validate-fix",
-      "name": "One-Stop Repair — Trigger Verification CI",
+      "name": "One-Stop Repair \u2014 Trigger Verification CI",
       "type": "api",
       "config": {
         "method": "POST",
@@ -175,15 +221,24 @@
           "Authorization": "Bearer {{ .github_token }}",
           "Accept": "application/vnd.github+json"
         },
-        "body": { "ref": "{{ .branch }}" },
-        "expected_status": [204]
+        "body": {
+          "ref": "{{ .branch }}"
+        },
+        "expected_status": [
+          204
+        ]
       },
-      "depends_on": ["integrate"],
-      "retry": { "max_attempts": 1, "backoff_ms": 5000 }
+      "depends_on": [
+        "integrate"
+      ],
+      "retry": {
+        "max_attempts": 1,
+        "backoff_ms": 5000
+      }
     },
     {
       "id": "monitor",
-      "name": "One-Stop Repair — Monitor Re-run Until Conclusion",
+      "name": "One-Stop Repair \u2014 Monitor Re-run Until Conclusion",
       "type": "shell",
       "config": {
         "command": "bash actions/monitor.sh",
@@ -192,30 +247,109 @@
         },
         "timeout_seconds": 360
       },
-      "depends_on": ["validate-fix"],
-      "retry": { "max_attempts": 1, "backoff_ms": 10000 }
+      "depends_on": [
+        "validate-fix"
+      ],
+      "retry": {
+        "max_attempts": 1,
+        "backoff_ms": 10000
+      }
     }
   ],
   "inputs": [
-    { "name": "repository", "type": "string", "required": true, "description": "GitHub repository (owner/repo)" },
-    { "name": "run_id", "type": "string", "required": true, "description": "Failed workflow run ID" },
-    { "name": "github_token", "type": "string", "required": true, "description": "GitHub PAT with actions and contents scope" },
-    { "name": "branch", "type": "string", "required": false, "default": "main", "description": "Target branch" },
-    { "name": "workflow_file", "type": "string", "required": false, "default": "ci.yaml", "description": "Workflow filename for re-trigger" },
-    { "name": "commit_message", "type": "string", "required": false, "default": "fix: automated CI/CD repair", "description": "Commit message for fix" }
+    {
+      "name": "repository",
+      "type": "string",
+      "required": true,
+      "description": "GitHub repository (owner/repo)"
+    },
+    {
+      "name": "run_id",
+      "type": "string",
+      "required": true,
+      "description": "Failed workflow run ID"
+    },
+    {
+      "name": "github_token",
+      "type": "string",
+      "required": true,
+      "description": "GitHub PAT with actions and contents scope"
+    },
+    {
+      "name": "branch",
+      "type": "string",
+      "required": false,
+      "default": "main",
+      "description": "Target branch"
+    },
+    {
+      "name": "workflow_file",
+      "type": "string",
+      "required": false,
+      "default": "ci.yaml",
+      "description": "Workflow filename for re-trigger"
+    },
+    {
+      "name": "commit_message",
+      "type": "string",
+      "required": false,
+      "default": "fix: automated CI/CD repair",
+      "description": "Commit message for fix"
+    }
   ],
   "outputs": [
-    { "name": "root_cause", "type": "string", "required": true, "description": "Identified root cause of failure" },
-    { "name": "fix_applied", "type": "boolean", "required": true, "description": "Whether fix was successfully applied" },
-    { "name": "verification_status", "type": "string", "required": true, "description": "Post-fix verification result: success|failure|timeout" },
-    { "name": "patch_diff", "type": "string", "required": false, "description": "Applied patch in unified diff format" },
-    { "name": "commit_sha", "type": "string", "required": false, "description": "SHA of the fix commit" },
-    { "name": "error_taxonomy", "type": "object", "required": false, "description": "Classified error details with category, severity, file, line" }
+    {
+      "name": "root_cause",
+      "type": "string",
+      "required": true,
+      "description": "Identified root cause of failure"
+    },
+    {
+      "name": "fix_applied",
+      "type": "boolean",
+      "required": true,
+      "description": "Whether fix was successfully applied"
+    },
+    {
+      "name": "verification_status",
+      "type": "string",
+      "required": true,
+      "description": "Post-fix verification result: success|failure|timeout"
+    },
+    {
+      "name": "patch_diff",
+      "type": "string",
+      "required": false,
+      "description": "Applied patch in unified diff format"
+    },
+    {
+      "name": "commit_sha",
+      "type": "string",
+      "required": false,
+      "description": "SHA of the fix commit"
+    },
+    {
+      "name": "error_taxonomy",
+      "type": "object",
+      "required": false,
+      "description": "Classified error details with category, severity, file, line"
+    }
   ],
   "governance": {
     "owner": "platform-team",
-    "approval_chain": ["platform-team", "devops-lead"],
-    "compliance_tags": ["ci-cd", "automation", "self-healing", "zero-trust"],
+    "approval_chain": [
+      "platform-team",
+      "devops-lead"
+    ],
+    "compliance_tags": [
+      "ci-cd",
+      "automation",
+      "self-healing",
+      "zero-trust",
+      "slsa-l3",
+      "audit-trail",
+      "soc2-compliant"
+    ],
     "lifecycle_policy": "active"
   },
   "metadata": {

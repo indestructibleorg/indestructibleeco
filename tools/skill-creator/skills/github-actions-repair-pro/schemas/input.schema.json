@@ -3,6 +3,7 @@
   "title": "github-actions-repair-pro input",
   "type": "object",
   "required": ["repository", "run_id", "github_token"],
+  "minProperties": 3,
   "properties": {
     "repository": {
       "type": "string",
@@ -22,7 +23,7 @@
     "branch": {
       "type": "string",
       "default": "main",
-      "description": "Target branch"
+      "description": "Target branch for fix integration"
     },
     "workflow_file": {
       "type": "string",
@@ -32,7 +33,7 @@
     "commit_message": {
       "type": "string",
       "default": "fix: automated CI/CD repair",
-      "description": "Commit message for fix"
+      "description": "Commit message for the fix"
     }
   }
 }

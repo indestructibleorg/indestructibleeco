@@ -7,8 +7,25 @@
 ```bash
 # Prerequisites: Node 20+, pnpm 9+, Docker, kubectl
 
-# 1. Install all workspace dependencies
-pnpm install
+## Core Policies
+
+| Policy | Standard | Weight |
+|--------|----------|--------|
+| UUID | v1 (time-based, sortable, traceable) | 1.0 |
+| URI | `indestructibleeco://{domain}/{kind}/{name}` | 1.0 |
+| URN | `urn:indestructibleeco:{domain}:{kind}:{name}:{uuid}` | 1.0 |
+| Schema Version | v1 | 1.0 |
+| YAML Toolkit | v1 | 1.0 |
+| Manifests | `.qyaml` extension, 4 mandatory governance blocks | 1.0 |
+| Vector Alignment | quantum-bert-xxl-v1, dim 1024–4096, tol 0.0001–0.005 | 1.0 |
+| Security | Zero-trust, mTLS, Sealed Secrets, RBAC, RLS, NetworkPolicy | 1.0 |
+| Env Vars | `ECO_*` prefix for all configuration variables | 1.0 |
+| Namespace | `indestructibleeco` (K8s, Docker, Helm) | 1.0 |
+| Container Naming | `eco-*` prefix for all containers | 1.0 |
+| Registry | `ghcr.io/indestructibleorg/*` | 1.0 |
+| GitHub Actions | Actions from `indestructibleorg` (SHA-pinned), plus local `./.github/actions/*` and digest-pinned `docker://` actions | 1.0 |
+
+## Environment Variables (ECO_* Prefix)
 
 # 2. Start local infrastructure
 pnpm local:up          # postgres + redis + api + ai via Docker Compose
@@ -74,7 +91,16 @@ The unified CI pipeline (`.github/workflows/ci.yaml`) enforces a 5-gate quality 
 
 An additional `auto-repair.yaml` workflow triggers on CI failure via `workflow_run`, performing deep diagnostics and generating consolidated repair reports.
 
-## GitOps — Argo CD
+| Validator | Scope | Auto-fixable |
+|-----------|-------|-------------|
+| YAML Syntax | `*.yaml`, `*.yml`, `*.qyaml` | %YAML directives, tabs, inline python |
+| Governance Blocks | `*.qyaml` | Missing blocks/fields |
+| Identity Consistency | All source files | Stale `superai`/`SUPERAI_` references |
+| Dockerfile Paths | `Dockerfile*` | COPY path mismatches |
+| Schema Compliance | `skill.json` | Structure violations |
+| Workflow Syntax | `.github/workflows/*.yaml` | Inline `python -c`, `continue-on-error` |
+| Cross-References | `kustomization.yaml` | Missing file references |
+| Actions Policy | `.github/workflows/*.yaml` | GitHub Actions ownership and SHA pinning violations |
 
 The platform uses Argo CD for fully automated Kubernetes deployment via GitOps. Every push to `main` triggers automatic synchronization of all `.qyaml` manifests to the cluster.
 

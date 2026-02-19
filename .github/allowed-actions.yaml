@@ -1,0 +1,54 @@
+# GitHub Actions Policy Configuration
+# This file defines which GitHub Actions are allowed in this repository
+
+policy:
+  # Require all actions to be from repositories owned by this organization
+  require_org_ownership: true
+  allowed_organizations:
+    - indestructibleorg
+  
+  # Require all actions to be pinned to full-length commit SHAs (40 characters)
+  require_sha_pinning: true
+  
+  # Block tag references (e.g., @v1, @v2, @main)
+  block_tag_references: true
+  
+  # Require docker:// actions to be pinned to immutable SHA256 digests
+  # This prevents supply-chain attacks via mutable tags like :latest
+  require_docker_digest_pinning: true
+  
+  # Enforcement level: "error" will fail the build, "warning" will only warn
+  enforcement_level: error
+
+# List of explicitly blocked actions (regardless of organization)
+blocked_actions:
+  - actions/checkout  # Use manual git clone instead
+  - actions/github-script  # Use gh CLI or API calls instead
+  - actions/upload-artifact  # Use manual artifact handling
+  - actions/download-artifact  # Use manual artifact handling
+  - actions/setup-node  # Use container with pre-installed Node
+  - actions/setup-python  # Use container with pre-installed Python
+  - actions/cache  # Use manual caching or BuildKit cache
+  - github/codeql-action/init  # Use manual CodeQL setup
+  - github/codeql-action/analyze  # Use manual CodeQL analysis
+  - github/codeql-action/upload-sarif  # Use manual SARIF upload
+
+# Documentation
+description: |
+  This repository enforces strict GitHub Actions usage policies for security and consistency:
+  
+  1. All actions must be from repositories owned by 'indestructibleorg'
+  2. All actions must be pinned to full-length commit SHAs (40 characters)
+  3. Tag references (@v1, @v2, @main) are not allowed
+  4. Docker actions must be pinned to immutable SHA256 digests
+  
+  Current workflows use manual commands (git clone, gh CLI) instead of external actions
+  to comply with this policy.
+  
+  Local actions (./.github/actions/) are permitted.
+  Docker actions (docker://) are permitted only when pinned to SHA256 digests.
+  
+  If you need to use a GitHub Action, either:
+  - Create a wrapper action in the indestructibleorg organization
+  - Use manual commands (git, gh, curl, etc.) to achieve the same functionality
+

@@ -14,6 +14,7 @@ Validators:
     5. Schema compliance — skill.json, package.json, pyproject.toml structure
     6. Workflow syntax — GitHub Actions workflow files are valid
     7. Cross-reference integrity — all file references in configs point to existing files
+    8. Actions policy — GitHub Actions comply with repository ownership and SHA pinning requirements
 
 Exit codes:
     0 — all validators pass
@@ -30,6 +31,13 @@ import hashlib
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Any
+
+# Import shared actions policy validation logic
+try:
+    from . import actions_policy_core
+except ImportError:
+    # Support running as script directly
+    import actions_policy_core
 
 # Resolve repo root (two levels up from this script)
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -49,6 +57,7 @@ class Category:
     SCHEMA_VIOLATION = "schema-violation"
     WORKFLOW_SYNTAX = "workflow-syntax"
     CROSS_REFERENCE = "cross-reference"
+    ACTIONS_POLICY = "actions-policy"
 
 
 def finding(category: str, severity: str, file: str, message: str,
@@ -487,6 +496,88 @@ def validate_cross_references(repo: Path) -> list[dict]:
 
 
 # ============================================================
+# Validator 8: GitHub Actions Policy
+# ============================================================
+def validate_actions_policy(repo: Path) -> list[dict]:
+    """Validate that all GitHub Actions comply with repository policy"""
+    findings = []
+    workflows_dir = repo / ".github" / "workflows"
+    
+    if not workflows_dir.exists():
+        return findings
+    
+    # Load policy using shared module
+    policy_file = repo / ".github" / "allowed-actions.yaml"
+    policy, load_error = actions_policy_core.load_policy_file(policy_file)
+    
+    if policy is None:
+        # Use default policy
+        policy = actions_policy_core.get_default_policy()
+        
+        # Emit warning/error if there was a load error (parse failure, not just missing file)
+        if load_error and policy_file.exists():
+            # Policy file exists but couldn't be loaded - this is a serious misconfiguration
+            findings.append(finding(
+                Category.ACTIONS_POLICY,
+                Severity.ERROR,
+                ".github/allowed-actions.yaml",
+                f"Policy configuration error: {load_error}"
+            ))
+            # Continue with default policy but user is warned
+    
+    # Get enforcement level from policy
+    policy_config = policy.get('policy', {})
+    enforcement_level = policy_config.get('enforcement_level', 'error')
+    severity = Severity.ERROR if enforcement_level == 'error' else Severity.WARNING
+    
+    workflow_files = list(workflows_dir.glob('*.yml')) + list(workflows_dir.glob('*.yaml'))
+    
+    for workflow_file in workflow_files:
+        try:
+            # Extract actions using shared function
+            actions = actions_policy_core.extract_actions_from_workflow(workflow_file, repo)
+            
+            for action_info in actions:
+                action_ref = action_info['action']
+                line_num = action_info['line']
+                
+                # Validate using shared function
+                violation_messages = actions_policy_core.validate_action_reference(
+                    action_ref, policy
+                )
+                
+                # Convert violations to findings
+                for message in violation_messages:
+                    findings.append(finding(
+                        Category.ACTIONS_POLICY,
+                        severity,
+                        workflow_file.relative_to(repo),
+                        message,
+                        line=line_num
+                    ))
+        
+        except RuntimeError as e:
+            # Workflow parsing error - emit finding with configured severity
+            findings.append(finding(
+                Category.ACTIONS_POLICY,
+                severity,
+                workflow_file.relative_to(repo),
+                f"Error parsing workflow: {e}"
+            ))
+        except Exception as e:
+            # Unexpected error - always treat as ERROR regardless of enforcement level
+            findings.append(finding(
+                Category.ACTIONS_POLICY,
+                Severity.ERROR,
+                workflow_file.relative_to(repo),
+                f"Unexpected error validating workflow: {e}"
+            ))
+
+    
+    return findings
+
+
+# ============================================================
 # Main Engine
 # ============================================================
 ALL_VALIDATORS = [
@@ -497,6 +588,7 @@ ALL_VALIDATORS = [
     ("schema-compliance", validate_schema_compliance),
     ("workflow-syntax", validate_workflow_syntax),
     ("cross-references", validate_cross_references),
+    ("actions-policy", validate_actions_policy),
 ]
 
 

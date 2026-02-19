@@ -1,12 +1,8 @@
 {
   "name": "@indestructibleeco/shared-types",
-  "version": "1.0.0",
-  "description": "Cross-platform shared type definitions",
-  "main": "src/index.ts",
+  "version": "0.1.0",
+  "description": "Shared TypeScript type definitions — zero runtime cost",
   "types": "src/index.ts",
-  "scripts": {
-    "build": "tsc",
-    "lint": "tsc --noEmit"
-  },
-  "license": "MIT"
+  "scripts": { "typecheck": "tsc --noEmit" },
+  "devDependencies": { "typescript": "^5.5.0" }
 }

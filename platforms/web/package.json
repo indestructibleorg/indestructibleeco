@@ -1,31 +1,30 @@
 {
   "name": "@indestructibleeco/web",
-  "version": "1.0.0",
-  "description": "IndestructibleEco Web Application + Landing Page",
-  "type": "module",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint src/"
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.22.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "react-router-dom": "^6.24.0",
     "zustand": "^4.5.0",
-    "@tanstack/react-query": "^5.17.0",
+    "@tanstack/react-query": "^5.50.0",
+    "@supabase/supabase-js": "^2.44.0",
     "@indestructibleeco/ui-kit": "workspace:*",
     "@indestructibleeco/api-client": "workspace:*",
     "@indestructibleeco/shared-types": "workspace:*"
   },
   "devDependencies": {
-    "vite": "^5.0.0",
-    "@vitejs/plugin-react": "^4.2.0",
-    "typescript": "^5.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
     "tailwindcss": "^3.4.0",
-    "autoprefixer": "^10.4.0",
-    "postcss": "^8.4.0"
-  },
-  "private": true
+    "vite": "^5.3.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
 }

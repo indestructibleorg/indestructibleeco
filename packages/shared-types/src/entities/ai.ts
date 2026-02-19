@@ -1,0 +1,1 @@
+export interface AiJob { id: string; status: "pending" | "running" | "completed" | "failed"; prompt: string; model_id: string; result?: string; error?: string; createdAt: string; completedAt?: string; }

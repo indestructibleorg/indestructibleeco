@@ -1,0 +1,41 @@
+name: YAML Governance Lint
+
+on:
+  pull_request:
+    paths:
+      - "**/*.qyaml"
+      - "**/*.yaml"
+      - "**/*.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Validate .qyaml governance blocks
+        run: |
+          echo "Scanning for .qyaml files..."
+          files=$(find . -name "*.qyaml" -not -path "*/node_modules/*")
+          for f in $files; do
+            echo "Validating: $f"
+            pnpm yaml:validate --input "$f" || exit 1
+          done
+          echo "All .qyaml files valid ✓"
+
+      - name: Check no %YAML directive (GKE compatibility)
+        run: |
+          if grep -rn "^%YAML" --include="*.qyaml" --include="*.yaml" .; then
+            echo "ERROR: %YAML directive found — not GKE-compatible!"
+            exit 1
+          fi
+          echo "No %YAML directives found ✓"

@@ -30,9 +30,14 @@ jobs:
             python3 -m py_compile backend/ai/src/config.py
             python3 -m py_compile backend/ai/src/routes.py
             python3 -m py_compile backend/ai/src/governance.py
+            python3 -m py_compile backend/ai/src/routes/health.py
+            python3 -m py_compile backend/ai/src/routes/generate.py
+            python3 -m py_compile backend/ai/src/routes/models.py
             python3 -m py_compile backend/shared/models/__init__.py
             python3 -m py_compile backend/shared/utils/__init__.py
             python3 -m py_compile tools/ci-validator/validate.py
+            python3 -m py_compile tools/skill-creator/scripts/init_skill.py
+            python3 -m py_compile tools/skill-creator/scripts/quick_validate.py
             echo "Python compile check passed"
       - run:
           name: "JS syntax check"
@@ -49,6 +54,12 @@ jobs:
               for block in document_metadata governance_info registry_binding vector_alignment_map; do
                 if ! grep -q "${block}:" "$f"; then
                   echo "  FAIL: Missing $block in $f"
+                  FAIL=1
+                fi
+              done
+              for field in unique_id uri urn target_system schema_version generated_by; do
+                if ! grep -q "${field}:" "$f"; then
+                  echo "  FAIL: Missing $field in $f"
                   FAIL=1
                 fi
               done
@@ -123,6 +134,12 @@ jobs:
             node tools/yaml-toolkit/bin/cli.js gen --input=/tmp/toolkit-test/module.json --output=/tmp/toolkit-test
             node tools/yaml-toolkit/bin/cli.js validate /tmp/toolkit-test/test-svc.qyaml
             echo "YAML Toolkit tests passed"
+      - run:
+          name: "Skill creator tests"
+          command: |
+            pip install pytest jsonschema -q 2>/dev/null
+            python3 -m pytest tools/skill-creator/skills/ -v --tb=short
+            echo "Skill creator tests passed"
 
 workflows:
   indestructibleeco-ci:

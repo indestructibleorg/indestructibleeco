@@ -1,197 +1,188 @@
 # indestructibleeco v1.0
 
-> Enterprise cloud-native platform — mono-repository
+> Enterprise cloud-native AI platform — mono-repository
 
 ## Quick Start
 
 ```bash
-# Prerequisites: Node 20+, pnpm 9+, Docker, kubectl
+# Clone
+git clone https://github.com/indestructibleorg/indestructibleeco.git
+cd indestructibleeco
 
-## Core Policies
+# Install Python deps
+pip install pydantic fastapi httpx pytest pytest-asyncio jsonschema
 
-| Policy | Standard | Weight |
-|--------|----------|--------|
-| UUID | v1 (time-based, sortable, traceable) | 1.0 |
-| URI | `indestructibleeco://{domain}/{kind}/{name}` | 1.0 |
-| URN | `urn:indestructibleeco:{domain}:{kind}:{name}:{uuid}` | 1.0 |
-| Schema Version | v1 | 1.0 |
-| YAML Toolkit | v1 | 1.0 |
-| Manifests | `.qyaml` extension, 4 mandatory governance blocks | 1.0 |
-| Vector Alignment | quantum-bert-xxl-v1, dim 1024–4096, tol 0.0001–0.005 | 1.0 |
-| Security | Zero-trust, mTLS, Sealed Secrets, RBAC, RLS, NetworkPolicy | 1.0 |
-| Env Vars | `ECO_*` prefix for all configuration variables | 1.0 |
-| Namespace | `indestructibleeco` (K8s, Docker, Helm) | 1.0 |
-| Container Naming | `eco-*` prefix for all containers | 1.0 |
-| Registry | `ghcr.io/indestructibleorg/*` | 1.0 |
-| GitHub Actions | Actions from `indestructibleorg` (SHA-pinned), plus local `./.github/actions/*` and digest-pinned `docker://` actions | 1.0 |
+# Run tests (136 core + 70 skill = 206 total)
+PYTHONPATH=. pytest tests/ -v
+pytest tools/skill-creator/skills/ -v
 
-## Environment Variables (ECO_* Prefix)
+# Run CI validator
+python3 tools/ci-validator/validate.py
 
-# 2. Start local infrastructure
-pnpm local:up          # postgres + redis + api + ai via Docker Compose
+# Generate .qyaml
+node tools/yaml-toolkit/bin/cli.js gen --input=module.json --output=out/
 
-# 3. Start observability stack (optional)
-pnpm ecosystem:up      # Prometheus + Grafana + Jaeger + Consul
+# Docker build
+docker build -t eco-ai:dev -f backend/ai/Dockerfile backend/ai/
 
-# 4. Start web platform in dev mode
-pnpm --filter @indestructibleeco/web dev
-
-# 5. Open Grafana at http://localhost:3030 (admin/admin)
-#    Open Jaeger at http://localhost:16686
-#    Open Consul at http://localhost:8500
+# Argo CD sync
+argocd app sync eco-ai-service
 ```
 
-## Workspace Structure
+## Architecture
 
 ```
-├── packages/              # Shared: ui-kit, api-client, shared-types
+indestructibleeco/
 ├── backend/
-│   ├── api/               # Express + Socket.IO REST/WS API
-│   ├── ai/                # FastAPI + gRPC AI inference service
-│   │   └── engines/       # Multi-engine inference (vLLM, TGI, Ollama, etc.)
-│   ├── k8s/               # Kubernetes manifests (.qyaml governance)
-│   ├── shared/            # Proto definitions, shared models/utils
-│   ├── supabase/          # Database migrations & RLS policies
-│   └── cloudflare/        # Edge workers (webhook routing)
+│   ├── ai/                          # AI inference service (FastAPI)
+│   │   ├── src/
+│   │   │   ├── app.py               # FastAPI entry + engine lifecycle
+│   │   │   ├── config.py            # ECO_* env config
+│   │   │   ├── routes.py            # /generate, /vector/align, /models
+│   │   │   ├── governance.py        # Governance engine
+│   │   │   └── services/
+│   │   │       ├── engine_manager.py # 7-engine orchestrator + failover
+│   │   │       ├── circuit_breaker.py# 3-state circuit breaker
+│   │   │       └── connection_pool.py# Persistent httpx pools
+│   │   ├── engines/
+│   │   │   ├── inference/            # 7 adapters (vLLM, TGI, Ollama, SGLang, TensorRT, DeepSpeed, LMDeploy)
+│   │   │   ├── compute/             # similarity, ranking, clustering, reasoning
+│   │   │   ├── folding/             # vector, graph, hybrid, realtime
+│   │   │   └── index/               # FAISS, Elasticsearch, Neo4j, hybrid router
+│   │   ├── Dockerfile
+│   │   └── pyproject.toml
+│   ├── api/                          # API gateway (Express + TypeScript)
+│   │   ├── src/
+│   │   │   ├── server.ts             # Express entry
+│   │   │   ├── config.ts             # ECO_* config
+│   │   │   ├── middleware/            # auth, error-handler, rate-limiter
+│   │   │   ├── routes/               # auth, ai, yaml, platforms, health
+│   │   │   └── ws/handler.ts         # WebSocket handler
+│   │   ├── openapi.yaml              # OpenAPI 3.0 spec
+│   │   └── Dockerfile
+│   ├── shared/
+│   │   ├── models/                   # Python dataclasses
+│   │   ├── utils/                    # UUID v1, URI/URN, governance stamps
+│   │   └── proto/                    # gRPC definitions
+│   ├── cloudflare/
+│   │   └── workers/webhook-router.ts # HMAC-verified webhook forwarding
+│   ├── supabase/
+│   │   └── migrations/               # 6-table schema + RLS
+│   └── k8s/                          # 12 .qyaml manifests + kustomization
+├── packages/
+│   ├── shared-types/                 # TypeScript entities + API contracts
+│   ├── api-client/                   # HTTP client + WebSocket with reconnect
+│   └── ui-kit/                       # React components (Button, Card, Badge, Input, Spinner, StatusIndicator)
 ├── platforms/
-│   ├── web/               # React SPA (Vite + TailwindCSS)
-│   ├── desktop/           # Electron desktop app
-│   ├── im-integration/    # WhatsApp, Telegram, LINE, Messenger bots
-│   └── platform-template/ # Scaffold for new platforms
-├── ecosystem/             # Full observability, logging, tracing, gateway
-│   ├── monitoring/        # Prometheus + Grafana + Alertmanager
-│   ├── logging/           # Loki + Promtail
-│   ├── tracing/           # Jaeger + Tempo + OpenTelemetry Collector
-│   ├── service-discovery/ # Consul
-│   └── gateway/           # Nginx reverse proxy (dev)
+│   ├── web/app/                      # React + Vite
+│   │   └── src/
+│   │       ├── pages/                # Dashboard, Login
+│   │       ├── components/           # Layout, ProtectedRoute, AIChat, ModelSelector
+│   │       ├── store/                # Zustand (auth, ai, platform)
+│   │       ├── hooks/                # useAuth, useAI, useWebSocket
+│   │       └── lib/                  # api client, ws client
+│   ├── desktop/                      # Electron (main, preload, IPC, tray, auto-updater)
+│   │   └── resources/icon.png
+│   └── im-integration/              # 4 channel adapters
+│       ├── telegram/                 # Telegraf polling + webhook
+│       ├── whatsapp/                 # Cloud API webhook
+│       ├── line/                     # Messaging API + HMAC
+│       ├── messenger/                # Graph API + HMAC
+│       └── shared/                   # normalizer, router, server
 ├── tools/
-│   ├── yaml-toolkit/      # YAML Toolkit v8 — .qyaml generator & validator
-│   ├── skill-creator/     # Skill authoring & validation framework
-│   └── ci-validator/      # Centralized CI validation engine (7 validators) + auto-fix
-├── k8s/                   # Infrastructure-level K8s manifests
-│   ├── base/              # Core services (api-gateway, redis, postgres, engines)
-│   ├── ingress/           # Ingress rules
-│   ├── monitoring/        # Grafana + Prometheus
-│   └── argocd/            # Argo CD GitOps applications & config
-├── src/                   # Core business modules (root-level)
-│   ├── schemas/           # Pydantic schemas (auth, inference, models)
-│   ├── middleware/         # Auth middleware (API key + JWT)
-│   ├── core/              # Registry, queue, app factory
-│   └── app.py             # FastAPI application factory
-├── tests/                 # Test suites (51 unit + 7 integration)
-│   ├── unit/              # Schemas, auth, queue, registry
-│   ├── integration/       # API endpoint tests
-│   └── e2e/               # End-to-end tests
-├── docs/                  # Architecture guides & operational docs
-├── helm/                  # Helm chart for platform deployment
-├── docker/                # Docker build files (standard + GPU)
-├── scripts/               # Build, deploy & Argo CD automation
-├── tests/                 # Unit, integration, e2e test suites
-└── .github/workflows/     # CI/CD pipelines (validate → lint → test → build → auto-fix)
+│   ├── ci-validator/                 # 8 validators + auto-fix engine
+│   ├── skill-creator/                # 2 skills (70 tests)
+│   │   └── skills/
+│   │       ├── github-actions-repair-pro/
+│   │       └── ai-code-editor-workflow-pipeline/
+│   └── yaml-toolkit/                 # .qyaml gen/validate/validate-schema
+├── k8s/
+│   ├── base/                         # 8 .qyaml manifests
+│   ├── ingress/                      # Ingress .qyaml
+│   ├── monitoring/                   # ServiceMonitor .qyaml
+│   └── argocd/                       # Argo CD apps (prod + staging)
+├── helm/
+│   ├── Chart.yaml
+│   ├── values.yaml
+│   └── templates/                    # deployment, service, ingress, hpa, pdb
+├── ecosystem/
+│   ├── monitoring/                   # Prometheus, Alertmanager, Grafana
+│   ├── logging/                      # Loki, Promtail
+│   ├── tracing/                      # Tempo, OTel Collector
+│   ├── service-discovery/            # Consul
+│   └── gateway/                      # Nginx dev config
+├── docker/                           # Production Dockerfiles + compose
+├── scripts/                          # build.sh, deploy.sh, argocd-install.sh
+├── src/                              # Core gateway (FastAPI)
+│   ├── app.py                        # create_app() factory
+│   ├── schemas/                      # Pydantic v2 (auth, inference, models)
+│   ├── middleware/                    # AuthMiddleware (API key + JWT)
+│   └── core/                         # RequestQueue, ModelRegistry
+├── tests/
+│   ├── unit/                         # 38 tests (schemas, auth, queue, registry)
+│   ├── integration/                  # 7 tests (API endpoints)
+│   └── e2e/                          # 15 tests (full flow + circuit breaker)
+├── docs/
+│   ├── argocd-gitops-guide.md
+│   └── auto-repair-architecture.md
+├── .github/workflows/
+│   ├── ci.yaml                       # 5-gate pipeline (validate→lint→test→build→auto-fix)
+│   └── auto-repair.yaml              # Self-healing on CI failure
+└── .circleci/config.yml              # 3-stage mirror pipeline
 ```
 
 ## CI/CD Pipeline
 
-The unified CI pipeline (`.github/workflows/ci.yaml`) enforces a 5-gate quality system:
-
-| Gate | Purpose |
-|------|---------|
-| **validate** | Centralized CI Validator Engine (7 validators) |
-| **lint** | Python compile, JS syntax, YAML governance, skill manifests |
-| **test** | Config, governance, shared utils, YAML toolkit, skill tests |
-| **build** | Docker image build + repository structure verification |
-| **auto-fix** | Runs on failure — diagnoses issues, identifies auto-fixable patterns |
-
-An additional `auto-repair.yaml` workflow triggers on CI failure via `workflow_run`, performing deep diagnostics and generating consolidated repair reports.
-
-| Validator | Scope | Auto-fixable |
-|-----------|-------|-------------|
-| YAML Syntax | `*.yaml`, `*.yml`, `*.qyaml` | %YAML directives, tabs, inline python |
-| Governance Blocks | `*.qyaml` | Missing blocks/fields |
-| Identity Consistency | All source files | Stale `superai`/`SUPERAI_` references |
-| Dockerfile Paths | `Dockerfile*` | COPY path mismatches |
-| Schema Compliance | `skill.json` | Structure violations |
-| Workflow Syntax | `.github/workflows/*.yaml` | Inline `python -c`, `continue-on-error` |
-| Cross-References | `kustomization.yaml` | Missing file references |
-| Actions Policy | `.github/workflows/*.yaml` | GitHub Actions ownership and SHA pinning violations |
-
-The platform uses Argo CD for fully automated Kubernetes deployment via GitOps. Every push to `main` triggers automatic synchronization of all `.qyaml` manifests to the cluster.
-
-| Feature | Description |
-|---------|-------------|
-| **Self-Heal** | Cluster drift automatically corrected to Git state |
-| **Prune** | Resources removed from Git are deleted from cluster |
-| **Webhook** | Push-triggered sync (no polling delay) |
-| **Notifications** | Slack + webhook alerts for sync events |
-| **Dual Environment** | Production (`indestructibleeco`) + Staging (`ecosystem-staging`) |
-
-```bash
-# Install Argo CD + deploy applications
-./scripts/argocd-install.sh
-
-# Setup GitHub webhook for push-triggered sync
-./scripts/argocd-setup-webhook.sh
-
-# Full guide: docs/argocd-gitops-guide.md
-```
-
-## Auto-Repair Engine
-
-The CI Auto-Fix Engine (`tools/ci-validator/auto-fix.py`) provides automated repair for known issue patterns:
-
-| Strategy | Scope | Risk |
-|----------|-------|------|
-| `path-correction` | Dockerfile COPY paths | Low |
-| `identity-replace` | Stale identity references | Medium |
-| `yaml-syntax` | Tabs, trailing whitespace | Low |
-| `governance-block` | Missing .qyaml governance blocks | Medium |
-| `schema-field` | Missing skill.json fields | Low |
-
-```bash
-# Detect issues
-python3 tools/ci-validator/validate.py
-
-# Preview fixes (dry-run)
-python3 tools/ci-validator/auto-fix.py --dry-run
-
-# Apply fixes
-python3 tools/ci-validator/auto-fix.py
-
-# Full architecture: docs/auto-repair-architecture.md
-```
-
-## YAML Governance
-
-All deployment manifests are auto-generated by the indestructibleeco YAML Toolkit v8.
-**No hand-crafted .qyaml files in production.**
-
-```bash
-# Generate a K8s manifest from module descriptor
-pnpm yaml:gen --name my-service --target k8s
-
-# Validate an existing .qyaml file
-pnpm yaml:validate --input backend/k8s/deployments/api.qyaml
-```
+| Gate | Purpose | Duration |
+|------|---------|----------|
+| validate | CI Validator Engine (8 validators) | ~3s |
+| lint | Python compile, JS syntax, .qyaml governance, skill manifests | ~5s |
+| test | Core tests (66), skill tests (70), config, governance, utils, YAML toolkit | ~11s |
+| build | Docker image + repository structure verification | ~35s |
+| auto-fix | Diagnostic mode on failure | skipped if green |
 
 ## Environment Variables
 
-All environment variables use the `ECO_*` prefix:
+All variables use `ECO_*` prefix:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `ECO_AI_HTTP_PORT` | 8001 | AI service HTTP port |
-| `ECO_AI_GRPC_PORT` | 8000 | AI service gRPC port |
-| `ECO_REDIS_URL` | redis://localhost:6379 | Redis connection |
-| `ECO_VECTOR_DIM` | 1024 | Vector alignment dimension |
-| `ECO_ALIGNMENT_MODEL` | quantum-bert-xxl-v1 | Default alignment model |
+| ECO_AI_HTTP_PORT | 8001 | AI service HTTP port |
+| ECO_AI_GRPC_PORT | 8000 | AI service gRPC port |
+| ECO_REDIS_URL | redis://localhost:6379 | Redis connection |
+| ECO_SUPABASE_URL | — | Supabase project URL |
+| ECO_VLLM_URL | http://localhost:8100 | vLLM engine endpoint |
+| ECO_OLLAMA_URL | http://localhost:11434 | Ollama engine endpoint |
+| ECO_TGI_URL | http://localhost:8101 | TGI engine endpoint |
+| ECO_SGLANG_URL | http://localhost:8102 | SGLang engine endpoint |
+| ECO_TENSORRT_URL | http://localhost:8103 | TensorRT engine endpoint |
+| ECO_DEEPSPEED_URL | http://localhost:8104 | DeepSpeed engine endpoint |
+| ECO_LMDEPLOY_URL | http://localhost:8105 | LMDeploy engine endpoint |
 
-## Adding a new platform
+## Test Summary
+
+| Suite | Count | Coverage |
+|-------|-------|----------|
+| Unit (schemas, auth, queue, registry) | 38 | Core business logic |
+| Integration (API endpoints) | 7 | HTTP contract validation |
+| E2E (full flow + circuit breaker) | 15 | End-to-end + resilience |
+| Skill tests (2 skills) | 70 | Skill manifests + governance |
+| **Total** | **130+** | |
+
+## Deployment
 
 ```bash
-cp -r platforms/platform-template platforms/platform-XX
-# Edit package.json, add CI workflow, generate K8s manifest
+# Kubernetes
+kubectl apply -k k8s/base/
+
+# Argo CD
+argocd app create eco-ai --repo https://github.com/indestructibleorg/indestructibleeco \
+  --path k8s/base --dest-server https://kubernetes.default.svc \
+  --dest-namespace indestructibleeco --sync-policy automated
+
+# Helm
+helm install eco helm/ -n indestructibleeco --create-namespace
+
+# Docker Compose (development)
+docker-compose up -d
 ```
-
-## License
-
-Internal use only — CONFIDENTIAL

@@ -22,6 +22,7 @@ This repository enforces strict GitHub Actions usage policies for security, repr
 ✅ **ALLOWED:**
 ```yaml
 # Actions from indestructibleorg (when available)
+# Note: Replace example SHA with actual commit SHA from the action's repository
 - uses: indestructibleorg/checkout-action@1234567890abcdef1234567890abcdef12345678
 
 # Local actions are allowed
@@ -50,6 +51,7 @@ This repository enforces strict GitHub Actions usage policies for security, repr
 
 ✅ **ALLOWED:**
 ```yaml
+# Note: Replace example SHA with actual commit SHA from indestructibleorg action
 - uses: indestructibleorg/my-action@1234567890abcdef1234567890abcdef12345678
 ```
 

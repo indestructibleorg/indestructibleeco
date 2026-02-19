@@ -77,6 +77,10 @@ jobs:
         python3 -m py_compile backend/ai/src/services/circuit_breaker.py
         python3 -m py_compile backend/ai/src/services/connection_pool.py
         python3 -m py_compile backend/ai/src/services/engine_manager.py
+        python3 -m py_compile backend/ai/src/services/worker.py
+        python3 -m py_compile backend/ai/src/services/embedding.py
+        python3 -m py_compile backend/ai/src/services/grpc_server.py
+        python3 -m py_compile backend/ai/src/services/health_monitor.py
         echo "Python compile check passed"
 
     - name: JS syntax check
@@ -279,6 +283,7 @@ jobs:
           helm/templates/pdb.yaml \
           platforms/desktop/resources/icon.png \
           tests/e2e/test_full_flow.py \
+          tests/e2e/test_service_lifecycle.py \
           backend/ai/src/services/engine_manager.py \
           backend/ai/src/services/circuit_breaker.py; do
           if [ -f "$file" ]; then

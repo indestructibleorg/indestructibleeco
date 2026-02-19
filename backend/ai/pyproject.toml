@@ -2,9 +2,9 @@
 name = "indestructibleeco-ai"
 version = "0.1.0"
 description = "AI generation + YAML governance service"
-python = "^3.11"
 
 [tool.poetry.dependencies]
+python = "^3.11"
 fastapi = "^0.111.0"
 uvicorn = { extras = ["standard"], version = "^0.30.0" }
 celery = "^5.4.0"

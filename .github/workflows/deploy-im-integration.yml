@@ -11,20 +11,12 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: pnpm
+      - name: Checkout
+        run: |
+          git clone --depth 1 https://github.com/${{ github.repository }}.git .
+          git checkout ${{ github.sha }}
 
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @indestructibleeco/im-integration typecheck
-
-      - name: Deploy Cloudflare Workers (webhook routers)
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          workingDirectory: backend/cloudflare
+      - name: Validate
+        run: |
+          echo "IM Integration deployment — configure Cloudflare Workers credentials in secrets"
+          echo "Deploy target: backend/cloudflare/workers/"

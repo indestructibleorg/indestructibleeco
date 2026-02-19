@@ -14,6 +14,7 @@ Validators:
     5. Schema compliance — skill.json, package.json, pyproject.toml structure
     6. Workflow syntax — GitHub Actions workflow files are valid
     7. Cross-reference integrity — all file references in configs point to existing files
+    8. Actions policy — GitHub Actions comply with repository ownership and SHA pinning requirements
 
 Exit codes:
     0 — all validators pass
@@ -49,6 +50,7 @@ class Category:
     SCHEMA_VIOLATION = "schema-violation"
     WORKFLOW_SYNTAX = "workflow-syntax"
     CROSS_REFERENCE = "cross-reference"
+    ACTIONS_POLICY = "actions-policy"
 
 
 def finding(category: str, severity: str, file: str, message: str,
@@ -442,6 +444,131 @@ def validate_cross_references(repo: Path) -> list[dict]:
 
 
 # ============================================================
+# Validator 8: GitHub Actions Policy
+# ============================================================
+def validate_actions_policy(repo: Path) -> list[dict]:
+    """Validate that all GitHub Actions comply with repository policy"""
+    findings = []
+    workflows_dir = repo / ".github" / "workflows"
+    
+    if not workflows_dir.exists():
+        return findings
+    
+    # Load policy
+    policy_file = repo / ".github" / "allowed-actions.yaml"
+    policy = {}
+    
+    if policy_file.exists():
+        try:
+            import yaml
+            with open(policy_file, 'r') as f:
+                policy = yaml.safe_load(f)
+        except Exception as e:
+            findings.append(finding(
+                Category.ACTIONS_POLICY, Severity.WARNING, ".github/allowed-actions.yaml",
+                f"Failed to load policy file: {e}"
+            ))
+            return findings
+    else:
+        # Default policy if file doesn't exist
+        policy = {
+            'policy': {
+                'require_org_ownership': True,
+                'allowed_organizations': ['indestructibleorg'],
+                'require_sha_pinning': True,
+                'block_tag_references': True
+            },
+            'blocked_actions': [],
+            'approved_actions': []
+        }
+    
+    workflow_files = list(workflows_dir.glob('*.yml')) + list(workflows_dir.glob('*.yaml'))
+    
+    for workflow_file in workflow_files:
+        try:
+            content = workflow_file.read_text()
+            
+            # Find all 'uses:' statements
+            pattern = r'uses:\s*([^\s#]+)'
+            
+            for line_num, line in enumerate(content.split('\n'), 1):
+                match = re.search(pattern, line)
+                if match:
+                    action_ref = match.group(1).strip()
+                    
+                    # Validate the action
+                    if '@' not in action_ref:
+                        findings.append(finding(
+                            Category.ACTIONS_POLICY, Severity.ERROR,
+                            workflow_file.relative_to(repo),
+                            f"Action '{action_ref}' missing version/ref specifier",
+                            line=line_num
+                        ))
+                        continue
+                    
+                    action_path, ref = action_ref.rsplit('@', 1)
+                    parts = action_path.split('/')
+                    
+                    if len(parts) < 2:
+                        findings.append(finding(
+                            Category.ACTIONS_POLICY, Severity.ERROR,
+                            workflow_file.relative_to(repo),
+                            f"Invalid action format '{action_ref}' (expected owner/repo@ref)",
+                            line=line_num
+                        ))
+                        continue
+                    
+                    owner = parts[0]
+                    repo_name = parts[1]
+                    action_base = f"{owner}/{repo_name}"
+                    
+                    # Check if action is explicitly blocked
+                    blocked_actions = policy.get('blocked_actions', [])
+                    for blocked in blocked_actions:
+                        if action_path.startswith(blocked):
+                            findings.append(finding(
+                                Category.ACTIONS_POLICY, Severity.ERROR,
+                                workflow_file.relative_to(repo),
+                                f"Action '{action_base}' is explicitly blocked by policy. Use manual commands instead.",
+                                line=line_num
+                            ))
+                            break
+                    
+                    # Check organization ownership requirement
+                    policy_config = policy.get('policy', {})
+                    if policy_config.get('require_org_ownership', False):
+                        allowed_orgs = policy_config.get('allowed_organizations', [])
+                        if owner not in allowed_orgs:
+                            findings.append(finding(
+                                Category.ACTIONS_POLICY, Severity.ERROR,
+                                workflow_file.relative_to(repo),
+                                f"Action from '{owner}' is not allowed. Only actions from {', '.join(allowed_orgs)} are permitted.",
+                                line=line_num
+                            ))
+                    
+                    # Check SHA pinning requirement
+                    if policy_config.get('require_sha_pinning', False):
+                        # SHA should be 40 characters hex
+                        sha_pattern = re.compile(r'^[a-f0-9]{40}$', re.IGNORECASE)
+                        if not sha_pattern.match(ref):
+                            findings.append(finding(
+                                Category.ACTIONS_POLICY, Severity.ERROR,
+                                workflow_file.relative_to(repo),
+                                f"Action '{action_base}@{ref}' must be pinned to full-length commit SHA (40 characters), not tag '{ref}'",
+                                line=line_num
+                            ))
+        
+        except Exception as e:
+            findings.append(finding(
+                Category.ACTIONS_POLICY, Severity.WARNING,
+                workflow_file.relative_to(repo),
+                f"Error parsing workflow: {e}"
+            ))
+    
+    return findings
+
+
+# ============================================================
 # Main Engine
 # ============================================================
 ALL_VALIDATORS = [
@@ -452,6 +579,7 @@ ALL_VALIDATORS = [
     ("schema-compliance", validate_schema_compliance),
     ("workflow-syntax", validate_workflow_syntax),
     ("cross-references", validate_cross_references),
+    ("actions-policy", validate_actions_policy),
 ]
 
 

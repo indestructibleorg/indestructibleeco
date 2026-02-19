@@ -91,6 +91,7 @@ indestructibleeco/
 | Namespace | `indestructibleeco` (K8s, Docker, Helm) | 1.0 |
 | Container Naming | `eco-*` prefix for all containers | 1.0 |
 | Registry | `ghcr.io/indestructibleorg/*` | 1.0 |
+| GitHub Actions | Only from `indestructibleorg` org, pinned to commit SHAs | 1.0 |
 
 ## Environment Variables (ECO_* Prefix)
 
@@ -140,6 +141,7 @@ Every `.qyaml` manifest must contain these 4 mandatory blocks:
 | Schema Compliance | `skill.json` | Structure violations |
 | Workflow Syntax | `.github/workflows/*.yaml` | Inline `python -c`, `continue-on-error` |
 | Cross-References | `kustomization.yaml` | Missing file references |
+| Actions Policy | `.github/workflows/*.yaml` | GitHub Actions ownership and SHA pinning violations |
 
 ### Self-Healing Automation (`.github/workflows/auto-repair.yaml`)
 

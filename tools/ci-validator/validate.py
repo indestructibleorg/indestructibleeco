@@ -519,8 +519,8 @@ def validate_actions_policy(repo: Path) -> list[dict]:
                         continue
                     
                     owner = parts[0]
-                    action_repo = parts[1]
-                    action_base = f"{owner}/{action_repo}"
+                    repository_name = parts[1]
+                    action_base = f"{owner}/{repository_name}"
                     
                     # Check if action is explicitly blocked
                     blocked_actions = policy.get('blocked_actions', [])

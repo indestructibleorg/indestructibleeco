@@ -1,0 +1,22 @@
+name: Deploy IM Integration
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "platforms/im-integration/**"
+      - "backend/cloudflare/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        run: |
+          git clone --depth 1 https://github.com/${{ github.repository }}.git .
+          git checkout ${{ github.sha }}
+
+      - name: Validate
+        run: |
+          echo "IM Integration deployment — configure Cloudflare Workers credentials in secrets"
+          echo "Deploy target: backend/cloudflare/workers/"

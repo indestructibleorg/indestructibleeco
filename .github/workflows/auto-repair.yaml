@@ -1,4 +1,11 @@
-name: Auto-Repair on CI Failure
+# IndestructibleEco v1.0 — Auto-Repair Workflow
+# URI: indestructibleeco://workflows/auto-repair
+#
+# Triggered when CI/CD pipeline fails. Runs diagnostic analysis,
+# identifies auto-fixable issues, and generates repair reports.
+#
+# GitOps integration: Argo CD picks up any committed fixes automatically.
+name: Auto-Repair
 
 on:
   workflow_run:
@@ -6,75 +13,142 @@ on:
     types: [completed]
 
 permissions:
-  contents: write
-  actions: write
+  contents: read
+  actions: read
 
 jobs:
-  diagnose-and-repair:
+  diagnose:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.head_branch == 'main' }}
+    if: github.event.workflow_run.conclusion == 'failure'
     steps:
-    - name: Checkout
+    - name: Checkout (failed commit)
       run: |
-        git clone https://github.com/${{ github.repository }}.git .
-        git checkout main
+        git clone --depth 5 https://github.com/${{ github.repository }}.git .
+        git checkout ${{ github.event.workflow_run.head_sha }}
 
-    - name: Configure git
+    - name: Collect failure context
+      id: context
       run: |
-        git config user.name "eco-auto-repair[bot]"
-        git config user.email "auto-repair@indestructibleeco.io"
+        echo "=== Failure Context ==="
+        echo "Run ID: ${{ github.event.workflow_run.id }}"
+        echo "Commit: ${{ github.event.workflow_run.head_sha }}"
+        echo "Branch: ${{ github.event.workflow_run.head_branch }}"
+        echo "Trigger: ${{ github.event.workflow_run.event }}"
+        echo ""
+        echo "commit_sha=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
+        echo "run_id=${{ github.event.workflow_run.id }}" >> "$GITHUB_OUTPUT"
 
-    - name: Run CI Validator Engine (diagnostic mode)
-      id: diagnose
+    - name: Run CI Validator Engine (diagnostic)
+      id: validator
       run: |
-        python3 tools/ci-validator/validate.py --report=/tmp/diagnosis.json 2>&1 || true
-        if [ -f /tmp/diagnosis.json ]; then
-          cat > /tmp/extract_errors.py << 'PYEOF'
-        import json
-        d = json.load(open("/tmp/diagnosis.json"))
-        print(d["error_count"])
-        PYEOF
-          ERROR_COUNT=$(python3 /tmp/extract_errors.py)
-          echo "error_count=${ERROR_COUNT}" >> "$GITHUB_OUTPUT"
-          echo "Diagnosis complete: ${ERROR_COUNT} errors found"
-          cat > /tmp/extract_fixable.py << 'PYEOF'
-        import json
-        d = json.load(open("/tmp/diagnosis.json"))
-        fixable = [f for f in d["findings"] if f.get("auto_fixable") and f["severity"] == "error"]
-        print(f"Auto-fixable errors: {len(fixable)}")
-        for f in fixable:
-            print(f"  [{f['category']}] {f['file']}:L{f['line']} -- {f['message']} (strategy: {f['fix_strategy']})")
-        PYEOF
-          python3 /tmp/extract_fixable.py 2>/dev/null || echo "No auto-fixable errors detected"
-        else
-          echo "error_count=0" >> "$GITHUB_OUTPUT"
-          echo "Validator did not produce a report — CI failure may be in build/test phase"
+        echo "=== CI Validator Diagnostic ==="
+        python3 tools/ci-validator/validate.py --report=/tmp/validator-report.json || true
+        if [ -f /tmp/validator-report.json ]; then
+          cat /tmp/validator-report.json | python3 -m json.tool
         fi
 
-    - name: Fetch failure logs
-      env:
-        GH_TOKEN: ${{ github.token }}
+    - name: Run Auto-Fix Engine (analysis)
+      id: autofix
       run: |
-        RUN_ID=${{ github.event.workflow_run.id }}
-        echo "Fetching logs for run ${RUN_ID}..."
-        gh api "repos/${{ github.repository }}/actions/runs/${RUN_ID}/jobs" \
-          --jq '.jobs[] | select(.conclusion=="failure") | {name, conclusion, steps: [.steps[] | select(.conclusion=="failure") | {name, conclusion, number}]}' \
-          > /tmp/failed-jobs.json 2>/dev/null || echo "[]" > /tmp/failed-jobs.json
-        echo "=== Failed Jobs ==="
-        cat /tmp/failed-jobs.json
+        echo "=== Auto-Fix Analysis ==="
+        python3 tools/ci-validator/auto-fix.py --dry-run --report=/tmp/autofix-report.json || true
+        if [ -f /tmp/autofix-report.json ]; then
+          cat /tmp/autofix-report.json | python3 -m json.tool
+        fi
+
+    - name: Fetch failed job logs
+      run: |
+        echo "=== Failed Job Logs ==="
+        # Use GitHub API to fetch workflow run jobs
+        cat > /tmp/fetch_logs.py << 'PYEOF'
+        import json, os, urllib.request
+
+        run_id = os.environ.get("RUN_ID", "")
+        repo = os.environ.get("GITHUB_REPOSITORY", "")
+        token = os.environ.get("GITHUB_TOKEN", "")
+
+        if not all([run_id, repo, token]):
+            print("Missing environment variables for log fetch")
+            exit(0)
+
+        url = f"https://api.github.com/repos/{repo}/actions/runs/{run_id}/jobs"
+        req = urllib.request.Request(url, headers={
+            "Authorization": f"token {token}",
+            "Accept": "application/vnd.github.v3+json",
+        })
+
+        try:
+            with urllib.request.urlopen(req) as resp:
+                data = json.loads(resp.read())
+                failed_jobs = [j for j in data.get("jobs", []) if j.get("conclusion") == "failure"]
+                for job in failed_jobs:
+                    print(f"\n--- Failed Job: {job['name']} ---")
+                    for step in job.get("steps", []):
+                        if step.get("conclusion") == "failure":
+                            print(f"  Failed Step: {step['name']}")
+                            print(f"  Started: {step.get('started_at', 'N/A')}")
+                            print(f"  Completed: {step.get('completed_at', 'N/A')}")
+                if not failed_jobs:
+                    print("No failed jobs found in this run")
+        except Exception as e:
+            print(f"Could not fetch logs: {e}")
+        PYEOF
+        RUN_ID="${{ steps.context.outputs.run_id }}" \
+        GITHUB_TOKEN="${{ github.token }}" \
+        python3 /tmp/fetch_logs.py
 
     - name: Generate repair report
-      if: always()
       run: |
-        cat > /tmp/repair-report.json << REPORTEOF
-        {
-          "trigger_run_id": "${{ github.event.workflow_run.id }}",
-          "trigger_sha": "${{ github.event.workflow_run.head_sha }}",
-          "trigger_branch": "${{ github.event.workflow_run.head_branch }}",
-          "diagnosis_errors": ${{ steps.diagnose.outputs.error_count || 0 }},
-          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-          "status": "diagnosed"
+        cat > /tmp/generate_report.py << 'PYEOF'
+        import json, os
+        from datetime import datetime, timezone
+
+        report = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "trigger": {
+                "run_id": os.environ.get("RUN_ID", ""),
+                "commit": os.environ.get("COMMIT_SHA", ""),
+                "repository": os.environ.get("GITHUB_REPOSITORY", ""),
+            },
+            "validator": {},
+            "autofix": {},
+            "recommendations": [],
         }
-        REPORTEOF
-        echo "=== Repair Report ==="
-        cat /tmp/repair-report.json | python3 -m json.tool
+
+        # Load validator report
+        try:
+            with open("/tmp/validator-report.json") as f:
+                report["validator"] = json.load(f)
+        except Exception:
+            report["validator"] = {"error": "Report not available"}
+
+        # Load autofix report
+        try:
+            with open("/tmp/autofix-report.json") as f:
+                af = json.load(f)
+                report["autofix"] = af
+                if af.get("auto_fixable", 0) > 0:
+                    report["recommendations"].append(
+                        "Run 'python3 tools/ci-validator/auto-fix.py' locally to apply automatic fixes"
+                    )
+                if af.get("manual_required", 0) > 0:
+                    report["recommendations"].append(
+                        "Manual review required for some issues — see autofix report details"
+                    )
+        except Exception:
+            report["autofix"] = {"error": "Report not available"}
+
+        if not report["recommendations"]:
+            report["recommendations"].append(
+                "No auto-fixable issues detected — review CI logs for root cause"
+            )
+
+        print("=== Consolidated Repair Report ===")
+        print(json.dumps(report, indent=2))
+
+        with open("/tmp/repair-report.json", "w") as f:
+            json.dump(report, f, indent=2)
+        PYEOF
+        RUN_ID="${{ steps.context.outputs.run_id }}" \
+        COMMIT_SHA="${{ steps.context.outputs.commit_sha }}" \
+        python3 /tmp/generate_report.py

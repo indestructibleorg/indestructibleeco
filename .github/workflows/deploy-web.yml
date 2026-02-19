@@ -1,0 +1,22 @@
+name: Deploy Web
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "platforms/web/**"
+      - "packages/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        run: |
+          git clone --depth 1 https://github.com/${{ github.repository }}.git .
+          git checkout ${{ github.sha }}
+
+      - name: Validate
+        run: |
+          echo "Web deployment — configure Cloudflare Pages credentials in secrets"
+          echo "Deploy target: platforms/web/app/dist"

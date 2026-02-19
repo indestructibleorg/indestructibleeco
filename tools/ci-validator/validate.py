@@ -210,6 +210,7 @@ STALE_PATTERNS = [
 # Files that legitimately reference stale patterns (detection rules, repair descriptions)
 IDENTITY_SCAN_EXCLUDES = {
     "tools/ci-validator/validate.py",       # This file — contains detection patterns
+    "tools/ci-validator/auto-fix.py",       # Auto-fix engine — contains replacement maps
     "tools/ci-validator/rules/identity.yaml",  # Rule definitions
 }
 
@@ -279,15 +280,47 @@ def validate_dockerfile_paths(repo: Path) -> list[dict]:
     findings = []
     dockerfiles = [f for f in repo.rglob("Dockerfile*") if ".git" not in f.parts and f.is_file()]
 
-    # Parse workflow files to find build contexts
+    # Parse build contexts from ALL sources (workflows, docker-compose, build scripts)
     build_contexts: dict[str, str] = {}
+
+    # Source 1: GitHub Actions workflows — pattern: -f <dockerfile> <context>
     for wf in (repo / ".github" / "workflows").glob("*.y*ml") if (repo / ".github" / "workflows").exists() else []:
         content = wf.read_text()
-        # Match patterns like: -f backend/ai/Dockerfile backend/ai/
         for m in re.finditer(r"-f\s+(\S+Dockerfile\S*)\s+(\S+)", content):
             df_path = m.group(1)
             ctx = m.group(2)
             build_contexts[df_path] = ctx
+
+    # Source 2: docker-compose files — pattern: context: <path>, dockerfile: <name>
+    compose_files = list(repo.glob("docker-compose*.yml")) + list(repo.glob("docker-compose*.yaml"))
+    compose_files += list(repo.glob("docker/docker-compose*.yml")) + list(repo.glob("docker/docker-compose*.yaml"))
+    for cf in compose_files:
+        try:
+            content = cf.read_text()
+            # Parse context + dockerfile pairs from compose files
+            # Match blocks like: build:\n  context: ./backend/ai\n  dockerfile: Dockerfile
+            for m in re.finditer(
+                r"build:\s*\n\s+context:\s*(\S+)\s*\n\s+dockerfile:\s*(\S+)",
+                content,
+            ):
+                ctx = m.group(1).strip("./") or "."
+                df_name = m.group(2).strip()
+                df_path = f"{ctx}/{df_name}" if ctx != "." else df_name
+                build_contexts[df_path] = ctx
+        except Exception:
+            pass
+
+    # Source 3: Shell build scripts — pattern: -f <dockerfile> <context> (same as workflows)
+    for script in (repo / "scripts").glob("*.sh") if (repo / "scripts").exists() else []:
+        try:
+            content = script.read_text()
+            for m in re.finditer(r"-f\s+(\S+Dockerfile\S*)\s+\\?\s*(\S+)", content):
+                df_path = m.group(1)
+                ctx = m.group(2).strip()
+                if ctx and not ctx.startswith("-"):
+                    build_contexts[df_path] = ctx
+        except Exception:
+            pass
 
     for df in dockerfiles:
         content = df.read_text()
@@ -303,14 +336,26 @@ def validate_dockerfile_paths(repo: Path) -> list[dict]:
                     # Skip variable references
                     if src.startswith("$") or src.startswith("--"):
                         continue
-                    # Determine build context
+                    # Determine build context — check all known context mappings
                     df_rel = str(rel)
-                    ctx_dir = build_contexts.get(df_rel, str(df.parent.relative_to(repo)))
-                    src_full = repo / ctx_dir / src
+                    ctx_dir = build_contexts.get(df_rel, None)
+                    # Fallback: check if Dockerfile basename matches any mapped path
+                    if ctx_dir is None:
+                        for mapped_df, mapped_ctx in build_contexts.items():
+                            if df_rel.endswith(mapped_df) or mapped_df.endswith(str(rel.name)):
+                                ctx_dir = mapped_ctx
+                                break
+                    # Final fallback: Dockerfile's parent directory
+                    if ctx_dir is None:
+                        ctx_dir = str(df.parent.relative_to(repo))
+
+                    # Normalize context: "." means repo root
+                    ctx_path = repo if ctx_dir == "." else repo / ctx_dir
+                    src_full = ctx_path / src
                     # Check if source exists (file or directory or glob)
-                    if not src_full.exists() and not list(repo.glob(f"{ctx_dir}/{src}")):
-                        # Check if it's a relative path within the Dockerfile's directory
-                        if not (df.parent / src).exists():
+                    if not src_full.exists() and not list(ctx_path.glob(src)):
+                        # Also check repo root as final fallback for "." context
+                        if ctx_dir != "." or not (repo / src).exists():
                             findings.append(finding(
                                 Category.DOCKERFILE_PATH, Severity.WARNING, rel,
                                 f"COPY source '{src}' may not exist in build context '{ctx_dir}'",

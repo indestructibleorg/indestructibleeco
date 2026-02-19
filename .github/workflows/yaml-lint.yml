@@ -1,0 +1,40 @@
+name: YAML Governance Lint
+
+on:
+  pull_request:
+    paths:
+      - "**/*.qyaml"
+      - "**/*.yaml"
+      - "**/*.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        run: |
+          git clone --depth 1 https://github.com/${{ github.repository }}.git .
+          git checkout ${{ github.sha }}
+
+      - name: Validate .qyaml governance blocks
+        run: |
+          FAIL=0
+          for f in $(find . -name "*.qyaml" -not -path "*/node_modules/*" -type f); do
+            echo "Validating: $f"
+            for block in document_metadata governance_info registry_binding vector_alignment_map; do
+              if ! grep -q "${block}:" "$f"; then
+                echo "  FAIL: Missing $block in $f"
+                FAIL=1
+              fi
+            done
+          done
+          if [ "$FAIL" -eq 1 ]; then exit 1; fi
+          echo "All .qyaml files valid"
+
+      - name: Check no %YAML directive (GKE compatibility)
+        run: |
+          if grep -rn "^%YAML" --include="*.qyaml" --include="*.yaml" .; then
+            echo "ERROR: %YAML directive found"
+            exit 1
+          fi
+          echo "No %YAML directives found"

@@ -1,0 +1,20 @@
+name: Deploy Desktop
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        run: |
+          git clone --depth 1 https://github.com/${{ github.repository }}.git .
+          git checkout ${{ github.sha }}
+
+      - name: Build placeholder
+        run: |
+          echo "Desktop build — configure electron-builder on macOS/Windows runners"
+          echo "Target: platforms/desktop/build/*"

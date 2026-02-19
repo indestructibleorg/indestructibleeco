@@ -1,0 +1,149 @@
+# IndestructibleEco v1.0 — Argo CD Notifications Configuration
+# URI: indestructibleeco://k8s/argocd/notifications
+# Configures Slack and webhook notifications for sync events.
+#
+# Prerequisites:
+#   1. Create Slack app at https://api.slack.com/apps
+#   2. Store token in argocd-notifications-secret:
+#      kubectl create secret generic argocd-notifications-secret \
+#        --from-literal=slack-token=xoxb-YOUR-TOKEN -n argocd
+#
+# Deploy: kubectl apply -f k8s/argocd/argocd-notifications-cm.yaml -n argocd
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-notifications-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-notifications
+    app.kubernetes.io/part-of: indestructibleeco
+data:
+  # ── Slack Service ──────────────────────────────────────────
+  service.slack: |
+    token: $slack-token
+    signingSecret: $slack-signing-secret
+
+  # ── Webhook Service (generic) ──────────────────────────────
+  service.webhook.indestructibleeco: |
+    url: $webhook-url
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: X-IndestructibleEco-Event
+        value: argocd-sync
+
+  # ── Notification Templates ─────────────────────────────────
+  template.app-sync-succeeded: |
+    slack:
+      attachments: |
+        [{
+          "color": "#18be52",
+          "title": "✅ {{ .app.metadata.name }} — Sync Succeeded",
+          "fields": [
+            {"title": "Application", "value": "{{ .app.metadata.name }}", "short": true},
+            {"title": "Namespace", "value": "{{ .app.spec.destination.namespace }}", "short": true},
+            {"title": "Revision", "value": "{{ .app.status.sync.revision | trunc 7 }}", "short": true},
+            {"title": "Status", "value": "{{ .app.status.sync.status }}", "short": true}
+          ],
+          "footer": "IndestructibleEco GitOps | Argo CD",
+          "footer_icon": "https://argo-cd.readthedocs.io/en/stable/assets/logo.png"
+        }]
+    webhook:
+      indestructibleeco:
+        method: POST
+        body: |
+          {
+            "event": "sync-succeeded",
+            "app": "{{ .app.metadata.name }}",
+            "namespace": "{{ .app.spec.destination.namespace }}",
+            "revision": "{{ .app.status.sync.revision }}",
+            "timestamp": "{{ .app.status.operationState.finishedAt }}"
+          }
+
+  template.app-sync-failed: |
+    slack:
+      attachments: |
+        [{
+          "color": "#e53935",
+          "title": "❌ {{ .app.metadata.name }} — Sync Failed",
+          "fields": [
+            {"title": "Application", "value": "{{ .app.metadata.name }}", "short": true},
+            {"title": "Namespace", "value": "{{ .app.spec.destination.namespace }}", "short": true},
+            {"title": "Revision", "value": "{{ .app.status.sync.revision | trunc 7 }}", "short": true},
+            {"title": "Error", "value": "{{ .app.status.operationState.message | trunc 200 }}", "short": false}
+          ],
+          "footer": "IndestructibleEco GitOps | Argo CD"
+        }]
+    webhook:
+      indestructibleeco:
+        method: POST
+        body: |
+          {
+            "event": "sync-failed",
+            "app": "{{ .app.metadata.name }}",
+            "namespace": "{{ .app.spec.destination.namespace }}",
+            "revision": "{{ .app.status.sync.revision }}",
+            "error": "{{ .app.status.operationState.message }}",
+            "timestamp": "{{ .app.status.operationState.finishedAt }}"
+          }
+
+  template.app-health-degraded: |
+    slack:
+      attachments: |
+        [{
+          "color": "#ff9800",
+          "title": "⚠️ {{ .app.metadata.name }} — Health Degraded",
+          "fields": [
+            {"title": "Application", "value": "{{ .app.metadata.name }}", "short": true},
+            {"title": "Health", "value": "{{ .app.status.health.status }}", "short": true},
+            {"title": "Namespace", "value": "{{ .app.spec.destination.namespace }}", "short": true}
+          ],
+          "footer": "IndestructibleEco GitOps | Argo CD"
+        }]
+
+  template.app-sync-running: |
+    slack:
+      attachments: |
+        [{
+          "color": "#2196f3",
+          "title": "🔄 {{ .app.metadata.name }} — Sync In Progress",
+          "fields": [
+            {"title": "Application", "value": "{{ .app.metadata.name }}", "short": true},
+            {"title": "Revision", "value": "{{ .app.status.sync.revision | trunc 7 }}", "short": true}
+          ],
+          "footer": "IndestructibleEco GitOps | Argo CD"
+        }]
+
+  # ── Trigger Definitions ────────────────────────────────────
+  trigger.on-sync-succeeded: |
+    - when: app.status.operationState.phase in ['Succeeded']
+      send: [app-sync-succeeded]
+
+  trigger.on-sync-failed: |
+    - when: app.status.operationState.phase in ['Error', 'Failed']
+      send: [app-sync-failed]
+
+  trigger.on-health-degraded: |
+    - when: app.status.health.status == 'Degraded'
+      send: [app-health-degraded]
+
+  trigger.on-sync-running: |
+    - when: app.status.operationState.phase in ['Running']
+      send: [app-sync-running]
+
+  # ── Default Triggers (applied to all apps) ─────────────────
+  defaultTriggers: |
+    - on-sync-succeeded
+    - on-sync-failed
+    - on-health-degraded
+
+  # ── Subscriptions ──────────────────────────────────────────
+  subscriptions: |
+    - recipients:
+        - slack:indestructibleeco-deployments
+        - webhook:indestructibleeco
+      triggers:
+        - on-sync-succeeded
+        - on-sync-failed
+        - on-health-degraded
+        - on-sync-running

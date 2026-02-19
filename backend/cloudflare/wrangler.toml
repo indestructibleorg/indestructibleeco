@@ -1,0 +1,8 @@
+name = "indestructibleeco-workers"
+main = "workers/webhook-router.ts"
+compatibility_date = "2024-06-01"
+[vars]
+ENVIRONMENT = "production"
+[[routes]]
+pattern = "api.indestructibleeco.io/webhook/*"
+zone_name = "indestructibleeco.io"

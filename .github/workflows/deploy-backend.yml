@@ -1,0 +1,39 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "packages/**"
+
+concurrency:
+  group: deploy-backend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        run: |
+          git clone --depth 1 https://github.com/${{ github.repository }}.git .
+          git checkout ${{ github.sha }}
+
+      - name: Validate YAML manifests
+        run: |
+          python3 tools/ci-validator/validate.py
+          echo "Validation passed"
+
+      - name: Build Docker images
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/api:${{ github.sha }} backend/api
+          docker build -t ghcr.io/${{ github.repository_owner }}/ai:${{ github.sha }} -f backend/ai/Dockerfile backend/ai/
+          echo "Docker images built"
+
+      - name: Push images
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker push ghcr.io/${{ github.repository_owner }}/api:${{ github.sha }}
+          docker push ghcr.io/${{ github.repository_owner }}/ai:${{ github.sha }}
+          echo "Images pushed"

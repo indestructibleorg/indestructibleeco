@@ -1,0 +1,67 @@
+# IndestructibleEco v1.0 — Argo CD Application (Production)
+# URI: indestructibleeco://k8s/argocd/application/production
+# This manifest defines the main Argo CD Application that watches the k8s/ directory
+# and auto-syncs all .qyaml manifests to the production namespace.
+#
+# Deploy: kubectl apply -f k8s/argocd/argo-app.yaml -n argocd
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: indestructibleeco
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: indestructibleeco
+    app.kubernetes.io/part-of: indestructibleeco
+    app.kubernetes.io/managed-by: argocd
+  annotations:
+    # Governance traceability
+    indestructibleeco/uri: "indestructibleeco://k8s/argocd/application/production"
+    indestructibleeco/owner: "platform-team"
+    indestructibleeco/compliance: "soc2,zero-trust,gitops"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  # ── Source: GitHub repository ──────────────────────────────
+  source:
+    repoURL: https://github.com/indestructibleorg/indestructibleeco
+    targetRevision: main
+    path: k8s
+    # Only sync .qyaml files (governance-validated manifests)
+    directory:
+      recurse: true
+      include: "*.qyaml"
+
+  # ── Destination: Production cluster ────────────────────────
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: indestructibleeco
+
+  # ── Sync Policy: Fully automated GitOps ────────────────────
+  syncPolicy:
+    automated:
+      selfHeal: true       # Auto-repair drift (cluster → Git state)
+      prune: true          # Auto-delete resources removed from Git
+      allowEmpty: false     # Prevent accidental full-delete
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+  # ── Health & Status ────────────────────────────────────────
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas    # Allow HPA to manage replicas
+
+  revisionHistoryLimit: 10

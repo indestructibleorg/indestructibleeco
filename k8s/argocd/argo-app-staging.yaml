@@ -1,0 +1,68 @@
+# IndestructibleEco v1.0 — Argo CD Application (Staging)
+# URI: indestructibleeco://k8s/argocd/application/staging
+# Staging environment syncs from the same repo but targets ecosystem-staging namespace.
+# Used for pre-production validation before promoting to production.
+#
+# Deploy: kubectl apply -f k8s/argocd/argo-app-staging.yaml -n argocd
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: indestructibleeco-staging
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: indestructibleeco-staging
+    app.kubernetes.io/part-of: indestructibleeco
+    app.kubernetes.io/managed-by: argocd
+    environment: staging
+  annotations:
+    indestructibleeco/uri: "indestructibleeco://k8s/argocd/application/staging"
+    indestructibleeco/owner: "platform-team"
+    indestructibleeco/compliance: "soc2,zero-trust,gitops"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  # ── Source: GitHub repository ──────────────────────────────
+  source:
+    repoURL: https://github.com/indestructibleorg/indestructibleeco
+    targetRevision: main
+    path: k8s
+    directory:
+      recurse: true
+      include: "*.qyaml"
+
+  # ── Destination: Staging namespace ─────────────────────────
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ecosystem-staging
+
+  # ── Sync Policy: Automated with self-heal ──────────────────
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true
+      # Override namespace for staging isolation
+      - RespectIgnoreDifferences=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 2m
+
+  # ── Health & Status ────────────────────────────────────────
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+
+  revisionHistoryLimit: 5

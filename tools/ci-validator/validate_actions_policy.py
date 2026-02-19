@@ -188,11 +188,9 @@ class ActionsPolicyValidator:
         if enforcement_level == 'error':
             print("Policy enforcement level: ERROR")
             print("Build will fail due to policy violations.")
-            return False
         else:
             print("Policy enforcement level: WARNING")
             print("Policy violations detected but build will continue.")
-            return True
 
 
 def main():
@@ -225,7 +223,7 @@ def main():
     
     print(f"\nScanned {total_actions} GitHub Actions usage(s)")
     
-    success = validator.report()
+    validator.report()
     
     if total_violations > 0 and not args.exit_zero:
         policy_config = validator.policy.get('policy', {})

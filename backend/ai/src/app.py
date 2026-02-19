@@ -3,8 +3,10 @@
 Runtime: Python 3.11 + FastAPI + Uvicorn
 Ports: 8000 (gRPC internal) + 8001 (HTTP)
 Vector alignment: quantum-bert-xxl-v1, dim 1024-4096, tol 0.0001-0.005
-Queuing: Celery + Redis for async inference jobs
+Queuing: Async worker for inference jobs
 Engine management: 7 adapters with connection pools + circuit breakers
+Embedding: Batch embedding via engine adapters with fallback
+gRPC: Internal high-performance inference endpoint
 """
 
 import os
@@ -42,6 +44,7 @@ async def lifespan(app: FastAPI):
     app.state.start_time = time.time()
     app.state.governance = GovernanceEngine()
 
+    # --- Engine Manager ---
     from .services.engine_manager import EngineManager
 
     endpoints = _resolve_engine_endpoints()
@@ -53,8 +56,49 @@ async def lifespan(app: FastAPI):
     await engine_mgr.initialize()
     app.state.engine_manager = engine_mgr
 
+    # --- Embedding Service ---
+    from .services.embedding import EmbeddingService
+
+    embedding_svc = EmbeddingService(
+        engine_manager=engine_mgr,
+        default_model=settings.alignment_model,
+        default_dimensions=settings.vector_dim,
+    )
+    app.state.embedding_service = embedding_svc
+
+    # --- Inference Worker ---
+    from .services.worker import InferenceWorker
+
+    worker = InferenceWorker(
+        engine_manager=engine_mgr,
+        max_queue_size=int(os.environ.get("ECO_WORKER_QUEUE_SIZE", "10000")),
+        stale_timeout=float(os.environ.get("ECO_WORKER_STALE_TIMEOUT", "600")),
+    )
+    worker_concurrency = int(os.environ.get("ECO_WORKER_CONCURRENCY", "4"))
+    await worker.start(concurrency=worker_concurrency)
+    app.state.inference_worker = worker
+
+    # --- gRPC Server ---
+    from .services.grpc_server import GrpcServer, GrpcServiceConfig
+
+    grpc_config = GrpcServiceConfig(
+        port=settings.grpc_port,
+        max_workers=int(os.environ.get("ECO_GRPC_MAX_WORKERS", "10")),
+        max_concurrent_rpcs=int(os.environ.get("ECO_GRPC_MAX_CONCURRENT", "100")),
+    )
+    grpc_server = GrpcServer(
+        config=grpc_config,
+        engine_manager=engine_mgr,
+        embedding_service=embedding_svc,
+    )
+    await grpc_server.start()
+    app.state.grpc_server = grpc_server
+
     yield
 
+    # --- Shutdown ---
+    await grpc_server.stop()
+    await worker.shutdown()
     await engine_mgr.shutdown()
 
 
@@ -82,6 +126,12 @@ async def health(request: Request):
     engine_mgr = getattr(request.app.state, "engine_manager", None)
     available_engines = engine_mgr.list_available_engines() if engine_mgr else []
 
+    worker = getattr(request.app.state, "inference_worker", None)
+    worker_running = worker._running if worker else False
+
+    grpc = getattr(request.app.state, "grpc_server", None)
+    grpc_running = grpc.is_running if grpc else False
+
     return {
         "status": "healthy",
         "service": "ai",
@@ -90,6 +140,8 @@ async def health(request: Request):
         "urn": f"urn:indestructibleeco:backend:ai:health:{uuid.uuid1()}",
         "uptime_seconds": round(uptime, 2),
         "engines": available_engines,
+        "worker": {"running": worker_running},
+        "grpc": {"running": grpc_running, "port": settings.grpc_port},
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
@@ -101,6 +153,33 @@ async def engine_health(request: Request):
     if not engine_mgr:
         return {"error": "engine manager not initialized"}
     return engine_mgr.get_health()
+
+
+@app.get("/health/worker")
+async def worker_health(request: Request):
+    """Worker queue depth and job statistics."""
+    worker = getattr(request.app.state, "inference_worker", None)
+    if not worker:
+        return {"error": "worker not initialized"}
+    return worker.get_stats()
+
+
+@app.get("/health/grpc")
+async def grpc_health(request: Request):
+    """gRPC server metrics."""
+    grpc = getattr(request.app.state, "grpc_server", None)
+    if not grpc:
+        return {"error": "grpc server not initialized"}
+    return grpc.get_metrics()
+
+
+@app.get("/health/embedding")
+async def embedding_health(request: Request):
+    """Embedding service statistics."""
+    embedding_svc = getattr(request.app.state, "embedding_service", None)
+    if not embedding_svc:
+        return {"error": "embedding service not initialized"}
+    return embedding_svc.get_stats()
 
 
 @app.get("/metrics")
@@ -120,6 +199,38 @@ async def metrics(request: Request):
                 f'eco_engine_available{{engine="{name}"}} {1 if h.is_available else 0}',
             ])
 
+    worker = getattr(request.app.state, "inference_worker", None)
+    worker_lines = []
+    if worker:
+        worker_lines.extend([
+            f"eco_worker_submitted_total {worker.total_submitted}",
+            f"eco_worker_completed_total {worker.total_completed}",
+            f"eco_worker_failed_total {worker.total_failed}",
+            f"eco_worker_timeout_total {worker.total_timeout}",
+            f"eco_worker_queue_depth {worker._queue.qsize()}",
+        ])
+
+    embedding_svc = getattr(request.app.state, "embedding_service", None)
+    embedding_lines = []
+    if embedding_svc:
+        embedding_lines.extend([
+            f"eco_embedding_requests_total {embedding_svc.total_requests}",
+            f"eco_embedding_tokens_total {embedding_svc.total_tokens}",
+            f"eco_embedding_vectors_total {embedding_svc.total_vectors}",
+            f"eco_embedding_errors_total {embedding_svc.total_errors}",
+        ])
+
+    grpc = getattr(request.app.state, "grpc_server", None)
+    grpc_lines = []
+    if grpc:
+        sm = grpc.servicer.get_metrics()
+        grpc_lines.extend([
+            f"eco_grpc_requests_total {sm['total_requests']}",
+            f"eco_grpc_errors_total {sm['total_errors']}",
+            f"eco_grpc_stream_requests_total {sm['total_stream_requests']}",
+            f"eco_grpc_embedding_requests_total {sm['total_embedding_requests']}",
+        ])
+
     lines = [
         "# HELP eco_uptime_seconds AI service uptime in seconds",
         "# TYPE eco_uptime_seconds gauge",
@@ -131,7 +242,16 @@ async def metrics(request: Request):
         "# TYPE eco_engine_requests_total counter",
         "# HELP eco_engine_errors_total Total errors per engine",
         "# TYPE eco_engine_errors_total counter",
-    ] + engine_lines
+    ] + engine_lines + [
+        "# HELP eco_worker_submitted_total Total jobs submitted to worker",
+        "# TYPE eco_worker_submitted_total counter",
+    ] + worker_lines + [
+        "# HELP eco_embedding_requests_total Total embedding requests",
+        "# TYPE eco_embedding_requests_total counter",
+    ] + embedding_lines + [
+        "# HELP eco_grpc_requests_total Total gRPC requests",
+        "# TYPE eco_grpc_requests_total counter",
+    ] + grpc_lines
 
     return JSONResponse(
         content="\n".join(lines) + "\n",

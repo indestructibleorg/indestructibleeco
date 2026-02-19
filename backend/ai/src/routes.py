@@ -1,6 +1,8 @@
-"""AI Service API routes -- generation, vector alignment, model listing.
+"""AI Service API routes -- generation, vector alignment, model listing,
+embedding, async jobs.
 
-Routes dispatch to EngineManager for real inference with failover.
+Routes dispatch to EngineManager for real inference with failover,
+EmbeddingService for vector embeddings, and InferenceWorker for async jobs.
 """
 
 import uuid
@@ -66,6 +68,73 @@ class ModelInfo(BaseModel):
     uri: str
     urn: str
     capabilities: List[str]
+
+
+class EmbedRequest(BaseModel):
+    input: Any  # str or List[str]
+    model: str = "default"
+    dimensions: int = 1024
+    encoding_format: str = "float"
+
+
+class EmbedResponse(BaseModel):
+    request_id: str
+    data: List[Dict[str, Any]]
+    model: str
+    dimensions: int
+    total_tokens: int
+    latency_ms: float
+    uri: str
+    urn: str
+
+
+class SimilarityRequest(BaseModel):
+    text_a: str
+    text_b: str
+    model: str = "default"
+    dimensions: int = 1024
+
+
+class SimilarityResponse(BaseModel):
+    text_a: str
+    text_b: str
+    cosine_similarity: float
+    euclidean_distance: float
+    model: str
+    uri: str
+    urn: str
+
+
+class AsyncJobRequest(BaseModel):
+    prompt: str
+    model_id: str = "default"
+    max_tokens: int = 2048
+    temperature: float = 0.7
+    top_p: float = 0.9
+    priority: str = "normal"
+    timeout_seconds: float = 300.0
+
+
+class AsyncJobResponse(BaseModel):
+    job_id: str
+    status: str
+    uri: str
+    urn: str
+    created_at: str
+
+
+class JobStatusResponse(BaseModel):
+    job_id: str
+    status: str
+    result: Optional[str] = None
+    error: Optional[str] = None
+    engine: Optional[str] = None
+    usage: Dict[str, int] = Field(default_factory=dict)
+    latency_ms: float = 0.0
+    uri: str
+    urn: str
+    created_at: str
+    completed_at: Optional[str] = None
 
 
 # --- Routes ---
@@ -207,6 +276,194 @@ async def list_models(request: Request):
     return models
 
 
+# --- Embedding Routes ---
+
+@router.post("/embeddings", response_model=EmbedResponse)
+async def create_embeddings(req: EmbedRequest, request: Request):
+    """Generate embeddings for text input(s).
+
+    Accepts a single string or list of strings. Returns normalized
+    embedding vectors via EmbeddingService.
+    """
+    embedding_svc = getattr(request.app.state, "embedding_service", None)
+    if not embedding_svc:
+        raise HTTPException(status_code=503, detail="Embedding service not available")
+
+    texts: List[str] = [req.input] if isinstance(req.input, str) else list(req.input)
+    if not texts:
+        raise HTTPException(status_code=400, detail="Empty input")
+
+    model = req.model if req.model != "default" else settings.alignment_model
+
+    try:
+        result = await embedding_svc.embed_batch(
+            texts=texts,
+            model_id=model,
+            dimensions=req.dimensions,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    uid = uuid.uuid1()
+    data = [
+        {"object": "embedding", "index": i, "embedding": emb}
+        for i, emb in enumerate(result.embeddings)
+    ]
+
+    return EmbedResponse(
+        request_id=result.request_id,
+        data=data,
+        model=model,
+        dimensions=result.dimensions,
+        total_tokens=result.total_tokens,
+        latency_ms=round(result.latency_ms, 2),
+        uri=f"indestructibleeco://ai/embedding/{uid}",
+        urn=f"urn:indestructibleeco:ai:embedding:{model}:{uid}",
+    )
+
+
+@router.post("/embeddings/similarity", response_model=SimilarityResponse)
+async def compute_similarity(req: SimilarityRequest, request: Request):
+    """Compute cosine similarity and Euclidean distance between two texts."""
+    embedding_svc = getattr(request.app.state, "embedding_service", None)
+    if not embedding_svc:
+        raise HTTPException(status_code=503, detail="Embedding service not available")
+
+    model = req.model if req.model != "default" else settings.alignment_model
+
+    try:
+        result = await embedding_svc.similarity(
+            text_a=req.text_a,
+            text_b=req.text_b,
+            model_id=model,
+            dimensions=req.dimensions,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    uid = uuid.uuid1()
+    return SimilarityResponse(
+        text_a=result.text_a[:100],
+        text_b=result.text_b[:100],
+        cosine_similarity=round(result.cosine_similarity, 6),
+        euclidean_distance=round(result.euclidean_distance, 6),
+        model=model,
+        uri=f"indestructibleeco://ai/similarity/{uid}",
+        urn=f"urn:indestructibleeco:ai:similarity:{model}:{uid}",
+    )
+
+
+# --- Async Job Routes ---
+
+@router.post("/jobs", response_model=AsyncJobResponse)
+async def submit_job(req: AsyncJobRequest, request: Request):
+    """Submit an async inference job to the worker queue."""
+    worker = getattr(request.app.state, "inference_worker", None)
+    if not worker:
+        raise HTTPException(status_code=503, detail="Inference worker not available")
+
+    from .services.worker import InferenceJob, JobPriority
+
+    priority_map = {
+        "high": JobPriority.HIGH,
+        "normal": JobPriority.NORMAL,
+        "low": JobPriority.LOW,
+    }
+    priority = priority_map.get(req.priority, JobPriority.NORMAL)
+    model_id = req.model_id if req.model_id != "default" else settings.ai_models[0]
+
+    job = InferenceJob(
+        model_id=model_id,
+        prompt=req.prompt,
+        max_tokens=req.max_tokens,
+        temperature=req.temperature,
+        top_p=req.top_p,
+        priority=priority,
+        timeout_seconds=req.timeout_seconds,
+    )
+
+    try:
+        job_id = await worker.submit(job)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+
+    return AsyncJobResponse(
+        job_id=job_id,
+        status=job.status.value,
+        uri=f"indestructibleeco://ai/job/{job_id}",
+        urn=f"urn:indestructibleeco:ai:job:{model_id}:{job_id}",
+        created_at=datetime.fromtimestamp(job.created_at, tz=timezone.utc).isoformat(),
+    )
+
+
+@router.get("/jobs/{job_id}", response_model=JobStatusResponse)
+async def get_job(job_id: str, request: Request):
+    """Get status and result of an async inference job."""
+    worker = getattr(request.app.state, "inference_worker", None)
+    if not worker:
+        raise HTTPException(status_code=503, detail="Inference worker not available")
+
+    job = worker.get_job(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail=f"Job {job_id} not found")
+
+    return JobStatusResponse(
+        job_id=job.job_id,
+        status=job.status.value,
+        result=job.result,
+        error=job.error,
+        engine=job.engine,
+        usage=job.usage,
+        latency_ms=job.latency_ms,
+        uri=f"indestructibleeco://ai/job/{job.job_id}",
+        urn=f"urn:indestructibleeco:ai:job:{job.model_id}:{job.job_id}",
+        created_at=datetime.fromtimestamp(job.created_at, tz=timezone.utc).isoformat(),
+        completed_at=(
+            datetime.fromtimestamp(job.completed_at, tz=timezone.utc).isoformat()
+            if job.completed_at
+            else None
+        ),
+    )
+
+
+@router.get("/jobs")
+async def list_jobs(
+    request: Request,
+    status: Optional[str] = None,
+    limit: int = 100,
+):
+    """List async inference jobs, optionally filtered by status."""
+    worker = getattr(request.app.state, "inference_worker", None)
+    if not worker:
+        raise HTTPException(status_code=503, detail="Inference worker not available")
+
+    from .services.worker import JobStatus as WJobStatus
+
+    filter_status = None
+    if status:
+        try:
+            filter_status = WJobStatus(status)
+        except ValueError:
+            raise HTTPException(status_code=400, detail=f"Invalid status: {status}")
+
+    jobs = worker.list_jobs(status=filter_status, limit=limit)
+    return [j.to_dict() for j in jobs]
+
+
+@router.delete("/jobs/{job_id}")
+async def cancel_job(job_id: str, request: Request):
+    """Cancel a pending async inference job."""
+    worker = getattr(request.app.state, "inference_worker", None)
+    if not worker:
+        raise HTTPException(status_code=503, detail="Inference worker not available")
+
+    cancelled = await worker.cancel(job_id)
+    if not cancelled:
+        raise HTTPException(status_code=404, detail=f"Job {job_id} not found or not cancellable")
+
+    return {"job_id": job_id, "status": "cancelled"}
+
+
 @router.post("/qyaml/descriptor")
 async def generate_qyaml_descriptor(request: Request):
     """Generate .qyaml governance descriptor for AI service."""
@@ -240,7 +497,7 @@ async def generate_qyaml_descriptor(request: Request):
         "vector_alignment_map": {
             "alignment_model": settings.alignment_model,
             "coherence_vector_dim": settings.vector_dim,
-            "function_keyword": ["ai", "inference", "generation", "vector-alignment"],
+            "function_keyword": ["ai", "inference", "generation", "vector-alignment", "embedding"],
             "contextual_binding": f"{service_name} -> [redis, supabase, vllm, ollama]",
         },
     }

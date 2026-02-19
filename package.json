@@ -1,39 +1,40 @@
 {
   "name": "indestructibleeco",
   "version": "1.0.0",
-  "description": "IndestructibleEco v1.0 — Enterprise Cloud-Native Platform",
   "private": true,
+  "description": "Enterprise cloud-native platform — mono-repository",
+  "engines": { "node": ">=20.0.0", "pnpm": ">=9.0.0" },
+  "packageManager": "pnpm@9.4.0",
   "workspaces": [
-    "packages/shared-types",
-    "packages/api-client",
-    "packages/ui-kit",
+    "packages/*",
     "backend/api",
+    "backend/ai",
     "platforms/web",
     "platforms/desktop",
     "platforms/im-integration",
-    "tools/yaml-toolkit",
-    "tools/skill-creator"
+    "tools/*"
   ],
   "scripts": {
-    "dev": "docker compose up",
-    "dev:web": "cd platforms/web && npm run dev",
-    "dev:api": "cd backend/api && npm run dev",
-    "build": "npm run build --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present",
-    "validate": "python3 tools/ci-validator/validate.py",
-    "validate:report": "python3 tools/ci-validator/validate.py --report=validation-report.json",
-    "yaml:generate": "node tools/yaml-toolkit/bin/cli.js gen",
-    "yaml:validate": "node tools/yaml-toolkit/bin/cli.js validate",
-    "yaml:lint": "node tools/yaml-toolkit/bin/cli.js lint backend/k8s/",
+    "dev":       "pnpm --filter @indestructibleeco/backend-api dev & pnpm --filter @indestructibleeco/web dev",
+    "build":     "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test":      "pnpm -r test",
+    "lint":      "eslint packages/ backend/ platforms/ --ext .ts,.tsx",
+    "validate":  "python3 tools/ci-validator/validate.py",
+    "ecosystem:up":   "docker compose -f ecosystem/docker-compose.ecosystem.yml up -d",
+    "ecosystem:down": "docker compose -f ecosystem/docker-compose.ecosystem.yml down",
+    "local:up":  "docker compose up -d",
+    "local:down": "docker compose down",
+    "yaml:gen":  "node tools/skill-creator/scripts/create-skill.js",
+    "yaml:validate": "node tools/skill-creator/scripts/validate-skill.js",
     "skill:init": "python3 tools/skill-creator/scripts/init_skill.py",
-    "skill:validate": "node tools/skill-creator/scripts/validate.js tools/skill-creator/skills",
-    "skill:validate:py": "python3 tools/skill-creator/scripts/quick_validate.py",
-    "ecosystem:up": "docker compose -f ecosystem/docker-compose.ecosystem.yml up -d",
-    "ecosystem:down": "docker compose -f ecosystem/docker-compose.ecosystem.yml down"
+    "skill:validate": "python3 tools/skill-creator/scripts/quick_validate.py"
   },
-  "engines": {
-    "node": ">=20.0.0",
-    "npm": ">=10.0.0"
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "eslint": "^9.6.0",
+    "@typescript-eslint/parser": "^7.15.0",
+    "@typescript-eslint/eslint-plugin": "^7.15.0",
+    "prettier": "^3.3.0"
   }
 }

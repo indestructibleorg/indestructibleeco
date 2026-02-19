@@ -1,67 +1,18 @@
-import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-import { config } from "../config";
+import { type RequestHandler } from "express";
+import { createClient } from "@supabase/supabase-js";
 
-export interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-    urn: string;
-  };
-}
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
-export function authMiddleware(
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): void {
-  const authHeader = req.headers.authorization;
+export const requireAuth: RequestHandler = async (req, res, next) => {
+  const token = req.headers.authorization?.replace("Bearer ", "");
+  if (!token) { res.status(401).json({ error: "No token" }); return; }
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    res.status(401).json({
-      error: "unauthorized",
-      message: "Missing or invalid Authorization header",
-    });
-    return;
-  }
+  const { data, error } = await supabase.auth.getUser(token);
+  if (error || !data.user) { res.status(401).json({ error: "Invalid token" }); return; }
 
-  const token = authHeader.slice(7);
-
-  try {
-    const payload = jwt.verify(token, config.jwtSecret) as {
-      sub: string;
-      email: string;
-      role: string;
-    };
-
-    req.user = {
-      id: payload.sub,
-      email: payload.email,
-      role: payload.role,
-      urn: `urn:indestructibleeco:iam:user:${payload.email}:${payload.sub}`,
-    };
-
-    next();
-  } catch (err) {
-    res.status(401).json({
-      error: "unauthorized",
-      message: "Invalid or expired token",
-    });
-  }
-}
-
-export function adminOnly(
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): void {
-  if (!req.user || req.user.role !== "admin") {
-    res.status(403).json({
-      error: "forbidden",
-      message: "Admin access required",
-    });
-    return;
-  }
+  (req as any).user = data.user;
   next();
-}
+};

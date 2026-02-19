@@ -1,0 +1,3 @@
+:root { --color-primary: #00F5D4; --color-accent: #4361EE; --color-danger: #F72585; --color-success: #06D6A0; --color-warning: #FFB703; --color-bg: #06060F; --color-surface: #0D0D1A; --color-text: #E0E0E0; --color-muted: #6B7A99; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--color-bg); color: var(--color-text); font-family: Arial, sans-serif; }

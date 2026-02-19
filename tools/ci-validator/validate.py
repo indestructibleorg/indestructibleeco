@@ -456,31 +456,33 @@ def validate_actions_policy(repo: Path) -> list[dict]:
     
     # Load policy
     policy_file = repo / ".github" / "allowed-actions.yaml"
-    policy = {}
+    default_policy = {
+        'policy': {
+            'require_org_ownership': True,
+            'allowed_organizations': ['indestructibleorg'],
+            'require_sha_pinning': True,
+            'block_tag_references': True
+        },
+        'blocked_actions': [],
+        'approved_actions': []
+    }
+    policy = default_policy
     
     if policy_file.exists():
         try:
             import yaml
             with open(policy_file, 'r') as f:
-                policy = yaml.safe_load(f)
+                loaded_policy = yaml.safe_load(f)
+            if loaded_policy is None:
+                policy = default_policy
+            else:
+                policy = loaded_policy
         except Exception as e:
             findings.append(finding(
-                Category.ACTIONS_POLICY, Severity.WARNING, ".github/allowed-actions.yaml",
+                Category.ACTIONS_POLICY, Severity.ERROR, ".github/allowed-actions.yaml",
                 f"Failed to load policy file: {e}"
             ))
             return findings
-    else:
-        # Default policy if file doesn't exist
-        policy = {
-            'policy': {
-                'require_org_ownership': True,
-                'allowed_organizations': ['indestructibleorg'],
-                'require_sha_pinning': True,
-                'block_tag_references': True
-            },
-            'blocked_actions': [],
-            'approved_actions': []
-        }
     
     workflow_files = list(workflows_dir.glob('*.yml')) + list(workflows_dir.glob('*.yaml'))
     
@@ -554,7 +556,7 @@ def validate_actions_policy(repo: Path) -> list[dict]:
                             findings.append(finding(
                                 Category.ACTIONS_POLICY, Severity.ERROR,
                                 workflow_file.relative_to(repo),
-                                f"Action '{action_base}@{ref}' must be pinned to full-length commit SHA (40 characters), not tag '{ref}'",
+                                f"Action '{action_base}@{ref}' must be pinned to a full-length commit SHA (40 hex characters); '{ref}' is not a full-length commit SHA.",
                                 line=line_num
                             ))
         

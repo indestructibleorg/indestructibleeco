@@ -41,8 +41,29 @@ class ActionsPolicyValidator:
                 'exceptions': []
             }
         
-        with open(self.policy_file, 'r') as f:
-            return yaml.safe_load(f)
+        try:
+            with open(self.policy_file, 'r') as f:
+                loaded = yaml.safe_load(f)
+        except yaml.YAMLError as e:
+            print(f"Error: Failed to parse policy file {self.policy_file}: {e}")
+            sys.exit(1)
+
+        if loaded is None:
+            print(f"Warning: Policy file {self.policy_file} is empty; using default policy.")
+            return {
+                'policy': {
+                    'require_org_ownership': True,
+                    'allowed_organizations': ['indestructibleorg'],
+                    'require_sha_pinning': True,
+                    'block_tag_references': True,
+                    'enforcement_level': 'error'
+                },
+                'blocked_actions': [],
+                'approved_actions': [],
+                'exceptions': []
+            }
+
+        return loaded
     
     def _extract_actions_from_workflow(self, workflow_file: Path) -> List[Dict]:
         """Extract all 'uses:' statements from a workflow file"""
@@ -120,11 +141,11 @@ class ActionsPolicyValidator:
             # SHA should be 40 characters hex
             sha_pattern = re.compile(r'^[a-f0-9]{40}$', re.IGNORECASE)
             if not sha_pattern.match(ref):
-                # Check if it's a tag reference
+                # Check if it's a tag or other non-SHA reference
                 if policy_config.get('block_tag_references', False):
                     violations.append(
                         f"Action '{action_base}@{ref}' must be pinned to full-length commit SHA (40 characters), "
-                        f"not tag '{ref}'"
+                        f"not non-SHA reference '{ref}' (tags and branches are not allowed)"
                     )
                 else:
                     violations.append(

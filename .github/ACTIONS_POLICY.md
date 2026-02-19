@@ -188,7 +188,7 @@ If you believe an exception to this policy is necessary:
 2. Propose alternative security measures
 3. Open an issue for discussion
 4. Get approval from security team
-5. Add to exceptions list in `.github/allowed-actions.yaml`
+5. Track the approved exception via an issue and/or pull request (note: automated validators currently do not support an exceptions list).
 
 ## Resources
 

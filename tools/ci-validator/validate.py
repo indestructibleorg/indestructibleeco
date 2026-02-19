@@ -502,7 +502,8 @@ def validate_actions_policy(repo: Path) -> list[dict]:
         
         except Exception as e:
             findings.append(finding(
-                Category.ACTIONS_POLICY, Severity.WARNING,
+                Category.ACTIONS_POLICY,
+                severity,
                 workflow_file.relative_to(repo),
                 f"Error parsing workflow: {e}"
             ))

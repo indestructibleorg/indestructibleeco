@@ -17,6 +17,7 @@ from .grpc_server import (
     GrpcServiceConfig,
     InferenceServicer,
 )
+from .health_monitor import EngineHealthMonitor, HealthMonitorConfig
 from .worker import InferenceJob, InferenceWorker, JobPriority, JobStatus
 
 __all__ = [
@@ -25,6 +26,7 @@ __all__ = [
     "ConnectionPool",
     "EmbeddingResult",
     "EmbeddingService",
+    "EngineHealthMonitor",
     "EngineManager",
     "GrpcEmbeddingRequest",
     "GrpcEmbeddingResponse",
@@ -32,6 +34,7 @@ __all__ = [
     "GrpcGenerateResponse",
     "GrpcServer",
     "GrpcServiceConfig",
+    "HealthMonitorConfig",
     "InferenceJob",
     "InferenceServicer",
     "InferenceWorker",

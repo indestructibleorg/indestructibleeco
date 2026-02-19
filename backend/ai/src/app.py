@@ -107,9 +107,28 @@ async def lifespan(app: FastAPI):
     await grpc_server.start()
     app.state.grpc_server = grpc_server
 
+    # --- Health Monitor ---
+    from .services.health_monitor import EngineHealthMonitor, HealthMonitorConfig
+
+    monitor_config = HealthMonitorConfig(
+        probe_interval=float(os.environ.get("ECO_PROBE_INTERVAL", "30")),
+        stale_cleanup_interval=float(os.environ.get("ECO_STALE_CLEANUP_INTERVAL", "300")),
+        registry_sync_interval=float(os.environ.get("ECO_REGISTRY_SYNC_INTERVAL", "60")),
+        max_consecutive_failures=int(os.environ.get("ECO_MAX_CONSECUTIVE_FAILURES", "10")),
+    )
+    health_monitor = EngineHealthMonitor(
+        config=monitor_config,
+        engine_manager=engine_mgr,
+        model_registry=registry,
+        inference_worker=worker,
+    )
+    await health_monitor.start()
+    app.state.health_monitor = health_monitor
+
     yield
 
     # --- Shutdown ---
+    await health_monitor.stop()
     await grpc_server.stop()
     await worker.shutdown()
     await engine_mgr.shutdown()
@@ -148,8 +167,11 @@ async def health(request: Request):
     registry = getattr(request.app.state, "model_registry", None)
     model_count = registry.count if registry else 0
 
+    monitor = getattr(request.app.state, "health_monitor", None)
+    is_degraded = monitor.is_degraded if monitor else False
+
     return {
-        "status": "healthy",
+        "status": "degraded" if is_degraded else "healthy",
         "service": "ai",
         "version": "1.0.0",
         "uri": "indestructibleeco://backend/ai/health",
@@ -159,6 +181,7 @@ async def health(request: Request):
         "models_registered": model_count,
         "worker": {"running": worker_running},
         "grpc": {"running": grpc_running, "port": settings.grpc_port},
+        "monitor": {"running": monitor.is_running if monitor else False, "degraded": is_degraded},
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
@@ -197,6 +220,15 @@ async def embedding_health(request: Request):
     if not embedding_svc:
         return {"error": "embedding service not initialized"}
     return embedding_svc.get_stats()
+
+
+@app.get("/health/monitor")
+async def monitor_health(request: Request):
+    """Health monitor background task statistics."""
+    monitor = getattr(request.app.state, "health_monitor", None)
+    if not monitor:
+        return {"error": "health monitor not initialized"}
+    return monitor.get_stats()
 
 
 @app.get("/health/registry")
@@ -274,6 +306,18 @@ async def metrics(request: Request):
     if registry:
         registry_lines.append(f"eco_models_registered_total {registry.count}")
 
+    monitor = getattr(request.app.state, "health_monitor", None)
+    monitor_lines = []
+    if monitor:
+        monitor_lines.extend([
+            f"eco_monitor_probes_total {monitor.total_probes}",
+            f"eco_monitor_recoveries_total {monitor.total_recoveries}",
+            f"eco_monitor_registry_syncs_total {monitor.total_registry_syncs}",
+            f"eco_monitor_stale_cleanups_total {monitor.total_stale_cleanups}",
+            f"eco_monitor_degraded {1 if monitor.is_degraded else 0}",
+            f"eco_monitor_consecutive_all_down {monitor.consecutive_all_down}",
+        ])
+
     lines = [
         "# HELP eco_uptime_seconds AI service uptime in seconds",
         "# TYPE eco_uptime_seconds gauge",
@@ -297,7 +341,10 @@ async def metrics(request: Request):
     ] + grpc_lines + [
         "# HELP eco_models_registered_total Total models in registry",
         "# TYPE eco_models_registered_total gauge",
-    ] + registry_lines
+    ] + registry_lines + [
+        "# HELP eco_monitor_probes_total Total health probes",
+        "# TYPE eco_monitor_probes_total counter",
+    ] + monitor_lines
 
     return JSONResponse(
         content="\n".join(lines) + "\n",

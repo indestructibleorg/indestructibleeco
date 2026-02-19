@@ -13,8 +13,8 @@ policy:
   # Block tag references (e.g., @v1, @v2, @main)
   block_tag_references: true
   
-  # Enforcement level: "error" will fail the build, "warning" will only warn
-  enforcement_level: error
+  # Enforcement is strict: all policy violations will fail the build
+  # (No configurable enforcement_level; validator always treats violations as errors)
 
 # List of explicitly blocked actions (regardless of organization)
 blocked_actions:

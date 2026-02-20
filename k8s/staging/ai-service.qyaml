@@ -1,5 +1,5 @@
 # IndestructibleEco v1.0 — AI Service Deployment (eco-staging)
-# Image: asia-east1-docker.pkg.dev/my-project-ops-1991/eco-images/eco-ai:latest
+# Image: ghcr.io/indestructibleorg/ai:latest
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -36,7 +36,7 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
         - name: eco-ai
-          image: asia-east1-docker.pkg.dev/my-project-ops-1991/eco-images/eco-ai:latest
+          image: ghcr.io/indestructibleorg/ai:latest
           imagePullPolicy: Always
           ports:
             - name: http

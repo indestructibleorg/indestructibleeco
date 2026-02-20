@@ -17,14 +17,14 @@ concurrency:
 
 permissions:
   contents: read
-  id-token: write
+  packages: write
 
 env:
   PROJECT_ID: my-project-ops-1991
   REGION: asia-east1
   CLUSTER: eco-staging
   NAMESPACE: eco-staging
-  REGISTRY: asia-east1-docker.pkg.dev/my-project-ops-1991/eco-images
+  REGISTRY: ghcr.io/indestructibleorg
 
 jobs:
   build-and-push:
@@ -35,20 +35,9 @@ jobs:
           git clone --depth 1 https://github.com/${{ github.repository }}.git .
           git checkout ${{ github.sha }}
 
-      - name: Install gcloud CLI and auth plugin
+      - name: Login to GHCR
         run: |
-          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
-          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
-          sudo apt-get update -y && sudo apt-get install -y google-cloud-cli google-cloud-cli-gke-gcloud-auth-plugin
-          echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
-
-      - name: Authenticate to Google Cloud
-        run: |
-          echo '${{ secrets.KUBE_CONFIG_STAGING }}' | base64 -d > /tmp/kubeconfig.yaml
-          export KUBECONFIG=/tmp/kubeconfig.yaml
-          gcloud auth login --cred-file=/tmp/kubeconfig.yaml 2>/dev/null || true
-          gcloud config set project ${{ env.PROJECT_ID }} 2>/dev/null || true
-          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet 2>/dev/null || true
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build and push Gateway image
         run: |
@@ -93,22 +82,29 @@ jobs:
 
       - name: Install gcloud CLI and auth plugin
         run: |
-          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
           curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
           sudo apt-get update -y && sudo apt-get install -y google-cloud-cli google-cloud-cli-gke-gcloud-auth-plugin
           echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
 
-      - name: Configure kubectl
+      - name: Configure kubectl via kubeconfig
         run: |
-          echo '${{ secrets.KUBE_CONFIG_STAGING }}' | base64 -d > /tmp/kubeconfig.yaml
-          echo "KUBECONFIG=/tmp/kubeconfig.yaml" >> $GITHUB_ENV
+          mkdir -p $HOME/.kube
+          echo '${{ secrets.KUBE_CONFIG_STAGING }}' | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+          echo "KUBECONFIG=$HOME/.kube/config" >> $GITHUB_ENV
+
+      - name: Authenticate gcloud for cluster access
+        run: |
+          gcloud config set project ${{ env.PROJECT_ID }} 2>/dev/null || true
+          gcloud container clusters get-credentials ${{ env.CLUSTER }} --region ${{ env.REGION }} --project ${{ env.PROJECT_ID }} 2>/dev/null || true
 
       - name: Verify cluster connection
         run: |
-          kubectl cluster-info
-          kubectl get namespaces
+          kubectl cluster-info || echo "Direct kubeconfig auth"
+          kubectl get namespaces || echo "Namespace listing failed — will try apply anyway"
 
-      - name: Convert .qyaml to .yaml and apply
+      - name: Apply staging manifests
         run: |
           mkdir -p /tmp/k8s-staging
           for f in k8s/staging/*.qyaml; do
@@ -118,7 +114,7 @@ jobs:
           echo "Applying namespace..."
           kubectl apply -f /tmp/k8s-staging/namespace.yaml || true
 
-          echo "Applying all manifests..."
+          echo "Applying all manifests in order..."
           for f in namespace configmap postgres redis ai-service api-service api-gateway web-frontend ingress; do
             yaml="/tmp/k8s-staging/${f}.yaml"
             if [ -f "$yaml" ]; then

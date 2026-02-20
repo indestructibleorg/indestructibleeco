@@ -1,5 +1,5 @@
 # IndestructibleEco v1.0 — API Gateway Deployment (eco-staging)
-# Image: asia-east1-docker.pkg.dev/my-project-ops-1991/eco-images/eco-gateway:latest
+# Image: ghcr.io/indestructibleorg/gateway:latest
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -36,7 +36,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: eco-gateway
-          image: asia-east1-docker.pkg.dev/my-project-ops-1991/eco-images/eco-gateway:latest
+          image: ghcr.io/indestructibleorg/gateway:latest
           imagePullPolicy: Always
           ports:
             - name: http

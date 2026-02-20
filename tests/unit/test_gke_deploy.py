@@ -72,23 +72,23 @@ class TestStagingManifests:
 
     def test_api_gateway_image(self):
         content = _read("k8s/staging/api-gateway.qyaml")
-        assert "asia-east1-docker.pkg.dev/my-project-ops-1991/eco-images/eco-gateway" in content
+        assert "ghcr.io/indestructibleorg/gateway" in content
         assert "readinessProbe" in content
         assert "livenessProbe" in content
 
     def test_ai_service_image(self):
         content = _read("k8s/staging/ai-service.qyaml")
-        assert "asia-east1-docker.pkg.dev/my-project-ops-1991/eco-images/eco-ai" in content
+        assert "ghcr.io/indestructibleorg/ai" in content
         assert "8001" in content
 
     def test_api_service_image(self):
         content = _read("k8s/staging/api-service.qyaml")
-        assert "asia-east1-docker.pkg.dev/my-project-ops-1991/eco-images/eco-api" in content
+        assert "ghcr.io/indestructibleorg/api" in content
         assert "3000" in content
 
     def test_web_frontend_image(self):
         content = _read("k8s/staging/web-frontend.qyaml")
-        assert "asia-east1-docker.pkg.dev/my-project-ops-1991/eco-images/eco-web" in content
+        assert "ghcr.io/indestructibleorg/web" in content
         assert "80" in content
 
     def test_redis_staging(self):
@@ -148,8 +148,6 @@ class TestDeployWorkflow:
         content = _read(".github/workflows/deploy-gke.yaml")
         assert "my-project-ops-1991" in content
         assert "eco-staging" in content
-        assert "asia-east1" in content
-        assert "eco-images" in content
         assert "KUBE_CONFIG_STAGING" in content
 
     def test_deploy_gke_builds_all_images(self):

@@ -1,5 +1,5 @@
 # IndestructibleEco v1.0 — Web Frontend Deployment (eco-staging)
-# Image: asia-east1-docker.pkg.dev/my-project-ops-1991/eco-images/eco-web:latest
+# Image: ghcr.io/indestructibleorg/web:latest
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -32,7 +32,7 @@ spec:
       terminationGracePeriodSeconds: 15
       containers:
         - name: eco-web
-          image: asia-east1-docker.pkg.dev/my-project-ops-1991/eco-images/eco-web:latest
+          image: ghcr.io/indestructibleorg/web:latest
           imagePullPolicy: Always
           ports:
             - name: http

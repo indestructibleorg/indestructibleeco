@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IndestructibleEco — Enterprise AI Platform</title>
+  <meta name="description" content="Production-grade AI inference platform with multi-engine routing, .qyaml governance, and Argo CD GitOps deployment.">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container">
+      <div class="nav-brand">🛡️ <span>IndestructibleEco</span></div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#architecture">Architecture</a>
+        <a href="https://github.com/indestructibleorg/indestructibleeco/blob/main/docs/API.md">API Docs</a>
+        <a href="https://github.com/indestructibleorg/indestructibleeco" class="nav-cta">GitHub →</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge"><span class="dot"></span> v1.0 — Production Ready</div>
+      <h1>Enterprise AI<br><span class="gradient">Indestructible by Design</span></h1>
+      <p>Multi-engine inference platform with automatic failover, .qyaml governance enforcement, and Argo CD GitOps — built for zero-downtime production.</p>
+      <div class="hero-actions">
+        <a href="https://github.com/indestructibleorg/indestructibleeco" class="btn-primary">Get Started</a>
+        <a href="#architecture" class="btn-secondary">View Architecture</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="container">
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value">7</div>
+        <div class="stat-label">Engine Backends</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">623+</div>
+        <div class="stat-label">Tests Passing</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">&lt;100ms</div>
+        <div class="stat-label">P95 Latency</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">100%</div>
+        <div class="stat-label">GitOps Coverage</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Built for Production</h2>
+        <p>Every component designed for resilience, governance, and observability from day one.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Multi-Engine Inference</h3>
+          <p>Route requests across vLLM, TGI, Ollama, SGLang, TensorRT-LLM, DeepSpeed, and LMDeploy with automatic failover and circuit breaking.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Zero-Trust Security</h3>
+          <p>mTLS service mesh, RBAC with row-level security, sealed secrets, and CIS Benchmark compliance across all clusters.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📋</div>
+          <h3>.qyaml Governance</h3>
+          <p>5-phase validation pipeline with persistent audit trail, YAML Toolkit v8 schema enforcement, and automated compliance checks.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔄</div>
+          <h3>Argo CD GitOps</h3>
+          <p>Self-healing deployments with automated pruning, drift detection, and Slack notifications for staging and production environments.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Full Observability</h3>
+          <p>Prometheus metrics, Grafana dashboards, Jaeger distributed tracing, and structured JSON logging across all services.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <h3>OpenAI-Compatible API</h3>
+          <p>Drop-in replacement endpoints for /v1/chat/completions, /v1/embeddings, and /v1/models with streaming SSE support.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🚀</div>
+          <h3>Auto-Scaling</h3>
+          <p>Horizontal Pod Autoscaler with custom metrics, priority-based job queuing, and WebSocket real-time status updates.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🛠️</div>
+          <h3>CI/CD Pipeline</h3>
+          <p>8-gate validation pipeline with automated security scanning, lint enforcement, test coverage gates, and auto-repair on failure.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">☁️</div>
+          <h3>Multi-Cluster GKE</h3>
+          <p>Staging and production clusters on GKE asia-east1 with Cloudflare edge proxy, managed TLS certificates, and DNS automation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture -->
+  <section class="architecture" id="architecture">
+    <div class="container">
+      <div class="arch-grid">
+        <div class="arch-content">
+          <h2>Cloud-Native Architecture</h2>
+          <p>A monorepo ecosystem with Python AI backend, Node.js API gateway, React frontend, and Kubernetes-native deployment.</p>
+          <ul class="arch-list">
+            <li>Python 3.11 + FastAPI AI inference service</li>
+            <li>Node.js 20 + Express API gateway</li>
+            <li>React + Vite web frontend with SPA routing</li>
+            <li>PostgreSQL 16 + Redis 7 data layer</li>
+            <li>GKE clusters with .qyaml manifests</li>
+            <li>Argo CD with self-heal and auto-prune</li>
+            <li>Cloudflare edge with proxied DNS</li>
+            <li>GHCR container registry</li>
+          </ul>
+        </div>
+        <div class="arch-visual">
+<pre>
+┌─────────────────────────────────────┐
+│         Cloudflare Edge             │
+│   staging.autoecoops.io             │
+│   api-staging.autoecoops.io         │
+│   production.autoecoops.io          │
+│   api-production.autoecoops.io      │
+└──────────────┬──────────────────────┘
+               │
+    ┌──────────┴──────────┐
+    │   GKE asia-east1    │
+    │  ┌────────────────┐ │
+    │  │  eco-staging    │ │
+    │  │  ┌──────────┐  │ │
+    │  │  │ Gateway  │  │ │
+    │  │  │ API Svc  │  │ │
+    │  │  │ AI Svc   │  │ │
+    │  │  │ Web UI   │  │ │
+    │  │  │ Redis    │  │ │
+    │  │  │ Postgres │  │ │
+    │  │  └──────────┘  │ │
+    │  └────────────────┘ │
+    │  ┌────────────────┐ │
+    │  │ eco-production  │ │
+    │  │  (same stack)   │ │
+    │  └────────────────┘ │
+    └─────────────────────┘
+               │
+    ┌──────────┴──────────┐
+    │     Argo CD         │
+    │  selfHeal: true     │
+    │  prune: true        │
+    │  *.qyaml sync       │
+    └─────────────────────┘
+</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="container">
+      <h2>Ready to Deploy?</h2>
+      <p>Clone the repo, run the tests, and deploy to your cluster in minutes.</p>
+      <div class="hero-actions">
+        <a href="https://github.com/indestructibleorg/indestructibleeco" class="btn-primary">View on GitHub</a>
+        <a href="https://github.com/indestructibleorg/indestructibleeco/blob/main/docs/DEPLOYMENT.md" class="btn-secondary">Deployment Guide</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-brand">🛡️ IndestructibleEco</div>
+      <div class="footer-links">
+        <a href="https://github.com/indestructibleorg/indestructibleeco">GitHub</a>
+        <a href="https://github.com/indestructibleorg/indestructibleeco/blob/main/docs/API.md">API</a>
+        <a href="https://github.com/indestructibleorg/indestructibleeco/blob/main/docs/ARCHITECTURE.md">Docs</a>
+        <a href="https://github.com/indestructibleorg/indestructibleeco/blob/main/LICENSE">License</a>
+      </div>
+      <div class="footer-copy">© 2026 IndestructibleOrg. Apache-2.0 License.</div>
+    </div>
+  </footer>
+
+</body>
+</html>

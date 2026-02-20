@@ -7,6 +7,11 @@ policy:
   allowed_organizations:
     - indestructibleorg
   
+  # GitHub-owned actions that are explicitly allowed (no alternative exists)
+  allowed_github_actions:
+    - actions/upload-pages-artifact  # Required for GitHub Pages deployment
+    - actions/deploy-pages  # Required for GitHub Pages deployment
+  
   # Require all actions to be pinned to full-length commit SHAs (40 characters)
   require_sha_pinning: true
   

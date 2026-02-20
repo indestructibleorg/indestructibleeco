@@ -146,6 +146,19 @@ def validate_action_reference(
     repository_name = parts[1]
     action_base = f"{owner}/{repository_name}"
     
+    # Check if action is explicitly allowed (GitHub-owned Pages actions, etc.)
+    policy_config = policy.get('policy', {})
+    allowed_github_actions = policy_config.get('allowed_github_actions', [])
+    if action_base in allowed_github_actions:
+        # Still enforce SHA pinning on allowed actions
+        is_sha = bool(SHA_PATTERN.match(ref))
+        if policy_config.get('require_sha_pinning', False) and not is_sha:
+            violations.append(
+                f"Action '{action_base}@{ref}' must be pinned to a full-length commit SHA "
+                f"(40 hex characters); '{ref}' is not a full-length commit SHA."
+            )
+        return violations
+
     # Check if action is explicitly blocked
     blocked_actions = policy.get('blocked_actions', [])
     for blocked in blocked_actions:
@@ -157,7 +170,6 @@ def validate_action_reference(
             break  # Only report one blocklist violation per action
     
     # Check organization ownership requirement
-    policy_config = policy.get('policy', {})
     if policy_config.get('require_org_ownership', False):
         allowed_orgs = policy_config.get('allowed_organizations', [])
         if owner not in allowed_orgs:

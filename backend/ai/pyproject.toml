@@ -1,22 +1,41 @@
 [tool.poetry]
 name = "indestructibleeco-ai"
-version = "0.1.0"
-description = "AI generation + YAML governance service"
+version = "1.0.0"
+description = "AI generation + YAML governance service for IndestructibleEco platform"
+authors = ["IndestructibleEco Platform Team <platform-team@indestructibleeco.io>"]
+license = "Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/indestructibleorg/indestructibleeco"
+repository = "https://github.com/indestructibleorg/indestructibleeco"
+keywords = ["ai", "inference", "llm", "vllm", "governance"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: FastAPI",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.111.0"
-uvicorn = { extras = ["standard"], version = "^0.30.0" }
-celery = "^5.4.0"
-redis = "^5.0.0"
-pydantic = "^2.7.0"
-numpy = "^1.26.0"
-prometheus-client = "^0.20.0"
-grpcio = "^1.64.0"
-grpcio-tools = "^1.64.0"
+fastapi = "~0.111.0"
+uvicorn = { extras = ["standard"], version = "~0.30.1" }
+celery = "~5.4.0"
+redis = "~5.0.7"
+pydantic = "~2.7.4"
+numpy = "~1.26.4"
+prometheus-client = "~0.20.0"
+grpcio = "~1.64.1"
+grpcio-tools = "~1.64.1"
+
 [tool.poetry.extras]
 faiss = ["faiss-cpu"]
 elasticsearch = ["elasticsearch"]
 neo4j = ["neo4j"]
 all-indexes = ["faiss-cpu", "elasticsearch", "neo4j"]
+
+[build-system]
+requires = ["poetry-core>=1.9.0"]
+build-backend = "poetry.core.masonry.api"

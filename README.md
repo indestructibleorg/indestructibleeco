@@ -4,7 +4,7 @@
 
 [![CI](https://github.com/indestructibleorg/indestructibleeco/actions/workflows/ci.yaml/badge.svg)](https://github.com/indestructibleorg/indestructibleeco/actions/workflows/ci.yaml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-448%20passing-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/tests-500%20passing-brightgreen.svg)]()
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)]()
 [![TypeScript](https://img.shields.io/badge/typescript-5.x-blue.svg)]()
 
@@ -21,7 +21,7 @@ IndestructibleEco is a production-grade AI inference platform that routes reques
 - **.qyaml governance** with 5-phase validation and persistent audit trail
 - **Argo CD GitOps** with self-healing staging and manual production sync
 - **Full observability** (Prometheus, Grafana, Jaeger, Loki)
-- **448 tests** across unit, integration, and E2E suites
+- **500 tests** across unit, integration, and E2E suites
 
 ## Quick Start
 
@@ -33,7 +33,7 @@ cd indestructibleeco
 # Install Python deps
 pip install pydantic fastapi httpx pytest pytest-asyncio jsonschema pyyaml numpy
 
-# Run tests (448 passing)
+# Run tests (500 passing)
 PYTHONPATH=. pytest tests/ -v
 
 # Run CI validator
@@ -90,7 +90,7 @@ indestructibleeco/
 +-- policy/                       # OPA governance policies
 +-- docs/                         # API, Architecture, Deployment, Developer Guide,
 |                                 # Env Reference, .qyaml Governance, Argo CD, Auto-Repair
-+-- tests/                        # 448 tests (unit, integration, e2e)
++-- tests/                        # 500 tests (unit, integration, e2e)
 ```
 
 ## Inference Engines
@@ -115,7 +115,7 @@ All adapters implement a unified interface (`BaseInferenceAdapter`) with `genera
 |------|------|-------------|
 | 1 | validate | CI Validator Engine (8 validators) |
 | 2 | lint | Python compile + JS syntax + YAML governance |
-| 3 | test | 448 tests (unit + integration + e2e + skill) |
+| 3 | test | 500 tests (unit + integration + e2e + skill) |
 | 4 | build | Docker build + structure verification |
 | 5 | auto-fix | Diagnostic mode on failure |
 

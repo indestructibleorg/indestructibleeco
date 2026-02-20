@@ -1,0 +1,66 @@
+name: Publish Docker Images
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io/indestructibleorg
+
+jobs:
+  build-ai:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      run: |
+        git clone --depth 1 https://github.com/${{ github.repository }}.git .
+        git checkout ${{ github.ref_name }}
+
+    - name: Extract version
+      id: version
+      run: |
+        VERSION="${GITHUB_REF#refs/tags/v}"
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+    - name: Build and push AI image
+      run: |
+        echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+        docker build -t ${{ env.REGISTRY }}/ai:${{ steps.version.outputs.version }} \
+                     -t ${{ env.REGISTRY }}/ai:latest \
+                     --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+                     --label "org.opencontainers.image.version=${{ steps.version.outputs.version }}" \
+                     --label "org.opencontainers.image.licenses=Apache-2.0" \
+                     -f backend/ai/Dockerfile backend/ai/
+        docker push ${{ env.REGISTRY }}/ai:${{ steps.version.outputs.version }}
+        docker push ${{ env.REGISTRY }}/ai:latest
+
+  build-api:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      run: |
+        git clone --depth 1 https://github.com/${{ github.repository }}.git .
+        git checkout ${{ github.ref_name }}
+
+    - name: Extract version
+      id: version
+      run: |
+        VERSION="${GITHUB_REF#refs/tags/v}"
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+    - name: Build and push API image
+      run: |
+        echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+        docker build -t ${{ env.REGISTRY }}/api:${{ steps.version.outputs.version }} \
+                     -t ${{ env.REGISTRY }}/api:latest \
+                     --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+                     --label "org.opencontainers.image.version=${{ steps.version.outputs.version }}" \
+                     --label "org.opencontainers.image.licenses=Apache-2.0" \
+                     -f backend/api/Dockerfile backend/api/
+        docker push ${{ env.REGISTRY }}/api:${{ steps.version.outputs.version }}
+        docker push ${{ env.REGISTRY }}/api:latest

@@ -308,7 +308,13 @@ jobs:
           tests/unit/test_docs.py \
           tests/unit/test_readme.py \
           backend/ai/src/services/engine_manager.py \
-          backend/ai/src/services/circuit_breaker.py; do
+          backend/ai/src/services/circuit_breaker.py \
+          CHANGELOG.md \
+          tests/unit/test_release.py \
+          .github/workflows/release.yml \
+          .github/workflows/publish-npm.yml \
+          .github/workflows/publish-docker.yml \
+          .github/workflows/publish-pypi.yml; do
           if [ -f "$file" ]; then
             echo "  PASS: $file"
           else

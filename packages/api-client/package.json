@@ -1,19 +1,48 @@
 {
   "name": "@indestructibleeco/api-client",
-  "version": "0.1.0",
-  "description": "Auto-generated typed API + WebSocket client SDK",
+  "version": "1.0.0",
+  "description": "Typed API + WebSocket client SDK for IndestructibleEco platform",
   "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist/",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "generate": "openapi-typescript-codegen --input ../../backend/api/openapi.yaml --output src/generated --client fetch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/indestructibleorg/indestructibleeco.git",
+    "directory": "packages/api-client"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "keywords": [
+    "indestructibleeco",
+    "api-client",
+    "sdk",
+    "typescript",
+    "websocket"
+  ],
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/indestructibleorg/indestructibleeco/tree/main/packages/api-client",
+  "bugs": {
+    "url": "https://github.com/indestructibleorg/indestructibleeco/issues"
   },
   "dependencies": {
-    "socket.io-client": "^4.7.0"
+    "socket.io-client": "~4.7.5"
   },
   "devDependencies": {
-    "openapi-typescript-codegen": "^0.27.0",
-    "typescript": "^5.5.0"
+    "openapi-typescript-codegen": "~0.27.0",
+    "typescript": "~5.5.4"
   }
 }

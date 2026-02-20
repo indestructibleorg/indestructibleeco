@@ -4,7 +4,8 @@
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 .DEFAULT_GOAL := help
-.PHONY: help up down restart logs ps shell pull clean \
+.PHONY: help up down restart logs ps shell pull clean \ \
+        release-patch release-minor release-major changelog test-release
         eco-up eco-down eco-restart eco-logs \
         all-up all-down all-restart \
         tools-up tools-down \
@@ -219,3 +220,48 @@ urls:
 	@echo "  Redis Commander  →  http://localhost:$${REDIS_COMMANDER_PORT:-8081}"
 	@echo "  Flower           →  http://localhost:$${FLOWER_PORT:-5555}"
 	@echo ""
+
+# ══════════════════════════════════════════════════════════════════════════════
+# RELEASE
+# ══════════════════════════════════════════════════════════════════════════════
+.PHONY: release-patch release-minor release-major changelog test-release
+
+release-patch: ## Tag a patch release (e.g., 1.0.1)
+	@CURRENT=$$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0"); \
+	MAJOR=$$(echo $$CURRENT | sed 's/v//' | cut -d. -f1); \
+	MINOR=$$(echo $$CURRENT | sed 's/v//' | cut -d. -f2); \
+	PATCH=$$(echo $$CURRENT | sed 's/v//' | cut -d. -f3); \
+	NEW_PATCH=$$((PATCH + 1)); \
+	NEW_TAG="v$$MAJOR.$$MINOR.$$NEW_PATCH"; \
+	echo "$(GREEN)Tagging $$NEW_TAG$(RESET)"; \
+	git tag -a "$$NEW_TAG" -m "Release $$NEW_TAG"; \
+	git push origin "$$NEW_TAG"
+
+release-minor: ## Tag a minor release (e.g., 1.1.0)
+	@CURRENT=$$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0"); \
+	MAJOR=$$(echo $$CURRENT | sed 's/v//' | cut -d. -f1); \
+	MINOR=$$(echo $$CURRENT | sed 's/v//' | cut -d. -f2); \
+	NEW_MINOR=$$((MINOR + 1)); \
+	NEW_TAG="v$$MAJOR.$$NEW_MINOR.0"; \
+	echo "$(GREEN)Tagging $$NEW_TAG$(RESET)"; \
+	git tag -a "$$NEW_TAG" -m "Release $$NEW_TAG"; \
+	git push origin "$$NEW_TAG"
+
+release-major: ## Tag a major release (e.g., 2.0.0)
+	@CURRENT=$$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0"); \
+	MAJOR=$$(echo $$CURRENT | sed 's/v//' | cut -d. -f1); \
+	NEW_MAJOR=$$((MAJOR + 1)); \
+	NEW_TAG="v$$NEW_MAJOR.0.0"; \
+	echo "$(GREEN)Tagging $$NEW_TAG$(RESET)"; \
+	git tag -a "$$NEW_TAG" -m "Release $$NEW_TAG"; \
+	git push origin "$$NEW_TAG"
+
+changelog: ## Show changelog for latest tag
+	@TAG=$$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0"); \
+	VERSION=$${TAG#v}; \
+	echo "$(CYAN)Changelog for $$TAG$(RESET)"; \
+	awk '/^## \['"$$VERSION"'\]/{found=1; next} /^## \[/{if(found) exit} found{print}' CHANGELOG.md
+
+test-release: ## Run release artifact tests
+	@pip install pytest -q 2>/dev/null; \
+	PYTHONPATH=. python3 -m pytest tests/unit/test_release.py -v --tb=short

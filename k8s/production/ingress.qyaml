@@ -1,28 +1,30 @@
-# IndestructibleEco v1.0 — Ingress (eco-staging)
-# GKE eco-staging cluster, asia-east1
-# Domains: staging.autoecoops.io, api-staging.autoecoops.io
+# IndestructibleEco v1.0 — Ingress (eco-production)
+# GKE eco-production cluster, asia-east1
+# Domains: production.autoecoops.io, api-production.autoecoops.io
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: eco-staging-ingress
-  namespace: eco-staging
+  name: eco-production-ingress
+  namespace: eco-production
   labels:
-    app.kubernetes.io/name: eco-staging-ingress
+    app.kubernetes.io/name: eco-production-ingress
     app.kubernetes.io/part-of: indestructibleeco
-    environment: staging
+    environment: production
   annotations:
     kubernetes.io/ingress.class: "gce"
-    kubernetes.io/ingress.global-static-ip-name: "eco-staging-ip"
-    networking.gke.io/managed-certificates: "eco-staging-cert"
+    kubernetes.io/ingress.global-static-ip-name: "eco-production-ip"
+    networking.gke.io/managed-certificates: "eco-production-cert"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
     nginx.ingress.kubernetes.io/proxy-buffering: "off"
     nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "https://staging.autoecoops.io,https://api-staging.autoecoops.io"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://production.autoecoops.io,https://api-production.autoecoops.io"
     nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type, X-API-Key"
+    nginx.ingress.kubernetes.io/limit-rps: "200"
+    nginx.ingress.kubernetes.io/limit-connections: "100"
 spec:
   defaultBackend:
     service:
@@ -30,7 +32,7 @@ spec:
       port:
         number: 80
   rules:
-    - host: staging.autoecoops.io
+    - host: production.autoecoops.io
       http:
         paths:
           - path: /api
@@ -75,7 +77,7 @@ spec:
                 name: eco-web-svc
                 port:
                   number: 80
-    - host: api-staging.autoecoops.io
+    - host: api-production.autoecoops.io
       http:
         paths:
           - path: /
@@ -86,27 +88,27 @@ spec:
                 port:
                   number: 8000
 ---
-# GKE Managed Certificate for staging
+# GKE Managed Certificate for production
 apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
 metadata:
-  name: eco-staging-cert
-  namespace: eco-staging
+  name: eco-production-cert
+  namespace: eco-production
   labels:
-    app.kubernetes.io/name: eco-staging-cert
+    app.kubernetes.io/name: eco-production-cert
     app.kubernetes.io/part-of: indestructibleeco
-    environment: staging
+    environment: production
 spec:
   domains:
-    - staging.autoecoops.io
-    - api-staging.autoecoops.io
+    - production.autoecoops.io
+    - api-production.autoecoops.io
 ---
 # YAML Toolkit v8 — Governance Block
 document_metadata:
-  unique_id: "eco-stg-ig-0001-0001-000000000001"
-  uri: "indestructibleeco://k8s/eco-staging/ingress/main"
-  urn: "urn:indestructibleeco:k8s:eco-staging:ingress:main:eco-stg-ig-0001-0001-000000000001"
-  target_system: gke-eco-staging
+  unique_id: "eco-prod-ig-0001-0001-000000000001"
+  uri: "indestructibleeco://k8s/eco-production/ingress/main"
+  urn: "urn:indestructibleeco:k8s:eco-production:ingress:main:eco-prod-ig-0001-0001-000000000001"
+  target_system: gke-eco-production
   cross_layer_binding: [api-gateway, api-service, web-frontend]
   schema_version: v8
   generated_by: yaml-toolkit-v8
@@ -114,15 +116,15 @@ document_metadata:
 governance_info:
   owner: platform-team
   approval_chain: [platform-team, security-team]
-  compliance_tags: [zero-trust, soc2, tls-required, edge, staging]
+  compliance_tags: [zero-trust, soc2, tls-required, edge, production]
   lifecycle_policy: active
 registry_binding:
-  service_endpoint: "https://staging.autoecoops.io"
+  service_endpoint: "https://production.autoecoops.io"
   discovery_protocol: gke-ingress
   health_check_path: "/health"
   registry_ttl: 30
 vector_alignment_map:
   alignment_model: quantum-bert-xxl-v1
   coherence_vector_dim: 1024
-  function_keyword: [ingress, gke, routing, tls, edge, staging]
+  function_keyword: [ingress, gke, routing, tls, edge, production]
   contextual_binding: "ingress -> [api-gateway, api-service, web-frontend]"

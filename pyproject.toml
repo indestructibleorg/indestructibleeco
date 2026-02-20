@@ -10,7 +10,7 @@ readme = "README.md"
 license = { text = "Apache-2.0" }
 requires-python = ">=3.11"
 authors = [
-    { name = "IndestructibleEco Platform Team", email = "platform-team@indestructibleeco.io" },
+    { name = "IndestructibleEco Platform Team", email = "platform-team@autoecoops.io" },
 ]
 keywords = ["ai", "inference", "llm", "vllm", "sglang", "tgi", "ollama", "kubernetes", "governance", "qyaml"]
 classifiers = [

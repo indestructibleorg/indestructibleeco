@@ -11,10 +11,10 @@ const spec = {
     title: "IndestructibleEco API",
     version: "1.0.0",
     description: "Enterprise cloud-native platform API — REST + WebSocket",
-    contact: { name: "Platform Team", url: "https://indestructibleeco.io" },
+    contact: { name: "Platform Team", url: "https://autoecoops.io" },
   },
   servers: [
-    { url: "https://api.indestructibleeco.io", description: "Production" },
+    { url: "https://api.autoecoops.io", description: "Production" },
     { url: "http://localhost:3000", description: "Local Development" },
   ],
   paths: {

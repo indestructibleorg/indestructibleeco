@@ -1,0 +1,108 @@
+# IndestructibleEco v1.0 — Redis Deployment & Service (eco-production)
+# Target: GKE eco-production cluster (asia-east1)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eco-redis
+  namespace: eco-production
+  labels:
+    app.kubernetes.io/name: eco-redis
+    app.kubernetes.io/part-of: indestructibleeco
+    environment: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eco-redis
+  template:
+    metadata:
+      labels:
+        app: eco-redis
+        app.kubernetes.io/name: eco-redis
+        app.kubernetes.io/part-of: indestructibleeco
+        environment: production
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        fsGroup: 999
+      containers:
+        - name: eco-redis
+          image: redis:7.2-alpine
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+          command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 384Mi
+          livenessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+      volumes:
+        - name: redis-data
+          emptyDir:
+            sizeLimit: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eco-redis-svc
+  namespace: eco-production
+  labels:
+    app.kubernetes.io/name: eco-redis
+    app.kubernetes.io/part-of: indestructibleeco
+    environment: production
+spec:
+  type: ClusterIP
+  selector:
+    app: eco-redis
+  ports:
+    - port: 6379
+      targetPort: 6379
+      protocol: TCP
+      name: redis
+---
+# YAML Toolkit v8 — Governance Block
+document_metadata:
+  unique_id: "eco-prod-rd-0001-0001-000000000001"
+  uri: "indestructibleeco://k8s/eco-production/deployment/redis"
+  urn: "urn:indestructibleeco:k8s:eco-production:deployment:redis:eco-prod-rd-0001-0001-000000000001"
+  target_system: gke-eco-production
+  cross_layer_binding: [api-service, ai-service]
+  schema_version: v8
+  generated_by: yaml-toolkit-v8
+  created_at: "2026-02-20T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team]
+  compliance_tags: [zero-trust, soc2, cache, production]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "redis://eco-redis-svc.eco-production.svc.cluster.local:6379"
+  discovery_protocol: k8s-dns
+  health_check_path: "n/a"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [redis, cache, session, production]
+  contextual_binding: "redis -> [api-service, ai-service]"

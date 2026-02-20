@@ -1,0 +1,78 @@
+# IndestructibleEco v1.0 — eco-production Namespace & RBAC
+# Target: GKE eco-production cluster (asia-east1)
+# Project: my-project-ops-1991
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eco-production
+  labels:
+    app.kubernetes.io/name: indestructibleeco
+    app.kubernetes.io/part-of: indestructibleeco
+    environment: production
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: eco-sa
+  namespace: eco-production
+  labels:
+    app.kubernetes.io/name: indestructibleeco
+    app.kubernetes.io/part-of: indestructibleeco
+  annotations:
+    iam.gke.io/gcp-service-account: eco-production-sa@my-project-ops-1991.iam.gserviceaccount.com
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: eco-role
+  namespace: eco-production
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "configmaps", "secrets", "events"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "statefulsets", "replicasets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: eco-rolebinding
+  namespace: eco-production
+subjects:
+  - kind: ServiceAccount
+    name: eco-sa
+    namespace: eco-production
+roleRef:
+  kind: Role
+  name: eco-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# YAML Toolkit v8 — Governance Block
+document_metadata:
+  unique_id: "eco-prod-ns-0001-0001-000000000001"
+  uri: "indestructibleeco://k8s/eco-production/namespace"
+  urn: "urn:indestructibleeco:k8s:eco-production:namespace:eco-prod-ns-0001-0001-000000000001"
+  target_system: gke-eco-production
+  cross_layer_binding: []
+  schema_version: v8
+  generated_by: yaml-toolkit-v8
+  created_at: "2026-02-20T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team, security-team]
+  compliance_tags: [zero-trust, soc2, internal, production]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "n/a"
+  discovery_protocol: k8s-dns
+  health_check_path: "n/a"
+  registry_ttl: 0
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [namespace, production, rbac, gke]
+  contextual_binding: "eco-production -> []"

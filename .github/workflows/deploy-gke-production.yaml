@@ -1,20 +1,16 @@
-name: Deploy to GKE eco-staging
+name: Deploy to GKE eco-production
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "backend/**"
-      - "platforms/web/**"
-      - "k8s/staging/**"
-      - "k8s/base/**"
-      - "docker/**"
-      - "src/**"
   workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "deploy-production" to confirm'
+        required: true
+        type: string
 
 concurrency:
-  group: deploy-gke-${{ github.ref }}
-  cancel-in-progress: true
+  group: deploy-gke-production-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -23,12 +19,23 @@ permissions:
 env:
   PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
   REGION: ${{ vars.GKE_REGION }}
-  CLUSTER: ${{ vars.GKE_CLUSTER_STAGING }}
-  NAMESPACE: ${{ vars.K8S_NAMESPACE_STAGING }}
+  CLUSTER: ${{ vars.GKE_CLUSTER_PRODUCTION }}
+  NAMESPACE: ${{ vars.K8S_NAMESPACE_PRODUCTION }}
   REGISTRY: ${{ vars.REGISTRY }}
 
 jobs:
+  validate-input:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "deploy-production" ]; then
+            echo "::error::Confirmation failed. You must type 'deploy-production' to proceed."
+            exit 1
+          fi
+
   build-and-push:
+    needs: validate-input
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -43,39 +50,39 @@ jobs:
       - name: Build and push Gateway image
         run: |
           docker build -t ${{ env.REGISTRY }}/gateway:${{ github.sha }} \
-                        -t ${{ env.REGISTRY }}/gateway:latest \
+                        -t ${{ env.REGISTRY }}/gateway:production \
                         -f docker/Dockerfile .
           docker push ${{ env.REGISTRY }}/gateway:${{ github.sha }}
-          docker push ${{ env.REGISTRY }}/gateway:latest
+          docker push ${{ env.REGISTRY }}/gateway:production
 
       - name: Build and push AI image
         run: |
           docker build -t ${{ env.REGISTRY }}/ai:${{ github.sha }} \
-                        -t ${{ env.REGISTRY }}/ai:latest \
+                        -t ${{ env.REGISTRY }}/ai:production \
                         backend/ai/
           docker push ${{ env.REGISTRY }}/ai:${{ github.sha }}
-          docker push ${{ env.REGISTRY }}/ai:latest
+          docker push ${{ env.REGISTRY }}/ai:production
 
       - name: Build and push API image
         run: |
           docker build -t ${{ env.REGISTRY }}/api:${{ github.sha }} \
-                        -t ${{ env.REGISTRY }}/api:latest \
+                        -t ${{ env.REGISTRY }}/api:production \
                         backend/api/
           docker push ${{ env.REGISTRY }}/api:${{ github.sha }}
-          docker push ${{ env.REGISTRY }}/api:latest
+          docker push ${{ env.REGISTRY }}/api:production
 
       - name: Build and push Web image
         run: |
           docker build -t ${{ env.REGISTRY }}/web:${{ github.sha }} \
-                        -t ${{ env.REGISTRY }}/web:latest \
+                        -t ${{ env.REGISTRY }}/web:production \
                         platforms/web/
           docker push ${{ env.REGISTRY }}/web:${{ github.sha }}
-          docker push ${{ env.REGISTRY }}/web:latest
+          docker push ${{ env.REGISTRY }}/web:production
 
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-    environment: staging
+    environment: production
     steps:
       - name: Checkout
         run: |
@@ -92,7 +99,7 @@ jobs:
       - name: Configure kubectl via kubeconfig
         run: |
           mkdir -p $HOME/.kube
-          echo '${{ secrets.KUBE_CONFIG_STAGING }}' | base64 -d > $HOME/.kube/config
+          echo '${{ secrets.KUBE_CONFIG_PRODUCTION }}' | base64 -d > $HOME/.kube/config
           chmod 600 $HOME/.kube/config
           echo "KUBECONFIG=$HOME/.kube/config" >> $GITHUB_ENV
 
@@ -106,19 +113,19 @@ jobs:
           kubectl cluster-info || echo "Direct kubeconfig auth"
           kubectl get namespaces || echo "Namespace listing failed — will try apply anyway"
 
-      - name: Apply staging manifests
+      - name: Apply production manifests
         run: |
-          mkdir -p /tmp/k8s-staging
-          for f in k8s/staging/*.qyaml; do
-            cp "$f" "/tmp/k8s-staging/$(basename "${f%.qyaml}.yaml")"
+          mkdir -p /tmp/k8s-production
+          for f in k8s/production/*.qyaml; do
+            cp "$f" "/tmp/k8s-production/$(basename "${f%.qyaml}.yaml")"
           done
 
           echo "Applying namespace..."
-          kubectl apply -f /tmp/k8s-staging/namespace.yaml || true
+          kubectl apply -f /tmp/k8s-production/namespace.yaml || true
 
           echo "Applying all manifests in order..."
           for f in namespace configmap postgres redis ai-service api-service api-gateway web-frontend ingress; do
-            yaml="/tmp/k8s-staging/${f}.yaml"
+            yaml="/tmp/k8s-production/${f}.yaml"
             if [ -f "$yaml" ]; then
               echo "  Applying ${f}..."
               kubectl apply -f "$yaml" -n ${{ env.NAMESPACE }} || true

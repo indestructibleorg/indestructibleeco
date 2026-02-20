@@ -1,0 +1,106 @@
+# IndestructibleEco v1.0 — AI Service Deployment & Service (eco-production)
+# Target: GKE eco-production cluster (asia-east1)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eco-ai-service
+  namespace: eco-production
+  labels:
+    app.kubernetes.io/name: eco-ai-service
+    app.kubernetes.io/part-of: indestructibleeco
+    environment: production
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: eco-ai-service
+  template:
+    metadata:
+      labels:
+        app: eco-ai-service
+        app.kubernetes.io/name: eco-ai-service
+        app.kubernetes.io/part-of: indestructibleeco
+        environment: production
+    spec:
+      serviceAccountName: eco-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: eco-ai-service
+          image: ghcr.io/indestructibleorg/ai:latest
+          ports:
+            - containerPort: 8001
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: eco-config
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eco-ai-svc
+  namespace: eco-production
+  labels:
+    app.kubernetes.io/name: eco-ai-service
+    app.kubernetes.io/part-of: indestructibleeco
+    environment: production
+spec:
+  type: ClusterIP
+  selector:
+    app: eco-ai-service
+  ports:
+    - port: 8001
+      targetPort: 8001
+      protocol: TCP
+      name: http
+---
+# YAML Toolkit v8 — Governance Block
+document_metadata:
+  unique_id: "eco-prod-ai-0001-0001-000000000001"
+  uri: "indestructibleeco://k8s/eco-production/deployment/ai-service"
+  urn: "urn:indestructibleeco:k8s:eco-production:deployment:ai-service:eco-prod-ai-0001-0001-000000000001"
+  target_system: gke-eco-production
+  cross_layer_binding: [api-gateway]
+  schema_version: v8
+  generated_by: yaml-toolkit-v8
+  created_at: "2026-02-20T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team, ml-team, security-team]
+  compliance_tags: [zero-trust, soc2, ai-inference, production]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "http://eco-ai-svc.eco-production.svc.cluster.local:8001"
+  discovery_protocol: k8s-dns
+  health_check_path: "/health"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [ai, inference, ml, service, production]
+  contextual_binding: "ai-service -> [api-gateway]"

@@ -10,8 +10,8 @@ DEDUP_TTL_SECONDS = "300"
 DEAD_LETTER_TTL_SECONDS = "86400"
 
 [[routes]]
-pattern = "api.indestructibleeco.io/webhook/*"
-zone_name = "indestructibleeco.io"
+pattern = "api.autoecoops.io/webhook/*"
+zone_name = "autoecoops.io"
 
 [[kv_namespaces]]
 binding = "WEBHOOK_KV"

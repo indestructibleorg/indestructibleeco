@@ -1,0 +1,106 @@
+# IndestructibleEco v1.0 — Web Frontend Deployment & Service (eco-production)
+# Target: GKE eco-production cluster (asia-east1)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eco-web-frontend
+  namespace: eco-production
+  labels:
+    app.kubernetes.io/name: eco-web-frontend
+    app.kubernetes.io/part-of: indestructibleeco
+    environment: production
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: eco-web-frontend
+  template:
+    metadata:
+      labels:
+        app: eco-web-frontend
+        app.kubernetes.io/name: eco-web-frontend
+        app.kubernetes.io/part-of: indestructibleeco
+        environment: production
+    spec:
+      serviceAccountName: eco-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: eco-web-frontend
+          image: ghcr.io/indestructibleorg/web:latest
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: eco-config
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eco-web-svc
+  namespace: eco-production
+  labels:
+    app.kubernetes.io/name: eco-web-frontend
+    app.kubernetes.io/part-of: indestructibleeco
+    environment: production
+spec:
+  type: ClusterIP
+  selector:
+    app: eco-web-frontend
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+---
+# YAML Toolkit v8 — Governance Block
+document_metadata:
+  unique_id: "eco-prod-web-0001-0001-000000000001"
+  uri: "indestructibleeco://k8s/eco-production/deployment/web-frontend"
+  urn: "urn:indestructibleeco:k8s:eco-production:deployment:web-frontend:eco-prod-web-0001-0001-000000000001"
+  target_system: gke-eco-production
+  cross_layer_binding: [api-gateway, api-service]
+  schema_version: v8
+  generated_by: yaml-toolkit-v8
+  created_at: "2026-02-20T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team]
+  compliance_tags: [zero-trust, soc2, frontend, production]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "http://eco-web-svc.eco-production.svc.cluster.local:80"
+  discovery_protocol: k8s-dns
+  health_check_path: "/"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [web, frontend, ui, spa, production]
+  contextual_binding: "web-frontend -> [api-gateway, api-service]"

@@ -38,7 +38,7 @@ ai:
 
 ingress:
   enabled: true
-  host: staging.indestructibleeco.io
+  host: staging.autoecoops.io
   tls:
     enabled: true
     secretName: eco-staging-tls

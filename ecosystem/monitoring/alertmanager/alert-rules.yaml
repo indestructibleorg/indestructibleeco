@@ -13,7 +13,7 @@ groups:
         annotations:
           summary: "High inference latency on {{ $labels.engine }}"
           description: "p95 latency is {{ $value }}s (threshold: 5s) for engine {{ $labels.engine }}"
-          runbook_url: "https://docs.indestructibleeco.io/runbooks/high-latency"
+          runbook_url: "https://docs.autoecoops.io/runbooks/high-latency"
 
       - alert: CriticalInferenceLatency
         expr: histogram_quantile(0.99, rate(eco_inference_latency_seconds_bucket[5m])) > 15
@@ -34,7 +34,7 @@ groups:
         annotations:
           summary: "Inference engine {{ $labels.engine }} is down"
           description: "Engine {{ $labels.engine }} has been unhealthy for >1m"
-          runbook_url: "https://docs.indestructibleeco.io/runbooks/engine-down"
+          runbook_url: "https://docs.autoecoops.io/runbooks/engine-down"
 
       - alert: AllEnginesDown
         expr: count(eco_engine_health_status == 1) == 0

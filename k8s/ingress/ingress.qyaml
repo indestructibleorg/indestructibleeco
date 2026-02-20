@@ -1,4 +1,5 @@
-# IndestructibleEco v1.0 - Ingress & TLS
+# IndestructibleEco v1.0 - Ingress & TLS (base/production)
+# Domains: api-production.autoecoops.io, grafana.autoecoops.io
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -15,7 +16,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-buffering: "off"
     nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://production.autoecoops.io,https://api-production.autoecoops.io"
     nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type, X-API-Key"
     nginx.ingress.kubernetes.io/limit-rps: "100"
@@ -34,11 +35,11 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - api.indestructibleeco.io
-        - grafana.indestructibleeco.io
+        - api-production.autoecoops.io
+        - grafana.autoecoops.io
       secretName: eco-tls
   rules:
-    - host: api.indestructibleeco.io
+    - host: api-production.autoecoops.io
       http:
         paths:
           - path: /
@@ -48,7 +49,7 @@ spec:
                 name: eco-api-svc
                 port:
                   number: 8000
-    - host: grafana.indestructibleeco.io
+    - host: grafana.autoecoops.io
       http:
         paths:
           - path: /
@@ -107,14 +108,14 @@ document_metadata:
   cross_layer_binding: [api-gateway, grafana, cert-manager]
   schema_version: v8
   generated_by: yaml-toolkit-v8
-  created_at: "2025-02-18T00:00:00.000Z"
+  created_at: "2026-02-20T00:00:00.000Z"
 governance_info:
   owner: platform-team
   approval_chain: [platform-team, security-team]
   compliance_tags: [zero-trust, soc2, tls-required, edge]
   lifecycle_policy: active
 registry_binding:
-  service_endpoint: "https://api.indestructibleeco.io"
+  service_endpoint: "https://api-production.autoecoops.io"
   discovery_protocol: consul
   health_check_path: "/health"
   registry_ttl: 30

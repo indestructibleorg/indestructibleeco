@@ -23,10 +23,10 @@ spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - api.indestructibleeco.io
+    - api.autoecoops.io
     secretName: api-tls
   rules:
-  - host: api.indestructibleeco.io
+  - host: api.autoecoops.io
     http:
       paths:
       - path: /
@@ -53,7 +53,7 @@ governance_info:
   compliance_tags: [zero-trust, soc2, internal]
   lifecycle_policy: active
 registry_binding:
-  service_endpoint: "https://api.indestructibleeco.io"
+  service_endpoint: "https://api.autoecoops.io"
   discovery_protocol: consul
   health_check_path: "/health"
   registry_ttl: 30

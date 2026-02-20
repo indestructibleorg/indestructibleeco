@@ -15,7 +15,7 @@ data:
   PORT: "3000"
   LOG_LEVEL: "info"
   LOG_FORMAT: "json"
-  CORS_ORIGINS: "https://app.indestructibleeco.io,https://indestructibleeco.io"
+  CORS_ORIGINS: "https://app.autoecoops.io,https://autoecoops.io"
   RATE_LIMIT_AUTHENTICATED: "100"
   RATE_LIMIT_PUBLIC: "10"
   RATE_LIMIT_WINDOW_MS: "60000"

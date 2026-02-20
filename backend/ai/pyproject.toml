@@ -2,7 +2,7 @@
 name = "indestructibleeco-ai"
 version = "1.0.0"
 description = "AI generation + YAML governance service for IndestructibleEco platform"
-authors = ["IndestructibleEco Platform Team <platform-team@indestructibleeco.io>"]
+authors = ["IndestructibleEco Platform Team <platform-team@autoecoops.io>"]
 license = "Apache-2.0"
 readme = "README.md"
 homepage = "https://github.com/indestructibleorg/indestructibleeco"

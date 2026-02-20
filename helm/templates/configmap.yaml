@@ -13,6 +13,6 @@ data:
   ECO_VECTOR_DIM: {{ .Values.ai.env.ECO_VECTOR_DIM | default "1024" | quote }}
   ECO_ALIGNMENT_MODEL: {{ .Values.ai.env.ECO_ALIGNMENT_MODEL | default "quantum-bert-xxl-v1" | quote }}
   ECO_AI_MODELS: {{ .Values.ai.env.ECO_AI_MODELS | default "vllm,ollama,tgi,sglang" | quote }}
-  ECO_CORS_ORIGINS: "https://api.indestructibleeco.io,https://ai.indestructibleeco.io"
+  ECO_CORS_ORIGINS: "https://api.autoecoops.io,https://ai.autoecoops.io"
   ECO_CONSUL_ENDPOINT: "http://consul.indestructibleeco.svc.cluster.local:8500"
   ECO_JAEGER_ENDPOINT: "http://jaeger-collector.indestructibleeco.svc.cluster.local:14268/api/traces"

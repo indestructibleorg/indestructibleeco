@@ -271,7 +271,7 @@ class TestDeployWorkflow:
         content = _read(".github/workflows/deploy-gke.yaml")
         assert "vars.GCP_PROJECT_ID" in content
         assert "vars.GKE_CLUSTER_STAGING" in content or "eco-staging" in content
-        assert "KUBE_CONFIG_STAGING" in content
+        assert "GCP_SA_KEY" in content
 
     def test_deploy_gke_builds_all_images(self):
         content = _read(".github/workflows/deploy-gke.yaml")
@@ -287,7 +287,7 @@ class TestDeployWorkflow:
         content = _read(".github/workflows/deploy-gke-production.yaml")
         assert "vars.GCP_PROJECT_ID" in content
         assert "vars.GKE_CLUSTER_PRODUCTION" in content or "eco-production" in content
-        assert "KUBE_CONFIG_PRODUCTION" in content
+        assert "GCP_SA_KEY" in content
         assert "deploy-production" in content
 
     def test_deploy_production_requires_confirmation(self):

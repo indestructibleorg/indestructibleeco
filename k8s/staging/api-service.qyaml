@@ -34,10 +34,10 @@ spec:
     spec:
       serviceAccountName: eco-sa
       terminationGracePeriodSeconds: 30
-    securityContext:
-    runAsNonRoot: true
-    runAsUser: 1000
-    fsGroup: 1000
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
       containers:
         - name: eco-api
           image: ghcr.io/indestructibleorg/api:latest

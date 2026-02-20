@@ -1,0 +1,37 @@
+severity:
+  - CRITICAL
+  - HIGH
+
+scan:
+  security-checks:
+    - vuln
+    - config
+    - secret
+
+vulnerability:
+  type:
+    - os
+    - library
+  ignore-unfixed: true
+
+misconfiguration:
+  scanners:
+    - dockerfile
+    - kubernetes
+  include-non-failures: false
+
+image:
+  removed-pkgs: true
+  input: []
+
+cache:
+  backend: fs
+  ttl: 24h
+
+output:
+  format: table
+  template: ""
+
+db:
+  skip-update: false
+  repository: ghcr.io/aquasecurity/trivy-db

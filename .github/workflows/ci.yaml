@@ -302,6 +302,11 @@ jobs:
           tests/unit/test_api_client.py \
           tests/unit/test_grafana_dashboard.py \
           tests/unit/test_alert_rules.py \
+          tests/unit/test_docker_compose.py \
+          tests/unit/test_argocd_appset.py \
+          tests/unit/test_security.py \
+          tests/unit/test_docs.py \
+          tests/unit/test_readme.py \
           backend/ai/src/services/engine_manager.py \
           backend/ai/src/services/circuit_breaker.py; do
           if [ -f "$file" ]; then

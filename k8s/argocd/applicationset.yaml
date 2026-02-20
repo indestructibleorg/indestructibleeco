@@ -1,0 +1,74 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: indestructibleeco-envs
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: indestructibleeco
+    app.kubernetes.io/part-of: indestructibleeco
+spec:
+  generators:
+    - list:
+        elements:
+          - env: staging
+            namespace: indestructibleeco-staging
+            cluster: https://kubernetes.default.svc
+            revision: develop
+            values_file: values-staging.yaml
+            auto_sync: "true"
+            prune: "true"
+          - env: production
+            namespace: indestructibleeco
+            cluster: https://kubernetes.default.svc
+            revision: main
+            values_file: values.yaml
+            auto_sync: "false"
+            prune: "false"
+  template:
+    metadata:
+      name: "eco-{{env}}"
+      namespace: argocd
+      labels:
+        app.kubernetes.io/name: indestructibleeco
+        app.kubernetes.io/instance: "eco-{{env}}"
+        environment: "{{env}}"
+      annotations:
+        notifications.argoproj.io/subscribe.on-sync-succeeded.slack: eco-deployments
+        notifications.argoproj.io/subscribe.on-sync-failed.slack: eco-alerts
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/indestructibleorg/indestructibleeco.git
+        targetRevision: "{{revision}}"
+        path: helm
+        helm:
+          releaseName: "eco-{{env}}"
+          valueFiles:
+            - "{{values_file}}"
+          parameters:
+            - name: global.namespace
+              value: "{{namespace}}"
+            - name: global.environment
+              value: "{{env}}"
+      destination:
+        server: "{{cluster}}"
+        namespace: "{{namespace}}"
+      syncPolicy:
+        automated:
+          selfHeal: true
+          prune: true
+        syncOptions:
+          - CreateNamespace=true
+          - PrunePropagationPolicy=foreground
+          - PruneLast=true
+        retry:
+          limit: 3
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
+      ignoreDifferences:
+        - group: apps
+          kind: Deployment
+          jsonPointers:
+            - /spec/replicas

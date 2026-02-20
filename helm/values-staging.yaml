@@ -1,0 +1,47 @@
+# IndestructibleEco Staging Values Override
+global:
+  namespace: indestructibleeco-staging
+  imageRegistry: "ghcr.io/indestructibleorg"
+
+api:
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m"
+      memory: "2Gi"
+  autoscaling:
+    enabled: false
+  env:
+    ECO_ENVIRONMENT: staging
+    ECO_LOG_LEVEL: DEBUG
+
+ai:
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m"
+      memory: "2Gi"
+  autoscaling:
+    enabled: false
+  env:
+    ECO_ENVIRONMENT: staging
+    ECO_LOG_LEVEL: DEBUG
+    ECO_FAISS_ENABLED: "true"
+    ECO_ES_ENABLED: "false"
+    ECO_NEO4J_ENABLED: "false"
+
+ingress:
+  enabled: true
+  host: staging.indestructibleeco.io
+  tls:
+    enabled: true
+    secretName: eco-staging-tls
+
+networkPolicy:
+  enabled: true

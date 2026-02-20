@@ -1,0 +1,105 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2025-02-20T00:00:00Z",
+    "component": {
+      "type": "application",
+      "name": "indestructibleeco",
+      "version": "1.0.0",
+      "description": "Enterprise Cloud-Native AI Platform",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/indestructibleorg/indestructibleeco"
+        },
+        {
+          "type": "website",
+          "url": "https://indestructibleeco.io"
+        }
+      ]
+    },
+    "tools": [
+      {
+        "name": "indestructibleeco-sbom-gen",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "framework",
+      "name": "fastapi",
+      "version": "0.115.0",
+      "purl": "pkg:pypi/fastapi@0.115.0"
+    },
+    {
+      "type": "library",
+      "name": "pydantic",
+      "version": "2.9.0",
+      "purl": "pkg:pypi/pydantic@2.9.0"
+    },
+    {
+      "type": "library",
+      "name": "httpx",
+      "version": "0.27.0",
+      "purl": "pkg:pypi/httpx@0.27.0"
+    },
+    {
+      "type": "library",
+      "name": "uvicorn",
+      "version": "0.30.0",
+      "purl": "pkg:pypi/uvicorn@0.30.0"
+    },
+    {
+      "type": "library",
+      "name": "celery",
+      "version": "5.4.0",
+      "purl": "pkg:pypi/celery@5.4.0"
+    },
+    {
+      "type": "library",
+      "name": "redis",
+      "version": "5.0.0",
+      "purl": "pkg:pypi/redis@5.0.0"
+    },
+    {
+      "type": "library",
+      "name": "pyyaml",
+      "version": "6.0.1",
+      "purl": "pkg:pypi/pyyaml@6.0.1"
+    },
+    {
+      "type": "library",
+      "name": "numpy",
+      "version": "1.26.0",
+      "purl": "pkg:pypi/numpy@1.26.0"
+    },
+    {
+      "type": "framework",
+      "name": "express",
+      "version": "4.19.0",
+      "purl": "pkg:npm/express@4.19.0"
+    },
+    {
+      "type": "framework",
+      "name": "react",
+      "version": "18.3.0",
+      "purl": "pkg:npm/react@18.3.0"
+    },
+    {
+      "type": "library",
+      "name": "typescript",
+      "version": "5.5.0",
+      "purl": "pkg:npm/typescript@5.5.0"
+    }
+  ]
+}

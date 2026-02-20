@@ -1,0 +1,58 @@
+{{- if .Values.networkPolicy.enabled | default true }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "eco.fullname" . }}
+  namespace: {{ .Values.namespace | default "indestructibleeco" }}
+  labels:
+    {{- include "eco.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "eco.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: indestructibleeco
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.service.port | default 8001 }}
+        - protocol: TCP
+          port: {{ .Values.service.grpcPort | default 8000 }}
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: {{ .Values.service.port | default 8001 }}
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: indestructibleeco
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+      ports:
+        - protocol: TCP
+          port: 443
+{{- end }}

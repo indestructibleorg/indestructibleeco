@@ -281,6 +281,11 @@ jobs:
           helm/templates/service.yaml \
           helm/templates/hpa.yaml \
           helm/templates/pdb.yaml \
+          helm/templates/configmap.yaml \
+          helm/templates/secrets.yaml \
+          helm/templates/serviceaccount.yaml \
+          helm/templates/networkpolicy.yaml \
+          helm/templates/servicemonitor.yaml \
           platforms/desktop/resources/icon.png \
           tests/e2e/test_full_flow.py \
           tests/e2e/test_service_lifecycle.py \

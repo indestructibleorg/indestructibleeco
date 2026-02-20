@@ -1,0 +1,29 @@
+IndestructibleEco v{{ .Chart.AppVersion }} deployed successfully.
+
+Namespace: {{ .Values.namespace | default "indestructibleeco" }}
+
+Services:
+  AI Service (HTTP): {{ include "eco.fullname" . }}:{{ .Values.service.port | default 8001 }}
+  AI Service (gRPC): {{ include "eco.fullname" . }}:{{ .Values.service.grpcPort | default 8000 }}
+
+Health check:
+  kubectl -n {{ .Values.namespace | default "indestructibleeco" }} port-forward svc/{{ include "eco.fullname" . }} {{ .Values.service.port | default 8001 }}:{{ .Values.service.port | default 8001 }}
+  curl http://localhost:{{ .Values.service.port | default 8001 }}/health
+
+{{- if .Values.ingress.enabled }}
+Ingress:
+  {{- range .Values.ingress.hosts }}
+  https://{{ .host }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.autoscaling.enabled }}
+HPA: {{ .Values.autoscaling.minReplicas }}-{{ .Values.autoscaling.maxReplicas }} replicas (CPU target: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}%)
+{{- end }}
+
+{{- if .Values.podDisruptionBudget.enabled }}
+PDB: maxUnavailable={{ .Values.podDisruptionBudget.maxUnavailable | default 1 }}
+{{- end }}
+
+Argo CD sync:
+  argocd app sync indestructibleeco-platform

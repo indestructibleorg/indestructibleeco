@@ -266,3 +266,11 @@ env: {}
 nodeSelector: {}
 tolerations: []
 affinity: {}
+
+# ── Network Policy ─────────────────────────────────────────────────────────────
+networkPolicy:
+  enabled: true
+
+# ── Secrets (override via --set or external secret manager) ────────────────────
+# secrets block already exists above; these are additional defaults for template
+# secrets.redisUrl, secrets.supabaseUrl are consumed by secrets.yaml template

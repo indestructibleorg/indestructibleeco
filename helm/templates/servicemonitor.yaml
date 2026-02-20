@@ -1,0 +1,27 @@
+{{- if .Values.monitoring.prometheus.enabled | default true }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "eco.fullname" . }}
+  namespace: {{ .Values.namespace | default "indestructibleeco" }}
+  labels:
+    {{- include "eco.labels" . | nindent 4 }}
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      {{- include "eco.selectorLabels" . | nindent 6 }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Values.namespace | default "indestructibleeco" }}
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s
+      honorLabels: true
+      metricRelabelings:
+        - sourceLabels: [__name__]
+          regex: "eco_.*"
+          action: keep
+{{- end }}

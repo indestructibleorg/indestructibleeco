@@ -50,3 +50,4 @@ __pycache__/
 *.egg-info/
 # Governance audit logs
 .eco-audit/
+.eco-wal/

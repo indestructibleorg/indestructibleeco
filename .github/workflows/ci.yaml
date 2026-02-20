@@ -294,6 +294,10 @@ jobs:
           tests/unit/test_index_config.py \
           tests/unit/test_adapter_resilience.py \
           tests/unit/test_gateway_proxy.py \
+          tests/unit/test_shared_db.py \
+          tests/unit/test_proto_stubs.py \
+          tests/unit/test_api_types.py \
+          tests/unit/test_yaml_studio.py \
           backend/ai/src/services/engine_manager.py \
           backend/ai/src/services/circuit_breaker.py; do
           if [ -f "$file" ]; then

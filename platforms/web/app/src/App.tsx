@@ -3,6 +3,7 @@ import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import YAMLStudio from './pages/YAMLStudio';
 import AIPlayground from "./pages/AIPlayground";
 import Models from "./pages/Models";
 import Platforms from "./pages/Platforms";

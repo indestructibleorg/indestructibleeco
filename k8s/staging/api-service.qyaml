@@ -1,0 +1,121 @@
+# IndestructibleEco v1.0 — API Service Deployment (eco-staging)
+# Image: asia-east1-docker.pkg.dev/my-project-ops-1991/eco-images/eco-api:latest
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eco-api-service
+  namespace: eco-staging
+  labels:
+    app.kubernetes.io/name: eco-api-service
+    app.kubernetes.io/component: api-service
+    app.kubernetes.io/part-of: indestructibleeco
+    environment: staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: eco-api-service
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: eco-api-service
+        app.kubernetes.io/component: api-service
+        app.kubernetes.io/part-of: indestructibleeco
+        environment: staging
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: eco-sa
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: eco-api
+          image: asia-east1-docker.pkg.dev/my-project-ops-1991/eco-images/eco-api:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: eco-config
+            - secretRef:
+                name: eco-secrets
+          env:
+            - name: PORT
+              value: "3000"
+            - name: NODE_ENV
+              value: "staging"
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eco-api-svc
+  namespace: eco-staging
+  labels:
+    app.kubernetes.io/name: eco-api-service
+    app.kubernetes.io/part-of: indestructibleeco
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: eco-api-service
+---
+# YAML Toolkit v8 — Governance Block
+document_metadata:
+  unique_id: "eco-stg-api-0001-0001-000000000001"
+  uri: "indestructibleeco://k8s/eco-staging/deployment/api-service"
+  urn: "urn:indestructibleeco:k8s:eco-staging:deployment:api-service:eco-stg-api-0001-0001-000000000001"
+  target_system: gke-eco-staging
+  cross_layer_binding: [api-gateway, ai-service, postgres, redis]
+  schema_version: v8
+  generated_by: yaml-toolkit-v8
+  created_at: "2026-02-20T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team]
+  compliance_tags: [zero-trust, soc2, internal, staging]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "http://eco-api-svc.eco-staging.svc.cluster.local:3000"
+  discovery_protocol: k8s-dns
+  health_check_path: "/health"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [api, express, nodejs, rest, websocket, staging]
+  contextual_binding: "api-service -> [api-gateway, ai-service, postgres, redis]"

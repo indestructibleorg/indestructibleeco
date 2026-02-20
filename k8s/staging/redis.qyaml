@@ -1,0 +1,110 @@
+# IndestructibleEco v1.0 — Redis (eco-staging)
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: eco-staging
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/component: cache
+    app.kubernetes.io/part-of: indestructibleeco
+    environment: staging
+spec:
+  serviceName: redis-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redis
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: redis
+        app.kubernetes.io/component: cache
+        environment: staging
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - name: redis
+              containerPort: 6379
+          command:
+            - redis-server
+            - "--appendonly"
+            - "yes"
+            - "--maxmemory"
+            - "512mb"
+            - "--maxmemory-policy"
+            - "allkeys-lru"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "768Mi"
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+          readinessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 15
+            periodSeconds: 20
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-svc
+  namespace: eco-staging
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/part-of: indestructibleeco
+spec:
+  type: ClusterIP
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+  selector:
+    app.kubernetes.io/name: redis
+---
+# YAML Toolkit v8 — Governance Block
+document_metadata:
+  unique_id: "eco-stg-rd-0001-0001-000000000001"
+  uri: "indestructibleeco://k8s/eco-staging/statefulset/redis"
+  urn: "urn:indestructibleeco:k8s:eco-staging:statefulset:redis:eco-stg-rd-0001-0001-000000000001"
+  target_system: gke-eco-staging
+  cross_layer_binding: [api-gateway, ai-service, api-service]
+  schema_version: v8
+  generated_by: yaml-toolkit-v8
+  created_at: "2026-02-20T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team]
+  compliance_tags: [zero-trust, soc2, internal, staging, stateful]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "redis://redis-svc.eco-staging.svc.cluster.local:6379"
+  discovery_protocol: k8s-dns
+  health_check_path: "n/a"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [redis, cache, queue, staging]
+  contextual_binding: "redis -> [api-gateway, ai-service, api-service]"

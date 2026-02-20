@@ -1,0 +1,57 @@
+# IndestructibleEco v1.0 — Argo CD Application (eco-staging on GKE)
+# Target: GKE eco-staging cluster, asia-east1
+# Project: my-project-ops-1991
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: eco-staging
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: eco-staging
+    app.kubernetes.io/part-of: indestructibleeco
+    app.kubernetes.io/managed-by: argocd
+    environment: staging
+  annotations:
+    indestructibleeco/uri: "indestructibleeco://k8s/argocd/application/eco-staging"
+    indestructibleeco/owner: "platform-team"
+    indestructibleeco/compliance: "soc2,zero-trust,gitops"
+    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: eco-deployments
+    notifications.argoproj.io/subscribe.on-sync-failed.slack: eco-alerts
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/indestructibleorg/indestructibleeco.git
+    targetRevision: main
+    path: k8s/staging
+    directory:
+      recurse: false
+      include: "*.qyaml"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: eco-staging
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 2m
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+  revisionHistoryLimit: 5

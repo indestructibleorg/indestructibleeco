@@ -1,0 +1,117 @@
+# IndestructibleEco v1.0 — PostgreSQL (eco-staging)
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: eco-staging
+  labels:
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: indestructibleeco
+    environment: staging
+spec:
+  serviceName: postgres-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgres
+        app.kubernetes.io/component: database
+        environment: staging
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: eco-secrets
+                  key: ECO_POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eco-secrets
+                  key: ECO_POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              value: "indestructibleeco"
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "indestructibleeco"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "indestructibleeco"]
+            initialDelaySeconds: 30
+            periodSeconds: 30
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 20Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-svc
+  namespace: eco-staging
+  labels:
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/part-of: indestructibleeco
+spec:
+  type: ClusterIP
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+  selector:
+    app.kubernetes.io/name: postgres
+---
+# YAML Toolkit v8 — Governance Block
+document_metadata:
+  unique_id: "eco-stg-pg-0001-0001-000000000001"
+  uri: "indestructibleeco://k8s/eco-staging/statefulset/postgres"
+  urn: "urn:indestructibleeco:k8s:eco-staging:statefulset:postgres:eco-stg-pg-0001-0001-000000000001"
+  target_system: gke-eco-staging
+  cross_layer_binding: [api-gateway, api-service]
+  schema_version: v8
+  generated_by: yaml-toolkit-v8
+  created_at: "2026-02-20T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team, security-team]
+  compliance_tags: [zero-trust, soc2, internal, staging, stateful, database]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "postgres://postgres-svc.eco-staging.svc.cluster.local:5432"
+  discovery_protocol: k8s-dns
+  health_check_path: "n/a"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [postgres, database, persistence, staging]
+  contextual_binding: "postgres -> [api-gateway, api-service]"

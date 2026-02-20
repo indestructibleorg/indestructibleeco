@@ -248,7 +248,7 @@ jobs:
           ecosystem/monitoring ecosystem/tracing ecosystem/service-discovery \
           ecosystem/logging ecosystem/gateway \
           tools/yaml-toolkit tools/skill-creator tools/ci-validator \
-          k8s/base k8s/ingress k8s/monitoring k8s/argocd \
+          k8s/base k8s/ingress k8s/monitoring k8s/argocd k8s/staging \
           src src/schemas src/middleware src/core docs \
           helm/templates \
           platforms/im-integration/whatsapp/src platforms/im-integration/line/src \
@@ -314,7 +314,21 @@ jobs:
           .github/workflows/release.yml \
           .github/workflows/publish-npm.yml \
           .github/workflows/publish-docker.yml \
-          .github/workflows/publish-pypi.yml; do
+          .github/workflows/publish-pypi.yml \
+          .github/workflows/deploy-gke.yaml \
+          deploy.sh \
+          platforms/web/Dockerfile \
+          k8s/staging/namespace.qyaml \
+          k8s/staging/configmap.qyaml \
+          k8s/staging/api-gateway.qyaml \
+          k8s/staging/ai-service.qyaml \
+          k8s/staging/api-service.qyaml \
+          k8s/staging/web-frontend.qyaml \
+          k8s/staging/redis.qyaml \
+          k8s/staging/postgres.qyaml \
+          k8s/staging/ingress.qyaml \
+          k8s/argocd/argo-app-eco-staging.yaml \
+          tests/unit/test_gke_deploy.py; do
           if [ -f "$file" ]; then
             echo "  PASS: $file"
           else

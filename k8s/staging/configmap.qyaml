@@ -1,0 +1,93 @@
+# IndestructibleEco v1.0 — eco-staging ConfigMap & Secrets
+# Target: GKE eco-staging (asia-east1), Project: my-project-ops-1991
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eco-config
+  namespace: eco-staging
+  labels:
+    app.kubernetes.io/name: indestructibleeco
+    app.kubernetes.io/part-of: indestructibleeco
+    environment: staging
+data:
+  ECO_ENVIRONMENT: "staging"
+  ECO_LOG_LEVEL: "DEBUG"
+  ECO_HOST: "0.0.0.0"
+  ECO_PORT: "8000"
+  ECO_API_PORT: "3000"
+  ECO_WEB_PORT: "80"
+  ECO_WORKERS: "2"
+  ECO_DEFAULT_ENGINE: "vllm"
+  ECO_ENGINE_TIMEOUT_SECONDS: "120"
+  ECO_MAX_CONCURRENT_REQUESTS: "64"
+  ECO_REQUEST_QUEUE_SIZE: "1024"
+  ECO_VLLM_HOST: "vllm-svc"
+  ECO_VLLM_PORT: "8001"
+  ECO_VLLM_GPU_MEMORY_UTILIZATION: "0.90"
+  ECO_VLLM_MAX_MODEL_LEN: "32768"
+  ECO_VLLM_TENSOR_PARALLEL_SIZE: "1"
+  ECO_TGI_HOST: "tgi-svc"
+  ECO_TGI_PORT: "8002"
+  ECO_SGLANG_HOST: "sglang-svc"
+  ECO_SGLANG_PORT: "8003"
+  ECO_OLLAMA_HOST: "ollama-svc"
+  ECO_OLLAMA_PORT: "11434"
+  ECO_REDIS_HOST: "redis-svc"
+  ECO_REDIS_PORT: "6379"
+  ECO_POSTGRES_HOST: "postgres-svc"
+  ECO_POSTGRES_PORT: "5432"
+  ECO_POSTGRES_DB: "indestructibleeco"
+  ECO_MODEL_CACHE_DIR: "/models"
+  ECO_DEFAULT_MODEL: "meta-llama/Llama-3.1-8B-Instruct"
+  ECO_EMBEDDING_MODEL: "BAAI/bge-large-en-v1.5"
+  ECO_ENABLE_TRACING: "true"
+  ECO_AI_SERVICE_URL: "http://eco-ai-svc.eco-staging.svc.cluster.local:8001"
+  ECO_API_SERVICE_URL: "http://eco-api-svc.eco-staging.svc.cluster.local:3000"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: eco-secrets
+  namespace: eco-staging
+  labels:
+    app.kubernetes.io/name: indestructibleeco
+    app.kubernetes.io/part-of: indestructibleeco
+    environment: staging
+type: Opaque
+stringData:
+  ECO_SECRET_KEY: "staging-change-me-openssl-rand-hex-32"
+  ECO_POSTGRES_USER: "indestructibleeco"
+  ECO_POSTGRES_PASSWORD: "eco_staging_secret"
+  ECO_REDIS_PASSWORD: ""
+  ECO_JWT_SECRET: "staging-jwt-secret-change-me"
+  ECO_SUPABASE_URL: "placeholder"
+  ECO_SUPABASE_ANON_KEY: "placeholder"
+  ECO_SUPABASE_SERVICE_ROLE_KEY: "placeholder"
+  HF_TOKEN: ""
+  DATABASE_URL: "postgresql://indestructibleeco:eco_staging_secret@postgres-svc.eco-staging.svc.cluster.local:5432/indestructibleeco"
+---
+# YAML Toolkit v8 — Governance Block
+document_metadata:
+  unique_id: "eco-stg-cm-0001-0001-000000000001"
+  uri: "indestructibleeco://k8s/eco-staging/configmap/eco-config"
+  urn: "urn:indestructibleeco:k8s:eco-staging:configmap:eco-config:eco-stg-cm-0001-0001-000000000001"
+  target_system: gke-eco-staging
+  cross_layer_binding: [api-gateway, ai-service, web-frontend]
+  schema_version: v8
+  generated_by: yaml-toolkit-v8
+  created_at: "2026-02-20T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team]
+  compliance_tags: [zero-trust, soc2, internal, staging]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "n/a"
+  discovery_protocol: k8s-dns
+  health_check_path: "n/a"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [configmap, secrets, environment, staging]
+  contextual_binding: "eco-config -> [api-gateway, ai-service, web-frontend]"

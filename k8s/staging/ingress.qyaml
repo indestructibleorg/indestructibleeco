@@ -1,0 +1,101 @@
+# IndestructibleEco v1.0 — Ingress (eco-staging)
+# GKE eco-staging cluster, asia-east1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: eco-staging-ingress
+  namespace: eco-staging
+  labels:
+    app.kubernetes.io/name: eco-staging-ingress
+    app.kubernetes.io/part-of: indestructibleeco
+    environment: staging
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "eco-staging-ip"
+    networking.gke.io/managed-certificates: "eco-staging-cert"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type, X-API-Key"
+spec:
+  defaultBackend:
+    service:
+      name: eco-web-svc
+      port:
+        number: 80
+  rules:
+    - http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: eco-api-svc
+                port:
+                  number: 3000
+          - path: /auth
+            pathType: Prefix
+            backend:
+              service:
+                name: eco-api-svc
+                port:
+                  number: 3000
+          - path: /health
+            pathType: Exact
+            backend:
+              service:
+                name: eco-gateway-svc
+                port:
+                  number: 8000
+          - path: /metrics
+            pathType: Exact
+            backend:
+              service:
+                name: eco-gateway-svc
+                port:
+                  number: 8000
+          - path: /v1
+            pathType: Prefix
+            backend:
+              service:
+                name: eco-gateway-svc
+                port:
+                  number: 8000
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: eco-web-svc
+                port:
+                  number: 80
+---
+# YAML Toolkit v8 — Governance Block
+document_metadata:
+  unique_id: "eco-stg-ig-0001-0001-000000000001"
+  uri: "indestructibleeco://k8s/eco-staging/ingress/main"
+  urn: "urn:indestructibleeco:k8s:eco-staging:ingress:main:eco-stg-ig-0001-0001-000000000001"
+  target_system: gke-eco-staging
+  cross_layer_binding: [api-gateway, api-service, web-frontend]
+  schema_version: v8
+  generated_by: yaml-toolkit-v8
+  created_at: "2026-02-20T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team, security-team]
+  compliance_tags: [zero-trust, soc2, tls-required, edge, staging]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "https://staging.indestructibleeco.io"
+  discovery_protocol: gke-ingress
+  health_check_path: "/health"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [ingress, gke, routing, tls, edge, staging]
+  contextual_binding: "ingress -> [api-gateway, api-service, web-frontend]"

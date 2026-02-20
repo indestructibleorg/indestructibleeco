@@ -1,4 +1,4 @@
-"""Tests for GKE eco-staging deployment artifacts."""
+"""Tests for GKE deployment artifacts (staging + production)."""
 import os
 import sys
 
@@ -109,6 +109,11 @@ class TestStagingManifests:
         assert "/v1" in content
         assert "eco-web-svc" in content
 
+    def test_ingress_staging_domain(self):
+        content = _read("k8s/staging/ingress.qyaml")
+        assert "staging.autoecoops.io" in content
+        assert "api-staging.autoecoops.io" in content
+
     def test_all_have_governance_blocks(self):
         for f in self.STAGING_FILES:
             content = _read(f)
@@ -119,6 +124,109 @@ class TestStagingManifests:
         for f in self.STAGING_FILES:
             content = _read(f)
             assert "eco-staging" in content, f"Missing eco-staging namespace in {f}"
+
+
+# ── K8s production manifests ────────────────────────────────
+class TestProductionManifests:
+    PRODUCTION_FILES = [
+        "k8s/production/namespace.qyaml",
+        "k8s/production/configmap.qyaml",
+        "k8s/production/api-gateway.qyaml",
+        "k8s/production/ai-service.qyaml",
+        "k8s/production/api-service.qyaml",
+        "k8s/production/web-frontend.qyaml",
+        "k8s/production/redis.qyaml",
+        "k8s/production/postgres.qyaml",
+        "k8s/production/ingress.qyaml",
+    ]
+
+    def test_all_production_files_exist(self):
+        for f in self.PRODUCTION_FILES:
+            assert _exists(f), f"Missing: {f}"
+
+    def test_namespace_eco_production(self):
+        content = _read("k8s/production/namespace.qyaml")
+        assert "eco-production" in content
+        assert "ServiceAccount" in content
+        assert "eco-sa" in content
+
+    def test_configmap_production_vars(self):
+        content = _read("k8s/production/configmap.qyaml")
+        assert "ECO_ENVIRONMENT" in content
+        assert '"production"' in content
+        assert "ECO_LOG_LEVEL" in content
+
+    def test_configmap_no_hardcoded_secrets(self):
+        content = _read("k8s/production/configmap.qyaml")
+        assert "INJECT_FROM_K8S_SECRET" in content
+
+    def test_api_gateway_production(self):
+        content = _read("k8s/production/api-gateway.qyaml")
+        assert "ghcr.io/indestructibleorg/gateway" in content
+        assert "eco-production" in content
+        assert "replicas: 3" in content
+        assert "readinessProbe" in content
+        assert "livenessProbe" in content
+
+    def test_ai_service_production(self):
+        content = _read("k8s/production/ai-service.qyaml")
+        assert "ghcr.io/indestructibleorg/ai" in content
+        assert "eco-production" in content
+        assert "8001" in content
+
+    def test_api_service_production(self):
+        content = _read("k8s/production/api-service.qyaml")
+        assert "ghcr.io/indestructibleorg/api" in content
+        assert "eco-production" in content
+        assert "replicas: 3" in content
+
+    def test_web_frontend_production(self):
+        content = _read("k8s/production/web-frontend.qyaml")
+        assert "ghcr.io/indestructibleorg/web" in content
+        assert "eco-production" in content
+        assert "replicas: 3" in content
+
+    def test_redis_production(self):
+        content = _read("k8s/production/redis.qyaml")
+        assert "eco-production" in content
+        assert "redis:" in content
+
+    def test_postgres_production(self):
+        content = _read("k8s/production/postgres.qyaml")
+        assert "eco-production" in content
+        assert "postgres:16-alpine" in content
+        assert "eco_production" in content
+
+    def test_ingress_production_domain(self):
+        content = _read("k8s/production/ingress.qyaml")
+        assert "production.autoecoops.io" in content
+        assert "api-production.autoecoops.io" in content
+
+    def test_ingress_production_routing(self):
+        content = _read("k8s/production/ingress.qyaml")
+        assert "/api" in content
+        assert "/v1" in content
+        assert "eco-web-svc" in content
+        assert "eco-gateway-svc" in content
+
+    def test_production_security_context(self):
+        for f in ["k8s/production/api-gateway.qyaml",
+                   "k8s/production/ai-service.qyaml",
+                   "k8s/production/api-service.qyaml",
+                   "k8s/production/web-frontend.qyaml"]:
+            content = _read(f)
+            assert "runAsNonRoot: true" in content, f"Missing securityContext in {f}"
+
+    def test_all_have_governance_blocks(self):
+        for f in self.PRODUCTION_FILES:
+            content = _read(f)
+            assert "schema_version: v8" in content, f"Missing governance in {f}"
+            assert "yaml-toolkit-v8" in content, f"Missing toolkit ref in {f}"
+
+    def test_all_have_eco_production_namespace(self):
+        for f in self.PRODUCTION_FILES:
+            content = _read(f)
+            assert "eco-production" in content, f"Missing eco-production namespace in {f}"
 
 
 # ── Argo CD ─────────────────────────────────────────────────
@@ -138,8 +246,23 @@ class TestArgoCD:
         content = _read("k8s/argocd/argo-app-eco-staging.yaml")
         assert "namespace: eco-staging" in content
 
+    def test_eco_production_app_exists(self):
+        assert _exists("k8s/argocd/argo-app-eco-production.yaml")
 
-# ── Deploy workflow ──────────────────────────────────────────
+    def test_eco_production_app_content(self):
+        content = _read("k8s/argocd/argo-app-eco-production.yaml")
+        assert "eco-production" in content
+        assert "k8s/production" in content
+        assert "selfHeal: true" in content
+        assert "prune: true" in content
+        assert "*.qyaml" in content
+
+    def test_eco_production_targets_correct_namespace(self):
+        content = _read("k8s/argocd/argo-app-eco-production.yaml")
+        assert "namespace: eco-production" in content
+
+
+# ── Deploy workflows ────────────────────────────────────────
 class TestDeployWorkflow:
     def test_deploy_gke_workflow_exists(self):
         assert _exists(".github/workflows/deploy-gke.yaml")
@@ -157,8 +280,23 @@ class TestDeployWorkflow:
         assert "/api:" in content or "eco-api" in content
         assert "/web:" in content or "eco-web" in content
 
+    def test_deploy_production_workflow_exists(self):
+        assert _exists(".github/workflows/deploy-gke-production.yaml")
 
-# ── Deploy script ────────────────────────────────────────────
+    def test_deploy_production_content(self):
+        content = _read(".github/workflows/deploy-gke-production.yaml")
+        assert "vars.GCP_PROJECT_ID" in content
+        assert "vars.GKE_CLUSTER_PRODUCTION" in content or "eco-production" in content
+        assert "KUBE_CONFIG_PRODUCTION" in content
+        assert "deploy-production" in content
+
+    def test_deploy_production_requires_confirmation(self):
+        content = _read(".github/workflows/deploy-gke-production.yaml")
+        assert "workflow_dispatch" in content
+        assert "confirm" in content
+
+
+# ── Deploy script ───────────────────────────────────────────
 class TestDeployScript:
     def test_deploy_script_exists(self):
         assert _exists("deploy.sh")
@@ -172,3 +310,31 @@ class TestDeployScript:
         assert "gcloud" in content
         assert "kubectl" in content
         assert "docker" in content
+
+
+# ── Domain configuration ────────────────────────────────────
+class TestDomainConfig:
+    def test_staging_ingress_uses_autoecoops(self):
+        content = _read("k8s/staging/ingress.qyaml")
+        assert "autoecoops.io" in content
+        assert "indestructibleeco.io" not in content
+
+    def test_production_ingress_uses_autoecoops(self):
+        content = _read("k8s/production/ingress.qyaml")
+        assert "autoecoops.io" in content
+        assert "indestructibleeco.io" not in content
+
+    def test_base_ingress_uses_autoecoops(self):
+        content = _read("k8s/ingress/ingress.qyaml")
+        assert "autoecoops.io" in content
+        assert "indestructibleeco.io" not in content
+
+    def test_wrangler_uses_autoecoops(self):
+        content = _read("backend/cloudflare/wrangler.toml")
+        assert "autoecoops.io" in content
+        assert "indestructibleeco.io" not in content
+
+    def test_helm_values_uses_autoecoops(self):
+        content = _read("helm/values.yaml")
+        assert "autoecoops.io" in content
+        assert "indestructibleeco.io" not in content

@@ -10,7 +10,7 @@ info:
     vector alignment, async job management, embedding, and .qyaml governance.
   contact:
     name: IndestructibleEco Platform Team
-    email: platform-team@indestructibleeco.io
+    email: platform-team@autoecoops.io
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
@@ -20,7 +20,7 @@ servers:
     description: Local development (API gateway)
   - url: http://localhost:8001
     description: Local development (AI service)
-  - url: https://api.indestructibleeco.io
+  - url: https://api.autoecoops.io
     description: Production
 
 tags:

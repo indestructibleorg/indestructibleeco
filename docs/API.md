@@ -13,8 +13,8 @@ All services share a common authentication model, error format, and URI/URN iden
 | Environment | AI Service | API Gateway | Root Gateway |
 |-------------|-----------|-------------|--------------|
 | Development | `http://localhost:8001` | `http://localhost:3000` | `http://localhost:8000` |
-| Staging | `https://ai-staging.indestructibleeco.io` | `https://api-staging.indestructibleeco.io` | `https://staging.indestructibleeco.io` |
-| Production | `https://ai.indestructibleeco.io` | `https://api.indestructibleeco.io` | `https://indestructibleeco.io` |
+| Staging | `https://ai-staging.autoecoops.io` | `https://api-staging.autoecoops.io` | `https://staging.autoecoops.io` |
+| Production | `https://ai.autoecoops.io` | `https://api.autoecoops.io` | `https://autoecoops.io` |
 
 ## Authentication
 

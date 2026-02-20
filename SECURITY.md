@@ -42,4 +42,4 @@
 
 ## Contact
 
-security@indestructibleeco.io
+security@autoecoops.io

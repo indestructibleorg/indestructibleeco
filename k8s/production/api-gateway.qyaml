@@ -1,0 +1,106 @@
+# IndestructibleEco v1.0 — API Gateway Deployment & Service (eco-production)
+# Target: GKE eco-production cluster (asia-east1)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eco-api-gateway
+  namespace: eco-production
+  labels:
+    app.kubernetes.io/name: eco-api-gateway
+    app.kubernetes.io/part-of: indestructibleeco
+    environment: production
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: eco-api-gateway
+  template:
+    metadata:
+      labels:
+        app: eco-api-gateway
+        app.kubernetes.io/name: eco-api-gateway
+        app.kubernetes.io/part-of: indestructibleeco
+        environment: production
+    spec:
+      serviceAccountName: eco-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: eco-api-gateway
+          image: ghcr.io/indestructibleorg/gateway:latest
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: eco-config
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eco-gateway-svc
+  namespace: eco-production
+  labels:
+    app.kubernetes.io/name: eco-api-gateway
+    app.kubernetes.io/part-of: indestructibleeco
+    environment: production
+spec:
+  type: ClusterIP
+  selector:
+    app: eco-api-gateway
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: http
+---
+# YAML Toolkit v8 — Governance Block
+document_metadata:
+  unique_id: "eco-prod-gw-0001-0001-000000000001"
+  uri: "indestructibleeco://k8s/eco-production/deployment/api-gateway"
+  urn: "urn:indestructibleeco:k8s:eco-production:deployment:api-gateway:eco-prod-gw-0001-0001-000000000001"
+  target_system: gke-eco-production
+  cross_layer_binding: [ai-service, api-service, web-frontend]
+  schema_version: v8
+  generated_by: yaml-toolkit-v8
+  created_at: "2026-02-20T00:00:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team, security-team]
+  compliance_tags: [zero-trust, soc2, api-gateway, production]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "http://eco-gateway-svc.eco-production.svc.cluster.local:8000"
+  discovery_protocol: k8s-dns
+  health_check_path: "/health"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [gateway, api, routing, proxy, production]
+  contextual_binding: "api-gateway -> [ai-service, api-service, web-frontend]"

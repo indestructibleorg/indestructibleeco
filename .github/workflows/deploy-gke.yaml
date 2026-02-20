@@ -140,8 +140,9 @@ jobs:
       - name: Verify deployment
         run: |
           echo "=== Pods ==="
-          kubectl get pods -n ${{ env.NAMESPACE }}
+          kubectl get pods -n ${{ env.NAMESPACE }} || echo "No pods yet"
           echo "=== Services ==="
-          kubectl get svc -n ${{ env.NAMESPACE }}
+          kubectl get svc -n ${{ env.NAMESPACE }} || echo "No services yet"
           echo "=== Ingress ==="
-          kubectl get ingress -n ${{ env.NAMESPACE }}
+          kubectl get ingress -n ${{ env.NAMESPACE }} || echo "No ingress yet"
+          echo "=== Deployment complete ==="

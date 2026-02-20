@@ -289,6 +289,7 @@ jobs:
           platforms/desktop/resources/icon.png \
           tests/e2e/test_full_flow.py \
           tests/e2e/test_service_lifecycle.py \
+          tests/unit/test_governance_engine.py \
           backend/ai/src/services/engine_manager.py \
           backend/ai/src/services/circuit_breaker.py; do
           if [ -f "$file" ]; then

@@ -48,3 +48,5 @@ __pycache__/
 *.pyc
 .venv/
 *.egg-info/
+# Governance audit logs
+.eco-audit/

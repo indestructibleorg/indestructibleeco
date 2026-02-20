@@ -1,16 +1,18 @@
-# Step 17 — Helm templates + HPA + PDB
+# Step 18 — package-lock.json + OpenAPI + Desktop icon
 
 ## Tasks
-- [x] Audit existing helm/templates/ (deployment, service, hpa, pdb, ingress, _helpers.tpl)
-- [x] Create helm/templates/configmap.yaml (ECO_* env vars)
-- [x] Create helm/templates/secrets.yaml (redis-url, supabase-url, jwt, hf-token)
-- [x] Create helm/templates/serviceaccount.yaml (GKE workload identity)
-- [x] Create helm/templates/networkpolicy.yaml (namespace isolation, DNS, HTTPS egress)
-- [x] Create helm/templates/servicemonitor.yaml (Prometheus eco_* metrics)
-- [x] Create helm/templates/NOTES.txt (post-install instructions)
-- [x] Update helm/values.yaml (networkPolicy.enabled)
-- [x] Update CI structure checks for 5 new template files
+- [x] Create package-lock.json (lockfileVersion 3, pnpm workspace compat)
+- [x] Expand backend/api/openapi.yaml (287 -> 723 lines)
+  - [x] OpenAI-compatible: /v1/chat/completions, /v1/completions, /v1/embeddings, /v1/models
+  - [x] Embeddings: /api/v1/embeddings, /api/v1/embeddings/similarity
+  - [x] Jobs: /api/v1/jobs (POST/GET), /api/v1/jobs/{jobId} (GET/DELETE)
+  - [x] Governance: /api/v1/qyaml/descriptor
+  - [x] Metrics: /metrics
+  - [x] Component schemas: 12 reusable schemas
+- [x] Replace 1x1 desktop icon with 256x256 branded PNG
 - [x] All 255 tests pass
 - [x] CI Validator 0 errors, 0 warnings
 - [x] Git commit + push
-- [x] CI 5-gate ALL GREEN
+- [x] CI 5-gate ALL GREEN (Deploy Backend is infra-only, pre-existing)
+
+# Architecture Plan — ALL 18 STEPS COMPLETE

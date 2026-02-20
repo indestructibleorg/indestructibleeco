@@ -5,11 +5,41 @@ info:
   description: |
     Enterprise cloud-native AI platform API.
     URI: indestructibleeco://backend/api/openapi
+
+    Provides authentication, platform management, AI inference (OpenAI-compatible),
+    vector alignment, async job management, embedding, and .qyaml governance.
+  contact:
+    name: IndestructibleEco Platform Team
+    email: platform-team@indestructibleeco.io
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
 servers:
   - url: http://localhost:3000
-    description: Local development
+    description: Local development (API gateway)
+  - url: http://localhost:8001
+    description: Local development (AI service)
   - url: https://api.indestructibleeco.io
     description: Production
+
+tags:
+  - name: Health
+    description: Liveness and readiness probes
+  - name: Auth
+    description: Authentication and session management
+  - name: Platforms
+    description: Platform CRUD operations
+  - name: AI
+    description: AI inference (legacy endpoints)
+  - name: OpenAI
+    description: OpenAI-compatible endpoints
+  - name: Embeddings
+    description: Vector embedding operations
+  - name: Jobs
+    description: Async inference job management
+  - name: YAML
+    description: .qyaml governance generation and validation
 
 paths:
   /health:
@@ -25,8 +55,11 @@ paths:
                 type: object
                 properties:
                   status: { type: string, example: healthy }
-                  service: { type: string, example: api }
+                  service: { type: string, example: ai }
                   version: { type: string, example: "1.0.0" }
+                  engines: { type: array, items: { type: string } }
+                  uptime_seconds: { type: number }
+                  models_registered: { type: integer }
 
   /ready:
     get:
@@ -37,6 +70,18 @@ paths:
           description: All dependencies healthy
         "503":
           description: One or more dependencies unhealthy
+
+  /metrics:
+    get:
+      summary: Prometheus metrics endpoint
+      tags: [Health]
+      responses:
+        "200":
+          description: Prometheus text format metrics
+          content:
+            text/plain:
+              schema:
+                type: string
 
   /auth/signup:
     post:
@@ -154,8 +199,208 @@ paths:
 
   /api/v1/ai/generate:
     post:
-      summary: Generate AI content
+      summary: Generate AI content (legacy)
       tags: [AI]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateRequest"
+      responses:
+        "200":
+          description: Generated content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerateResponse"
+        "504":
+          description: AI service timeout
+
+  /api/v1/ai/chat/completions:
+    post:
+      summary: OpenAI-compatible chat completions (via API gateway)
+      tags: [AI]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatCompletionRequest"
+      responses:
+        "200":
+          description: Chat completion response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatCompletionResponse"
+
+  /api/v1/ai/models:
+    get:
+      summary: List available AI models (via API gateway)
+      tags: [AI]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Model list
+
+  /api/v1/ai/vector/align:
+    post:
+      summary: Compute vector alignment (via API gateway)
+      tags: [AI]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VectorAlignRequest"
+      responses:
+        "200":
+          description: Vector alignment result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VectorAlignResponse"
+
+  /v1/chat/completions:
+    post:
+      summary: OpenAI-compatible chat completions
+      tags: [OpenAI]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatCompletionRequest"
+      responses:
+        "200":
+          description: Chat completion response (or SSE stream if stream=true)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatCompletionResponse"
+            text/event-stream:
+              schema:
+                type: string
+        "422":
+          description: Validation error
+
+  /v1/completions:
+    post:
+      summary: OpenAI-compatible text completions
+      tags: [OpenAI]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompletionRequest"
+      responses:
+        "200":
+          description: Text completion response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompletionResponse"
+
+  /v1/embeddings:
+    post:
+      summary: OpenAI-compatible embeddings
+      tags: [OpenAI]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OAIEmbeddingRequest"
+      responses:
+        "200":
+          description: Embedding response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAIEmbeddingResponse"
+
+  /v1/models:
+    get:
+      summary: OpenAI-compatible model list
+      tags: [OpenAI]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Model list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModelListResponse"
+
+  /api/v1/embeddings:
+    post:
+      summary: Generate embeddings (eco format)
+      tags: [Embeddings]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [input]
+              properties:
+                input: { type: string }
+                model: { type: string, default: "quantum-bert-xxl-v1" }
+                dimensions: { type: integer, default: 1024 }
+      responses:
+        "200":
+          description: Embedding result
+
+  /api/v1/embeddings/similarity:
+    post:
+      summary: Compute cosine similarity between two texts
+      tags: [Embeddings]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text_a, text_b]
+              properties:
+                text_a: { type: string }
+                text_b: { type: string }
+                model: { type: string, default: "quantum-bert-xxl-v1" }
+      responses:
+        "200":
+          description: Similarity result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cosine_similarity: { type: number }
+                  euclidean_distance: { type: number }
+
+  /api/v1/jobs:
+    post:
+      summary: Submit async inference job
+      tags: [Jobs]
       security:
         - bearerAuth: []
       requestBody:
@@ -169,17 +414,69 @@ paths:
                 prompt: { type: string }
                 model_id: { type: string, default: "default" }
                 max_tokens: { type: integer, default: 2048 }
-                temperature: { type: number, default: 0.7 }
+                priority: { type: string, enum: [high, normal, low], default: normal }
+      responses:
+        "202":
+          description: Job accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_id: { type: string, format: uuid }
+                  status: { type: string, example: pending }
+    get:
+      summary: List inference jobs
+      tags: [Jobs]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string, enum: [pending, running, completed, failed, cancelled] }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 100 }
       responses:
         "200":
-          description: Generated content
-        "504":
-          description: AI service timeout
+          description: Job list
 
-  /api/v1/ai/chat/completions:
+  /api/v1/jobs/{jobId}:
+    get:
+      summary: Get job status
+      tags: [Jobs]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Job details
+        "404":
+          description: Job not found
+    delete:
+      summary: Cancel job
+      tags: [Jobs]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Job cancelled
+        "404":
+          description: Job not found
+
+  /api/v1/qyaml/descriptor:
     post:
-      summary: OpenAI-compatible chat completions
-      tags: [AI]
+      summary: Generate .qyaml governance descriptor
+      tags: [YAML]
       security:
         - bearerAuth: []
       requestBody:
@@ -188,52 +485,27 @@ paths:
           application/json:
             schema:
               type: object
-              required: [messages]
+              required: [service_name]
               properties:
-                model: { type: string, default: "default" }
-                messages:
-                  type: array
-                  items:
+                service_name: { type: string }
+                namespace: { type: string, default: indestructibleeco }
+                kind: { type: string, default: Deployment }
+      responses:
+        "200":
+          description: Governance descriptor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid: { type: boolean }
+                  descriptor:
                     type: object
                     properties:
-                      role: { type: string, enum: [system, user, assistant] }
-                      content: { type: string }
-                temperature: { type: number }
-                max_tokens: { type: integer }
-      responses:
-        "200":
-          description: Chat completion response
-
-  /api/v1/ai/models:
-    get:
-      summary: List available AI models
-      tags: [AI]
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: Model list
-
-  /api/v1/ai/vector/align:
-    post:
-      summary: Compute vector alignment
-      tags: [AI]
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [tokens]
-              properties:
-                tokens: { type: array, items: { type: string } }
-                target_dim: { type: integer, default: 1024 }
-                alignment_model: { type: string, default: "quantum-bert-xxl-v1" }
-      responses:
-        "200":
-          description: Vector alignment result
+                      document_metadata: { type: object }
+                      governance_info: { type: object }
+                      registry_binding: { type: object }
+                      vector_alignment_map: { type: object }
 
   /api/v1/yaml/generate:
     post:
@@ -285,3 +557,167 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
+  schemas:
+    GenerateRequest:
+      type: object
+      required: [prompt]
+      properties:
+        prompt: { type: string }
+        model_id: { type: string, default: "default" }
+        max_tokens: { type: integer, default: 2048 }
+        temperature: { type: number, default: 0.7 }
+
+    GenerateResponse:
+      type: object
+      properties:
+        request_id: { type: string }
+        content: { type: string }
+        engine: { type: string }
+        model_id: { type: string }
+        uri: { type: string }
+        urn: { type: string }
+        usage: { type: object }
+        latency_ms: { type: number }
+
+    ChatCompletionRequest:
+      type: object
+      required: [messages]
+      properties:
+        model: { type: string, default: "default" }
+        messages:
+          type: array
+          items:
+            type: object
+            required: [role, content]
+            properties:
+              role: { type: string, enum: [system, user, assistant] }
+              content: { type: string }
+        temperature: { type: number, minimum: 0, maximum: 2 }
+        max_tokens: { type: integer, default: 2048 }
+        stream: { type: boolean, default: false }
+
+    ChatCompletionResponse:
+      type: object
+      properties:
+        id: { type: string }
+        object: { type: string, example: chat.completion }
+        model: { type: string }
+        choices:
+          type: array
+          items:
+            type: object
+            properties:
+              index: { type: integer }
+              message:
+                type: object
+                properties:
+                  role: { type: string }
+                  content: { type: string }
+              finish_reason: { type: string }
+        usage:
+          $ref: "#/components/schemas/UsageInfo"
+        system_fingerprint: { type: string }
+
+    CompletionRequest:
+      type: object
+      required: [prompt]
+      properties:
+        model: { type: string, default: "default" }
+        prompt:
+          oneOf:
+            - type: string
+            - type: array
+              items: { type: string }
+        max_tokens: { type: integer, default: 2048 }
+        temperature: { type: number, default: 0.7 }
+
+    CompletionResponse:
+      type: object
+      properties:
+        id: { type: string }
+        object: { type: string, example: text_completion }
+        model: { type: string }
+        choices:
+          type: array
+          items:
+            type: object
+            properties:
+              text: { type: string }
+              index: { type: integer }
+              finish_reason: { type: string }
+        usage:
+          $ref: "#/components/schemas/UsageInfo"
+
+    OAIEmbeddingRequest:
+      type: object
+      required: [input]
+      properties:
+        input:
+          oneOf:
+            - type: string
+            - type: array
+              items: { type: string }
+        model: { type: string, default: "default" }
+        dimensions: { type: integer }
+
+    OAIEmbeddingResponse:
+      type: object
+      properties:
+        object: { type: string, example: list }
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              object: { type: string, example: embedding }
+              embedding: { type: array, items: { type: number } }
+              index: { type: integer }
+        model: { type: string }
+        usage:
+          type: object
+          properties:
+            prompt_tokens: { type: integer }
+            total_tokens: { type: integer }
+
+    ModelListResponse:
+      type: object
+      properties:
+        object: { type: string, example: list }
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              object: { type: string, example: model }
+              owned_by: { type: string, example: indestructibleeco }
+              capabilities: { type: array, items: { type: string } }
+              compatible_engines: { type: array, items: { type: string } }
+              context_length: { type: integer }
+
+    VectorAlignRequest:
+      type: object
+      required: [tokens]
+      properties:
+        tokens: { type: array, items: { type: string } }
+        target_dim: { type: integer, default: 1024 }
+        alignment_model: { type: string, default: "quantum-bert-xxl-v1" }
+        tolerance: { type: number, default: 0.001 }
+
+    VectorAlignResponse:
+      type: object
+      properties:
+        dimension: { type: integer }
+        alignment_model: { type: string }
+        alignment_score: { type: number }
+        coherence_vector: { type: array, items: { type: number } }
+        uri: { type: string }
+        urn: { type: string }
+
+    UsageInfo:
+      type: object
+      properties:
+        prompt_tokens: { type: integer }
+        completion_tokens: { type: integer }
+        total_tokens: { type: integer }

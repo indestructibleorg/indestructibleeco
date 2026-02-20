@@ -1,11 +1,16 @@
-# Step 16 — E2E Tests + CI Enable tests/
+# Step 17 — Helm templates + HPA + PDB
 
 ## Tasks
-- [x] Create tests/e2e/test_service_lifecycle.py (59 tests covering all service layers)
-- [x] Add py_compile checks for worker.py, embedding.py, grpc_server.py, health_monitor.py to CI
-- [x] Add test_service_lifecycle.py to CI build gate structure check
-- [x] Fix sys.path shadowing (use backend.ai.src.* imports instead of sys.path manipulation)
-- [x] Verify all 255 tests pass (196 existing + 59 new)
+- [x] Audit existing helm/templates/ (deployment, service, hpa, pdb, ingress, _helpers.tpl)
+- [x] Create helm/templates/configmap.yaml (ECO_* env vars)
+- [x] Create helm/templates/secrets.yaml (redis-url, supabase-url, jwt, hf-token)
+- [x] Create helm/templates/serviceaccount.yaml (GKE workload identity)
+- [x] Create helm/templates/networkpolicy.yaml (namespace isolation, DNS, HTTPS egress)
+- [x] Create helm/templates/servicemonitor.yaml (Prometheus eco_* metrics)
+- [x] Create helm/templates/NOTES.txt (post-install instructions)
+- [x] Update helm/values.yaml (networkPolicy.enabled)
+- [x] Update CI structure checks for 5 new template files
+- [x] All 255 tests pass
 - [x] CI Validator 0 errors, 0 warnings
 - [x] Git commit + push
 - [x] CI 5-gate ALL GREEN

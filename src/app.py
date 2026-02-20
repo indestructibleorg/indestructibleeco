@@ -6,6 +6,7 @@ Provides:
 - create_app() factory for FastAPI application
 - /health, /metrics, /v1/models, /v1/chat/completions endpoints
 - API key authentication middleware
+- Proxy routing to backend/ai and backend/api services
 - Standalone HTTP server fallback
 
 Contracts defined by: tests/integration/test_api.py
@@ -44,6 +45,61 @@ from .schemas.models import ModelStatus
 
 VERSION = "1.0.0"
 ENVIRONMENT = os.getenv("ECO_ENVIRONMENT", "development")
+AI_SERVICE_URL = os.getenv("ECO_AI_SERVICE_URL", "http://localhost:8001")
+API_SERVICE_URL = os.getenv("ECO_API_SERVICE_URL", "http://localhost:3000")
+
+
+# ── Proxy Client ───────────────────────────────────────────────────
+
+class ServiceProxy:
+    """Lightweight HTTP proxy to backend services."""
+
+    def __init__(self, base_url: str, timeout: float = 30.0) -> None:
+        self.base_url = base_url.rstrip("/")
+        self.timeout = timeout
+        self._client: Any = None
+
+    async def _get_client(self) -> Any:
+        if self._client is None:
+            import httpx
+            self._client = httpx.AsyncClient(
+                base_url=self.base_url,
+                timeout=self.timeout,
+            )
+        return self._client
+
+    async def forward(
+        self,
+        method: str,
+        path: str,
+        headers: Optional[Dict[str, str]] = None,
+        json_body: Any = None,
+        params: Optional[Dict[str, str]] = None,
+    ) -> Dict[str, Any]:
+        """Forward request to backend service, return parsed JSON."""
+        try:
+            client = await self._get_client()
+            response = await client.request(
+                method, path, headers=headers, json=json_body, params=params,
+            )
+            if response.status_code >= 400:
+                return {
+                    "_proxy_error": True,
+                    "status_code": response.status_code,
+                    "detail": response.text[:500],
+                }
+            return response.json()
+        except Exception as exc:
+            return {
+                "_proxy_error": True,
+                "status_code": 502,
+                "detail": f"Upstream service unavailable: {type(exc).__name__}: {exc}",
+            }
+
+    async def close(self) -> None:
+        if self._client:
+            await self._client.aclose()
+            self._client = None
 
 
 # ── Application Factory ─────────────────────────────────────────────
@@ -55,6 +111,8 @@ def _init_state(app: FastAPI) -> None:
         app.state.auth = AuthMiddleware()
         app.state.registry = ModelRegistry()
         app.state.queue = RequestQueue()
+        app.state.ai_proxy = ServiceProxy(AI_SERVICE_URL)
+        app.state.api_proxy = ServiceProxy(API_SERVICE_URL)
 
 
 def create_app() -> FastAPI:
@@ -64,6 +122,8 @@ def create_app() -> FastAPI:
     async def lifespan(app: FastAPI):
         _init_state(app)
         yield
+        await app.state.ai_proxy.close()
+        await app.state.api_proxy.close()
 
     app = FastAPI(
         title="IndestructibleEco AI Service",
@@ -136,6 +196,7 @@ def create_app() -> FastAPI:
         mem = resource.getrusage(resource.RUSAGE_SELF)
         registry: ModelRegistry = request.app.state.registry
         model_count = registry.count
+        queue: RequestQueue = request.app.state.queue
         lines = [
             "# HELP eco_uptime_seconds Service uptime in seconds",
             "# TYPE eco_uptime_seconds gauge",
@@ -146,6 +207,9 @@ def create_app() -> FastAPI:
             "# HELP eco_models_registered Total registered models",
             "# TYPE eco_models_registered gauge",
             f"eco_models_registered {model_count}",
+            "# HELP eco_queue_depth Current request queue depth",
+            "# TYPE eco_queue_depth gauge",
+            f"eco_queue_depth {queue.depth}",
         ]
         return PlainTextResponse(
             "\n".join(lines) + "\n",
@@ -187,7 +251,24 @@ def create_app() -> FastAPI:
         if model is None:
             raise HTTPException(status_code=404, detail=f"Model '{req.model}' not found")
 
-        # Simulate inference (production: route to engine adapter)
+        # Try proxy to AI service first
+        ai_proxy: ServiceProxy = request.app.state.ai_proxy
+        proxy_result = await ai_proxy.forward(
+            "POST", "/v1/chat/completions",
+            json_body={
+                "model": model.model_id,
+                "messages": [{"role": m.role.value, "content": m.content} for m in req.messages],
+                "temperature": req.temperature,
+                "max_tokens": req.max_tokens,
+                "stream": req.stream,
+            },
+            headers={"Authorization": request.headers.get("Authorization", "")},
+        )
+
+        if not proxy_result.get("_proxy_error"):
+            return proxy_result
+
+        # Fallback: local inference simulation
         request_id = f"chatcmpl-{uuid.uuid4().hex[:12]}"
         prompt_tokens = sum(len(m.content.split()) for m in req.messages)
         completion_tokens = min(req.max_tokens, max(1, prompt_tokens))
@@ -212,6 +293,58 @@ def create_app() -> FastAPI:
             ),
         )
         return response
+
+    # ── Proxy routes to API service ──────────────────────────────
+
+    @app.post("/api/v1/generate")
+    async def proxy_generate(request: Request, user: Dict = Depends(require_auth)):
+        body = await request.json()
+        api_proxy: ServiceProxy = request.app.state.api_proxy
+        result = await api_proxy.forward(
+            "POST", "/api/v1/ai/generate",
+            json_body=body,
+            headers={"Authorization": request.headers.get("Authorization", "")},
+        )
+        if result.get("_proxy_error"):
+            raise HTTPException(status_code=result["status_code"], detail=result["detail"])
+        return result
+
+    @app.post("/api/v1/yaml/generate")
+    async def proxy_yaml_generate(request: Request, user: Dict = Depends(require_auth)):
+        body = await request.json()
+        api_proxy: ServiceProxy = request.app.state.api_proxy
+        result = await api_proxy.forward(
+            "POST", "/api/v1/yaml/generate",
+            json_body=body,
+            headers={"Authorization": request.headers.get("Authorization", "")},
+        )
+        if result.get("_proxy_error"):
+            raise HTTPException(status_code=result["status_code"], detail=result["detail"])
+        return result
+
+    @app.post("/api/v1/yaml/validate")
+    async def proxy_yaml_validate(request: Request, user: Dict = Depends(require_auth)):
+        body = await request.json()
+        api_proxy: ServiceProxy = request.app.state.api_proxy
+        result = await api_proxy.forward(
+            "POST", "/api/v1/yaml/validate",
+            json_body=body,
+            headers={"Authorization": request.headers.get("Authorization", "")},
+        )
+        if result.get("_proxy_error"):
+            raise HTTPException(status_code=result["status_code"], detail=result["detail"])
+        return result
+
+    @app.get("/api/v1/platforms")
+    async def proxy_platforms(request: Request, user: Dict = Depends(require_auth)):
+        api_proxy: ServiceProxy = request.app.state.api_proxy
+        result = await api_proxy.forward(
+            "GET", "/api/v1/platforms",
+            headers={"Authorization": request.headers.get("Authorization", "")},
+        )
+        if result.get("_proxy_error"):
+            raise HTTPException(status_code=result["status_code"], detail=result["detail"])
+        return result
 
     return app
 

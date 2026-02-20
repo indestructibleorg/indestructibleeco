@@ -1,0 +1,91 @@
+extensions:
+  health_check:
+    endpoint: "0.0.0.0:13133"
+  zpages:
+    endpoint: "0.0.0.0:55679"
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317"
+      http:
+        endpoint: "0.0.0.0:4318"
+        cors:
+          allowed_origins: ["http://localhost:*"]
+
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: otel-collector-self
+          static_configs:
+            - targets: ["localhost:8888"]
+
+processors:
+  batch:
+    timeout:         5s
+    send_batch_size: 1024
+
+  memory_limiter:
+    check_interval:        1s
+    limit_percentage:      75
+    spike_limit_percentage: 25
+
+  resource:
+    attributes:
+      - key:    deployment.environment
+        value:  development
+        action: upsert
+      - key:    service.namespace
+        value:  indestructibleeco
+        action: upsert
+
+  filter/drop_health:
+    traces:
+      span:
+        - 'attributes["http.route"] == "/health"'
+        - 'attributes["http.route"] == "/ready"'
+        - 'attributes["http.route"] == "/metrics"'
+
+exporters:
+  jaeger:
+    endpoint: jaeger:14250
+    tls:
+      insecure: true
+
+  otlp/tempo:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+
+  prometheusremotewrite:
+    endpoint: http://prometheus:9090/api/v1/write
+
+  loki:
+    endpoint: http://loki:3100/loki/api/v1/push
+    labels:
+      resource:
+        service.name:           service
+        deployment.environment: env
+
+  logging:
+    verbosity: normal
+
+service:
+  extensions: [health_check, zpages]
+
+  pipelines:
+    traces:
+      receivers:  [otlp]
+      processors: [memory_limiter, filter/drop_health, resource, batch]
+      exporters:  [jaeger, otlp/tempo]
+
+    metrics:
+      receivers:  [otlp, prometheus]
+      processors: [memory_limiter, resource, batch]
+      exporters:  [prometheusremotewrite]
+
+    logs:
+      receivers:  [otlp]
+      processors: [memory_limiter, resource, batch]
+      exporters:  [loki]

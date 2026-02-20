@@ -1,0 +1,29 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by:       [alertname, service]
+  group_wait:     30s
+  group_interval: 5m
+  repeat_interval: 12h
+  receiver:       dev-log
+
+  routes:
+    - match:
+        severity: critical
+      receiver: dev-log
+      continue: true
+
+receivers:
+  - name: dev-log
+    # Production: add Slack / PagerDuty here
+    # slack_configs:
+    #   - api_url: '${SLACK_WEBHOOK_URL}'
+    #     channel: '#alerts'
+
+inhibit_rules:
+  - source_match:
+      severity: critical
+    target_match:
+      severity: warning
+    equal: [alertname, service]

@@ -154,10 +154,10 @@ class TestDeployWorkflow:
 
     def test_deploy_gke_builds_all_images(self):
         content = _read(".github/workflows/deploy-gke.yaml")
-        assert "eco-gateway" in content
-        assert "eco-ai" in content
-        assert "eco-api" in content
-        assert "eco-web" in content
+        assert "gateway" in content
+        assert "/ai:" in content or "eco-ai" in content
+        assert "/api:" in content or "eco-api" in content
+        assert "/web:" in content or "eco-web" in content
 
 
 # ── Deploy script ────────────────────────────────────────────

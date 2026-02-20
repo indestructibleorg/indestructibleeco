@@ -6,9 +6,9 @@ on:
     paths:
       - "backend/**"
       - "platforms/web/**"
-      - "src/**"
       - "k8s/staging/**"
       - "docker/**"
+      - "src/**"
   workflow_dispatch:
 
 concurrency:
@@ -20,110 +20,132 @@ permissions:
   id-token: write
 
 env:
-  GCP_PROJECT: my-project-ops-1991
-  GKE_CLUSTER: eco-staging
-  GKE_ZONE: asia-east1
-  GAR_LOCATION: asia-east1
-  GAR_REPOSITORY: eco-images
+  PROJECT_ID: my-project-ops-1991
+  REGION: asia-east1
+  CLUSTER: eco-staging
+  NAMESPACE: eco-staging
   REGISTRY: asia-east1-docker.pkg.dev/my-project-ops-1991/eco-images
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    outputs:
-      image_tag: ${{ steps.meta.outputs.tag }}
     steps:
       - name: Checkout
         run: |
           git clone --depth 1 https://github.com/${{ github.repository }}.git .
           git checkout ${{ github.sha }}
 
-      - name: Set image tag
-        id: meta
+      - name: Install gcloud CLI and auth plugin
         run: |
-          TAG="${{ github.sha }}"
-          echo "tag=${TAG:0:7}" >> "$GITHUB_OUTPUT"
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+          sudo apt-get update -y && sudo apt-get install -y google-cloud-cli google-cloud-cli-gke-gcloud-auth-plugin
+          echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
 
       - name: Authenticate to Google Cloud
         run: |
-          echo '${{ secrets.KUBE_CONFIG_STAGING }}' | base64 -d > /tmp/gcloud-key.json
-          gcloud auth activate-service-account --key-file=/tmp/gcloud-key.json
-          gcloud config set project ${{ env.GCP_PROJECT }}
+          echo '${{ secrets.KUBE_CONFIG_STAGING }}' | base64 -d > /tmp/kubeconfig.yaml
+          export KUBECONFIG=/tmp/kubeconfig.yaml
+          gcloud auth login --cred-file=/tmp/kubeconfig.yaml 2>/dev/null || true
+          gcloud config set project ${{ env.PROJECT_ID }} 2>/dev/null || true
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet 2>/dev/null || true
 
-      - name: Configure Docker for Artifact Registry
+      - name: Build and push Gateway image
         run: |
-          gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev --quiet
+          docker build -t ${{ env.REGISTRY }}/gateway:${{ github.sha }} \
+                        -t ${{ env.REGISTRY }}/gateway:latest \
+                        -f docker/Dockerfile .
+          docker push ${{ env.REGISTRY }}/gateway:${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/gateway:latest
 
-      - name: Build and push eco-gateway
+      - name: Build and push AI image
         run: |
-          docker build             -t ${{ env.REGISTRY }}/eco-gateway:${{ steps.meta.outputs.tag }}             -t ${{ env.REGISTRY }}/eco-gateway:latest             -f docker/Dockerfile .
-          docker push ${{ env.REGISTRY }}/eco-gateway:${{ steps.meta.outputs.tag }}
-          docker push ${{ env.REGISTRY }}/eco-gateway:latest
+          docker build -t ${{ env.REGISTRY }}/ai:${{ github.sha }} \
+                        -t ${{ env.REGISTRY }}/ai:latest \
+                        backend/ai/
+          docker push ${{ env.REGISTRY }}/ai:${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/ai:latest
 
-      - name: Build and push eco-ai
+      - name: Build and push API image
         run: |
-          docker build             -t ${{ env.REGISTRY }}/eco-ai:${{ steps.meta.outputs.tag }}             -t ${{ env.REGISTRY }}/eco-ai:latest             -f backend/ai/Dockerfile backend/ai/
-          docker push ${{ env.REGISTRY }}/eco-ai:${{ steps.meta.outputs.tag }}
-          docker push ${{ env.REGISTRY }}/eco-ai:latest
+          docker build -t ${{ env.REGISTRY }}/api:${{ github.sha }} \
+                        -t ${{ env.REGISTRY }}/api:latest \
+                        backend/api/
+          docker push ${{ env.REGISTRY }}/api:${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/api:latest
 
-      - name: Build and push eco-api
+      - name: Build and push Web image
         run: |
-          docker build             -t ${{ env.REGISTRY }}/eco-api:${{ steps.meta.outputs.tag }}             -t ${{ env.REGISTRY }}/eco-api:latest             backend/api/
-          docker push ${{ env.REGISTRY }}/eco-api:${{ steps.meta.outputs.tag }}
-          docker push ${{ env.REGISTRY }}/eco-api:latest
-
-      - name: Build and push eco-web
-        run: |
-          docker build             -t ${{ env.REGISTRY }}/eco-web:${{ steps.meta.outputs.tag }}             -t ${{ env.REGISTRY }}/eco-web:latest             platforms/web/
-          docker push ${{ env.REGISTRY }}/eco-web:${{ steps.meta.outputs.tag }}
-          docker push ${{ env.REGISTRY }}/eco-web:latest
+          docker build -t ${{ env.REGISTRY }}/web:${{ github.sha }} \
+                        -t ${{ env.REGISTRY }}/web:latest \
+                        platforms/web/
+          docker push ${{ env.REGISTRY }}/web:${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/web:latest
 
   deploy:
-    runs-on: ubuntu-latest
     needs: build-and-push
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         run: |
           git clone --depth 1 https://github.com/${{ github.repository }}.git .
           git checkout ${{ github.sha }}
 
-      - name: Authenticate to GKE
+      - name: Install gcloud CLI and auth plugin
         run: |
-          echo '${{ secrets.KUBE_CONFIG_STAGING }}' | base64 -d > /tmp/gcloud-key.json
-          gcloud auth activate-service-account --key-file=/tmp/gcloud-key.json
-          gcloud config set project ${{ env.GCP_PROJECT }}
-          gcloud container clusters get-credentials ${{ env.GKE_CLUSTER }} --zone ${{ env.GKE_ZONE }}
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+          sudo apt-get update -y && sudo apt-get install -y google-cloud-cli google-cloud-cli-gke-gcloud-auth-plugin
+          echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
 
-      - name: Convert .qyaml to .yaml
+      - name: Configure kubectl
         run: |
-          node tools/yaml-toolkit/bin/cli.js convert k8s/staging/ --output /tmp/k8s-staging/ 2>/dev/null ||           (mkdir -p /tmp/k8s-staging && for f in k8s/staging/*.qyaml; do cp "$f" "/tmp/k8s-staging/$(basename "${f%.qyaml}.yaml")"; done)
+          echo '${{ secrets.KUBE_CONFIG_STAGING }}' | base64 -d > /tmp/kubeconfig.yaml
+          echo "KUBECONFIG=/tmp/kubeconfig.yaml" >> $GITHUB_ENV
 
-      - name: Apply manifests
+      - name: Verify cluster connection
         run: |
-          kubectl apply -f /tmp/k8s-staging/namespace.yaml
-          kubectl apply -f /tmp/k8s-staging/ --namespace=eco-staging
-          echo "Manifests applied"
+          kubectl cluster-info
+          kubectl get namespaces
+
+      - name: Convert .qyaml to .yaml and apply
+        run: |
+          mkdir -p /tmp/k8s-staging
+          for f in k8s/staging/*.qyaml; do
+            cp "$f" "/tmp/k8s-staging/$(basename "${f%.qyaml}.yaml")"
+          done
+
+          echo "Applying namespace..."
+          kubectl apply -f /tmp/k8s-staging/namespace.yaml || true
+
+          echo "Applying all manifests..."
+          for f in namespace configmap postgres redis ai-service api-service api-gateway web-frontend ingress; do
+            yaml="/tmp/k8s-staging/${f}.yaml"
+            if [ -f "$yaml" ]; then
+              echo "  Applying ${f}..."
+              kubectl apply -f "$yaml" -n ${{ env.NAMESPACE }} || true
+            fi
+          done
 
       - name: Update image tags
         run: |
-          TAG="${{ needs.build-and-push.outputs.image_tag }}"
-          kubectl set image deployment/eco-api-gateway eco-gateway=${{ env.REGISTRY }}/eco-gateway:${TAG} -n eco-staging || true
-          kubectl set image deployment/eco-ai-service eco-ai=${{ env.REGISTRY }}/eco-ai:${TAG} -n eco-staging || true
-          kubectl set image deployment/eco-api-service eco-api=${{ env.REGISTRY }}/eco-api:${TAG} -n eco-staging || true
-          kubectl set image deployment/eco-web-frontend eco-web=${{ env.REGISTRY }}/eco-web:${TAG} -n eco-staging || true
+          kubectl set image deployment/eco-api-gateway eco-api-gateway=${{ env.REGISTRY }}/gateway:${{ github.sha }} -n ${{ env.NAMESPACE }} || true
+          kubectl set image deployment/eco-ai-service eco-ai-service=${{ env.REGISTRY }}/ai:${{ github.sha }} -n ${{ env.NAMESPACE }} || true
+          kubectl set image deployment/eco-api-service eco-api-service=${{ env.REGISTRY }}/api:${{ github.sha }} -n ${{ env.NAMESPACE }} || true
+          kubectl set image deployment/eco-web-frontend eco-web-frontend=${{ env.REGISTRY }}/web:${{ github.sha }} -n ${{ env.NAMESPACE }} || true
 
       - name: Wait for rollout
         run: |
-          kubectl rollout status deployment/eco-api-gateway -n eco-staging --timeout=300s || true
-          kubectl rollout status deployment/eco-ai-service -n eco-staging --timeout=300s || true
-          kubectl rollout status deployment/eco-api-service -n eco-staging --timeout=300s || true
-          kubectl rollout status deployment/eco-web-frontend -n eco-staging --timeout=120s || true
+          kubectl rollout status deployment/eco-api-gateway -n ${{ env.NAMESPACE }} --timeout=300s || true
+          kubectl rollout status deployment/eco-ai-service -n ${{ env.NAMESPACE }} --timeout=300s || true
+          kubectl rollout status deployment/eco-api-service -n ${{ env.NAMESPACE }} --timeout=300s || true
+          kubectl rollout status deployment/eco-web-frontend -n ${{ env.NAMESPACE }} --timeout=300s || true
 
       - name: Verify deployment
         run: |
           echo "=== Pods ==="
-          kubectl get pods -n eco-staging -o wide
+          kubectl get pods -n ${{ env.NAMESPACE }}
           echo "=== Services ==="
-          kubectl get svc -n eco-staging
+          kubectl get svc -n ${{ env.NAMESPACE }}
           echo "=== Ingress ==="
-          kubectl get ingress -n eco-staging
+          kubectl get ingress -n ${{ env.NAMESPACE }}

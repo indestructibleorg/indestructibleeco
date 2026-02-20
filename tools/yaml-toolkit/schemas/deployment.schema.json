@@ -14,8 +14,8 @@
         "urn": { "type": "string", "pattern": "^urn:indestructibleeco:" },
         "target_system": { "type": "string" },
         "cross_layer_binding": { "type": "array", "items": { "type": "string" } },
-        "schema_version": { "type": "string", "const": "v1" },
-        "generated_by": { "type": "string", "const": "yaml-toolkit-v1" },
+        "schema_version": { "type": "string", "enum": ["v1", "v8"] },
+        "generated_by": { "type": "string", "enum": ["yaml-toolkit-v1", "yaml-toolkit-v8"] },
         "created_at": { "type": "string", "format": "date-time" }
       }
     },

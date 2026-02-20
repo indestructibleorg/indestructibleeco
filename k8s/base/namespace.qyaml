@@ -42,15 +42,15 @@ roleRef:
   name: eco-role
   apiGroup: rbac.authorization.k8s.io
 ---
-# YAML Toolkit v1 — Governance Block (auto-generated, manual editing prohibited)
+# YAML Toolkit v8 — Governance Block (auto-generated, manual editing prohibited)
 document_metadata:
   unique_id: "eco-ns-0001-0001-000000000001"
   uri: "indestructibleeco://k8s/cluster/namespace/indestructibleeco"
   urn: "urn:indestructibleeco:k8s:cluster:namespace:indestructibleeco:eco-ns-0001-0001-000000000001"
   target_system: gke-production
   cross_layer_binding: []
-  schema_version: v1
-  generated_by: yaml-toolkit-v1
+  schema_version: v8
+  generated_by: yaml-toolkit-v8
   created_at: "2025-02-18T00:00:00.000Z"
 governance_info:
   owner: platform-team

@@ -59,15 +59,15 @@ subjects:
     name: argocd-application-controller
     namespace: argocd
 ---
-# YAML Toolkit v1 — Governance Block (auto-generated, manual editing prohibited)
+# YAML Toolkit v8 — Governance Block (auto-generated, manual editing prohibited)
 document_metadata:
   unique_id: "eco-argo-ns-0001-0001-000000000001"
   uri: "indestructibleeco://k8s/argocd/namespace"
   urn: "urn:indestructibleeco:k8s:argocd:namespace:eco-argo-ns-0001-0001-000000000001"
   target_system: gke-production
   cross_layer_binding: [argocd, ecosystem-staging, indestructibleeco]
-  schema_version: v1
-  generated_by: yaml-toolkit-v1
+  schema_version: v8
+  generated_by: yaml-toolkit-v8
   created_at: "2025-02-20T00:00:00.000Z"
 governance_info:
   owner: platform-team

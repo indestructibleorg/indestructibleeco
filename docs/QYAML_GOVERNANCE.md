@@ -228,6 +228,21 @@ curl -X POST http://localhost:3000/api/v1/yaml/validate \
   -d '{"content": "..."}'
 ```
 
+## Converting to Standard Kubernetes YAML
+
+The `convert` command strips governance blocks from `.qyaml` files, producing standard Kubernetes `.yaml` files compatible with any tool (kubectl, kustomize, Helm, etc.):
+
+```bash
+# Convert a single file
+node tools/yaml-toolkit/bin/cli.js convert k8s/base/api-gateway.qyaml --output=out/
+
+# The output file (out/api-gateway.yaml) contains only standard K8s manifests
+# with all governance blocks removed.
+kubectl apply -f out/api-gateway.yaml
+```
+
+This enables interoperability with standard Kubernetes tooling while maintaining governance in the source `.qyaml` files. The governance blocks are preserved in the repository and enforced by CI, but stripped at deployment time if needed.
+
 ## Audit Trail
 
 Every governance validation produces an audit entry persisted to the append-only JSONL audit log:

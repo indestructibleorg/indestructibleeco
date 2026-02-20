@@ -48,15 +48,15 @@ data:
   CONSUL_ENDPOINT: "http://consul.indestructibleeco.svc.cluster.local:8500"
   JAEGER_ENDPOINT: "http://jaeger.indestructibleeco.svc.cluster.local:14268/api/traces"
 ---
-# YAML Toolkit v1 — Governance Block (auto-generated, manual editing prohibited)
+# YAML Toolkit v8 — Governance Block (auto-generated, manual editing prohibited)
 document_metadata:
   unique_id: "6ba7b815-9dad-11d1-80b4-00c04fd430c8"
   uri: "indestructibleeco://k8s/indestructibleeco/configmap/api-config"
   urn: "urn:indestructibleeco:k8s:indestructibleeco:configmap:api-config:6ba7b815-9dad-11d1-80b4-00c04fd430c8"
   target_system: gke-production
   cross_layer_binding: [api-service, ai-service, consul, jaeger]
-  schema_version: v1
-  generated_by: yaml-toolkit-v1
+  schema_version: v8
+  generated_by: yaml-toolkit-v8
   created_at: "2025-02-18T00:00:00.000Z"
 governance_info:
   owner: platform-team

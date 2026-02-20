@@ -92,8 +92,8 @@ function generateQYAML(input, targetSystem) {
     `  urn: "${urn}"`,
     `  target_system: ${targetSystem}`,
     `  cross_layer_binding: [${(input.depends_on || []).join(", ")}]`,
-    "  schema_version: v1",
-    "  generated_by: yaml-toolkit-v1",
+    "  schema_version: v8",
+    "  generated_by: yaml-toolkit-v8",
     `  created_at: "${now}"`,
     "governance_info:",
     `  owner: ${input.owner || "platform-team"}`,
@@ -144,7 +144,7 @@ function generateDeployment(input, uid, uri, urn, namespace) {
     "  labels:",
     `    app: ${input.name}`,
     "    tier: backend",
-    "    generated-by: yaml-toolkit-v1",
+    "    generated-by: yaml-toolkit-v8",
     `    unique-id: "${uid}"`,
     "  annotations:",
     `    indestructibleeco/uri: "${uri}"`,
@@ -199,7 +199,7 @@ function generateService(input, uid, uri, urn, namespace) {
     `  namespace: ${namespace}`,
     "  labels:",
     `    app: ${input.name}`,
-    "    generated-by: yaml-toolkit-v1",
+    "    generated-by: yaml-toolkit-v8",
     `    unique-id: "${uid}"`,
     "  annotations:",
     `    indestructibleeco/uri: "${uri}"`,
@@ -221,7 +221,7 @@ function generateNamespace(input, uid, uri, urn) {
     "metadata:",
     `  name: ${input.name}`,
     "  labels:",
-    "    generated-by: yaml-toolkit-v1",
+    "    generated-by: yaml-toolkit-v8",
     `    unique-id: "${uid}"`,
     "  annotations:",
     `    indestructibleeco/uri: "${uri}"`,
@@ -241,7 +241,7 @@ function generateConfigMap(input, uid, uri, urn, namespace) {
     `  name: ${input.name}`,
     `  namespace: ${namespace}`,
     "  labels:",
-    "    generated-by: yaml-toolkit-v1",
+    "    generated-by: yaml-toolkit-v8",
     `    unique-id: "${uid}"`,
     "  annotations:",
     `    indestructibleeco/uri: "${uri}"`,
@@ -260,7 +260,7 @@ function generateIngress(input, uid, uri, urn, namespace) {
     `  name: ${input.name}`,
     `  namespace: ${namespace}`,
     "  labels:",
-    "    generated-by: yaml-toolkit-v1",
+    "    generated-by: yaml-toolkit-v8",
     `    unique-id: "${uid}"`,
     "  annotations:",
     `    indestructibleeco/uri: "${uri}"`,
@@ -300,7 +300,7 @@ function validateQYAML(content) {
       errors.push({ path: `document_metadata.${field}`, message: `Missing required field: ${field}`, severity: "error" });
     }
   }
-  if (content.includes("%YAML")) {
+  if (/^%YAML/m.test(content)) {
     errors.push({ path: "header", message: "GKE incompatible: %YAML directive detected — must be removed", severity: "error" });
   }
   if (!content.includes("unique-id:") && !content.includes("unique_id:")) {
@@ -412,12 +412,44 @@ switch (command) {
     }
     break;
   }
+  case "convert": {
+    const srcFile = args.find((a) => !a.startsWith("--"));
+    const outDir = args.find((a) => a.startsWith("--output="))?.split("=")[1] || ".";
+    if (!srcFile) {
+      console.error("Usage: yaml-toolkit convert <file.qyaml> [--output=dir]");
+      process.exit(1);
+    }
+    if (!fs.existsSync(srcFile)) {
+      console.error(`File not found: ${srcFile}`);
+      process.exit(1);
+    }
+    const raw = fs.readFileSync(srcFile, "utf-8");
+    const docs = raw.split(/^---$/m).filter((d) => d.trim());
+    const k8sDocs = [];
+    const governanceBlocks = ["document_metadata:", "governance_info:", "registry_binding:", "vector_alignment_map:"];
+    for (const doc of docs) {
+      const trimmed = doc.trim();
+      if (!trimmed) continue;
+      const isGovernance = governanceBlocks.some((b) => trimmed.startsWith(b) || trimmed.startsWith("# YAML Toolkit"));
+      if (!isGovernance) {
+        k8sDocs.push(trimmed);
+      }
+    }
+    const output = k8sDocs.map((d) => "---\n" + d).join("\n");
+    fs.mkdirSync(outDir, { recursive: true });
+    const baseName = path.basename(srcFile, ".qyaml") + ".yaml";
+    const outFile = path.join(outDir, baseName);
+    fs.writeFileSync(outFile, output + "\n");
+    console.log(`Converted: ${srcFile} -> ${outFile}`);
+    break;
+  }
   default:
     console.log("IndestructibleEco YAML Toolkit v8");
-    console.log("Commands: gen | validate | validate-schema | lint");
+    console.log("Commands: gen | validate | validate-schema | lint | convert");
     console.log("  gen              --input=module.json [--target=gke-production] [--output=output/]");
     console.log("  validate         <file.qyaml> [--strict]");
     console.log("  validate-schema  <file.qyaml> [--dir path] [--json] [--strict]");
     console.log("  lint             [directory]");
+    console.log("  convert          <file.qyaml> [--output=dir]  Strip governance -> standard .yaml");
     break;
 }

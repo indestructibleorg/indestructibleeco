@@ -127,7 +127,7 @@ async function proxyRequest<T>(
       const resp = await fetch(url, reqInit);
 
       if (!resp.ok) {
-        const errBody = await resp.json().catch(() => ({ error: resp.statusText }));
+        const errBody = (await resp.json().catch(() => ({ error: resp.statusText }))) as Record<string, string>;
         const proxyErr: AiProxyError = {
           error: errBody.error || "upstream_error",
           message: errBody.message || errBody.detail || resp.statusText,

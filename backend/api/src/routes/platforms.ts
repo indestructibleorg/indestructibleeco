@@ -61,7 +61,7 @@ platformRouter.post("/", adminOnly, async (req: AuthenticatedRequest, res: Respo
 // GET /api/v1/platforms/:id
 platformRouter.get("/:id", async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const platform = await db.getPlatformById(req.params.id);
+    const platform = await db.getPlatformById(req.params.id as string);
     if (!platform) {
       throw new AppError(404, "not_found", "Platform not found");
     }
@@ -74,7 +74,7 @@ platformRouter.get("/:id", async (req: AuthenticatedRequest, res: Response, next
 // PATCH /api/v1/platforms/:id
 platformRouter.patch("/:id", adminOnly, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const existing = await db.getPlatformById(req.params.id);
+    const existing = await db.getPlatformById(req.params.id as string);
     if (!existing) {
       throw new AppError(404, "not_found", "Platform not found");
     }
@@ -87,7 +87,7 @@ platformRouter.patch("/:id", adminOnly, async (req: AuthenticatedRequest, res: R
     if (capabilities !== undefined) updates.capabilities = capabilities;
     if (deploy_target !== undefined) updates.deploy_target = deploy_target;
 
-    const platform = await db.updatePlatform(req.params.id, updates);
+    const platform = await db.updatePlatform(req.params.id as string, updates);
     res.status(200).json({ platform });
   } catch (err) {
     next(err);
@@ -97,16 +97,16 @@ platformRouter.patch("/:id", adminOnly, async (req: AuthenticatedRequest, res: R
 // DELETE /api/v1/platforms/:id
 platformRouter.delete("/:id", adminOnly, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const existing = await db.getPlatformById(req.params.id);
+    const existing = await db.getPlatformById(req.params.id as string);
     if (!existing) {
       throw new AppError(404, "not_found", "Platform not found");
     }
 
-    await db.deletePlatform(req.params.id);
+    await db.deletePlatform(req.params.id as string);
 
     res.status(200).json({
       message: "Platform deregistered",
-      id: req.params.id,
+      id: req.params.id as string,
       urn: existing.urn,
     });
   } catch (err) {

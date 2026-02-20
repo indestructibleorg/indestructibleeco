@@ -21,12 +21,9 @@ jobs:
       run: |
         curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
         sudo apt-get install -y nodejs
-        mkdir -p /tmp/build-shared-types
-        cp -r packages/shared-types/* /tmp/build-shared-types/
-        cp tsconfig.base.json /tmp/build-shared-types/../../tsconfig.base.json 2>/dev/null || true
-        cd /tmp/build-shared-types
+        cd packages/shared-types
         npm install
-        npm run build || echo "No build output needed for types-only package"
+        npm run build
         echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
         npm publish --access public
 
@@ -43,9 +40,7 @@ jobs:
       run: |
         curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
         sudo apt-get install -y nodejs
-        mkdir -p /tmp/build-api-client
-        cp -r packages/api-client/* /tmp/build-api-client/
-        cd /tmp/build-api-client
+        cd packages/api-client
         npm install
         npm run build
         echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
@@ -64,9 +59,7 @@ jobs:
       run: |
         curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
         sudo apt-get install -y nodejs
-        mkdir -p /tmp/build-ui-kit
-        cp -r packages/ui-kit/* /tmp/build-ui-kit/
-        cd /tmp/build-ui-kit
+        cd packages/ui-kit
         npm install
         npm run build
         echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc

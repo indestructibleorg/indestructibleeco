@@ -165,7 +165,7 @@ yamlRouter.get("/registry", async (req: AuthenticatedRequest, res: Response, nex
 // GET /api/v1/yaml/vector/:id — Get vector alignment for a document
 yamlRouter.get("/vector/:id", async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const upstream = await fetch(`${config.aiServiceHttp}/api/v1/yaml/vector/${req.params.id}`, {
+    const upstream = await fetch(`${config.aiServiceHttp}/api/v1/yaml/vector/${req.params.id as string}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       signal: AbortSignal.timeout(5000),
@@ -177,8 +177,8 @@ yamlRouter.get("/vector/:id", async (req: AuthenticatedRequest, res: Response, n
       return;
     }
 
-    res.status(200).json({ id: req.params.id, vector: [], source: "local-fallback" });
+    res.status(200).json({ id: req.params.id as string, vector: [], source: "local-fallback" });
   } catch {
-    res.status(200).json({ id: req.params.id, vector: [], source: "local-fallback" });
+    res.status(200).json({ id: req.params.id as string, vector: [], source: "local-fallback" });
   }
 });

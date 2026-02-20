@@ -129,7 +129,7 @@ aiRouter.get("/models", async (req: AuthenticatedRequest, res: Response, next: N
 // GET /api/v1/ai/jobs/:jobId — Get job status from Supabase
 aiRouter.get("/jobs/:jobId", async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const job = await db.getAiJob(req.params.jobId);
+    const job = await db.getAiJob(req.params.jobId as string);
     if (!job) {
       res.status(404).json({ error: "not_found", message: "Job not found" });
       return;

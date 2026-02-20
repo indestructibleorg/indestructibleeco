@@ -146,8 +146,8 @@ class TestDeployWorkflow:
 
     def test_deploy_gke_content(self):
         content = _read(".github/workflows/deploy-gke.yaml")
-        assert "my-project-ops-1991" in content
-        assert "eco-staging" in content
+        assert "vars.GCP_PROJECT_ID" in content
+        assert "vars.GKE_CLUSTER_STAGING" in content or "eco-staging" in content
         assert "KUBE_CONFIG_STAGING" in content
 
     def test_deploy_gke_builds_all_images(self):

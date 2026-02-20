@@ -20,20 +20,18 @@ permissions:
   packages: write
 
 env:
-  PROJECT_ID: my-project-ops-1991
-  REGION: asia-east1
-  CLUSTER: eco-staging
-  NAMESPACE: eco-staging
-  REGISTRY: ghcr.io/indestructibleorg
+  PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  REGION: ${{ vars.GKE_REGION }}
+  CLUSTER: ${{ vars.GKE_CLUSTER_STAGING }}
+  NAMESPACE: ${{ vars.K8S_NAMESPACE_STAGING }}
+  REGISTRY: ${{ vars.REGISTRY }}
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        run: |
-          git clone --depth 1 https://github.com/${{ github.repository }}.git .
-          git checkout ${{ github.sha }}
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
 
       - name: Login to GHCR
         run: |
@@ -74,11 +72,10 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+    environment: staging
     steps:
       - name: Checkout
-        run: |
-          git clone --depth 1 https://github.com/${{ github.repository }}.git .
-          git checkout ${{ github.sha }}
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
 
       - name: Install gcloud CLI and auth plugin
         run: |

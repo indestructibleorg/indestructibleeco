@@ -60,6 +60,18 @@
 - [ ] Deploy Supabase Edge Function (hello-world) - needs personal access token
 - [ ] Verify Supabase integration end-to-end
 
+### Supabase Pro Monitoring (NEW)
+- [x] Create Prometheus configuration for Supabase Metrics API
+- [x] Create Grafana dashboards for Supabase monitoring
+- [x] Create Kubernetes manifests for monitoring stack
+- [x] Create setup script for automated deployment
+- [x] Create comprehensive monitoring documentation
+- [x] Create GitHub workflow for monitoring deployment
+- [ ] Deploy monitoring stack to staging cluster
+- [ ] Deploy monitoring stack to production cluster
+- [ ] Configure alert notifications
+- [ ] Verify metrics collection and dashboards
+
 ---
 
 ## Phase 4: Security Remediation

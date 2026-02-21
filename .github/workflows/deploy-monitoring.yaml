@@ -1,0 +1,139 @@
+name: Deploy Monitoring Stack
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      deploy_prometheus:
+        description: 'Deploy Prometheus'
+        required: false
+        type: boolean
+        default: true
+      deploy_grafana:
+        description: 'Deploy Grafana'
+        required: false
+        type: boolean
+        default: true
+
+env:
+  GCP_PROJECT: my-project-ops-1991
+  GCP_REGION: asia-east1
+
+jobs:
+  deploy-monitoring:
+    name: Deploy Monitoring Stack
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      - name: Authenticate with GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: eco-${{ github.event.inputs.environment }}
+          location: ${{ env.GCP_REGION }}
+          project_id: ${{ env.GCP_PROJECT }}
+
+      - name: Create monitoring namespace
+        run: |
+          kubectl apply -f monitoring/k8s/namespace.yaml
+
+      - name: Deploy Node Exporter
+        run: |
+          kubectl apply -f monitoring/k8s/node-exporter-daemonset.yaml
+
+      - name: Deploy Prometheus
+        if: github.event.inputs.deploy_prometheus == 'true'
+        env:
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          # Create secret with Supabase credentials
+          kubectl create secret generic prometheus-secrets \
+            --from-literal=SUPABASE_SECRET_KEY="$SUPABASE_SECRET_KEY" \
+            --namespace=monitoring \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          # Deploy Prometheus
+          kubectl apply -f monitoring/k8s/prometheus-deployment.yaml
+
+      - name: Deploy Grafana
+        if: github.event.inputs.deploy_grafana == 'true'
+        env:
+          GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+        run: |
+          # Create secret with admin credentials
+          kubectl create secret generic grafana-secrets \
+            --from-literal=admin-user="admin" \
+            --from-literal=admin-password="$GRAFANA_ADMIN_PASSWORD" \
+            --namespace=monitoring \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          # Deploy Grafana
+          kubectl apply -f monitoring/k8s/grafana-deployment.yaml
+
+      - name: Wait for deployments
+        run: |
+          kubectl wait --for=condition=available --timeout=300s \
+            deployment/prometheus -n monitoring || true
+          kubectl wait --for=condition=available --timeout=300s \
+            deployment/grafana -n monitoring || true
+
+      - name: Verify deployments
+        run: |
+          echo "=== Deployment Status ==="
+          kubectl get deployments -n monitoring
+          echo ""
+          echo "=== Pod Status ==="
+          kubectl get pods -n monitoring
+          echo ""
+          echo "=== Service Status ==="
+          kubectl get services -n monitoring
+
+      - name: Test Supabase metrics endpoint
+        env:
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          echo "=== Testing Supabase Metrics API ==="
+          curl -s https://yrfxijooswpvdpdseswy.supabase.co/customer/v1/privileged/metrics \
+            --user "service_role:$SUPABASE_SECRET_KEY" | head -20
+
+      - name: Create deployment summary
+        run: |
+          echo "## Monitoring Stack Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment**: ${{ github.event.inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deployed Components" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Monitoring Namespace" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Node Exporter" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ github.event.inputs.deploy_prometheus }}" == "true" ]; then
+            echo "- ✅ Prometheus" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ github.event.inputs.deploy_grafana }}" == "true" ]; then
+            echo "- ✅ Grafana" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Access URLs" >> $GITHUB_STEP_SUMMARY
+          echo "- Prometheus: http://prometheus.indestructibleeco.io" >> $GITHUB_STEP_SUMMARY
+          echo "- Grafana: http://grafana.indestructibleeco.io" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Access Grafana and verify dashboards" >> $GITHUB_STEP_SUMMARY
+          echo "2. Check Prometheus targets status" >> $GITHUB_STEP_SUMMARY
+          echo "3. Configure alert notifications" >> $GITHUB_STEP_SUMMARY

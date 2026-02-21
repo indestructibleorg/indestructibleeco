@@ -38,6 +38,8 @@ jobs:
           pip install google-cloud-secret-manager google-auth
 
       - name: Install gcloud CLI and authenticate
+        env:
+          CLUSTER_NAME: ${{ secrets.GKE_CLUSTER_NAME }}
         run: |
           curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
           echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
@@ -47,8 +49,8 @@ jobs:
           chmod 600 /tmp/gcp-sa-key.json
           gcloud auth activate-service-account --key-file=/tmp/gcp-sa-key.json
           gcloud config set project $GCP_PROJECT
-          gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER_NAME }} --region $GCP_REGION --project $GCP_PROJECT
-          rm -f /tmp/gcp-sa-key.json
+          gcloud container clusters get-credentials $CLUSTER_NAME --region $GCP_REGION --project $GCP_PROJECT
+          echo "GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp-sa-key.json" >> $GITHUB_ENV
 
       - name: Run OAuth setup script
         env:
@@ -80,3 +82,7 @@ jobs:
           ENVIRONMENT: ${{ github.event.inputs.environment }}
         run: |
           echo "OAuth setup completed successfully for ${ENVIRONMENT}"
+
+      - name: Cleanup credentials
+        if: always()
+        run: rm -f /tmp/gcp-sa-key.json

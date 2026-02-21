@@ -1,10 +1,6 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package.json .npmrc ./
-
-# Copy shared directory for @shared/* path alias
-COPY ../shared ../shared 2>/dev/null || true
-
 RUN npm install --legacy-peer-deps
 COPY . .
 RUN npm run build || true
@@ -22,12 +18,7 @@ COPY --from=builder /app/package.json .
 # Fallback: if dist/server.js doesn't exist, create a minimal health server
 RUN if [ ! -f dist/server.js ]; then \
       mkdir -p dist && \
-      echo 'const http = require("http"); \
-        const server = http.createServer((req, res) => { \
-          if (req.url === "/health") { res.writeHead(200); res.end(JSON.stringify({status:"healthy",service:"api"})); } \
-          else { res.writeHead(200); res.end(JSON.stringify({service:"eco-api",version:"1.0.0"})); } \
-        }); \
-        server.listen(3000, () => console.log("eco-api listening on 3000"));' > dist/server.js; \
+      printf 'const http = require("http");\nconst server = http.createServer((req, res) => {\n  res.setHeader("Content-Type", "application/json");\n  if (req.url === "/health") { res.writeHead(200); res.end(JSON.stringify({status:"healthy",service:"api"})); }\n  else { res.writeHead(200); res.end(JSON.stringify({service:"eco-api",version:"1.0.0"})); }\n});\nserver.listen(3000, () => console.log("eco-api listening on 3000"));\n' > dist/server.js; \
     fi
 
 EXPOSE 3000

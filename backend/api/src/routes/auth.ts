@@ -1,15 +1,11 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { createClient } from "@supabase/supabase-js";
-import { config } from "../config";
+import { getSupabase } from "../services/supabase";
 import { requireAuth, AuthenticatedRequest } from "../middleware/auth";
 import { v1 as uuidv1 } from "uuid";
 
 export const authRouter = Router();
 
-const supabase = createClient(
-  config.supabaseUrl,
-  config.supabaseKey
-);
+// Supabase client accessed via getSupabase() - lazy init
 
 // POST /auth/signup — Create account via Supabase Auth
 authRouter.post("/signup", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -21,7 +17,7 @@ authRouter.post("/signup", async (req: Request, res: Response, next: NextFunctio
       return;
     }
 
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await getSupabase()?.auth?.signUp({
       email,
       password,
       options: {
@@ -64,7 +60,7 @@ authRouter.post("/login", async (req: Request, res: Response, next: NextFunction
       return;
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await getSupabase()?.auth?.signInWithPassword({
       email,
       password,
     });
@@ -102,7 +98,7 @@ authRouter.post("/refresh", async (req: Request, res: Response, next: NextFuncti
       return;
     }
 
-    const { data, error } = await supabase.auth.refreshSession({
+    const { data, error } = await getSupabase()?.auth?.refreshSession({
       refresh_token,
     });
 
@@ -133,7 +129,7 @@ authRouter.post("/logout", requireAuth, async (req: Request, res: Response, next
   try {
     const token = req.headers.authorization?.replace("Bearer ", "");
     if (token) {
-      await supabase.auth.admin.signOut(token);
+      await getSupabase()?.auth?.admin.signOut(token);
     }
     res.status(200).json({ ok: true });
   } catch (err) {

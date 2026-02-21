@@ -13,10 +13,10 @@ import { config } from "../config";
 
 let _client: SupabaseClient | null = null;
 
-export function getSupabase(): SupabaseClient {
+export function getSupabase(): SupabaseClient | null {
   if (!_client) {
-    if (!config.supabaseUrl) {
-      throw new Error("ECO_SUPABASE_URL is not configured");
+    if (!config.supabaseUrl || !config.supabaseUrl.startsWith("http")) {
+      return null;
     }
     _client = createClient(
       config.supabaseUrl,

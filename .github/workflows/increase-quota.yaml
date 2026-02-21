@@ -49,6 +49,7 @@ jobs:
           echo '${{ secrets.GCP_SA_KEY }}' > /tmp/gcp-sa-key.json
           chmod 600 /tmp/gcp-sa-key.json
           gcloud auth activate-service-account --key-file=/tmp/gcp-sa-key.json
+          gcloud auth application-default activate-service-account --key-file=/tmp/gcp-sa-key.json
           gcloud config set project ${{ env.GCP_PROJECT }}
           rm -f /tmp/gcp-sa-key.json
 

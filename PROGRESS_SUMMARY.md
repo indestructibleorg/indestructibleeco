@@ -46,7 +46,7 @@ The IndestructibleEco GKE deployment and security remediation project has made s
 - **Status**: ✅ RUNNING (6/6 pods)
 - **Endpoints**: 
   - https://staging.autoecoops.io/
-  - https://api-staging.autoecoops.io/
+  - <https://api-staging.autoecoops.io/>
 - **Pods**: gateway, ai, api, web, postgres, redis (all healthy)
 
 #### Production Cluster

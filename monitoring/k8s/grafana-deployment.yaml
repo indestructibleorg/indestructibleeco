@@ -490,6 +490,12 @@ data:
       "version": 1
     }
 ---
+# NOTE: The grafana-secrets Secret must be created before deploying Grafana.
+# You can create it with:
+#   kubectl create secret generic grafana-secrets \
+#     --from-literal=admin-user=<your-admin-user> \
+#     --from-literal=admin-password=<your-admin-password> \
+#     -n monitoring
 apiVersion: apps/v1
 kind: Deployment
 metadata:

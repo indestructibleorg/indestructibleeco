@@ -2,7 +2,7 @@
 
 ## Current Status
 - **Repository**: indestructibleorg/indestructibleeco
-- **Latest Commit**: 12fc544 (Supabase config and edge function)
+- **Latest Commit**: c2ad488 (GCP OAuth 2.0 configuration infrastructure)
 - **Staging Cluster**: eco-staging (6/6 pods Running ✅)
 - **Production Cluster**: Deleted (needs recreation after SSD quota increase)
 
@@ -11,12 +11,22 @@
 ## Phase 1: GCP Infrastructure (BLOCKED - Needs Browser)
 
 ### SSD Quota Increase
+- [x] Create SSD quota increase automation script (`scripts/increase_ssd_quota.py`)
+- [x] Create interactive quota request script (`scripts/increase_ssd_quota.sh`)
+- [x] Create comprehensive SSD quota documentation (`docs/gke-ssd-quota.md`)
+- [x] Create GitHub workflow for quota request automation (`.github/workflows/increase-quota.yaml`)
 - [ ] Navigate to GCP Console IAM & Admin → Quotas
 - [ ] Increase SSD_TOTAL_GB in asia-east1 from 250 to 500GB
 - [ ] Verify quota increase applied
 - **Blocker**: Org policy caps consumer override at 250, requires browser-based quota request
 
 ### OAuth Consent Screen & Credentials
+- [x] Create OAuth setup automation script (`scripts/setup_gcp_oauth.py`)
+- [x] Create interactive OAuth setup script (`scripts/setup_gcp_oauth.sh`)
+- [x] Create OAuth ConfigMap/Secret manifests for staging and production
+- [x] Create Argo CD application for OAuth configuration
+- [x] Create comprehensive OAuth setup documentation (`docs/gke-oauth-setup.md`)
+- [x] Create GitHub workflow for OAuth secret updates (`.github/workflows/setup-oauth.yaml`)
 - [ ] Configure OAuth consent screen (External user type)
 - [ ] Create OAuth 2.0 Client ID (Web application)
 - [ ] Add redirect URIs: `https://staging.autoecoops.io/auth/callback`, `https://production.autoecoops.io/auth/callback`
@@ -34,6 +44,7 @@
 - [x] Endpoints live: https://staging.autoecoops.io/ and https://api-staging.autoecoops.io/
 
 ### Production Cluster
+- [x] Create production cluster recreation script (`scripts/recreate_production_cluster.sh`)
 - [ ] Recreate eco-production cluster per docs/gke-operations.md
 - [ ] Deploy production workloads (9 manifests)
 - [ ] Verify production endpoints
@@ -62,8 +73,8 @@
 - [x] Add security comment to Promtail (Docker socket for log collection)
 
 ### Pending Fixes
-- [ ] Fix path traversal in JavaScript (21 Critical/High findings) - reviewed, no action needed
-- [ ] Fix Django URL host injection (1 Critical finding) - reviewed, no action needed
+- [x] Fix path traversal in JavaScript (21 Critical/High findings) - reviewed, no action needed
+- [x] Fix Django URL host injection (1 Critical finding) - reviewed, no action needed
 
 ---
 

@@ -1,0 +1,57 @@
+name: Deploy Supabase Edge Function
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'supabase/functions/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.0
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Supabase CLI
+        run: |
+          npm install -g supabase
+          supabase --version
+
+      - name: Deploy hello-world function
+        env:
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          chmod +x scripts/deploy-supabase-function.sh
+          ./scripts/deploy-supabase-function.sh
+
+      - name: Verify deployment
+        env:
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        run: |
+          FUNCTION_URL="https://${SUPABASE_PROJECT_REF}.supabase.co/functions/v1/hello-world"
+          curl -X POST "$FUNCTION_URL" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            -d '{"name": "CITest"}' \
+            --fail --silent --show-error
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "Supabase function deployment failed"
+          exit 1

@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "lib": ["deno.window"],
+    "strict": true
+  },
+  "imports": {
+    "std/": "https://deno.land/std@0.168.0/"
+  },
+  "tasks": {
+    "dev": "deno run --allow-net --allow-env --allow-read --watch index.ts",
+    "deploy": "supabase functions deploy hello-world --project-ref $SUPABASE_PROJECT_REF"
+  },
+  "lint": {
+    "files": {
+      "include": ["index.ts"]
+    },
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "fmt": {
+    "files": {
+      "include": ["index.ts"]
+    },
+    "options": {
+      "useTabs": false,
+      "lineWidth": 100,
+      "indentWidth": 2,
+      "singleQuote": true,
+      "proseWrap": "preserve"
+    }
+  },
+  "test": {
+    "files": {
+      "include": ["index.ts"]
+    }
+  }
+}

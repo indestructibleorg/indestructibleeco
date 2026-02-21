@@ -242,7 +242,7 @@ jobs:
           backend/api backend/ai backend/shared/proto backend/shared/models \
           backend/k8s/namespaces backend/k8s/deployments backend/k8s/services \
           backend/k8s/ingress backend/k8s/configmaps backend/k8s/secrets backend/k8s/security \
-          backend/cloudflare/workers backend/supabase/migrations \
+          backend/cloudflare/workers supabase/migrations \
           packages/shared-types packages/api-client packages/ui-kit \
           platforms/web platforms/desktop platforms/im-integration platforms/platform-template \
           ecosystem/monitoring ecosystem/tracing ecosystem/service-discovery \
@@ -265,7 +265,7 @@ jobs:
           backend/api/Dockerfile \
           backend/api/openapi.yaml \
           backend/cloudflare/wrangler.toml \
-          backend/supabase/migrations/001_initial_schema.sql \
+          supabase/migrations/001_initial_schema.sql \
           tools/ci-validator/validate.py \
           tools/ci-validator/auto-fix.py \
           tools/skill-creator/SKILL.md \

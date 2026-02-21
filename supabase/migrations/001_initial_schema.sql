@@ -1,5 +1,5 @@
 -- IndestructibleEco v1.0 — Unified Database Schema
--- URI: indestructibleeco://backend/supabase/schema
+-- URI: indestructibleeco://supabase/schema
 -- Target: Supabase PostgreSQL 15+
 
 create extension if not exists "uuid-ossp";

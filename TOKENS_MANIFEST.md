@@ -294,6 +294,7 @@ export SUPABASE_PROJECT_REF="yrfxijooswpvdpdseswy"
 ```
 
 ### Cloudflare Environment Variables
+
 ```bash
 export CLOUDFLARE_CUSTOM_HOSTNAME="_cf-custom-hostname.autoecoops.io"
 export CLOUDFLARE_HOSTNAME_ID="21c5d22a-4512-485b-9557-8aa9fa7c96ed"

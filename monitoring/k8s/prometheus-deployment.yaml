@@ -324,10 +324,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - prometheus.indestructibleeco.io
+    - prometheus._cf-custom-hostname.autoecoops.io
     secretName: prometheus-tls
   rules:
-  - host: prometheus.indestructibleeco.io
+  - host: prometheus._cf-custom-hostname.autoecoops.io
     http:
       paths:
       - path: /

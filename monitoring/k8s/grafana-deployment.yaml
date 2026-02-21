@@ -537,7 +537,7 @@ spec:
         - name: GF_INSTALL_PLUGINS
           value: ""
         - name: GF_SERVER_ROOT_URL
-          value: "https://grafana.indestructibleeco.io"
+          value: "https://grafana._cf-custom-hostname.autoecoops.io"
         volumeMounts:
         - name: datasources
           mountPath: /etc/grafana/provisioning/datasources
@@ -593,10 +593,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - grafana.indestructibleeco.io
+    - grafana._cf-custom-hostname.autoecoops.io
     secretName: grafana-tls
   rules:
-  - host: grafana.indestructibleeco.io
+  - host: grafana._cf-custom-hostname.autoecoops.io
     http:
       paths:
       - path: /

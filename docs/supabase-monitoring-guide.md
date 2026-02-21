@@ -42,32 +42,50 @@ This guide explains how to set up comprehensive monitoring for your Supabase Pro
 3. Copy your **Secret API key** (starts with `sb_secret_`)
 4. Note your **Project Reference** (e.g., `yrfxijooswpvdpdseswy`)
 
-### 2. Run the Setup Script
+### 2. Get Cloudflare Certificates
+
+1. Navigate to Cloudflare Dashboard → SSL/TLS → Origin Server
+2. Download the **Origin Certificate** and **Private Key**
+3. Save them as:
+   - `cloudflare-origin-cert.pem`
+   - `cloudflare-origin-key.key`
+
+### 3. Run the Setup Script
 
 ```bash
 # Navigate to the repository
 cd repo
 
-# Run the setup script
+# Run the monitoring setup script
 ./scripts/setup_supabase_monitoring.sh
+
+# Run the Cloudflare certificate setup script
+./scripts/setup_cloudflare_certs.sh
 ```
 
-The script will:
+The scripts will:
 - Create the monitoring namespace
 - Deploy Prometheus with Supabase configuration
 - Deploy Grafana with pre-configured dashboards
 - Deploy Node Exporter for Kubernetes metrics
 - Configure secrets with your credentials
+- Set up Cloudflare SSL certificates
 
-### 3. Access the Monitoring Stack
+### 4. Configure Cloudflare DNS
+
+Create CNAME records in Cloudflare:
+- `prometheus._cf-custom-hostname.autoecoops.io` → `<INGRESS_IP>`
+- `grafana._cf-custom-hostname.autoecoops.io` → `<INGRESS_IP>`
+
+### 5. Access the Monitoring Stack
 
 After deployment, access the services:
 
-- **Grafana**: http://grafana.indestructibleeco.io
+- **Grafana**: https://grafana._cf-custom-hostname.autoecoops.io
   - Username: `admin`
   - Password: (set during setup, default: `admin123`)
 
-- **Prometheus**: http://prometheus.indestructibleeco.io
+- **Prometheus**: https://prometheus._cf-custom-hostname.autoecoops.io
 
 ## Manual Deployment
 
@@ -110,7 +128,68 @@ kubectl create secret generic grafana-secrets \
 kubectl apply -f monitoring/k8s/grafana-deployment.yaml
 ```
 
+### 5. Configure Cloudflare Certificates
+
+```bash
+# Create secret with Cloudflare certificates
+kubectl create secret tls cloudflare-origin-cert \
+  --cert=cloudflare-origin-cert.pem \
+  --key=cloudflare-origin-key.key \
+  --namespace=monitoring
+
+# Update Ingress resources to use Cloudflare certificate
+kubectl patch ingress prometheus-ingress -n monitoring -p '{
+  "spec": {
+    "tls": [{
+      "hosts": ["prometheus._cf-custom-hostname.autoecoops.io"],
+      "secretName": "cloudflare-origin-cert"
+    }]
+  }
+}' --type=merge
+
+kubectl patch ingress grafana-ingress -n monitoring -p '{
+  "spec": {
+    "tls": [{
+      "hosts": ["grafana._cf-custom-hostname.autoecoops.io"],
+      "secretName": "cloudflare-origin-cert"
+    }]
+  }
+}' --type=merge
+```
+
 ## Configuration
+
+### Cloudflare Domain Configuration
+
+The monitoring stack uses Cloudflare custom hostname:
+- **Base Domain**: `_cf-custom-hostname.autoecoops.io`
+- **Prometheus**: `prometheus._cf-custom-hostname.autoecoops.io`
+- **Grafana**: `grafana._cf-custom-hostname.autoecoops.io`
+
+### Setting Up Cloudflare Certificates
+
+1. **Get Certificates from Cloudflare**:
+   - Go to Cloudflare Dashboard → SSL/TLS → Origin Server
+   - Download the Origin Certificate and Private Key
+   - Save them as `cloudflare-origin-cert.pem` and `cloudflare-origin-key.key`
+
+2. **Create Kubernetes Secret**:
+   ```bash
+   ./scripts/setup_cloudflare_certs.sh
+   ```
+
+   Or manually:
+   ```bash
+   kubectl create secret tls cloudflare-origin-cert \
+     --cert=cloudflare-origin-cert.pem \
+     --key=cloudflare-origin-key.key \
+     --namespace=monitoring
+   ```
+
+3. **Configure DNS Records**:
+   - Create CNAME records in Cloudflare:
+     - `prometheus._cf-custom-hostname.autoecoops.io` → `<INGRESS_IP>`
+     - `grafana._cf-custom-hostname.autoecoops.io` → `<INGRESS_IP>`
 
 ### Prometheus Configuration
 
@@ -163,13 +242,13 @@ Expected output: Prometheus metrics in text format
 
 ### Verify Prometheus Scraping
 
-1. Access Prometheus at http://prometheus.indestructibleeco.io
+1. Access Prometheus at https://prometheus._cf-custom-hostname.autoecoops.io
 2. Go to **Status → Targets**
 3. Verify `supabase-production` job is **UP**
 
 ### Verify Grafana Dashboards
 
-1. Access Grafana at http://grafana.indestructibleeco.io
+1. Access Grafana at https://grafana._cf-custom-hostname.autoecoops.io
 2. Login with admin credentials
 3. Navigate to **Dashboards → Supabase → Supabase Overview**
 4. Verify metrics are displaying
@@ -319,6 +398,34 @@ kubectl exec -n monitoring deployment/grafana -- \
      curl http://prometheus:9090/api/v1/query?query=up
    ```
 
+### SSL/TLS Certificate Issues
+
+1. Verify Cloudflare certificate secret exists:
+   ```bash
+   kubectl get secret cloudflare-origin-cert -n monitoring
+   ```
+
+2. Check Ingress configuration:
+   ```bash
+   kubectl get ingress -n monitoring
+   kubectl describe ingress prometheus-ingress -n monitoring
+   ```
+
+3. Verify DNS records in Cloudflare:
+   - Check CNAME records point to correct ingress IP
+   - Ensure proxy status is set to "Proxied" (orange cloud)
+
+4. Test SSL certificate:
+   ```bash
+   curl -v https://prometheus._cf-custom-hostname.autoecoops.io
+   curl -v https://grafana._cf-custom-hostname.autoecoops.io
+   ```
+
+5. Check certificate expiration:
+   ```bash
+   echo | openssl s_client -connect prometheus._cf-custom-hostname.autoecoops.io:443 2>/dev/null | openssl x509 -noout -dates
+   ```
+
 ### No Metrics Displaying in Dashboards
 
 1. Verify Prometheus is scraping:
@@ -345,12 +452,18 @@ kubectl exec -n monitoring deployment/grafana -- \
 
 3. **Enable TLS**
    - Use HTTPS for all external access
-   - Configure cert-manager for automatic certificate management
+   - Configure Cloudflare Origin Certificates for SSL/TLS
+   - Ensure Cloudflare DNS records are properly configured
 
 4. **Secure Grafana**
    - Change default admin password
    - Enable anonymous viewing if needed
    - Configure authentication providers (OAuth, LDAP)
+
+5. **Protect Cloudflare Certificates**
+   - Store private keys securely
+   - Never commit certificates to version control
+   - Rotate certificates before expiration (15 years for Cloudflare Origin Certs)
 
 ## Performance Optimization
 

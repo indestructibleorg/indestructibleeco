@@ -53,8 +53,8 @@ I've successfully configured a comprehensive monitoring system for your Supabase
   - Node Exporter (DaemonSet for cluster metrics)
 
 #### Access URLs
-- **Prometheus**: http://prometheus.indestructibleeco.io
-- **Grafana**: http://grafana.indestructibleeco.io
+- **Prometheus**: https://prometheus._cf-custom-hostname.autoecoops.io
+- **Grafana**: https://grafana._cf-custom-hostname.autoecoops.io
 
 ### 3. Automation Scripts
 
@@ -66,6 +66,15 @@ I've successfully configured a comprehensive monitoring system for your Supabase
   - Deploys all monitoring components
   - Configures secrets automatically
   - Provides access URLs and next steps
+
+#### Cloudflare Certificate Setup Script
+- **File**: `scripts/setup_cloudflare_certs.sh`
+- **Features**:
+  - Interactive certificate setup
+  - Base64 encoding of certificates
+  - Automatic Kubernetes secret creation
+  - Ingress configuration updates
+  - DNS configuration guidance
 
 #### GitHub Workflow
 - **File**: `.github/workflows/deploy-monitoring.yaml`
@@ -103,16 +112,21 @@ I've successfully configured a comprehensive monitoring system for your Supabase
 # Navigate to repository
 cd repo
 
-# Run the setup script
+# Run the monitoring setup script
 ./scripts/setup_supabase_monitoring.sh
+
+# Run the Cloudflare certificate setup script
+./scripts/setup_cloudflare_certs.sh
 ```
 
-The script will:
+The scripts will:
 1. Prompt for your Supabase Secret API key
-2. Create the monitoring namespace
-3. Deploy all components
-4. Configure secrets
-5. Provide access URLs
+2. Prompt for Cloudflare certificate files
+3. Create the monitoring namespace
+4. Deploy all components
+5. Configure secrets
+6. Set up Cloudflare SSL certificates
+7. Provide access URLs
 
 ### Option 2: GitHub Actions
 
@@ -143,6 +157,31 @@ kubectl create secret generic grafana-secrets \
   --from-literal=admin-password='your-password' \
   --namespace=monitoring
 kubectl apply -f monitoring/k8s/grafana-deployment.yaml
+
+# Configure Cloudflare certificates
+kubectl create secret tls cloudflare-origin-cert \
+  --cert=cloudflare-origin-cert.pem \
+  --key=cloudflare-origin-key.key \
+  --namespace=monitoring
+
+# Update Ingress to use Cloudflare certificates
+kubectl patch ingress prometheus-ingress -n monitoring -p '{
+  "spec": {
+    "tls": [{
+      "hosts": ["prometheus._cf-custom-hostname.autoecoops.io"],
+      "secretName": "cloudflare-origin-cert"
+    }]
+  }
+}' --type=merge
+
+kubectl patch ingress grafana-ingress -n monitoring -p '{
+  "spec": {
+    "tls": [{
+      "hosts": ["grafana._cf-custom-hostname.autoecoops.io"],
+      "secretName": "cloudflare-origin-cert"
+    }]
+  }
+}' --type=merge
 ```
 
 ---

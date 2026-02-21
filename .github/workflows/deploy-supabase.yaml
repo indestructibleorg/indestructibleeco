@@ -17,13 +17,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+        run: |
+          git clone --depth 1 https://github.com/${{ github.repository }}.git .
+          git checkout ${{ github.sha }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.0
-        with:
-          node-version: '20'
-          cache: 'npm'
+        run: |
+          curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+          sudo apt-get install -y nodejs
 
       - name: Install Supabase CLI
         run: |

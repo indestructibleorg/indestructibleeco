@@ -1,0 +1,35 @@
+apiVersion: 1
+
+providers:
+  - name: 'Supabase Dashboards'
+    orgId: 1
+    folder: 'Supabase'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/supabase
+      foldersFromFilesStructure: true
+
+  - name: 'Kubernetes Dashboards'
+    orgId: 1
+    folder: 'Kubernetes'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/kubernetes
+      foldersFromFilesStructure: true
+
+  - name: 'IndestructibleEco Dashboards'
+    orgId: 1
+    folder: 'IndestructibleEco'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/indestructibleeco
+      foldersFromFilesStructure: true

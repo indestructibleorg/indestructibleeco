@@ -1,0 +1,89 @@
+# Prometheus Configuration for Supabase Metrics
+# IndestructibleEco Production Monitoring
+
+global:
+  scrape_interval: 60s
+  evaluation_interval: 60s
+  external_labels:
+    cluster: 'indestructibleeco'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - '/etc/prometheus/rules/*.yml'
+
+# Scrape configurations
+scrape_configs:
+  # Supabase Metrics API
+  - job_name: 'supabase-production'
+    scrape_interval: 60s
+    metrics_path: /customer/v1/privileged/metrics
+    scheme: https
+    basic_auth:
+      username: service_role
+      password: '${SUPABASE_SECRET_KEY}'
+    static_configs:
+      - targets:
+          - 'yrfxijooswpvdpdseswy.supabase.co:443'
+        labels:
+          project: 'yrfxijooswpvdpdseswy'
+          environment: 'production'
+          service: 'supabase'
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Node Exporter (for Kubernetes nodes)
+  - job_name: 'node-exporter'
+    kubernetes_sd_configs:
+      - role: endpoints
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        regex: node-exporter
+        action: keep
+      - source_labels: [__meta_kubernetes_endpoint_port_name]
+        regex: metrics
+        action: keep
+
+  # Kubelet metrics
+  - job_name: 'kubelet'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    kubernetes_sd_configs:
+      - role: node
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_node_name]
+        regex: (.+)
+        target_label: __address__
+        replacement: ${1}:10250
+      - source_labels: [__meta_kubernetes_node_name]
+        target_label: node
+        regex: (.+)
+        replacement: ${1}
+
+  # cAdvisor (container metrics)
+  - job_name: 'cadvisor'
+    kubernetes_sd_configs:
+      - role: node
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_node_name]
+        regex: (.+)
+        target_label: __address__
+        replacement: ${1}:10250
+      - source_labels: [__meta_kubernetes_node_name]
+        target_label: node
+        regex: (.+)
+        replacement: ${1}
+      - source_labels: [__meta_kubernetes_node_name]
+        target_label: __metrics_path__
+        replacement: /metrics/cadvisor

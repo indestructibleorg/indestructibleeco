@@ -31,7 +31,7 @@ data:
         scheme: https
         basic_auth:
           username: service_role
-          password: '${SUPABASE_SECRET_KEY}'
+          password_file: /etc/prometheus/secrets/supabase_secret_key
         static_configs:
           - targets:
               - 'yrfxijooswpvdpdseswy.supabase.co:443'
@@ -229,15 +229,11 @@ data:
               description: "99th percentile API latency is {{ $value }}s for project {{ $labels.project }}"
 
 ---
-apiVersion: v1
-kind: Secret
-metadata:
-  name: prometheus-secrets
-  namespace: monitoring
-type: Opaque
-stringData:
-  SUPABASE_SECRET_KEY: "sb_secret_YOUR_SECRET_KEY_HERE"
----
+# NOTE: The 'prometheus-secrets' Secret (with key SUPABASE_SECRET_KEY) must be created
+# separately before deploying Prometheus, e.g.:
+#   kubectl create secret generic prometheus-secrets \
+#     --from-literal=SUPABASE_SECRET_KEY=<your-supabase-service-role-key> \
+#     -n monitoring
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -268,12 +264,6 @@ spec:
         - '--web.console.libraries=/usr/share/prometheus/console_libraries'
         - '--web.console.templates=/usr/share/prometheus/consoles'
         - '--web.enable-lifecycle'
-        env:
-        - name: SUPABASE_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: prometheus-secrets
-              key: SUPABASE_SECRET_KEY
         volumeMounts:
         - name: config
           mountPath: /etc/prometheus
@@ -281,6 +271,9 @@ spec:
           mountPath: /etc/prometheus/rules
         - name: storage
           mountPath: /prometheus
+        - name: supabase-secret
+          mountPath: /etc/prometheus/secrets
+          readOnly: true
         resources:
           requests:
             memory: "512Mi"
@@ -297,6 +290,12 @@ spec:
           name: prometheus-alerts
       - name: storage
         emptyDir: {}
+      - name: supabase-secret
+        secret:
+          secretName: prometheus-secrets
+          items:
+          - key: SUPABASE_SECRET_KEY
+            path: supabase_secret_key
 ---
 apiVersion: v1
 kind: Service

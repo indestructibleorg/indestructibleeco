@@ -122,7 +122,7 @@ monitor_quota_status() {
     log_step "Monitoring quota status..."
     
     log_info "To check quota status later, run:"
-    echo "  gcloud compute regions describe asia-east1 --format='json(quotas)' --filter=&quot;quotas.metric='SSD_TOTAL_STORAGE_GB'&quot;"
+    echo "  gcloud compute regions describe asia-east1 --format='json(quotas)' --filter=\"quotas.metric='SSD_TOTAL_STORAGE_GB'\""
     echo ""
     log_info "Expected quota after approval: 500 GB"
     log_info "Required for production cluster: ~200 GB"

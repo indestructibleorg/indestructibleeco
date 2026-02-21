@@ -39,12 +39,20 @@ echo -e "${GREEN}✓ GCP Service Account secret configured${NC}"
 echo ""
 
 echo -e "${GREEN}Step 2: Configuring Supabase Secrets${NC}"
+# Required environment variables (no defaults to prevent accidental deployment with placeholder values):
+# SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_DB_URL, SUPABASE_JWT_SECRET
+for var in SUPABASE_ANON_KEY SUPABASE_SERVICE_ROLE_KEY SUPABASE_DB_URL SUPABASE_JWT_SECRET; do
+  if [[ -z "${!var}" ]]; then
+    echo -e "${RED}Error: Required environment variable $var is not set${NC}"
+    exit 1
+  fi
+done
 kubectl create secret generic supabase-secrets \
   --from-literal=SUPABASE_URL="https://yrfxijooswpvdpdseswy.supabase.co" \
-  --from-literal=SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY:-sb_publishable_rhTyBa4IqqV14n_B87S7g_zKzDSYTd}" \
-  --from-literal=SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-sb_secret_31vU-HAOwfR81zlaDWa_hQ_EHmtoqS8}" \
-  --from-literal=SUPABASE_DB_URL="${SUPABASE_DB_URL:-postgresql://postgres:Wei412011\$@db.yrfxijooswpvdpdseswy.supabase.co:5432/postgres}" \
-  --from-literal=SUPABASE_JWT_SECRET="${SUPABASE_JWT_SECRET:-WamvSfLnv/A7IiKYib+Jga/YcgdqucrvXDBcmQTA3UtH5B/dZdwMnJvgyrCWMdZjykptcVEJwA1vicIOhBTiZw==}" \
+  --from-literal=SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY}" \
+  --from-literal=SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY}" \
+  --from-literal=SUPABASE_DB_URL="${SUPABASE_DB_URL}" \
+  --from-literal=SUPABASE_JWT_SECRET="${SUPABASE_JWT_SECRET}" \
   --from-literal=SUPABASE_PROJECT_REF="yrfxijooswpvdpdseswy" \
   --namespace=$NAMESPACE \
   --dry-run=client -o yaml | kubectl apply -f -

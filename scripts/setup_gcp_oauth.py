@@ -201,7 +201,7 @@ def main():
             config = json.loads(response.payload.data.decode("utf-8"))
             print(f"\n✓ OAuth configuration verified for {args.environment}")
             print(f"  Client ID: {config['oauth']['client_id']}")
-            print(f"  Redirect URIs: {', '.join(config['oauth']['redirect_urIs'])}")
+            print(f"  Redirect URIs: {', '.join(config['oauth']['redirect_uris'])}")
         except Exception as e:
             print(f"✗ Failed to verify configuration: {e}")
             sys.exit(1)

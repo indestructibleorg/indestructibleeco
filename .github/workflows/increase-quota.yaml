@@ -69,14 +69,20 @@ jobs:
         env:
           REGION: ${{ github.event.inputs.region }}
         run: |
-          # Run the quota script, capturing only the final JSON line into quota_status.json.
-          # Any non-JSON logs are written to a separate log file.
           python3.11 scripts/increase_ssd_quota.py \
             --action check \
             --region "$REGION" \
-            --output-json 2>increase_quota.log | tail -n 1 > quota_status.json
-          
-          # Optionally surface logs in the GitHub Actions output
+            --output-json > quota_status.raw
+
+          awk 'BEGIN{capture=0} /^\{/{capture=1} !capture{print}' quota_status.raw > increase_quota.log
+          awk 'BEGIN{capture=0} /^\{/{capture=1} capture{print}' quota_status.raw > quota_status.json
+
+          if [ ! -s quota_status.json ]; then
+            echo "Failed to extract JSON payload from quota check output"
+            cat quota_status.raw
+            exit 1
+          fi
+
           if [ -s increase_quota.log ]; then
             echo "::group::increase_ssd_quota.py logs"
             cat increase_quota.log
@@ -149,7 +155,15 @@ jobs:
             --current-limit $CURRENT_LIMIT \
             --requested-limit $REQUESTED_LIMIT \
             --justification "$JUSTIFICATION" \
-            --output-json > quota_request.json
+            --output-json > quota_request.raw
+
+          awk 'BEGIN{capture=0} /^\{/{capture=1} capture{print}' quota_request.raw > quota_request.json
+
+          if [ ! -s quota_request.json ]; then
+            echo "Failed to extract JSON payload from quota request output"
+            cat quota_request.raw
+            exit 1
+          fi
           
           cat quota_request.json
 
@@ -166,6 +180,7 @@ jobs:
           python3.11 <<'PY'
           import json
           import os
+          import textwrap
           import urllib.error
           import urllib.request
 
@@ -178,27 +193,31 @@ jobs:
               except json.JSONDecodeError as exc:
                   raise RuntimeError("quota_request.json exists but contains invalid JSON") from exc
 
-          body = f"""## SSD Quota Increase Request
+          body = textwrap.dedent(
+              f"""\
+              ## SSD Quota Increase Request
 
-          **Region**: {os.environ['REGION']}
-          **Current Limit**: {os.environ['CURRENT_LIMIT']} GB
-          **Requested Limit**: {os.environ['REQUESTED_LIMIT']} GB
-          **Current Usage**: {os.environ['CURRENT_USAGE']} GB
+              **Region**: {os.environ['REGION']}
+              **Current Limit**: {os.environ['CURRENT_LIMIT']} GB
+              **Requested Limit**: {os.environ['REQUESTED_LIMIT']} GB
+              **Current Usage**: {os.environ['CURRENT_USAGE']} GB
 
-          **Justification**:
-          {os.environ['JUSTIFICATION']}
+              **Justification**:
+              {os.environ['JUSTIFICATION']}
 
-          **Request ID**: `{request_data.get('request_id', 'N/A')}`
-          **Status**: `{request_data.get('status', 'Submitted')}`
+              **Request ID**: `{request_data.get('request_id', 'N/A')}`
+              **Status**: `{request_data.get('status', 'Submitted')}`
 
-          ### Next Steps
-          1. Monitor approval status in GCP Console
-          2. Once approved, recreate production cluster
-          3. Deploy production workloads
+              ### Next Steps
+              1. Monitor approval status in GCP Console
+              2. Once approved, recreate production cluster
+              3. Deploy production workloads
 
-          ### References
-          - [GCP Quotas Console](https://console.cloud.google.com/iam-admin/quotas?project=my-project-ops-1991)
-          - [Quota Guide](docs/gcp-quota-guide.md)"""
+              ### References
+              - [GCP Quotas Console](https://console.cloud.google.com/iam-admin/quotas?project=my-project-ops-1991)
+              - [Quota Guide](docs/gcp-quota-guide.md)
+              """
+          ).strip()
 
           payload = json.dumps({
               "title": f"SSD Quota Increase Request - {os.environ['REGION']}",
@@ -215,6 +234,7 @@ jobs:
                   "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
                   "X-GitHub-Api-Version": "2022-11-28",
                   "Content-Type": "application/json",
+                  "User-Agent": "increase-ssd-quota-workflow",
               },
           )
           try:

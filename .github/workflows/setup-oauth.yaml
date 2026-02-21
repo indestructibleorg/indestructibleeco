@@ -65,8 +65,8 @@ jobs:
           ECO_OAUTH_CLIENT_SECRET: ${{ secrets.ECO_OAUTH_CLIENT_SECRET }}
         run: |
           python3.11 scripts/setup_gcp_oauth.py \
-            --environment $ENVIRONMENT \
-            --action $ACTION
+            --environment "$ENVIRONMENT" \
+            --action "$ACTION"
 
       - name: Update K8s secrets
         if: github.event.inputs.action == 'update-secrets'

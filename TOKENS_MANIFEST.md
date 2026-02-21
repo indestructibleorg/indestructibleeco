@@ -63,6 +63,7 @@ sb_publishable_rhTyBa4IqqV14n_B87S7g_zKzDSYTd
 - **Security**: Safe to use in browser
 
 #### Secret Key (Service Role)
+
 ```
 sb_secret_YOUR_SERVICE_ROLE_KEY_HERE
 ```

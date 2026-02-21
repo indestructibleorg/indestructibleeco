@@ -287,13 +287,8 @@ class EngineHealthMonitor:
                     await self._model_registry.update_status(
                         model.model_id, ModelStatus.REGISTERED, None
                     )
-                except (KeyError, ValueError) as exc:
-                    # Best-effort downgrade; ignore missing/invalid registry entries.
-                    logger.warning(
-                        "HealthMonitor: failed to downgrade model %s to REGISTERED: %r",
-                        model.model_id,
-                        exc,
-                    )
+                except (KeyError, ValueError):
+                    pass
 
         self.total_registry_syncs += 1
         self.last_sync_time = time.time()

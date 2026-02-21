@@ -24,8 +24,8 @@ spec:
     spec:
       serviceAccountName: eco-sa
       securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
+        runAsNonRoot: false
+        runAsUser: 0
         fsGroup: 1000
       containers:
         - name: eco-web-frontend

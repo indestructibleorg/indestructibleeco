@@ -31,20 +31,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
 
       - name: Setup kubectl
-        uses: azure/setup-kubectl@v3
+        uses: azure/setup-kubectl@eabde32f4b27ac3d948e57843b4374c1c1ff717a
         with:
           version: 'v1.28.0'
 
       - name: Authenticate with GCP
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@0c5164e4f3f699b8bff8f34f5936c8835f1919bd
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Get GKE credentials
-        uses: google-github-actions/get-gke-credentials@v2
+        uses: google-github-actions/get-gke-credentials@5bfa9186c9bb4e4001a3ed6a0eef8949f0f9b867
         with:
           cluster_name: eco-${{ github.event.inputs.environment }}
           location: ${{ env.GCP_REGION }}

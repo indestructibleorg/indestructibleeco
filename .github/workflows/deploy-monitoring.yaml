@@ -37,8 +37,13 @@ jobs:
 
       - name: Setup kubectl
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y kubectl
+          KUBECTL_VERSION="v1.28.0"
+          curl -fsSLo kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+          curl -fsSLo kubectl.sha256 "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl.sha256"
+          echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
+          rm -f kubectl.sha256
 
       - name: Install gcloud CLI and auth plugin
         run: |
@@ -52,12 +57,15 @@ jobs:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
           TARGET_ENVIRONMENT: ${{ github.event.inputs.environment }}
         run: |
-          echo "$GCP_SA_KEY" > /tmp/gcp-sa-key.json
-          chmod 600 /tmp/gcp-sa-key.json
-          gcloud auth activate-service-account --key-file=/tmp/gcp-sa-key.json
+          TMP_DIR="$(mktemp -d)"
+          chmod 700 "$TMP_DIR"
+          trap 'rm -rf "$TMP_DIR"' EXIT
+          KEY_FILE="$(mktemp "$TMP_DIR/gcp-sa-key-XXXXXX.json")"
+          echo "$GCP_SA_KEY" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          gcloud auth activate-service-account --key-file="$KEY_FILE"
           gcloud config set project "$GCP_PROJECT"
           gcloud container clusters get-credentials "eco-$TARGET_ENVIRONMENT" --region "$GCP_REGION" --project "$GCP_PROJECT"
-          rm -f /tmp/gcp-sa-key.json
 
       - name: Create monitoring namespace
         run: |

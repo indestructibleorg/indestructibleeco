@@ -21,8 +21,12 @@ jobs:
           git clone --depth 1 https://github.com/${{ github.repository }}.git .
           git checkout ${{ github.sha }}
 
-      - name: Verify Node.js runtime
+      - name: Install Node.js 20
         run: |
+          curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/nodesource.gpg
+          echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+          sudo apt-get update -y
+          sudo apt-get install -y nodejs
           node --version
           npm --version
 

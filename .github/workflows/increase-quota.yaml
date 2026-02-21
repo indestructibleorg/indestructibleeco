@@ -154,9 +154,9 @@ jobs:
         run: |
           python3.11 scripts/increase_ssd_quota.py \
             --action request \
-            --region $REGION \
-            --current-limit $CURRENT_LIMIT \
-            --requested-limit $REQUESTED_LIMIT \
+            --region "$REGION" \
+            --current-limit "$CURRENT_LIMIT" \
+            --requested-limit "$REQUESTED_LIMIT" \
             --justification "$JUSTIFICATION" \
             --output-json > quota_request.raw
 

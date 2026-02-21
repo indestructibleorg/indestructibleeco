@@ -1,11 +1,13 @@
 """Unit tests for EngineHealthMonitor."""
 import pytest
 import asyncio
+from unittest.mock import AsyncMock, Mock
 
 from backend.ai.src.services.health_monitor import (
     EngineHealthMonitor,
     HealthMonitorConfig,
 )
+from src.schemas.models import ModelStatus, ModelInfo
 
 
 @pytest.fixture
@@ -200,9 +202,6 @@ class TestSyncRegistry:
     @pytest.mark.asyncio
     async def test_downgrade_ready_to_registered_no_engines(self, config):
         """Test READY->REGISTERED downgrade when no engines are available."""
-        from unittest.mock import AsyncMock, Mock
-        from src.schemas.models import ModelStatus, ModelInfo
-
         # Create mock registry
         mock_registry = Mock()
         mock_model = ModelInfo(
@@ -236,9 +235,6 @@ class TestSyncRegistry:
     @pytest.mark.asyncio
     async def test_no_downgrade_when_model_not_ready(self, config):
         """Test that models not in READY status are not downgraded."""
-        from unittest.mock import AsyncMock, Mock
-        from src.schemas.models import ModelStatus, ModelInfo
-
         mock_registry = Mock()
         mock_model = ModelInfo(
             model_id="test-model",
@@ -265,9 +261,6 @@ class TestSyncRegistry:
     @pytest.mark.asyncio
     async def test_downgrade_handles_keyerror(self, config):
         """Test that KeyError during downgrade is handled gracefully."""
-        from unittest.mock import AsyncMock, Mock
-        from src.schemas.models import ModelStatus, ModelInfo
-
         mock_registry = Mock()
         mock_model = ModelInfo(
             model_id="test-model",
@@ -297,9 +290,6 @@ class TestSyncRegistry:
     @pytest.mark.asyncio
     async def test_downgrade_handles_valueerror(self, config):
         """Test that ValueError during downgrade is handled gracefully."""
-        from unittest.mock import AsyncMock, Mock
-        from src.schemas.models import ModelStatus, ModelInfo
-
         mock_registry = Mock()
         mock_model = ModelInfo(
             model_id="test-model",
@@ -331,9 +321,6 @@ class TestSyncRegistry:
     @pytest.mark.asyncio
     async def test_upgrade_registered_to_ready_with_available_engine(self, config):
         """Test REGISTERED->READY upgrade when engines become available."""
-        from unittest.mock import AsyncMock, Mock
-        from src.schemas.models import ModelStatus, ModelInfo
-
         mock_registry = Mock()
         mock_model = ModelInfo(
             model_id="test-model",
@@ -362,9 +349,6 @@ class TestSyncRegistry:
     @pytest.mark.asyncio
     async def test_no_change_when_ready_and_engines_available(self, config):
         """Test that READY models with available engines are not updated."""
-        from unittest.mock import AsyncMock, Mock
-        from src.schemas.models import ModelStatus, ModelInfo
-
         mock_registry = Mock()
         mock_model = ModelInfo(
             model_id="test-model",
@@ -391,9 +375,6 @@ class TestSyncRegistry:
     @pytest.mark.asyncio
     async def test_upgrade_breaks_after_first_available_engine(self, config):
         """Test that upgrade only calls update_status once with first compatible engine."""
-        from unittest.mock import AsyncMock, Mock, call
-        from src.schemas.models import ModelStatus, ModelInfo
-
         mock_registry = Mock()
         mock_model = ModelInfo(
             model_id="test-model",

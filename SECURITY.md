@@ -20,22 +20,26 @@
 ## Security Measures
 
 ### Dependencies
+
 - All dependencies pinned to specific versions
 - Trivy scanning for CRITICAL and HIGH vulnerabilities
 - CycloneDX SBOM at `sbom.json`
 
 ### Infrastructure
+
 - OPA policies in `policy/` for .qyaml governance
 - Network policies for namespace isolation
 - mTLS between services
 - RBAC with least-privilege
 
 ### CI/CD
+
 - All GitHub Actions pinned to SHA
 - Docker images from `ghcr.io/indestructibleorg/*`
 - Automated security scanning in CI pipeline
 
 ### Configuration
+
 - All secrets via environment variables (`ECO_*` prefix)
 - No hardcoded credentials
 - `.env.example` for reference (no real values)

@@ -180,6 +180,7 @@ python3 tools/ci-validator/validate_actions_policy.py --repo-root=/path/to/repo
 ### Dependencies
 
 The validators gracefully handle missing dependencies:
+
 - If PyYAML is not installed, the default policy is used
 - No external dependencies required for basic validation
 - Install PyYAML for custom policy files: `pip install pyyaml`
@@ -258,6 +259,7 @@ If you believe an exception to this policy is necessary:
 ## Support
 
 For questions or issues with this policy:
+
 - Check existing documentation
 - Review current workflow implementations
 - Open an issue with tag `github-actions-policy`

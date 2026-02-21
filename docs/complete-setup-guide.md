@@ -15,12 +15,14 @@ This guide provides complete instructions for deploying the IndestructibleEco in
 ## 📋 Prerequisites
 
 ### Required Tools
+
 - `kubectl` - Kubernetes command-line tool
 - `gcloud` - Google Cloud SDK
 - `git` - Version control
 - `bash` - Shell environment
 
 ### Required Access
+
 - GCP Project: `my-project-ops-1991`
 - GKE Cluster: `eco-staging` (asia-east1)
 - Supabase Project: `yrfxijooswpvdpdseswy`
@@ -31,6 +33,7 @@ This guide provides complete instructions for deploying the IndestructibleEco in
 ## 🔐 Token Manifest
 
 All tokens and credentials are documented in `TOKENS_MANIFEST.md`. This file contains:
+
 - GCP Service Account credentials
 - Supabase API keys and database credentials
 - Cloudflare SSL/TLS certificates
@@ -54,6 +57,7 @@ cd indestructibleeco
 ```
 
 This script will:
+
 1. Configure all secrets (GCP, Supabase, Cloudflare)
 2. Deploy monitoring stack (Prometheus, Grafana, Node Exporter)
 3. Verify all deployments
@@ -69,6 +73,7 @@ This script will:
 ```
 
 This will configure:
+
 - GCP Service Account secret
 - Supabase secrets (URL, keys, database connection)
 - Cloudflare origin certificate
@@ -82,6 +87,7 @@ This will configure:
 ```
 
 This will deploy:
+
 - Prometheus with Supabase configuration
 - Grafana with pre-configured dashboards
 - Node Exporter for Kubernetes metrics
@@ -246,24 +252,28 @@ curl https://yrfxijooswpvdpdseswy.supabase.co/customer/v1/privileged/metrics \
 ## 🔒 Security Best Practices
 
 ### 1. Secret Management
+
 - ✅ All secrets stored in Kubernetes secrets
 - ✅ Never commit secrets to version control
 - ✅ Use environment variables for sensitive data
 - ✅ Rotate keys regularly (every 90 days)
 
 ### 2. Access Control
+
 - ✅ GCP Service Account has Owner permissions
 - ✅ Supabase Service Role key has full access
 - ✅ Grafana has secure admin password
 - ✅ Cloudflare certificates for SSL/TLS
 
 ### 3. Network Security
+
 - ✅ All communications use HTTPS
 - ✅ Cloudflare proxy enabled
 - ✅ TLS certificates configured
 - ✅ Network policies enforced
 
 ### 4. Monitoring & Alerting
+
 - ✅ Prometheus scraping every 60 seconds
 - ✅ 20+ pre-configured alerts
 - ✅ Grafana dashboards for monitoring
@@ -381,6 +391,7 @@ Your infrastructure is successfully deployed when:
 ## 📞 Support
 
 For issues or questions:
+
 1. Check the troubleshooting section
 2. Review logs: `kubectl logs -n monitoring <pod-name>`
 3. Consult the documentation

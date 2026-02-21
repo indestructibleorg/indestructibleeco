@@ -9,11 +9,13 @@
 ## 🔐 GCP Service Account Token
 
 ### Service Account Details
+
 - **Email**: `eco-deployer@my-project-ops-1991.iam.gserviceaccount.com`
 - **Name**: IndestructibleEco Deployer
 - **Key ID**: `9cd63bf911e39bdccc09ba4109c488ac76eaf523`
 
 ### Permissions
+
 - ✅ Owner
 - ✅ Editor
 - ✅ Viewer
@@ -33,6 +35,7 @@
 - ✅ Service Account API Key Binding Admin
 
 ### Usage
+
 - GKE cluster authentication
 - GCP resource management
 - Deployment automation
@@ -42,6 +45,7 @@
 ## 🔑 Supabase Tokens
 
 ### Project Details
+
 - **Project Name**: indestructibleeco
 - **Project Reference**: `yrfxijooswpvdpdseswy`
 - **Project URL**: `https://yrfxijooswpvdpdseswy.supabase.co`
@@ -53,6 +57,7 @@
 ```
 sb_publishable_rhTyBa4IqqV14n_B87S7g_zKzDSYTd
 ```
+
 - **Usage**: Client-side applications
 - **Permissions**: Anonymous access (with RLS policies)
 - **Security**: Safe to use in browser
@@ -61,6 +66,7 @@ sb_publishable_rhTyBa4IqqV14n_B87S7g_zKzDSYTd
 ```
 sb_secret_YOUR_SERVICE_ROLE_KEY_HERE
 ```
+
 - **Usage**: Server-side applications
 - **Permissions**: Full access, bypasses RLS
 - **Security**: Never expose to client
@@ -69,12 +75,14 @@ sb_secret_YOUR_SERVICE_ROLE_KEY_HERE
 ```
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyZnhpam9vc3dwdmRwZHNlc3d5Iiwicm9s
 ```
+
 - **Usage**: Legacy authentication
 - **Status**: Migrated to new JWT keys
 
 ### JWT Configuration
 
 #### JWT Signing Keys
+
 - **JWT Key ID**: `d8cfd2f1-cb4d-4f15-925f-1cd9faadebfc`
 - **Access Token Expiry**: 3600 seconds (1 hour)
 
@@ -82,6 +90,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyZnhpam9
 ```
 YOUR_JWT_SECRET_HERE
 ```
+
 - **Usage**: JWT token verification
 - **Status**: Legacy, consider rotating
 
@@ -93,6 +102,7 @@ postgresql://postgres:YOUR_PASSWORD@db.yrfxijooswpvdpdseswy.supabase.co:5432/pos
 ```
 
 #### Connection Parameters
+
 - **Host**: `db.yrfxijooswpvdpdseswy.supabase.co`
 - **Port**: `5432`
 - **Database**: `postgres`
@@ -102,6 +112,7 @@ postgresql://postgres:YOUR_PASSWORD@db.yrfxijooswpvdpdseswy.supabase.co:5432/pos
 ### S3 Configuration
 
 #### S3 Protocol Connection
+
 - **Endpoint**: `https://yrfxijooswpvdpdseswy.storage.supabase.co/storage/v1/s3`
 - **Region**: `ap-south-1`
 - **Bucket**: `autoecoops_keys`
@@ -127,6 +138,7 @@ curl -L -X POST 'https://yrfxijooswpvdpdseswy.supabase.co/functions/v1/hello-wor
 ## 🌐 Cloudflare Tokens
 
 ### Custom Hostname
+
 - **Hostname**: `_cf-custom-hostname.autoecoops.io`
 - **Hostname ID**: `21c5d22a-4512-485b-9557-8aa9fa7c96ed`
 
@@ -300,6 +312,7 @@ export GRAFANA_ADMIN_PASSWORD="YOUR_SECURE_PASSWORD"
 ## 🔒 Security Notes
 
 ### Critical Security Practices
+
 1. **Never commit secrets to version control**
 2. **Rotate keys regularly** (every 90 days recommended)
 3. **Use environment variables** for all sensitive data
@@ -309,12 +322,14 @@ export GRAFANA_ADMIN_PASSWORD="YOUR_SECURE_PASSWORD"
 7. **Monitor access logs** for suspicious activity
 
 ### Key Rotation Schedule
+
 - **GCP Service Account Keys**: Every 90 days
 - **Supabase Service Role Keys**: Every 90 days
 - **Cloudflare Certificates**: Every 15 years (Origin Certs)
 - **JWT Secrets**: Every 6 months
 
 ### Access Control
+
 - **GCP Service Account**: Owner permissions (use with caution)
 - **Supabase Service Role**: Full database access (server-side only)
 - **Supabase Anon Key**: Client-side access (with RLS)
@@ -325,15 +340,18 @@ export GRAFANA_ADMIN_PASSWORD="YOUR_SECURE_PASSWORD"
 ## 📞 Emergency Contacts
 
 ### GCP Support
+
 - **Project**: my-project-ops-1991
 - **Service Account**: eco-deployer@my-project-ops-1991.iam.gserviceaccount.com
 
 ### Supabase Support
+
 - **Project**: indestructibleeco
 - **Reference**: yrfxijooswpvdpdseswy
 - **Dashboard**: https://supabase.com/dashboard/project/yrfxijooswpvdpdseswy
 
 ### Cloudflare Support
+
 - **Account**: indestructibleorg
 - **Custom Hostname**: _cf-custom-hostname.autoecoops.io
 

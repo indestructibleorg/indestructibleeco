@@ -5,6 +5,7 @@
 ### hello-world Function
 
 **Function Details:**
+
 - **Name**: hello-world
 - **Runtime**: Deno 2
 - **Entry Point**: supabase/functions/hello-world/index.ts
@@ -12,6 +13,7 @@
 - **URN**: urn:indestructibleeco:functions:hello-world:v1
 
 **Deployment Status:**
+
 - [x] Function code implemented
 - [x] Deno configuration created
 - [x] Deployment script created
@@ -83,33 +85,39 @@ The function uses the following environment variables (configured in Supabase da
 ## Security
 
 ### JWT Verification
+
 - JWT verification is enabled by default
 - For testing, use `--no-verify-jwt` flag
 - For production, ensure proper JWT configuration
 
 ### CORS
+
 - Configure allowed origins in Supabase dashboard
 - Default: All origins allowed for development
 
 ### Rate Limiting
+
 - Rate limiting is applied at the Supabase platform level
 - Configure limits in Supabase dashboard
 
 ## Troubleshooting
 
 ### Deployment Fails
+
 1. Verify SUPABASE_PROJECT_REF is correct
 2. Verify SUPABASE_ACCESS_TOKEN has proper permissions
 3. Check Supabase CLI version: `supabase --version`
 4. View detailed logs: `supabase functions deploy hello-world --debug`
 
 ### Function Not Responding
+
 1. Check function logs: `supabase functions logs hello-world`
 2. Verify function is deployed: `supabase functions list`
 3. Test with `--no-verify-jwt` to rule out JWT issues
 4. Check Supabase dashboard for function status
 
 ### CORS Errors
+
 1. Configure allowed origins in Supabase dashboard
 2. Verify CORS headers in function response
 3. Check browser console for specific CORS errors

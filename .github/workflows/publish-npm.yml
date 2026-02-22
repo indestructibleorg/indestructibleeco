@@ -13,20 +13,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      run: |
+        git clone --depth 1 https://github.com/${{ github.repository }}.git .
+        git fetch --depth=1 origin tag ${{ github.ref_name }}
+        git checkout ${{ github.ref_name }}
 
-    - name: Setup Node.js
-      uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e  # v4.3.0
-      with:
-        node-version: "20"
-        registry-url: "https://registry.npmjs.org"
+    - name: Setup Node.js 20 and npm registry
+      run: |
+        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+        sudo apt-get install -y nodejs
+        node --version
+        npm --version
+        echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     - name: Build and publish shared-types
       working-directory: packages/shared-types
       run: |
         npm install --legacy-peer-deps
         npm run build
-        # Skip if version already published
         PKG_NAME=$(node -p "require('./package.json').name")
         PKG_VER=$(node -p "require('./package.json').version")
         if npm view "${PKG_NAME}@${PKG_VER}" version 2>/dev/null; then
@@ -42,13 +48,18 @@ jobs:
     needs: publish-shared-types
     steps:
     - name: Checkout
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      run: |
+        git clone --depth 1 https://github.com/${{ github.repository }}.git .
+        git fetch --depth=1 origin tag ${{ github.ref_name }}
+        git checkout ${{ github.ref_name }}
 
-    - name: Setup Node.js
-      uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e  # v4.3.0
-      with:
-        node-version: "20"
-        registry-url: "https://registry.npmjs.org"
+    - name: Setup Node.js 20 and npm registry
+      run: |
+        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+        sudo apt-get install -y nodejs
+        echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     - name: Build and publish api-client
       working-directory: packages/api-client
@@ -70,13 +81,18 @@ jobs:
     needs: publish-shared-types
     steps:
     - name: Checkout
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      run: |
+        git clone --depth 1 https://github.com/${{ github.repository }}.git .
+        git fetch --depth=1 origin tag ${{ github.ref_name }}
+        git checkout ${{ github.ref_name }}
 
-    - name: Setup Node.js
-      uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e  # v4.3.0
-      with:
-        node-version: "20"
-        registry-url: "https://registry.npmjs.org"
+    - name: Setup Node.js 20 and npm registry
+      run: |
+        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+        sudo apt-get install -y nodejs
+        echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     - name: Build and publish ui-kit
       working-directory: packages/ui-kit

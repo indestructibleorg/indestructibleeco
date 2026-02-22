@@ -38,7 +38,6 @@ class SSDQuotaManager:
                         "metric": quota.metric,
                         "limit": quota.limit,
                         "usage": quota.usage,
-                        "unit": quota.unit,
                         "region": region,
                         "timestamp": datetime.now().isoformat()
                     }

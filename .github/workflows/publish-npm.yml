@@ -17,8 +17,16 @@ jobs:
         git clone --depth 1 https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git .
         git fetch --depth=1 origin tag ${{ github.ref_name }}
         git checkout ${{ github.ref_name }}
-        # Remove pnpm lockfile so npm does not try to resolve workspace:* protocol
+        # Remove lockfiles and strip workspaces field from root package.json
+        # so npm does not try to resolve workspace:* protocol across the monorepo
         rm -f pnpm-lock.yaml package-lock.json
+        node -e "
+          const fs = require('fs');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          delete pkg.workspaces;
+          delete pkg.packageManager;
+          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+        "
 
     - name: Setup Node.js 20 and npm registry
       run: |
@@ -56,6 +64,13 @@ jobs:
         git fetch --depth=1 origin tag ${{ github.ref_name }}
         git checkout ${{ github.ref_name }}
         rm -f pnpm-lock.yaml package-lock.json
+        node -e "
+          const fs = require('fs');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          delete pkg.workspaces;
+          delete pkg.packageManager;
+          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+        "
 
     - name: Setup Node.js 20 and npm registry
       run: |
@@ -91,6 +106,13 @@ jobs:
         git fetch --depth=1 origin tag ${{ github.ref_name }}
         git checkout ${{ github.ref_name }}
         rm -f pnpm-lock.yaml package-lock.json
+        node -e "
+          const fs = require('fs');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          delete pkg.workspaces;
+          delete pkg.packageManager;
+          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+        "
 
     - name: Setup Node.js 20 and npm registry
       run: |

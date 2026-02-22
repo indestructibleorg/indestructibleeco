@@ -4,25 +4,17 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy package.json and strip workspace:* dependencies that don't resolve in Docker
+# Copy package files
 COPY ./package.json ./
-RUN node -e " \
-  const pkg = JSON.parse(require('fs').readFileSync('package.json','utf8')); \
-  for (const section of ['dependencies','devDependencies','peerDependencies']) { \
-    if (pkg[section]) { \
-      for (const [k,v] of Object.entries(pkg[section])) { \
-        if (String(v).includes('workspace:')) delete pkg[section][k]; \
-      } \
-    } \
-  } \
-  pkg.scripts = pkg.scripts || {}; \
-  pkg.scripts.build = 'vite build'; \
-  require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2)); \
-" && npm install --legacy-peer-deps
+COPY ./vite.config.js ./
+
+# Install dependencies
+RUN npm install --legacy-peer-deps
 
 # Copy app source and build
 COPY ./app/ ./app/
-RUN cd app && npx vite build --outDir ../dist
+COPY ./index.html ./
+RUN npm run build
 
 FROM nginx:1.25-alpine AS production
 LABEL org.opencontainers.image.title="IndestructibleEco Web Frontend" \

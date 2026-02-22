@@ -44,6 +44,8 @@ python3 tools/ci-validator/validate.py
    git push origin feat/my-feature
    ```
 
+6. If you want Codacy Production bot AI context review directly in GitHub, add the `codacy-review` label to your PR.
+
 ## Code Conventions
 
 ### Python (backend/ai, src/)

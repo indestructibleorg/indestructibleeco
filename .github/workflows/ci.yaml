@@ -25,8 +25,14 @@ jobs:
     steps:
     - name: Checkout
       run: |
-        git clone --depth 1 https://github.com/${{ github.repository }}.git .
-        git checkout ${{ github.sha }}
+        git init .
+        git remote add origin https://github.com/${{ github.repository }}.git
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          git fetch --depth=1 origin ${{ github.event.pull_request.head.sha }}
+        else
+          git fetch --depth=1 origin ${{ github.sha }}
+        fi
+        git checkout FETCH_HEAD
 
     - name: Run CI Validator Engine
       id: validator
@@ -51,8 +57,14 @@ jobs:
     steps:
     - name: Checkout
       run: |
-        git clone --depth 1 https://github.com/${{ github.repository }}.git .
-        git checkout ${{ github.sha }}
+        git init .
+        git remote add origin https://github.com/${{ github.repository }}.git
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          git fetch --depth=1 origin ${{ github.event.pull_request.head.sha }}
+        else
+          git fetch --depth=1 origin ${{ github.sha }}
+        fi
+        git checkout FETCH_HEAD
 
     - name: Python compile check
       run: |
@@ -134,12 +146,18 @@ jobs:
     steps:
     - name: Checkout
       run: |
-        git clone --depth 1 https://github.com/${{ github.repository }}.git .
-        git checkout ${{ github.sha }}
+        git init .
+        git remote add origin https://github.com/${{ github.repository }}.git
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          git fetch --depth=1 origin ${{ github.event.pull_request.head.sha }}
+        else
+          git fetch --depth=1 origin ${{ github.sha }}
+        fi
+        git checkout FETCH_HEAD
 
     - name: Core module tests (schemas, auth, queue, registry, API)
       run: |
-        pip install pytest pytest-asyncio pydantic fastapi httpx numpy pyyaml -q 2>/dev/null
+        pip install pytest pytest-asyncio pydantic fastapi httpx numpy pyyaml -q
         PYTHONPATH=. python3 -m pytest tests/ -v --tb=short
         echo "Core + E2E tests passed"
 
@@ -227,8 +245,14 @@ jobs:
     steps:
     - name: Checkout
       run: |
-        git clone --depth 1 https://github.com/${{ github.repository }}.git .
-        git checkout ${{ github.sha }}
+        git init .
+        git remote add origin https://github.com/${{ github.repository }}.git
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          git fetch --depth=1 origin ${{ github.event.pull_request.head.sha }}
+        else
+          git fetch --depth=1 origin ${{ github.sha }}
+        fi
+        git checkout FETCH_HEAD
 
     - name: Build AI Docker image
       run: |
@@ -349,8 +373,14 @@ jobs:
     steps:
     - name: Checkout
       run: |
-        git clone --depth 1 https://github.com/${{ github.repository }}.git .
-        git checkout ${{ github.sha }}
+        git init .
+        git remote add origin https://github.com/${{ github.repository }}.git
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          git fetch --depth=1 origin ${{ github.event.pull_request.head.sha }}
+        else
+          git fetch --depth=1 origin ${{ github.sha }}
+        fi
+        git checkout FETCH_HEAD
 
     - name: Run Auto-Fix Engine (diagnostic mode)
       run: |

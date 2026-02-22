@@ -426,8 +426,10 @@ class GrpcServer:
     async def start(self) -> None:
         """Start the gRPC server.
 
-        Attempts to use grpcio-based server. Falls back to a lightweight
-        asyncio TCP listener if grpcio is not available (test/dev mode).
+        Requires grpcio to be installed. If grpcio is unavailable or startup
+        fails, the server remains inactive (``is_running`` returns ``False``).
+        Callers should check ``is_running`` after ``start()`` to determine
+        whether the gRPC server is accepting requests.
         """
         if self._running:
             return
@@ -455,16 +457,15 @@ class GrpcServer:
             )
 
         except ImportError:
-            self._running = True
-            logger.info(
-                "gRPC server started in lightweight mode on port %d (grpcio not available)",
+            logger.warning(
+                "grpcio not available — gRPC server NOT started on port %d; "
+                "install grpcio to enable gRPC support",
                 self._config.port,
             )
 
         except Exception as exc:
-            self._running = True
             logger.warning(
-                "gRPC server started in fallback mode (port %d bind failed: %s)",
+                "gRPC server failed to start on port %d: %s",
                 self._config.port,
                 exc,
             )

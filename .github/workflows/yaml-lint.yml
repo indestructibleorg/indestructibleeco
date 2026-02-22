@@ -13,8 +13,10 @@ jobs:
     steps:
       - name: Checkout
         run: |
-          git clone --depth 1 https://github.com/${{ github.repository }}.git .
-          git checkout ${{ github.sha }}
+          git init .
+          git remote add origin https://github.com/${{ github.repository }}.git
+          git fetch --depth 1 origin ${{ github.sha }}
+          git checkout FETCH_HEAD
 
       - name: Validate .qyaml governance blocks
         run: |

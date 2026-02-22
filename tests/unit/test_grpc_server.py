@@ -1,4 +1,5 @@
 """Unit tests for gRPC Inference Server."""
+import importlib.util
 import pytest
 import asyncio
 
@@ -12,6 +13,8 @@ from backend.ai.src.services.grpc_server import (
     HealthResponse,
     InferenceServicer,
 )
+
+_grpcio_available = importlib.util.find_spec("grpc") is not None
 
 
 @pytest.fixture
@@ -130,6 +133,7 @@ class TestInferenceServicer:
         assert metrics["uptime_seconds"] >= 0
 
 
+@pytest.mark.skipif(not _grpcio_available, reason="grpcio not installed")
 class TestGrpcServer:
     @pytest.mark.asyncio
     async def test_server_lifecycle(self, config):

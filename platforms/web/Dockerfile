@@ -41,7 +41,7 @@ RUN printf 'server {\n\
         add_header Content-Type application/json;\n\
     }\n\
 \n\
-    location /api/ {\n\
+    location /api {\n\
         proxy_pass http://eco-api-svc:3000;\n\
         proxy_set_header Host $host;\n\
         proxy_set_header X-Real-IP $remote_addr;\n\

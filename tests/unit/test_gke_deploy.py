@@ -204,9 +204,9 @@ class TestProductionManifests:
 
     def test_ingress_production_routing(self):
         content = _read("k8s/production/ingress.qyaml")
-        assert "/api" in content
-        assert "/v1" in content
         assert "eco-web-svc" in content
+        assert "eco-api-svc" in content
+        assert "api.autoecoops.io" in content
 
     def test_production_security_context(self):
         # All services should use non-root user for security

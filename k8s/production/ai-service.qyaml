@@ -36,6 +36,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: eco-config
+            - secretRef:
+                name: eco-secrets
           resources:
             requests:
               cpu: 500m

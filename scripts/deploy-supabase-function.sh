@@ -66,10 +66,9 @@ deploy_function() {
     
     cd "$function_dir"
     
-    # Deploy with no-verify-jwt for testing (remove for production)
+    # Deploy function with JWT verification enabled
     supabase functions deploy "$function_name" \
-        --project-ref "$SUPABASE_PROJECT_REF" \
-        --no-verify-jwt
+        --project-ref "$SUPABASE_PROJECT_REF"
     
     if [[ $? -eq 0 ]]; then
         log_info "Function deployed successfully"

@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 # Configuration
 NAMESPACE="monitoring"
 SUPABASE_PROJECT_REF="yrfxijooswpvdpdseswy"
-GRAFANA_PASSWORD="${GRAFANA_PASSWORD:-admin123}"
+GRAFANA_PASSWORD="${GRAFANA_PASSWORD:?Error: GRAFANA_PASSWORD must be set}"
 
 echo -e "${GREEN}=== Supabase Monitoring Setup ===${NC}"
 echo ""
@@ -111,6 +111,6 @@ echo ""
 echo -e "${YELLOW}Testing Supabase Metrics API:${NC}"
 echo "Run the following command to test the metrics endpoint:"
 echo ""
-echo "curl https://$SUPABASE_PROJECT_REF.supabase.co/customer/v1/privileged/metrics \&quot;
-echo "  --user 'service_role:$SUPABASE_SECRET_KEY'"
+echo "curl https://${SUPABASE_PROJECT_REF}.supabase.co/customer/v1/privileged/metrics \\"
+echo "  --user 'service_role:<YOUR_SUPABASE_SECRET_KEY>'"
 echo ""

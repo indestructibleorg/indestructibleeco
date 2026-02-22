@@ -160,11 +160,11 @@ def main():
     quota_manager = SSDQuotaManager(args.project_id)
     
     if args.action == 'check':
-        print(f"Checking SSD quota for {args.region}...")
+        print(f"Checking SSD quota for {args.region}...", file=sys.stderr if args.output_json else sys.stdout)
         quota = quota_manager.get_current_quota(args.region)
         
         if 'error' in quota:
-            print(f"Error: {quota['error']}")
+            print(f"Error: {quota['error']}", file=sys.stderr)
             sys.exit(1)
         
         if args.output_json:
@@ -177,14 +177,14 @@ def main():
             print(f"  Utilization: {(quota['usage'] / quota['limit']) * 100:.1f}%")
     
     elif args.action == 'request':
-        print(f"Requesting SSD quota increase for {args.region}...")
+        print(f"Requesting SSD quota increase for {args.region}...", file=sys.stderr if args.output_json else sys.stdout)
         
         if not args.current_limit or not args.requested_limit:
-            print("Error: --current-limit and --requested-limit are required")
+            print("Error: --current-limit and --requested-limit are required", file=sys.stderr)
             sys.exit(1)
         
         if not args.justification:
-            print("Error: --justification is required")
+            print("Error: --justification is required", file=sys.stderr)
             sys.exit(1)
         
         request = quota_manager.request_quota_increase(

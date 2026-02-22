@@ -79,6 +79,8 @@ This single command will:
 ### Step-by-Step Deployment
 
 #### Step 1: Configure Secrets
+
+
 ```bash
 ./scripts/configure_all_secrets.sh
 ```
@@ -114,7 +116,7 @@ kubectl get ingress -n monitoring
 - **Database**: db.yrfxijooswpvdpdseswy.supabase.co:5432
 
 ### GCP
-- **Console**: https://console.cloud.google.com/project/my-project-ops-1991
+- **Console**: <https://console.cloud.google.com/project/my-project-ops-1991>
 - **GKE**: https://console.cloud.google.com/kubernetes/list?project=my-project-ops-1991
 
 ---

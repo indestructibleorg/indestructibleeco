@@ -30,6 +30,7 @@ Every pipeline action validates the actor's JWT token against the Auth Service b
 
 ### RBAC Permission Checks
 Required permissions per phase:
+
 - `remediation:read` — Understand, Retrieve, Analyze, Reason
 - `remediation:write` — Consolidate, Integrate
 - `remediation:deploy` — Validate (production), Audit
@@ -54,6 +55,7 @@ POST /api/v1/search
 
 ### Document Ingestion
 After successful remediation, the pipeline ingests the fix details into Memory Hub for future retrieval:
+
 - Root cause description
 - Fix strategy and patch
 - Validation results
@@ -87,6 +89,7 @@ The pipeline publishes events at each phase transition:
 ```
 
 ### Subscribers
+
 - **Monitoring dashboards** — Real-time remediation status
 - **Notification services** — Alert on failure or policy violation
 - **Analytics pipeline** — Aggregate success rates and trends
@@ -111,6 +114,7 @@ POST /v1/data/remediation/allow
 
 ### Kyverno Policies
 For K8s-related fixes, Kyverno validates manifests before deployment:
+
 - Resource limits enforcement
 - Image registry restrictions
 - Label requirements
@@ -118,6 +122,7 @@ For K8s-related fixes, Kyverno validates manifests before deployment:
 
 ### Audit Write
 Every phase writes to the immutable audit log:
+
 - Actor, action, resource, result
 - Policy version and decision
 - Content hash and signature
@@ -127,12 +132,14 @@ Every phase writes to the immutable audit log:
 
 ### Drift Detection
 After deployment, Infra Manager monitors for configuration drift:
+
 - Compare deployed state vs. GitOps source
 - Alert on unauthorized changes
 - Auto-remediate if policy allows
 
 ### Rollback Triggers
 If post-deployment validation fails:
+
 1. Infra Manager detects SLO violation
 2. Triggers automatic rollback to last known good state
 3. Publishes `remediation.rollback` event
@@ -140,6 +147,7 @@ If post-deployment validation fails:
 
 ### GitOps Sync
 All fixes are committed to Git and synced via ArgoCD:
+
 - Declarative desired state in Git
 - Automated sync with drift detection
 - Multi-cluster support via ApplicationSets

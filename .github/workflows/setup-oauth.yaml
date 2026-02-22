@@ -29,21 +29,41 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        run: |
+          git clone --depth 1 https://github.com/${{ github.repository }}.git .
+          git checkout ${{ github.sha }}
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+      - name: Install Python 3.11
+        run: |
+          sudo add-apt-repository ppa:deadsnakes/ppa -y
+          sudo apt-get update -y
+          sudo apt-get install -y python3.11 python3.11-venv python3.11-pip
+          python3.11 --version
 
       - name: Install dependencies
         run: |
-          pip install google-cloud-secret-manager google-auth
+          python3.11 -m pip install google-cloud-secret-manager google-auth
 
-      - name: Authenticate with GCP
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: Install gcloud CLI and authenticate
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          CLUSTER_NAME: ${{ secrets.GKE_CLUSTER_NAME }}
+        run: |
+          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+          sudo apt-get update -y && sudo apt-get install -y google-cloud-cli google-cloud-cli-gke-gcloud-auth-plugin
+          echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
+          TMP_DIR="$(mktemp -d)"
+          chmod 700 "$TMP_DIR"
+          trap 'rm -rf "$TMP_DIR"' EXIT
+          KEY_FILE="$(mktemp "$TMP_DIR/gcp-sa-key-XXXXXX.json")"
+          echo "$GCP_SA_KEY" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          gcloud auth activate-service-account --key-file="$KEY_FILE"
+          gcloud config set project $GCP_PROJECT
+          gcloud container clusters get-credentials $CLUSTER_NAME --region $GCP_REGION --project $GCP_PROJECT
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> $GITHUB_ENV
+          echo "GCP_CREDENTIALS_DIR=$TMP_DIR" >> $GITHUB_ENV
 
       - name: Run OAuth setup script
         env:
@@ -52,15 +72,16 @@ jobs:
           ECO_OAUTH_CLIENT_ID: ${{ secrets.ECO_OAUTH_CLIENT_ID }}
           ECO_OAUTH_CLIENT_SECRET: ${{ secrets.ECO_OAUTH_CLIENT_SECRET }}
         run: |
-          python scripts/setup_gcp_oauth.py \
-            --environment $ENVIRONMENT \
-            --action $ACTION
+          python3.11 scripts/setup_gcp_oauth.py \
+            --environment "$ENVIRONMENT" \
+            --action "$ACTION"
 
       - name: Update K8s secrets
         if: github.event.inputs.action == 'update-secrets'
+        env:
+          ENVIRONMENT: ${{ github.event.inputs.environment }}
         run: |
-          kubectl config use-context ${{ secrets.GKE_CLUSTER_CONTEXT }}
-          kubectl apply -f k8s/${{ github.event.inputs.environment }}/oauth-config.qyaml
+          kubectl apply -f k8s/${ENVIRONMENT}/oauth-config.qyaml
 
       - name: Verify configuration
         if: github.event.inputs.action == 'verify-config'
@@ -70,5 +91,12 @@ jobs:
 
       - name: Notify on success
         if: success()
+        env:
+          ENVIRONMENT: ${{ github.event.inputs.environment }}
         run: |
-          echo "OAuth setup completed successfully for ${{ github.event.inputs.environment }}"
+          echo "OAuth setup completed successfully for $ENVIRONMENT"
+          echo "OAuth setup completed successfully for ${ENVIRONMENT}"
+
+      - name: Cleanup credentials
+        if: always()
+        run: if [ -n "${GCP_CREDENTIALS_DIR:-}" ]; then rm -rf "$GCP_CREDENTIALS_DIR"; fi

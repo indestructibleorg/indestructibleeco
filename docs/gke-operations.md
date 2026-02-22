@@ -10,6 +10,7 @@
 ## Current Staging Deployment
 
 ### Pods (6/6 Running)
+
 - `eco-ai-service` — AI inference service (nginx placeholder)
 - `eco-api-gateway` — API gateway (nginx placeholder)
 - `eco-api-service` — Express API (nginx placeholder)
@@ -19,15 +20,18 @@
 
 ### Resource Configuration (GKE Autopilot Optimized)
 All application pods use standardized resources:
+
 - **Requests**: 250m CPU, 512Mi memory, 256Mi ephemeral-storage
 - **Limits**: 500m CPU, 1Gi memory, 256Mi ephemeral-storage
 
 ### Endpoints
+
 - `http://staging.autoecoops.io` → Web frontend
 - `http://api-staging.autoecoops.io` → API gateway
 - SSL certificate: Provisioning via GKE ManagedCertificate
 
 ### Static IPs
+
 - Staging: `34.102.242.107` (global, `eco-staging-ip`)
 - Production: `34.107.200.53` (global, `eco-production-ip`)
 
@@ -94,15 +98,18 @@ Once the ManagedCertificate status is `Active`, re-enable Cloudflare proxy for p
 ## SSD Quota Management
 
 ### Current Usage
+
 - eco-staging: ~100 GB (1 Autopilot node boot disk)
 - PVCs: 15 GB (10Gi postgres + 5Gi redis, pd-standard — does NOT count against SSD quota)
 
 ### Quota Limits
+
 - SSD_TOTAL_GB: 250 GB in asia-east1
 - Each Autopilot node requires ~100 GB SSD boot disk
 - Maximum 2 clusters with 1 node each = 200 GB
 
 ### Recommendations
+
 1. Request SSD quota increase to 500 GB via GCP Console
 2. Consider using a different region with higher default quotas
 3. Monitor quota usage: `gcloud compute regions describe asia-east1 --format="json(quotas)"`
@@ -137,16 +144,19 @@ Once the ManagedCertificate status is `Active`, re-enable Cloudflare proxy for p
 ## Troubleshooting
 
 ### Pods Stuck in Pending
+
 1. Check node resources: `kubectl describe node <node-name> | grep -A 10 "Allocated"`
 2. Check SSD quota: `gcloud compute regions describe asia-east1 --format="json(quotas)" | grep SSD`
 3. Check pod events: `kubectl describe pod <pod-name> -n eco-staging`
 
 ### Health Check Failures (502)
+
 1. Verify health check path: `gcloud compute health-checks list`
 2. Update if needed: `gcloud compute health-checks update http <name> --request-path="/"`
 3. Wait 30-60 seconds for backends to become healthy
 
 ### ManagedCertificate FailedNotVisible
+
 1. Ensure Cloudflare proxy is disabled (DNS-only) for the domain
 2. Verify DNS resolves to GKE static IP: `dig +short <domain>`
 3. Delete and recreate the ManagedCertificate

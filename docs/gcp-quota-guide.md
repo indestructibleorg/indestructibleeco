@@ -7,10 +7,12 @@ This guide explains how to request and manage SSD quota increases for the Indest
 ## Current Situation
 
 ### Cluster Status
+
 - **eco-staging**: ✅ RUNNING (asia-east1)
 - **eco-production**: ❌ DELETED (SSD quota exceeded)
 
 ### Quota Details
+
 - **Region**: asia-east1
 - **Current Limit**: 250 GB
 - **Current Usage**: ~100 GB (staging cluster)
@@ -69,6 +71,7 @@ chmod +x scripts/setup-gcp-quota.sh
 ```
 
 The script will:
+
 - Check gcloud CLI installation
 - Verify GCP authentication
 - Display current quota status
@@ -136,6 +139,7 @@ Once quota is approved:
 ### Request Denied
 
 If request is denied:
+
 1. Review denial reason in GCP Console
 2. Contact GCP Support for clarification
 3. Consider alternative regions with higher quotas
@@ -143,6 +147,7 @@ If request is denied:
 ### Quota Not Updated
 
 If quota is approved but not reflected:
+
 1. Wait 15-30 minutes for propagation
 2. Clear gcloud cache: `gcloud auth application-default revoke`
 3. Re-authenticate: `gcloud auth login`
@@ -151,6 +156,7 @@ If quota is approved but not reflected:
 ### Insufficient Quota
 
 If 500 GB is still insufficient:
+
 1. Monitor actual usage: `gcloud compute disks list`
 2. Request additional quota
 3. Consider using regional persistent disks instead of SSD

@@ -68,6 +68,7 @@ I've successfully configured a comprehensive monitoring system for your Supabase
   - Provides access URLs and next steps
 
 #### Cloudflare Certificate Setup Script
+
 - **File**: `scripts/setup_cloudflare_certs.sh`
 - **Features**:
   - Interactive certificate setup

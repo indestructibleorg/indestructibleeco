@@ -284,6 +284,18 @@ jobs:
                   error_message = error_body
               raise RuntimeError(f"Failed to create issue: HTTP {exc.code} - {error_message}") from exc
           PY
+
+      - name: Create GitHub issue for tracking
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USAGE: ${{ steps.check-quota.outputs.usage }}
+          REGION: ${{ github.event.inputs.region }}
+          CURRENT_LIMIT: ${{ github.event.inputs.current_limit }}
+          REQUESTED_LIMIT: ${{ github.event.inputs.requested_limit }}
+          JUSTIFICATION: ${{ github.event.inputs.justification }}
+          CURRENT_USAGE: ${{ needs.check-current-quota.outputs.current_usage }}
+          REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           REQUEST_ID=$(jq -r '.request_id // "N/A"' quota_request.json)
           STATUS=$(jq -r '.status // "Submitted"' quota_request.json)

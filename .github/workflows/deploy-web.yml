@@ -39,7 +39,7 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           VITE_API_URL: https://api.autoecoops.io
           VITE_AI_URL: https://ai.autoecoops.io
-          VITE_APP_URL: https://autoecoops.io
+          VITE_APP_URL: https://eco-base.pages.dev
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65  # v3.14.0
@@ -47,4 +47,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           packageManager: npm
-          command: pages deploy platforms/web/dist --project-name=autoecoops --commit-dirty=true
+          command: pages deploy platforms/web/dist --project-name=eco-base --commit-dirty=true

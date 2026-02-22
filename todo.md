@@ -32,9 +32,10 @@
 ## Phase C: Application Deployment (In Progress)
 - [x] C1: Create Docker build workflow (.github/workflows/build-images.yaml)
 - [x] C2: Update Kubernetes manifests with GCP Artifact Registry image references
-- [x] C3: Start GKE cluster creation (eco-production in asia-east1)
-- [ ] C4: Build and push Docker images (web, api, ai, gateway) to Artifact Registry
-- [ ] C5: Complete GKE cluster creation and verify connectivity
-- [ ] C6: Deploy Kubernetes manifests to production cluster
-- [ ] C7: Configure ingress routing for autoecoops.io, api.autoecoops.io, ai.autoecoops.io
-- [ ] C8: Set up GKE managed SSL/TLS certificates
+- [x] C3: Start GKE cluster creation (eco-production, asia-east1, PROVISIONING)
+- [ ] C4: Wait for GKE cluster to reach RUNNING status (~5-10 minutes)
+- [ ] C5: Build and push Docker images (web, api, ai, gateway) to Artifact Registry
+- [ ] C6: Verify cluster connectivity and create namespace
+- [ ] C7: Deploy Kubernetes manifests to production cluster
+- [ ] C8: Configure ingress routing for autoecoops.io, api.autoecoops.io, ai.autoecoops.io
+- [ ] C9: Set up GKE managed SSL/TLS certificates

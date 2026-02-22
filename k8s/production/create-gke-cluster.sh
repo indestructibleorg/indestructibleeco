@@ -17,15 +17,16 @@ gcloud container clusters create ${CLUSTER_NAME} \
   --network=${NETWORK} \
   --subnetwork=${SUBNET} \
   --machine-type=e2-medium \
-  --num-nodes=1 \
-  --min-nodes=1 \
-  --max-nodes=3 \
+  --num-nodes=0 \
+  --min-nodes=0 \
+  --max-nodes=1 \
+  --disk-size=30 \
+  --disk-type=pd-standard \
   --enable-autoscaling \
   --enable-autorepair \
   --enable-autoupgrade \
   --enable-vertical-pod-autoscaling \
-  --enable-master-authorized-networks \
-  --master-authorized-networks=0.0.0.0/0 \
+  --enable-ip-alias \
   --monitoring=SYSTEM \
   --logging=SYSTEM,WORKLOAD \
   --tags=eco-production \

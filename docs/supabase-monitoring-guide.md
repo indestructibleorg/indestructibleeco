@@ -85,7 +85,7 @@ After deployment, access the services:
 
 - **Grafana**: https://grafana._cf-custom-hostname.autoecoops.io
   - Username: `admin`
-  - Password: (set during setup, default: `admin123`)
+  - Password: (set via `GRAFANA_PASSWORD` environment variable, no default)
 
 - **Prometheus**: https://prometheus._cf-custom-hostname.autoecoops.io
 

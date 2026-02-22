@@ -16,7 +16,7 @@ All configurations, secrets, and infrastructure have been successfully set up fo
 
 ### 1. GCP Service Account
 - ✅ Service Account: `eco-deployer@my-project-ops-1991.iam.gserviceaccount.com`
-- ✅ Key ID: `9cd63bf911e39bdccc09ba4109c488ac76eaf523`
+- ✅ Key ID: `YOUR_GCP_SA_KEY_ID`
 - ✅ Permissions: Owner, Editor, Viewer, and all necessary roles
 - ✅ Authentication file: `.gcp/eco-deployer-key.json`
 
@@ -108,7 +108,7 @@ kubectl get ingress -n monitoring
 - **Prometheus**: https://prometheus._cf-custom-hostname.autoecoops.io
 - **Grafana**: https://grafana._cf-custom-hostname.autoecoops.io
   - Username: `admin`
-  - Password: `IndestructibleEco2026!`
+  - Password: `YOUR_GRAFANA_ADMIN_PASSWORD`
 
 ### Supabase
 - **Dashboard**: https://supabase.com/dashboard/project/yrfxijooswpvdpdseswy

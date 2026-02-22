@@ -1,5 +1,5 @@
 name: Deploy Web
-# Deploys the web frontend to Cloudflare Pages on push to main.
+# Deploys the web frontend to Cloudflare Pages (eco-base → eco-base.pages.dev)
 # Requires: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID secrets
 on:
   push:
@@ -27,13 +27,15 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install dependencies
-        working-directory: platforms/web
-        run: npm install --no-workspaces
+      - name: Install pnpm
+        run: npm install -g pnpm@9
 
-      - name: Build
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build web
         working-directory: platforms/web
-        run: npm run build
+        run: pnpm run build
         env:
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
@@ -41,10 +43,12 @@ jobs:
           VITE_AI_URL: https://ai.autoecoops.io
           VITE_APP_URL: https://eco-base.pages.dev
 
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65  # v3.14.0
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          packageManager: npm
-          command: pages deploy platforms/web/dist --project-name=eco-base --commit-dirty=true
+      - name: Deploy to Cloudflare Pages (eco-base)
+        run: |
+          npx wrangler@3 pages deploy platforms/web/dist \
+            --project-name=eco-base \
+            --commit-dirty=true \
+            --branch=main
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

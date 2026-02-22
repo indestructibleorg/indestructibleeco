@@ -46,7 +46,7 @@ jobs:
 
       - name: Validate YAML syntax for all workflow files
         run: |
-          python3 -c "
+          python3 << 'PYEOF'
           import yaml, os, sys
           fail = False
           for root, dirs, files in os.walk('.github/workflows'):
@@ -55,9 +55,9 @@ jobs:
                 path = os.path.join(root, f)
                 try:
                   yaml.safe_load(open(path).read())
-                  print(f'OK: {path}')
+                  print('OK: ' + path)
                 except Exception as e:
-                  print(f'FAIL: {path} - {e}')
+                  print('FAIL: ' + path + ' - ' + str(e))
                   fail = True
           sys.exit(1 if fail else 0)
-          "
+          PYEOF

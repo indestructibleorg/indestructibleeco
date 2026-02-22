@@ -23,8 +23,11 @@ jobs:
 
       - name: Install Supabase CLI
         run: |
-          curl -fsSL https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz | tar -xz
-          sudo mv supabase /usr/local/bin/supabase
+          TMPDIR=$(mktemp -d)
+          curl -fsSL https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz \
+            | tar -xz -C "$TMPDIR"
+          sudo mv "$TMPDIR/supabase" /usr/local/bin/supabase
+          rm -rf "$TMPDIR"
           supabase --version
 
       - name: Extract project ref from URL
@@ -54,6 +57,4 @@ jobs:
 
       - name: Notify on failure
         if: failure()
-        run: |
-          echo "Supabase function deployment failed"
-          exit 1
+        run: echo "Supabase function deployment failed"

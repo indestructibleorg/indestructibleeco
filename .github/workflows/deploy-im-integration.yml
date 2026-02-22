@@ -1,6 +1,6 @@
 name: Deploy IM Integration
 # Deploys IM integration Cloudflare Workers on push to main.
-# Requires: CF_API_TOKEN secret
+# Requires: CLOUDFLARE_API_TOKEN secret
 on:
   push:
     branches: [main]
@@ -26,9 +26,20 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies (monorepo root)
+        run: pnpm install --frozen-lockfile --ignore-scripts || pnpm install --ignore-scripts
+
       - name: Deploy Cloudflare Workers
         uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65  # v3.14.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: backend/cloudflare
           command: deploy
+
+      - name: Notify on failure
+        if: failure()
+        run: echo "IM Integration deployment failed"

@@ -1,6 +1,6 @@
 name: Deploy Web
 # Deploys the web frontend to Cloudflare Pages on push to main.
-# Requires: CF_API_TOKEN, CF_ACCOUNT_ID secrets
+# Requires: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID secrets
 on:
   push:
     branches: [main]
@@ -35,12 +35,11 @@ jobs:
         working-directory: platforms/web
         run: npm run build
         env:
-          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
-          VITE_API_URL: ${{ vars.VITE_API_URL }}
-
-      - name: Install Wrangler globally
-        run: npm install -g wrangler@3 --no-workspaces
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          VITE_API_URL: https://api.autoecoops.io
+          VITE_AI_URL: https://ai.autoecoops.io
+          VITE_APP_URL: https://autoecoops.io
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65  # v3.14.0
@@ -48,4 +47,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           packageManager: npm
-          command: pages deploy platforms/web/dist --project-name=eco-base-web --commit-dirty=true
+          command: pages deploy platforms/web/dist --project-name=autoecoops --commit-dirty=true

@@ -10,9 +10,10 @@ jobs:
     steps:
       - name: Verify eco-base Pages project
         run: |
-          RESULT=$(curl -s \
+          curl -s \
             -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
-            "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/pages/projects/eco-base")
+            "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/pages/projects/eco-base" \
+            -o /tmp/cf_result.json
           python3 << 'PY'
           import json, sys
           with open('/tmp/cf_result.json') as f:
@@ -27,8 +28,7 @@ jobs:
               print('ERROR:', d.get('errors'))
               sys.exit(1)
           PY
-        env:
-          CF_RESULT: ${{ env.RESULT }}
+
 
       - name: List recent deployments
         run: |

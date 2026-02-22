@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 # Configuration
 NAMESPACE="monitoring"
 SUPABASE_PROJECT_REF="yrfxijooswpvdpdseswy"
-GRAFANA_PASSWORD="${GRAFANA_PASSWORD:-admin123}"
+GRAFANA_PASSWORD="${GRAFANA_PASSWORD:?Error: GRAFANA_PASSWORD must be set}"
 
 echo -e "${GREEN}=== Supabase Monitoring Setup ===${NC}"
 echo ""

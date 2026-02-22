@@ -31,9 +31,9 @@ spec:
       serviceAccountName: eco-sa
       terminationGracePeriodSeconds: 15
       securityContext:
-        runAsNonRoot: false
-        runAsUser: 0
-        fsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 101
+        fsGroup: 101
       containers:
         - name: eco-web
           image: ghcr.io/indestructibleorg/web:latest

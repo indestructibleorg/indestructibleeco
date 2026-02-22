@@ -66,16 +66,6 @@ jobs:
           gcloud auth activate-service-account --key-file="$KEY_FILE"
           gcloud config set project "$GCP_PROJECT"
           gcloud container clusters get-credentials "eco-$TARGET_ENVIRONMENT" --region "$GCP_REGION" --project "$GCP_PROJECT"
-      - name: Authenticate to GCP and get GKE credentials
-        env:
-          ENVIRONMENT: ${{ github.event.inputs.environment }}
-        run: |
-          echo '${{ secrets.GCP_SA_KEY }}' > /tmp/gcp-sa-key.json
-          chmod 600 /tmp/gcp-sa-key.json
-          gcloud auth activate-service-account --key-file=/tmp/gcp-sa-key.json
-          gcloud config set project $GCP_PROJECT
-          gcloud container clusters get-credentials eco-${ENVIRONMENT} --region $GCP_REGION --project $GCP_PROJECT
-          rm -f /tmp/gcp-sa-key.json
 
       - name: Create monitoring namespace
         run: |

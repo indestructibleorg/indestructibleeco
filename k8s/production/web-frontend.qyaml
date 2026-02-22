@@ -24,9 +24,9 @@ spec:
     spec:
       serviceAccountName: eco-sa
       securityContext:
-        runAsNonRoot: false
-        runAsUser: 0
-        fsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 101
+        fsGroup: 101
       containers:
         - name: eco-web-frontend
           image: ghcr.io/indestructibleorg/web:latest

@@ -70,14 +70,14 @@ echo ""
 
 echo -e "${GREEN}Step 4: Configuring Prometheus Secrets${NC}"
 kubectl create secret generic prometheus-secrets \
-  --from-literal=SUPABASE_SECRET_KEY="${SUPABASE_SERVICE_ROLE_KEY:-sb_secret_31vU-HAOwfR81zlaDWa_hQ_EHmtoqS8}" \
+  --from-literal=SUPABASE_SECRET_KEY="${SUPABASE_SERVICE_ROLE_KEY:?Error: SUPABASE_SERVICE_ROLE_KEY must be set}" \
   --namespace=$MONITORING_NAMESPACE \
   --dry-run=client -o yaml | kubectl apply -f -
 echo -e "${GREEN}✓ Prometheus secrets configured${NC}"
 echo ""
 
 echo -e "${GREEN}Step 5: Configuring Grafana Secrets${NC}"
-GRAFANA_PASSWORD="${GRAFANA_PASSWORD:-IndestructibleEco2026!}"
+GRAFANA_PASSWORD="${GRAFANA_PASSWORD:?Error: GRAFANA_PASSWORD must be set}"
 kubectl create secret generic grafana-secrets \
   --from-literal=admin-user="admin" \
   --from-literal=admin-password="$GRAFANA_PASSWORD" \

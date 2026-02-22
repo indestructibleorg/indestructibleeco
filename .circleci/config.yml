@@ -5,6 +5,12 @@
 version: 2.1
 
 jobs:
+  runner-test:
+    machine: true
+    resource_class: indestructibleorg/indestructibleeco
+    steps:
+      - run: echo "Hi I'm on Runners!"
+
   validate:
     docker:
       - image: cimg/python:3.11-node
@@ -144,6 +150,7 @@ jobs:
 workflows:
   indestructibleeco-ci:
     jobs:
+      - runner-test
       - validate
       - lint:
           requires: [validate]

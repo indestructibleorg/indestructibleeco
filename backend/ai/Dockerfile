@@ -23,4 +23,6 @@ RUN mkdir -p /app/src/core && \
     touch /app/src/core/__init__.py
 
 EXPOSE 8000 8001
+RUN addgroup --system --gid 1001 eco && adduser --system --uid 1001 --ingroup eco eco
+USER eco
 CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8001"]

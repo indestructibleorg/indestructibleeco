@@ -228,6 +228,7 @@ Produce a `Deployment` resource. Rules:
   - `port: 80`, `targetPort: {module.ports[0] or 80}`
 
 Also produce a companion `ConfigMap` for the governance block:
+
 - `kind: ConfigMap`
 - `name: "{module.name}-governance"`
 - `namespace`: same as Deployment

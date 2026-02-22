@@ -40,7 +40,6 @@ indestructibleeco/
 │   │   ├── models/               # Shared data models
 │   │   └── utils/                # Shared utilities
 │   ├── cloudflare/               # Edge webhook router
-│   ├── supabase/                 # Database migrations
 │   └── k8s/                      # Backend K8s manifests
 ├── packages/
 │   ├── shared-types/             # TypeScript shared types (entities + API)
@@ -55,6 +54,7 @@ indestructibleeco/
 │   ├── tracing/                  # Distributed tracing
 │   ├── logging/                  # Centralized logging
 │   └── service-discovery/        # Service mesh
+├── supabase/                     # Shared Supabase migrations + RLS policies
 ├── k8s/                          # Platform K8s manifests + Argo CD
 ├── helm/                         # Helm chart (12 templates)
 ├── tools/
@@ -67,6 +67,27 @@ indestructibleeco/
 ```
 
 ## Development Workflow
+
+### External Platform Onboarding (安全導入原則)
+
+Current repository structure does **not** support silently or forcibly registering an external platform by illegal/implicit operations. New platform integration must be explicit and reviewable in Git:
+
+1. Add platform code under a clear ownership path (usually `platforms/<platform-name>/`).
+2. Add dependency/mapping/reference changes explicitly (API routes, manifests, env/config, CI paths).
+3. Pass repository validation (`npm run validate`) and related tests before merge.
+
+This keeps imports auditable and prevents hidden cross-platform coupling.
+
+### Platform Pollution Isolation
+
+If an imported external platform is chaotic/polluted, handle it with a **policy-enforced quarantine flow**, not unreviewed force operations (such as bypassing PR review, force-pushing direct rewrites, or bulk cross-tree edits without scoped ownership):
+
+1. Place incoming platform code in an isolated path (for example `platforms/my-new-platform/` only).
+2. Block cross-tree coupling until validation passes (no direct edits outside approved paths).
+3. Run `npm run validate` plus related tests, then fix mappings/dependencies/references in explicit commits.
+4. Merge only when structure and governance checks are clean and review-approved.
+
+This gives you an enforced cleanup result through CI policy gates and code review, while remaining legal, auditable, and reversible.
 
 ### 1. Branch Strategy
 

@@ -283,13 +283,16 @@ class EngineHealthMonitor:
                         break
 
             elif not has_available and model.status == ModelStatus.READY:
-                for eng in list(model.loaded_on_engines):
-                    try:
-                        await self._model_registry.update_status(
-                            model.model_id, ModelStatus.REGISTERED, None
-                        )
-                    except (KeyError, ValueError):
-                        pass
+                try:
+                    await self._model_registry.update_status(
+                        model.model_id, ModelStatus.REGISTERED, None
+                    )
+                except (KeyError, ValueError) as exc:
+                    logger.debug(
+                        "HealthMonitor: failed to downgrade model %s to REGISTERED during registry sync: %r",
+                        model.model_id,
+                        exc,
+                    )
 
         self.total_registry_syncs += 1
         self.last_sync_time = time.time()

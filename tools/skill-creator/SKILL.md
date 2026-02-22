@@ -32,6 +32,7 @@ skills/<skill-name>/
 ## Reference documents
 
 See `references/` for canonical examples and schema documentation:
+
 - `workflows.md` — Sequential, conditional, parallel, and self-healing workflow patterns
 - `output-patterns.md` — Structured report, error taxonomy, governance stamp patterns
 - `progressive-disclosure-patterns.md` — Content splitting strategies for skills

@@ -1,5 +1,5 @@
 -- IndestructibleEco v1.0 — Row Level Security Policies
--- URI: indestructibleeco://backend/supabase/rls
+-- URI: indestructibleeco://supabase/rls
 -- All tables enforce RLS — no access without policy match.
 -- Tables: users, platforms, ai_jobs, yaml_documents, service_registry, governance_records
 

@@ -66,7 +66,6 @@ indestructibleeco/
 |   |   +-- src/                  # server, routes, services, middleware, ws
 |   +-- shared/                   # DB client, gRPC stubs, models, utils
 |   +-- cloudflare/               # Edge webhook router (KV rate limiting)
-|   +-- supabase/                 # Database migrations
 |   +-- k8s/                      # Backend K8s manifests
 +-- packages/
 |   +-- shared-types/             # TypeScript shared types
@@ -81,6 +80,7 @@ indestructibleeco/
 |   +-- tracing/                  # Distributed tracing (Jaeger/Tempo)
 |   +-- logging/                  # Centralized logging (Loki)
 |   +-- service-discovery/        # Service mesh (Consul)
++-- supabase/                     # Shared Supabase migrations + RLS policies
 +-- k8s/                          # Platform K8s manifests + Argo CD
 +-- helm/                         # Helm chart (12 templates)
 +-- tools/
@@ -92,6 +92,12 @@ indestructibleeco/
 |                                 # Env Reference, .qyaml Governance, Argo CD, Auto-Repair
 +-- tests/                        # 500 tests (unit, integration, e2e)
 ```
+
+### Infrastructure placement guidance
+
+- Keep **shared infrastructure** at repository root (`supabase/`, `k8s/`, `helm/`) so CI/integration tooling has one canonical path.
+- Keep **service-owned infrastructure** near the service code (`backend/cloudflare/`, `backend/k8s/`) until that service is split into a standalone platform.
+- If a platform becomes independently extractable, move its infra to `platforms/<platform>/...` instead of creating more `backend/*` shared paths.
 
 ## Inference Engines
 

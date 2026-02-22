@@ -252,16 +252,19 @@ The 5-gate CI pipeline runs on every push to `main` and `develop`, and on all pu
 ### Gate Details
 
 **Gate 1: validate**
+
 - CI Validator Engine with 8 validators
 - .qyaml governance validation
 
 **Gate 2: lint**
+
 - Python `py_compile` on all `.py` files (including all services, engines, tests)
 - JavaScript syntax check
 - YAML governance validation
 - Skill validation
 
 **Gate 3: test**
+
 - 448 tests total:
   - Unit tests: `tests/unit/` (30+ test files)
   - Integration tests: `tests/integration/`
@@ -269,11 +272,13 @@ The 5-gate CI pipeline runs on every push to `main` and `develop`, and on all pu
   - Skill tests: `tools/skill-creator/skills/`
 
 **Gate 4: build**
+
 - Docker image build
 - Repository structure verification (42+ directories, 24+ files)
 - New test file presence verification
 
 **Gate 5: auto-fix**
+
 - Runs only on failure
 - Executes `tools/ci-validator/auto-fix.py` in diagnostic mode
 - Reports findings but does not auto-commit

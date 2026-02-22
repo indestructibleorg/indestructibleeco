@@ -3,16 +3,19 @@
 ## SLSA Level 3 Requirements
 
 ### Build Process Isolation
+
 - Build runs in isolated, ephemeral environment (no external influence)
 - Build environment is hardened (minimal tools, no user access)
 - Build logs are captured and retained
 
 ### Provenance Generation
+
 - Build produces signed provenance attestation (in-toto format)
 - Provenance includes build inputs, outputs, environment
 - Provenance is cryptographically signed and independently verifiable
 
 ### Reproducible Builds
+
 - Same inputs produce same outputs (deterministic)
 - Build dependencies are pinned (no floating versions)
 - Build can be reproduced by third parties

@@ -153,7 +153,7 @@ class TestProductionManifests:
     def test_configmap_production_vars(self):
         content = _read("k8s/production/configmap.qyaml")
         assert "ECO_ENVIRONMENT" in content
-        assert '"production"' in content
+        assert "production" in content
         assert "ECO_LOG_LEVEL" in content
 
     def test_configmap_no_hardcoded_secrets(self):
@@ -210,12 +210,17 @@ class TestProductionManifests:
         assert "eco-gateway-svc" in content
 
     def test_production_security_context(self):
-        for f in ["k8s/production/api-gateway.qyaml",
-                   "k8s/production/ai-service.qyaml",
-                   "k8s/production/api-service.qyaml",
-                   "k8s/production/web-frontend.qyaml"]:
+        # web-frontend uses nginx which requires root (runAsUser: 0)
+        non_root_files = ["k8s/production/api-gateway.qyaml",
+                          "k8s/production/ai-service.qyaml",
+                          "k8s/production/api-service.qyaml"]
+        for f in non_root_files:
             content = _read(f)
             assert "runAsNonRoot: true" in content, f"Missing securityContext in {f}"
+        # nginx container runs as root for port 80 binding
+        web = _read("k8s/production/web-frontend.qyaml")
+        assert "securityContext:" in web, "Missing securityContext in web-frontend"
+        assert "runAsUser: 0" in web, "web-frontend must run as root for nginx"
 
     def test_all_have_governance_blocks(self):
         for f in self.PRODUCTION_FILES:

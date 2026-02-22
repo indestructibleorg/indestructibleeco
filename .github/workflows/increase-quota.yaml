@@ -27,10 +27,6 @@ permissions:
 env:
   GCP_PROJECT: my-project-ops-1991
 
-permissions:
-  contents: read
-  issues: write
-
 jobs:
   manage-quota:
     name: Check and Request Quota Increase

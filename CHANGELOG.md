@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 
 #### Core Platform
+
 - Root gateway (FastAPI) with `ServiceProxy` forwarding to AI and API backends
 - Multi-engine inference routing across 7 backends (vLLM, TGI, Ollama, SGLang, TensorRT-LLM, DeepSpeed, LMDeploy)
 - OpenAI-compatible endpoints (`/v1/chat/completions`, `/v1/completions`, `/v1/embeddings`, `/v1/models`)
@@ -19,6 +20,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - API key + JWT authentication middleware with RBAC (admin/developer/viewer)
 
 #### AI Service (`backend/ai/`)
+
 - FastAPI application with lifespan-managed services
 - 7 inference engine adapters with unified `BaseInferenceAdapter` interface
 - `EngineManager` with automatic failover and health-based routing
@@ -35,6 +37,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - External dependency configs for FAISS, Elasticsearch, Neo4j
 
 #### API Gateway (`backend/api/`)
+
 - Express + TypeScript server with Socket.IO WebSocket
 - Supabase client with typed CRUD for users, platforms, AI jobs, governance records
 - AI proxy service with per-endpoint timeouts and exponential backoff retry
@@ -47,11 +50,13 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - OpenAPI 3.0.3 specification (723 lines, 12 reusable schemas)
 
 #### Edge & Messaging
+
 - Cloudflare Worker webhook router with KV rate limiting, request deduplication, HMAC verification
 - 4 IM channel adapters (WhatsApp, Telegram, LINE, Messenger) with signature verification
 - Shared normalizer/router with Redis retry and ephemeral session fallback
 
 #### Frontend (`platforms/web/`)
+
 - React + Vite application with 6 pages (Dashboard, Login, AIPlayground, Models, Platforms, Settings)
 - YAMLStudio page for .qyaml editing
 - Auth store, AI store, platform store (Zustand)
@@ -60,11 +65,13 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - WebSocket client with exponential backoff reconnect and heartbeat
 
 #### Packages
+
 - `@indestructibleeco/shared-types` v1.0.0 -- TypeScript type definitions (user, platform, AI, requests, responses)
 - `@indestructibleeco/api-client` v1.0.0 -- Typed HTTP client with retry, interceptors, WebSocket
 - `@indestructibleeco/ui-kit` v1.0.0 -- React components (Modal, Dropdown, Table, Toast)
 
 #### Infrastructure
+
 - Kubernetes .qyaml manifests with governance blocks (24 files)
 - Helm chart with 12 templates (Deployment, Service, Ingress, HPA, PDB, ConfigMap, Secrets, ServiceAccount, NetworkPolicy, ServiceMonitor, NOTES.txt)
 - Argo CD ApplicationSet for multi-environment (staging auto-sync, production manual)
@@ -73,6 +80,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Supabase migrations (initial schema + alignment migration)
 
 #### Observability
+
 - Grafana dashboard with 9 panels for AI service metrics
 - 16 Prometheus alert rules in 4 groups (availability, latency, saturation, governance)
 - Distributed tracing configuration (Jaeger/Tempo)
@@ -80,6 +88,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Service discovery (Consul)
 
 #### CI/CD
+
 - 5-gate CI pipeline (validate, lint, test, build, auto-fix)
 - CI Validator Engine with 8 validators
 - Auto-fix engine with dry-run diagnostic mode
@@ -87,6 +96,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - YAML governance lint with strict block/field validation
 
 #### Security
+
 - Trivy vulnerability scanning configuration
 - CycloneDX SBOM (sbom.json)
 - OPA governance policies (Dockerfile, .qyaml)
@@ -94,11 +104,13 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Network policies for namespace isolation
 
 #### Tooling
+
 - YAML Toolkit v8 with generate, validate, lint, convert commands
 - Skill creator with scaffolding and 70 skill tests
 - CI validator with 8 validation checks
 
 #### Documentation
+
 - API Reference (1003 lines) with request/response examples
 - Architecture guide (315 lines) with 6-layer breakdown
 - Deployment guide (434 lines) covering local, Docker, K8s, Helm, Argo CD
@@ -108,6 +120,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - CONTRIBUTING.md, SECURITY.md, LICENSE (Apache-2.0)
 
 #### Testing
+
 - 500 tests across unit, integration, and E2E suites
 - Test coverage for all core modules, services, engines, adapters
 - E2E service lifecycle tests (59 tests)

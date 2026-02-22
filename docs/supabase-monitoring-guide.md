@@ -64,6 +64,7 @@ cd repo
 ```
 
 The scripts will:
+
 - Create the monitoring namespace
 - Deploy Prometheus with Supabase configuration
 - Deploy Grafana with pre-configured dashboards
@@ -74,6 +75,7 @@ The scripts will:
 ### 4. Configure Cloudflare DNS
 
 Create CNAME records in Cloudflare:
+
 - `prometheus._cf-custom-hostname.autoecoops.io` → `<INGRESS_IP>`
 - `grafana._cf-custom-hostname.autoecoops.io` → `<INGRESS_IP>`
 
@@ -162,6 +164,7 @@ kubectl patch ingress grafana-ingress -n monitoring -p '{
 ### Cloudflare Domain Configuration
 
 The monitoring stack uses Cloudflare custom hostname:
+
 - **Base Domain**: `_cf-custom-hostname.autoecoops.io`
 - **Prometheus**: `prometheus._cf-custom-hostname.autoecoops.io`
 - **Grafana**: `grafana._cf-custom-hostname.autoecoops.io`
@@ -519,6 +522,7 @@ kubectl exec -n monitoring deployment/grafana -- \
 ## Support
 
 For issues or questions:
+
 - Check the troubleshooting section
 - Review Prometheus and Grafana logs
 - Consult the official documentation

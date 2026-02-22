@@ -7,11 +7,13 @@ This guide explains how to secure GKE clusters by removing insecure `0.0.0.0/0` 
 ## Current Security Status
 
 ### eco-staging Cluster
+
 - **Master Authorized Networks**: ⚠️ 0.0.0.0/0 (INSECURE)
 - **Risk**: Allows access from any IP address
 - **Priority**: HIGH
 
 ### eco-production Cluster
+
 - **Status**: Not yet created
 - **Action**: Configure secure networks during creation
 
@@ -20,12 +22,14 @@ This guide explains how to secure GKE clusters by removing insecure `0.0.0.0/0` 
 ### 0.0.0.0/0 in Authorized Networks
 
 **Risks:**
+
 - Allows unauthorized access to Kubernetes API server
 - Exposes cluster to brute-force attacks
 - Violates zero-trust security principles
 - Non-compliant with security best practices
 
 **Impact:**
+
 - Unauthorized cluster management
 - Potential data exfiltration
 - Service disruption
@@ -82,6 +86,7 @@ chmod +x scripts/harden-gke-security.sh
 ```
 
 The script will:
+
 - Check current authorized networks
 - Add your current IP to authorized networks
 - Remove 0.0.0.0/0 from authorized networks
@@ -94,16 +99,19 @@ The script will:
 Add the following IPs to authorized networks:
 
 **Administrator IPs:**
+
 - Your office IP
 - Your home IP
 - VPN gateway IP
 
 **CI/CD IPs:**
+
 - GitHub Actions IPs (dynamic)
 - Cloud Build IPs
 - Other CI/CD system IPs
 
 **Service IPs:**
+
 - Monitoring systems
 - Logging systems
 - Backup systems
@@ -113,14 +121,17 @@ Add the following IPs to authorized networks:
 GitHub Actions uses dynamic IPs. Use one of these approaches:
 
 **Option 1: Use GitHub-hosted runners with private network**
+
 - Configure GitHub Actions to use self-hosted runners
 - Add self-hosted runner IPs to authorized networks
 
 **Option 2: Use Cloud NAT**
+
 - Configure Cloud NAT for GKE nodes
 - Allow GitHub Actions through Cloud NAT
 
 **Option 3: Use IAP (Identity-Aware Proxy)**
+
 - Configure IAP for GKE
 - Use OAuth for authentication instead of IP restrictions
 
@@ -171,6 +182,7 @@ gcloud alpha monitoring policies create \
 ### Alert on Unauthorized Access
 
 Configure alerts for:
+
 - Failed authentication attempts
 - Access from unauthorized IPs
 - Unusual API server activity
@@ -180,6 +192,7 @@ Configure alerts for:
 ### Cannot Access Cluster After Hardening
 
 If you cannot access the cluster:
+
 1. Verify your IP is in authorized networks
 2. Check if you're using VPN
 3. Try accessing from a different network
@@ -188,6 +201,7 @@ If you cannot access the cluster:
 ### CI/CD Failures
 
 If CI/CD fails after hardening:
+
 1. Add CI/CD system IPs to authorized networks
 2. Use self-hosted runners
 3. Configure Cloud NAT
@@ -196,6 +210,7 @@ If CI/CD fails after hardening:
 ### Multiple Administrators
 
 For multiple administrators:
+
 1. Collect all administrator IPs
 2. Add all IPs to authorized networks
 3. Use VPN for consistent IP

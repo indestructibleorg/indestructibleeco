@@ -1,5 +1,5 @@
 -- IndestructibleEco v1.0 — Schema Alignment Migration
--- URI: indestructibleeco://backend/supabase/migrations/002
+-- URI: indestructibleeco://supabase/migrations/002
 -- Aligns DB schema with packages/shared-types entities (Step 6 → Step 7)
 
 -- ─── Users: add metadata + last_sign_in_at ─────────────────────────────────

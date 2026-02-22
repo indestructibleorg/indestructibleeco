@@ -426,8 +426,10 @@ class GrpcServer:
     async def start(self) -> None:
         """Start the gRPC server.
 
-        Attempts to use grpcio-based server. Falls back to a lightweight
-        asyncio TCP listener if grpcio is not available (test/dev mode).
+        Requires grpcio to be installed. If grpcio is unavailable or startup
+        fails, the server remains inactive (``is_running`` returns ``False``).
+        Callers should check ``is_running`` after ``start()`` to determine
+        whether the gRPC server is accepting requests.
         """
         if self._running:
             return

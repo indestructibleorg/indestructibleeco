@@ -10,21 +10,37 @@ jobs:
     steps:
       - name: Verify eco-base Pages project
         run: |
-          RESULT=$(curl -s             -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}"             "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/pages/projects/eco-base")
-          SUCCESS=$(echo "$RESULT" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get("success", False))")
-          NAME=$(echo "$RESULT" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get("result",{}).get("name","N/A"))")
-          SUBDOMAIN=$(echo "$RESULT" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get("result",{}).get("subdomain","N/A"))")
-          echo "Project: $NAME"
-          echo "Subdomain: $SUBDOMAIN"
-          if [ "$SUCCESS" != "True" ]; then echo "ERROR: project not found"; exit 1; fi
-          echo "Status: OK"
+          RESULT=$(curl -s \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/pages/projects/eco-base")
+          python3 << 'PY'
+          import json, sys
+          with open('/tmp/cf_result.json') as f:
+              d = json.load(f)
+          if d.get('success'):
+              p = d['result']
+              print('Project:  ', p.get('name'))
+              print('Subdomain:', p.get('subdomain'))
+              print('Branch:   ', p.get('production_branch'))
+              print('Status:    OK')
+          else:
+              print('ERROR:', d.get('errors'))
+              sys.exit(1)
+          PY
+        env:
+          CF_RESULT: ${{ env.RESULT }}
 
       - name: List recent deployments
         run: |
-          curl -s             -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}"             "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/pages/projects/eco-base/deployments?per_page=3"             | python3 -c "
-          import json, sys
-          d = json.load(sys.stdin)
-          for dep in d.get("result", []):
-              status = dep.get("latest_stage", {}).get("status", "unknown")
-              print(f"  {status:10} {dep.get(\"url\")} ({dep.get(\"created_on\",\"\")[:10]})")
-          "
+          curl -s \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/pages/projects/eco-base/deployments?per_page=3" \
+            -o /tmp/deployments.json
+          python3 << 'PY'
+          import json
+          with open('/tmp/deployments.json') as f:
+              d = json.load(f)
+          for dep in d.get('result', []):
+              status = dep.get('latest_stage', {}).get('status', 'unknown')
+              print(f"  {status:10} {dep.get('url')} ({dep.get('created_on','')[:10]})")
+          PY

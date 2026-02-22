@@ -85,6 +85,7 @@ jobs:
           docker build -t ${{ env.REGISTRY }}/web:${{ github.sha }} \
                        -t ${{ env.REGISTRY }}/web:${{ env.VERSION }} \
                        -t ${{ env.REGISTRY }}/web:latest \
+                       -f platforms/web/Dockerfile \
                        platforms/web/
           docker push ${{ env.REGISTRY }}/web:${{ github.sha }}
           docker push ${{ env.REGISTRY }}/web:${{ env.VERSION }}

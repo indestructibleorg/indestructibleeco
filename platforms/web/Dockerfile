@@ -5,7 +5,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copy package.json and strip workspace:* dependencies that don't resolve in Docker
-COPY package.json ./
+COPY ./package.json ./
 RUN node -e " \
   const pkg = JSON.parse(require('fs').readFileSync('package.json','utf8')); \
   for (const section of ['dependencies','devDependencies','peerDependencies']) { \
@@ -21,7 +21,7 @@ RUN node -e " \
 " && npm install --legacy-peer-deps
 
 # Copy app source and build
-COPY app/ ./app/
+COPY ./app/ ./app/
 RUN cd app && npx vite build --outDir ../dist
 
 FROM nginx:1.25-alpine AS production

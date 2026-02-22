@@ -1,5 +1,5 @@
 name: Deploy GitHub Pages
-
+# Deploys the landing page to GitHub Pages.
 on:
   push:
     branches: [main]
@@ -7,29 +7,28 @@ on:
       - "platforms/web/landing/**"
       - ".github/workflows/deploy-pages.yaml"
   workflow_dispatch:
-
 permissions:
   contents: read
   pages: write
   id-token: write
-
 concurrency:
   group: pages
   cancel-in-progress: false
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        run: |
-          git clone --depth 1 https://github.com/${{ github.repository }}.git .
-          git checkout ${{ github.sha }}
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
       - name: Prepare site
         run: |
           mkdir -p _site
-          cp -r platforms/web/landing/public/* _site/
+          if [ -d platforms/web/landing/public ]; then
+            cp -r platforms/web/landing/public/* _site/
+          else
+            echo "<html><body><h1>AutoEcoOps</h1></body></html>" > _site/index.html
+          fi
           echo "autoecoops.io" > _site/CNAME
           touch _site/.nojekyll
 

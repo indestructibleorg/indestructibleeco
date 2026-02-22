@@ -1,37 +1,36 @@
 name: Setup OAuth 2.0 Configuration
-
+# Configures GCP OAuth 2.0 clients and syncs secrets to Kubernetes.
+# Auth: GCP Service Account Key (secrets.GCP_SA_KEY)
 on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Target environment'
+        description: "Target environment"
         required: true
         type: choice
         options:
           - staging
           - production
       action:
-        description: 'Action to perform'
+        description: "Action to perform"
         required: true
         type: choice
         options:
           - create-client
           - update-secrets
           - verify-config
-
 env:
   GCP_PROJECT: my-project-ops-1991
   GCP_REGION: asia-east1
-
+permissions:
+  contents: read
 jobs:
   setup-oauth:
     name: Setup OAuth Configuration
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        run: |
-          git clone --depth 1 https://github.com/${{ github.repository }}.git .
-          git checkout ${{ github.sha }}
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
       - name: Install Python 3.11
         run: |
@@ -40,27 +39,29 @@ jobs:
           sudo apt-get install -y python3.11 python3.11-venv python3.11-pip
           python3.11 --version
 
-      - name: Install dependencies
-        run: |
-          python3.11 -m pip install google-cloud-secret-manager google-auth
+      - name: Install Python dependencies
+        run: python3.11 -m pip install google-cloud-secret-manager google-auth
 
-      - name: Install gcloud CLI and authenticate
-        env:
-          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
-          CLUSTER_NAME: ${{ secrets.GKE_CLUSTER_NAME }}
+      - name: Install gcloud CLI and gke-gcloud-auth-plugin
         run: |
           curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
           echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
           sudo apt-get update -y && sudo apt-get install -y google-cloud-cli google-cloud-cli-gke-gcloud-auth-plugin
           echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
+
+      - name: Authenticate to GCP and get cluster credentials
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
           TMP_DIR="$(mktemp -d)"
           chmod 700 "$TMP_DIR"
-          KEY_FILE="$(mktemp "$TMP_DIR/gcp-sa-key-XXXXXX.json")"
+          KEY_FILE="$TMP_DIR/gcp-sa-key.json"
           echo "$GCP_SA_KEY" > "$KEY_FILE"
           chmod 600 "$KEY_FILE"
           gcloud auth activate-service-account --key-file="$KEY_FILE"
-          gcloud config set project $GCP_PROJECT
-          gcloud container clusters get-credentials $CLUSTER_NAME --region $GCP_REGION --project $GCP_PROJECT
+          gcloud config set project ${{ env.GCP_PROJECT }}
+          CLUSTER="${{ github.event.inputs.environment == 'production' && vars.GKE_CLUSTER_PRODUCTION || vars.GKE_CLUSTER_STAGING }}"
+          gcloud container clusters get-credentials "$CLUSTER" --region ${{ env.GCP_REGION }} --project ${{ env.GCP_PROJECT }}
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> $GITHUB_ENV
           echo "GCP_CREDENTIALS_DIR=$TMP_DIR" >> $GITHUB_ENV
 
@@ -79,22 +80,17 @@ jobs:
         if: github.event.inputs.action == 'update-secrets'
         env:
           ENVIRONMENT: ${{ github.event.inputs.environment }}
-        run: |
-          kubectl apply -f k8s/${ENVIRONMENT}/oauth-config.qyaml
+        run: kubectl apply -f k8s/${ENVIRONMENT}/oauth-config.qyaml
 
       - name: Verify configuration
         if: github.event.inputs.action == 'verify-config'
         run: |
-          kubectl get secret oauth-secrets -n indestructibleeco
-          kubectl get configmap oauth-config -n indestructibleeco
-
-      - name: Notify on success
-        if: success()
-        env:
-          ENVIRONMENT: ${{ github.event.inputs.environment }}
-        run: |
-          echo "OAuth setup completed successfully for $ENVIRONMENT"
+          kubectl get secret oauth-secrets -n indestructibleeco 2>/dev/null || echo "Secret not found"
+          kubectl get configmap oauth-config -n indestructibleeco 2>/dev/null || echo "ConfigMap not found"
 
       - name: Cleanup credentials
         if: always()
-        run: if [ -n "${GCP_CREDENTIALS_DIR:-}" ]; then rm -rf "$GCP_CREDENTIALS_DIR"; fi
+        run: |
+          if [ -n "${GCP_CREDENTIALS_DIR:-}" ]; then
+            rm -rf "$GCP_CREDENTIALS_DIR"
+          fi

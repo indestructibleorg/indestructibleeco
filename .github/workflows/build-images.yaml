@@ -1,5 +1,7 @@
 name: Build and Push Docker Images to GCP Artifact Registry
-
+# Builds and pushes Docker images to GCP Artifact Registry (asia-east1).
+# Triggered manually via workflow_dispatch only.
+# Auth: GCP Service Account Key (secrets.GCP_SA_KEY)
 on:
   workflow_dispatch:
     inputs:
@@ -31,7 +33,6 @@ env:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   validate-input:
@@ -44,11 +45,11 @@ jobs:
         run: |
           SERVICE="${{ github.event.inputs.service }}"
           case "$SERVICE" in
-            web) echo "services=web" >> $GITHUB_OUTPUT ;;
-            api) echo "services=api" >> $GITHUB_OUTPUT ;;
-            ai) echo "services=ai" >> $GITHUB_OUTPUT ;;
-            gateway) echo "services=gateway" >> $GITHUB_OUTPUT ;;
-            all) echo "services=web,api,ai,gateway" >> $GITHUB_OUTPUT ;;
+            web)     echo "services=web"                    >> $GITHUB_OUTPUT ;;
+            api)     echo "services=api"                    >> $GITHUB_OUTPUT ;;
+            ai)      echo "services=ai"                     >> $GITHUB_OUTPUT ;;
+            gateway) echo "services=gateway"                >> $GITHUB_OUTPUT ;;
+            all)     echo "services=web,api,ai,gateway"     >> $GITHUB_OUTPUT ;;
           esac
 
   build-web:
@@ -61,25 +62,26 @@ jobs:
           git clone --depth 1 https://github.com/${{ github.repository }}.git .
           git checkout ${{ github.sha }}
 
+      - name: Install gcloud CLI
+        run: |
+          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+          sudo apt-get update -y && sudo apt-get install -y google-cloud-cli
+          echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
+
       - name: Authenticate to GCP
-        id: auth
-        uses: google-github-actions/auth@v2
-        with:
-          token_format: access_token
-          workload_identity_provider: projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/eco-pool/providers/eco-provider
-          service_account: eco-deploy-sa@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
-
-      - name: Setup Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ env.PROJECT_ID }}
-
-      - name: Configure Docker
-        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          TMP_KEY=$(mktemp)
+          echo "$GCP_SA_KEY" > "$TMP_KEY"
+          gcloud auth activate-service-account --key-file="$TMP_KEY"
+          gcloud config set project ${{ env.PROJECT_ID }}
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+          rm -f "$TMP_KEY"
 
       - name: Build and push Web image
         run: |
-          echo "${{ steps.auth.outputs.access_token }}" | docker login https://${{ env.REGION }}-docker.pkg.dev -u oauth2accesstoken --password-stdin
           docker build -t ${{ env.REGISTRY }}/web:${{ github.sha }} \
                        -t ${{ env.REGISTRY }}/web:${{ env.VERSION }} \
                        -t ${{ env.REGISTRY }}/web:latest \
@@ -98,30 +100,26 @@ jobs:
           git clone --depth 1 https://github.com/${{ github.repository }}.git .
           git checkout ${{ github.sha }}
 
-      - name: Authenticate to GCP
-        id: auth
-        uses: google-github-actions/auth@v2
-        with:
-          token_format: access_token
-          workload_identity_provider: projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/eco-pool/providers/eco-provider
-          service_account: eco-deploy-sa@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
-
-      - name: Setup Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ env.PROJECT_ID }}
-
-      - name: Configure Docker
-        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
-
-      - name: Create stub backend/api directory
+      - name: Install gcloud CLI
         run: |
-          mkdir -p backend/api/src
-          printf '%s\n' 'from fastapi import FastAPI' 'app = FastAPI(title="Eco API Service")' '@app.get("/health")' 'def health():' '    return {"status": "healthy"}' > backend/api/src/main.py
+          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+          sudo apt-get update -y && sudo apt-get install -y google-cloud-cli
+          echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
+
+      - name: Authenticate to GCP
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          TMP_KEY=$(mktemp)
+          echo "$GCP_SA_KEY" > "$TMP_KEY"
+          gcloud auth activate-service-account --key-file="$TMP_KEY"
+          gcloud config set project ${{ env.PROJECT_ID }}
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+          rm -f "$TMP_KEY"
 
       - name: Build and push API image
         run: |
-          echo "${{ steps.auth.outputs.access_token }}" | docker login https://${{ env.REGION }}-docker.pkg.dev -u oauth2accesstoken --password-stdin
           docker build -t ${{ env.REGISTRY }}/api:${{ github.sha }} \
                        -t ${{ env.REGISTRY }}/api:${{ env.VERSION }} \
                        -t ${{ env.REGISTRY }}/api:latest \
@@ -140,25 +138,26 @@ jobs:
           git clone --depth 1 https://github.com/${{ github.repository }}.git .
           git checkout ${{ github.sha }}
 
+      - name: Install gcloud CLI
+        run: |
+          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+          sudo apt-get update -y && sudo apt-get install -y google-cloud-cli
+          echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
+
       - name: Authenticate to GCP
-        id: auth
-        uses: google-github-actions/auth@v2
-        with:
-          token_format: access_token
-          workload_identity_provider: projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/eco-pool/providers/eco-provider
-          service_account: eco-deploy-sa@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
-
-      - name: Setup Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ env.PROJECT_ID }}
-
-      - name: Configure Docker
-        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          TMP_KEY=$(mktemp)
+          echo "$GCP_SA_KEY" > "$TMP_KEY"
+          gcloud auth activate-service-account --key-file="$TMP_KEY"
+          gcloud config set project ${{ env.PROJECT_ID }}
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+          rm -f "$TMP_KEY"
 
       - name: Build and push AI image
         run: |
-          echo "${{ steps.auth.outputs.access_token }}" | docker login https://${{ env.REGION }}-docker.pkg.dev -u oauth2accesstoken --password-stdin
           docker build -t ${{ env.REGISTRY }}/ai:${{ github.sha }} \
                        -t ${{ env.REGISTRY }}/ai:${{ env.VERSION }} \
                        -t ${{ env.REGISTRY }}/ai:latest \
@@ -177,25 +176,26 @@ jobs:
           git clone --depth 1 https://github.com/${{ github.repository }}.git .
           git checkout ${{ github.sha }}
 
+      - name: Install gcloud CLI
+        run: |
+          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+          sudo apt-get update -y && sudo apt-get install -y google-cloud-cli
+          echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
+
       - name: Authenticate to GCP
-        id: auth
-        uses: google-github-actions/auth@v2
-        with:
-          token_format: access_token
-          workload_identity_provider: projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/eco-pool/providers/eco-provider
-          service_account: eco-deploy-sa@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
-
-      - name: Setup Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ env.PROJECT_ID }}
-
-      - name: Configure Docker
-        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          TMP_KEY=$(mktemp)
+          echo "$GCP_SA_KEY" > "$TMP_KEY"
+          gcloud auth activate-service-account --key-file="$TMP_KEY"
+          gcloud config set project ${{ env.PROJECT_ID }}
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+          rm -f "$TMP_KEY"
 
       - name: Build and push Gateway image
         run: |
-          echo "${{ steps.auth.outputs.access_token }}" | docker login https://${{ env.REGION }}-docker.pkg.dev -u oauth2accesstoken --password-stdin
           docker build -t ${{ env.REGISTRY }}/gateway:${{ github.sha }} \
                        -t ${{ env.REGISTRY }}/gateway:${{ env.VERSION }} \
                        -t ${{ env.REGISTRY }}/gateway:latest \

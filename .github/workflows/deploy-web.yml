@@ -1,22 +1,49 @@
 name: Deploy Web
-
+# Deploys the web frontend to Cloudflare Pages on push to main.
+# Requires: CF_API_TOKEN, CF_ACCOUNT_ID secrets
 on:
   push:
     branches: [main]
     paths:
       - "platforms/web/**"
       - "packages/**"
-
+      - ".github/workflows/deploy-web.yml"
+  workflow_dispatch:
+concurrency:
+  group: deploy-web-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+  deployments: write
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        run: |
-          git clone --depth 1 https://github.com/${{ github.repository }}.git .
-          git checkout ${{ github.sha }}
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
-      - name: Validate
-        run: |
-          echo "Web deployment — configure Cloudflare Pages credentials in secrets"
-          echo "Deploy target: platforms/web/app/dist"
+      - name: Setup Node.js
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e  # v4.3.0
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: platforms/web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: platforms/web
+        run: npm ci --legacy-peer-deps
+
+      - name: Build
+        working-directory: platforms/web
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65  # v3.14.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy platforms/web/dist --project-name=indestructibleeco --commit-dirty=true

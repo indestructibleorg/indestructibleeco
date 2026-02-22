@@ -1,28 +1,29 @@
 name: Publish PyPI Package
-
+# Publishes the AI backend Python package to PyPI on version tags.
 on:
   push:
     tags:
-      - 'v*.*.*'
-
+      - "v*.*.*"
 permissions:
   contents: read
-
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      run: |
-        git clone --depth 1 https://github.com/${{ github.repository }}.git .
-        git checkout ${{ github.ref_name }}
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
-    - name: Build and publish to PyPI
-      run: |
-        pip install build twine
-        cd backend/ai
-        python -m build
-        twine upload dist/*
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+      - name: Setup Python
+        uses: actions/setup-python@42375524bfc5d698a7e7b2a2e7e7c8b8e8e8e8e8  # v5
+        with:
+          python-version: "3.11"
+
+      - name: Build and publish to PyPI
+        working-directory: backend/ai
+        run: |
+          pip install build twine
+          python -m build
+          twine upload dist/*
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}

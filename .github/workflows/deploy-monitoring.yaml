@@ -78,7 +78,7 @@ jobs:
       - name: Deploy Prometheus
         if: github.event.inputs.deploy_prometheus == 'true'
         env:
-          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           # Create secret with Supabase credentials
           kubectl create secret generic prometheus-secrets \
@@ -124,7 +124,7 @@ jobs:
 
       - name: Test Supabase metrics endpoint
         env:
-          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           echo "=== Testing Supabase Metrics API ==="
           curl -s https://yrfxijooswpvdpdseswy.supabase.co/customer/v1/privileged/metrics \

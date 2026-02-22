@@ -1,22 +1,25 @@
 name: YAML Governance Lint
-
+# Validates .qyaml governance blocks and checks for %YAML directives.
 on:
+  push:
+    branches: [main]
+    paths:
+      - "**/*.qyaml"
+      - "**/*.yaml"
+      - "**/*.yml"
   pull_request:
     paths:
       - "**/*.qyaml"
       - "**/*.yaml"
       - "**/*.yml"
-
+permissions:
+  contents: read
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        run: |
-          git init .
-          git remote add origin https://github.com/${{ github.repository }}.git
-          git fetch --depth 1 origin ${{ github.sha }}
-          git checkout FETCH_HEAD
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
       - name: Validate .qyaml governance blocks
         run: |
@@ -40,3 +43,21 @@ jobs:
             exit 1
           fi
           echo "No %YAML directives found"
+
+      - name: Validate YAML syntax for all workflow files
+        run: |
+          python3 -c "
+          import yaml, os, sys
+          fail = False
+          for root, dirs, files in os.walk('.github/workflows'):
+            for f in files:
+              if f.endswith(('.yaml', '.yml')):
+                path = os.path.join(root, f)
+                try:
+                  yaml.safe_load(open(path).read())
+                  print(f'OK: {path}')
+                except Exception as e:
+                  print(f'FAIL: {path} - {e}')
+                  fail = True
+          sys.exit(1 if fail else 0)
+          "

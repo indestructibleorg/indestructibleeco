@@ -171,7 +171,7 @@ kubectl create secret generic prometheus-secrets \
 ```bash
 kubectl create secret generic grafana-secrets \
   --from-literal=admin-user="admin" \
-  --from-literal=admin-password="IndestructibleEco2026!" \
+  --from-literal=admin-password="YOUR_GRAFANA_ADMIN_PASSWORD" \
   --namespace=monitoring
 ```
 
@@ -184,7 +184,7 @@ kubectl create secret generic grafana-secrets \
 - **Prometheus**: https://prometheus._cf-custom-hostname.autoecoops.io
 - **Grafana**: https://grafana._cf-custom-hostname.autoecoops.io
   - Username: `admin`
-  - Password: `IndestructibleEco2026!`
+  - Password: `YOUR_GRAFANA_ADMIN_PASSWORD`
 
 ### Supabase
 
@@ -296,9 +296,9 @@ export GCP_SA_EMAIL="eco-deployer@my-project-ops-1991.iam.gserviceaccount.com"
 ### Supabase Environment Variables
 ```bash
 export SUPABASE_URL="https://yrfxijooswpvdpdseswy.supabase.co"
-export SUPABASE_ANON_KEY="sb_publishable_rhTyBa4IqqV14n_B87S7g_zKzDSYTd"
+export SUPABASE_ANON_KEY="YOUR_SUPABASE_PUBLISHABLE_KEY"
 export SUPABASE_SERVICE_ROLE_KEY="sb_secret_YOUR_SERVICE_ROLE_KEY"
-export SUPABASE_DB_URL="postgresql://postgres:Wei412011$@db.yrfxijooswpvdpdseswy.supabase.co:5432/postgres"
+export SUPABASE_DB_URL="postgresql://postgres:YOUR_PASSWORD@db.yrfxijooswpvdpdseswy.supabase.co:5432/postgres"
 export SUPABASE_PROJECT_REF="yrfxijooswpvdpdseswy"
 ```
 

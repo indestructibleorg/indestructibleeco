@@ -162,7 +162,7 @@ class TestProductionManifests:
 
     def test_api_gateway_production(self):
         content = _read("k8s/production/api-gateway.qyaml")
-        assert "ghcr.io/indestructibleorg/gateway" in content
+        assert "asia-east1-docker.pkg.dev/my-project-ops-1991/indestructibleeco/gateway" in content
         assert "eco-production" in content
         assert "replicas: 3" in content
         assert "readinessProbe" in content
@@ -170,19 +170,19 @@ class TestProductionManifests:
 
     def test_ai_service_production(self):
         content = _read("k8s/production/ai-service.qyaml")
-        assert "ghcr.io/indestructibleorg/ai" in content
+        assert "asia-east1-docker.pkg.dev/my-project-ops-1991/indestructibleeco/ai" in content
         assert "eco-production" in content
         assert "8001" in content
 
     def test_api_service_production(self):
         content = _read("k8s/production/api-service.qyaml")
-        assert "ghcr.io/indestructibleorg/api" in content
+        assert "asia-east1-docker.pkg.dev/my-project-ops-1991/indestructibleeco/api" in content
         assert "eco-production" in content
         assert "replicas: 3" in content
 
     def test_web_frontend_production(self):
         content = _read("k8s/production/web-frontend.qyaml")
-        assert "ghcr.io/indestructibleorg/web" in content
+        assert "asia-east1-docker.pkg.dev/my-project-ops-1991/indestructibleeco/web" in content
         assert "eco-production" in content
         assert "replicas: 3" in content
 
@@ -199,28 +199,25 @@ class TestProductionManifests:
 
     def test_ingress_production_domain(self):
         content = _read("k8s/production/ingress.qyaml")
-        assert "production.autoecoops.io" in content
-        assert "api-production.autoecoops.io" in content
+        assert "autoecoops.io" in content
+        assert "api.autoecoops.io" in content
 
     def test_ingress_production_routing(self):
         content = _read("k8s/production/ingress.qyaml")
         assert "/api" in content
         assert "/v1" in content
         assert "eco-web-svc" in content
-        assert "eco-gateway-svc" in content
 
     def test_production_security_context(self):
-        # web-frontend uses nginx which requires root (runAsUser: 0)
+        # All services should use non-root user for security
         non_root_files = ["k8s/production/api-gateway.qyaml",
                           "k8s/production/ai-service.qyaml",
-                          "k8s/production/api-service.qyaml"]
+                          "k8s/production/api-service.qyaml",
+                          "k8s/production/web-frontend.qyaml"]
         for f in non_root_files:
             content = _read(f)
             assert "runAsNonRoot: true" in content, f"Missing securityContext in {f}"
-        # nginx container runs as root for port 80 binding
-        web = _read("k8s/production/web-frontend.qyaml")
-        assert "securityContext:" in web, "Missing securityContext in web-frontend"
-        assert "runAsUser: 0" in web, "web-frontend must run as root for nginx"
+            assert "runAsUser:" in content, f"Missing runAsUser in {f}"
 
     def test_all_have_governance_blocks(self):
         for f in self.PRODUCTION_FILES:

@@ -117,13 +117,7 @@ jobs:
       - name: Create stub backend/api directory
         run: |
           mkdir -p backend/api/src
-          cat > backend/api/src/main.py << 'PYTHON_EOF'
-from fastapi import FastAPI
-app = FastAPI(title="Eco API Service")
-@app.get("/health")
-def health():
-    return {"status": "healthy"}
-PYTHON_EOF
+          printf '%s\n' 'from fastapi import FastAPI' 'app = FastAPI(title="Eco API Service")' '@app.get("/health")' 'def health():' '    return {"status": "healthy"}' > backend/api/src/main.py
 
       - name: Build and push API image
         run: |

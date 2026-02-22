@@ -462,9 +462,8 @@ class GrpcServer:
             )
 
         except Exception as exc:
-            self._running = True
             logger.warning(
-                "gRPC server started in fallback mode (port %d bind failed: %s)",
+                "gRPC server failed to start on port %d: %s",
                 self._config.port,
                 exc,
             )

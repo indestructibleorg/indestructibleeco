@@ -145,7 +145,7 @@ production_secret = {
         'ECO_REDIS_PASSWORD': '',
         'ECO_JWT_SECRET': 'INJECT_FROM_K8S_SECRET',
         'ECO_SUPABASE_URL': 'https://bqyghtwaitlfxysmoext.supabase.co',
-        'ECO_SUPABASE_ANON_KEY': 'sb_publishable_RVYrVe_Kqy4nGjcyyFdEbw_mnG1mraC',
+        'ECO_SUPABASE_ANON_KEY': 'INJECT_FROM_K8S_SECRET',
         'ECO_SUPABASE_SERVICE_ROLE_KEY': 'INJECT_FROM_K8S_SECRET',
         'HF_TOKEN': '',
         'DATABASE_URL': 'INJECT_FROM_K8S_SECRET'

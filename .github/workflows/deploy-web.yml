@@ -27,13 +27,15 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install dependencies
-        working-directory: platforms/web
-        run: npm ci --legacy-peer-deps
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies (monorepo root)
+        run: pnpm install --frozen-lockfile --ignore-scripts || pnpm install --ignore-scripts
 
       - name: Build
         working-directory: platforms/web
-        run: npm run build
+        run: pnpm run build
         env:
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}

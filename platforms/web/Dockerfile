@@ -40,7 +40,7 @@ RUN printf 'server {\n\
     }\n\
 \n\
     location /api {\n\
-        proxy_pass http://eco-api-svc:3000;\n\
+        proxy_pass http://eco-api-svc.eco-staging.svc.cluster.local:3000;\n\
         proxy_set_header Host $host;\n\
         proxy_set_header X-Real-IP $remote_addr;\n\
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n\
@@ -48,7 +48,7 @@ RUN printf 'server {\n\
     }\n\
 \n\
     location /ws {\n\
-        proxy_pass http://eco-api-svc:3000;\n\
+        proxy_pass http://eco-api-svc.eco-staging.svc.cluster.local:3000;\n\
         proxy_http_version 1.1;\n\
         proxy_set_header Upgrade $http_upgrade;\n\
         proxy_set_header Connection "upgrade";\n\

@@ -1,11 +1,13 @@
 """Unit tests for EngineHealthMonitor."""
 import pytest
 import asyncio
+from unittest.mock import AsyncMock, Mock
 
 from backend.ai.src.services.health_monitor import (
     EngineHealthMonitor,
     HealthMonitorConfig,
 )
+from src.schemas.models import ModelStatus, ModelInfo
 
 
 @pytest.fixture
@@ -192,3 +194,213 @@ class TestEngineHealthMonitor:
 
         assert mon.total_probes >= 1
         await mon.stop()
+
+
+class TestSyncRegistry:
+    """Tests for EngineHealthMonitor._sync_registry method."""
+
+    @pytest.mark.asyncio
+    async def test_downgrade_ready_to_registered_no_engines(self, config):
+        """Test READY->REGISTERED downgrade when no engines are available."""
+        # Create mock registry
+        mock_registry = Mock()
+        mock_model = ModelInfo(
+            model_id="test-model",
+            compatible_engines=["vllm", "tgi"],
+            status=ModelStatus.READY,
+        )
+        mock_registry.list_models = AsyncMock(return_value=[mock_model])
+        mock_registry.update_status = AsyncMock()
+
+        # Create mock engine manager with NO available engines
+        mock_engine_mgr = Mock()
+        mock_engine_mgr.list_available_engines = Mock(return_value=[])
+
+        # Create monitor with mocked dependencies
+        mon = EngineHealthMonitor(
+            config=config,
+            engine_manager=mock_engine_mgr,
+            model_registry=mock_registry,
+        )
+
+        # Call _sync_registry
+        await mon._sync_registry()
+
+        # Assert update_status was called exactly once with correct parameters
+        mock_registry.update_status.assert_called_once_with(
+            "test-model", ModelStatus.REGISTERED, None
+        )
+        assert mon.total_registry_syncs == 1
+
+    @pytest.mark.asyncio
+    async def test_no_downgrade_when_model_not_ready(self, config):
+        """Test that models not in READY status are not downgraded."""
+        mock_registry = Mock()
+        mock_model = ModelInfo(
+            model_id="test-model",
+            compatible_engines=["vllm"],
+            status=ModelStatus.REGISTERED,  # Not READY
+        )
+        mock_registry.list_models = AsyncMock(return_value=[mock_model])
+        mock_registry.update_status = AsyncMock()
+
+        mock_engine_mgr = Mock()
+        mock_engine_mgr.list_available_engines = Mock(return_value=[])
+
+        mon = EngineHealthMonitor(
+            config=config,
+            engine_manager=mock_engine_mgr,
+            model_registry=mock_registry,
+        )
+
+        await mon._sync_registry()
+
+        # update_status should NOT be called for non-READY models
+        mock_registry.update_status.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_downgrade_handles_keyerror(self, config):
+        """Test that KeyError during downgrade is handled gracefully."""
+        mock_registry = Mock()
+        mock_model = ModelInfo(
+            model_id="test-model",
+            compatible_engines=["vllm"],
+            status=ModelStatus.READY,
+        )
+        mock_registry.list_models = AsyncMock(return_value=[mock_model])
+        # Simulate KeyError when updating status
+        mock_registry.update_status = AsyncMock(side_effect=KeyError("Model not found"))
+
+        mock_engine_mgr = Mock()
+        mock_engine_mgr.list_available_engines = Mock(return_value=[])
+
+        mon = EngineHealthMonitor(
+            config=config,
+            engine_manager=mock_engine_mgr,
+            model_registry=mock_registry,
+        )
+
+        # Should not raise exception - error is caught and debug-logged
+        await mon._sync_registry()
+
+        # Verify update_status was called (even though it raised)
+        mock_registry.update_status.assert_called_once()
+        assert mon.total_registry_syncs == 1
+
+    @pytest.mark.asyncio
+    async def test_downgrade_handles_valueerror(self, config):
+        """Test that ValueError during downgrade is handled gracefully."""
+        mock_registry = Mock()
+        mock_model = ModelInfo(
+            model_id="test-model",
+            compatible_engines=["vllm"],
+            status=ModelStatus.READY,
+        )
+        mock_registry.list_models = AsyncMock(return_value=[mock_model])
+        # Simulate ValueError when updating status
+        mock_registry.update_status = AsyncMock(
+            side_effect=ValueError("Invalid status transition")
+        )
+
+        mock_engine_mgr = Mock()
+        mock_engine_mgr.list_available_engines = Mock(return_value=[])
+
+        mon = EngineHealthMonitor(
+            config=config,
+            engine_manager=mock_engine_mgr,
+            model_registry=mock_registry,
+        )
+
+        # Should not raise exception - error is caught and debug-logged
+        await mon._sync_registry()
+
+        # Verify update_status was called (even though it raised)
+        mock_registry.update_status.assert_called_once()
+        assert mon.total_registry_syncs == 1
+
+    @pytest.mark.asyncio
+    async def test_upgrade_registered_to_ready_with_available_engine(self, config):
+        """Test REGISTERED->READY upgrade when engines become available."""
+        mock_registry = Mock()
+        mock_model = ModelInfo(
+            model_id="test-model",
+            compatible_engines=["vllm", "tgi"],
+            status=ModelStatus.REGISTERED,
+        )
+        mock_registry.list_models = AsyncMock(return_value=[mock_model])
+        mock_registry.update_status = AsyncMock()
+
+        mock_engine_mgr = Mock()
+        mock_engine_mgr.list_available_engines = Mock(return_value=["vllm"])
+
+        mon = EngineHealthMonitor(
+            config=config,
+            engine_manager=mock_engine_mgr,
+            model_registry=mock_registry,
+        )
+
+        await mon._sync_registry()
+
+        # Should upgrade to READY with the first available compatible engine
+        mock_registry.update_status.assert_called_once_with(
+            "test-model", ModelStatus.READY, "vllm"
+        )
+
+    @pytest.mark.asyncio
+    async def test_no_change_when_ready_and_engines_available(self, config):
+        """Test that READY models with available engines are not updated."""
+        mock_registry = Mock()
+        mock_model = ModelInfo(
+            model_id="test-model",
+            compatible_engines=["vllm"],
+            status=ModelStatus.READY,
+        )
+        mock_registry.list_models = AsyncMock(return_value=[mock_model])
+        mock_registry.update_status = AsyncMock()
+
+        mock_engine_mgr = Mock()
+        mock_engine_mgr.list_available_engines = Mock(return_value=["vllm"])
+
+        mon = EngineHealthMonitor(
+            config=config,
+            engine_manager=mock_engine_mgr,
+            model_registry=mock_registry,
+        )
+
+        await mon._sync_registry()
+
+        # No update needed - model is already READY and engines are available
+        mock_registry.update_status.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_upgrade_breaks_after_first_available_engine(self, config):
+        """Test that upgrade only calls update_status once with first compatible engine."""
+        mock_registry = Mock()
+        mock_model = ModelInfo(
+            model_id="test-model",
+            compatible_engines=["vllm", "tgi", "sglang"],
+            status=ModelStatus.REGISTERED,
+        )
+        mock_registry.list_models = AsyncMock(return_value=[mock_model])
+        mock_registry.update_status = AsyncMock()
+
+        mock_engine_mgr = Mock()
+        # All compatible engines are available
+        mock_engine_mgr.list_available_engines = Mock(
+            return_value=["vllm", "tgi", "sglang"]
+        )
+
+        mon = EngineHealthMonitor(
+            config=config,
+            engine_manager=mock_engine_mgr,
+            model_registry=mock_registry,
+        )
+
+        await mon._sync_registry()
+
+        # Should only be called once with the first available compatible engine
+        assert mock_registry.update_status.call_count == 1
+        # The first compatible engine is 'vllm'
+        mock_registry.update_status.assert_called_once_with(
+            "test-model", ModelStatus.READY, "vllm"
+        )

@@ -22,4 +22,6 @@ RUN if [ ! -f dist/server.js ]; then \
     fi
 
 EXPOSE 3000
+RUN addgroup --system --gid 1001 eco && adduser --system --uid 1001 --ingroup eco eco
+USER eco
 CMD ["node", "dist/server.js"]

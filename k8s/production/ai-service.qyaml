@@ -29,7 +29,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: eco-ai-service
-          image: ghcr.io/indestructibleorg/ai:latest
+          image: asia-east1-docker.pkg.dev/my-project-ops-1991/indestructibleeco/ai:v1.0.0
           ports:
             - containerPort: 8001
               protocol: TCP

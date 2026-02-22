@@ -1,0 +1,211 @@
+name: Build and Push Docker Images to GCP Artifact Registry
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Service to build (web, api, ai, gateway, or all)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - web
+          - api
+          - ai
+          - gateway
+          - all
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  PROJECT_ID: my-project-ops-1991
+  REGION: asia-east1
+  REGISTRY: asia-east1-docker.pkg.dev/my-project-ops-1991/indestructibleeco
+  VERSION: v1.0.0
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  validate-input:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.set-services.outputs.services }}
+    steps:
+      - name: Set services to build
+        id: set-services
+        run: |
+          SERVICE="${{ github.event.inputs.service }}"
+          case "$SERVICE" in
+            web) echo "services=web" >> $GITHUB_OUTPUT ;;
+            api) echo "services=api" >> $GITHUB_OUTPUT ;;
+            ai) echo "services=ai" >> $GITHUB_OUTPUT ;;
+            gateway) echo "services=gateway" >> $GITHUB_OUTPUT ;;
+            all) echo "services=web,api,ai,gateway" >> $GITHUB_OUTPUT ;;
+          esac
+
+  build-web:
+    if: contains(needs.validate-input.outputs.services, 'web')
+    needs: validate-input
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        run: |
+          git clone --depth 1 https://github.com/${{ github.repository }}.git .
+          git checkout ${{ github.sha }}
+
+      - name: Authenticate to GCP
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: access_token
+          workload_identity_provider: projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/eco-pool/providers/eco-provider
+          service_account: eco-deploy-sa@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+
+      - name: Setup Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and push Web image
+        run: |
+          echo "${{ steps.auth.outputs.access_token }}" | docker login https://${{ env.REGION }}-docker.pkg.dev -u oauth2accesstoken --password-stdin
+          docker build -t ${{ env.REGISTRY }}/web:${{ github.sha }} \
+                       -t ${{ env.REGISTRY }}/web:${{ env.VERSION }} \
+                       -t ${{ env.REGISTRY }}/web:latest \
+                       platforms/web/
+          docker push ${{ env.REGISTRY }}/web:${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/web:${{ env.VERSION }}
+          docker push ${{ env.REGISTRY }}/web:latest
+
+  build-api:
+    if: contains(needs.validate-input.outputs.services, 'api')
+    needs: validate-input
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        run: |
+          git clone --depth 1 https://github.com/${{ github.repository }}.git .
+          git checkout ${{ github.sha }}
+
+      - name: Authenticate to GCP
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: access_token
+          workload_identity_provider: projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/eco-pool/providers/eco-provider
+          service_account: eco-deploy-sa@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+
+      - name: Setup Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Create stub backend/api directory
+        run: |
+          mkdir -p backend/api/src
+          cat > backend/api/src/main.py << 'PYTHON_EOF'
+from fastapi import FastAPI
+app = FastAPI(title="Eco API Service")
+@app.get("/health")
+def health():
+    return {"status": "healthy"}
+PYTHON_EOF
+
+      - name: Build and push API image
+        run: |
+          echo "${{ steps.auth.outputs.access_token }}" | docker login https://${{ env.REGION }}-docker.pkg.dev -u oauth2accesstoken --password-stdin
+          docker build -t ${{ env.REGISTRY }}/api:${{ github.sha }} \
+                       -t ${{ env.REGISTRY }}/api:${{ env.VERSION }} \
+                       -t ${{ env.REGISTRY }}/api:latest \
+                       -f backend/api/Dockerfile backend/api/
+          docker push ${{ env.REGISTRY }}/api:${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/api:${{ env.VERSION }}
+          docker push ${{ env.REGISTRY }}/api:latest
+
+  build-ai:
+    if: contains(needs.validate-input.outputs.services, 'ai')
+    needs: validate-input
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        run: |
+          git clone --depth 1 https://github.com/${{ github.repository }}.git .
+          git checkout ${{ github.sha }}
+
+      - name: Authenticate to GCP
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: access_token
+          workload_identity_provider: projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/eco-pool/providers/eco-provider
+          service_account: eco-deploy-sa@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+
+      - name: Setup Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and push AI image
+        run: |
+          echo "${{ steps.auth.outputs.access_token }}" | docker login https://${{ env.REGION }}-docker.pkg.dev -u oauth2accesstoken --password-stdin
+          docker build -t ${{ env.REGISTRY }}/ai:${{ github.sha }} \
+                       -t ${{ env.REGISTRY }}/ai:${{ env.VERSION }} \
+                       -t ${{ env.REGISTRY }}/ai:latest \
+                       backend/ai/
+          docker push ${{ env.REGISTRY }}/ai:${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/ai:${{ env.VERSION }}
+          docker push ${{ env.REGISTRY }}/ai:latest
+
+  build-gateway:
+    if: contains(needs.validate-input.outputs.services, 'gateway')
+    needs: validate-input
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        run: |
+          git clone --depth 1 https://github.com/${{ github.repository }}.git .
+          git checkout ${{ github.sha }}
+
+      - name: Authenticate to GCP
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: access_token
+          workload_identity_provider: projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/eco-pool/providers/eco-provider
+          service_account: eco-deploy-sa@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+
+      - name: Setup Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and push Gateway image
+        run: |
+          echo "${{ steps.auth.outputs.access_token }}" | docker login https://${{ env.REGION }}-docker.pkg.dev -u oauth2accesstoken --password-stdin
+          docker build -t ${{ env.REGISTRY }}/gateway:${{ github.sha }} \
+                       -t ${{ env.REGISTRY }}/gateway:${{ env.VERSION }} \
+                       -t ${{ env.REGISTRY }}/gateway:latest \
+                       -f docker/Dockerfile .
+          docker push ${{ env.REGISTRY }}/gateway:${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/gateway:${{ env.VERSION }}
+          docker push ${{ env.REGISTRY }}/gateway:latest

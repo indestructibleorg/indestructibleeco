@@ -1,6 +1,6 @@
 # IndestructibleEco v1.0 — Ingress (eco-production)
 # GKE eco-production cluster, asia-east1
-# Domains: production.autoecoops.io, api-production.autoecoops.io
+# Domains: autoecoops.io, api.autoecoops.io, ai.autoecoops.io
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -13,14 +13,14 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: "gce"
     kubernetes.io/ingress.global-static-ip-name: "eco-production-ip"
-    networking.gke.io/managed-certificates: "eco-production-cert"
+    networking.gke.io/managed-certificates: "eco-production-cert,eco-web-cert"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
     nginx.ingress.kubernetes.io/proxy-buffering: "off"
     nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "https://production.autoecoops.io,https://api-production.autoecoops.io"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://autoecoops.io,https://api.autoecoops.io,https://ai.autoecoops.io"
     nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type, X-API-Key"
     nginx.ingress.kubernetes.io/limit-rps: "200"
@@ -32,44 +32,9 @@ spec:
       port:
         number: 80
   rules:
-    - host: production.autoecoops.io
+    - host: autoecoops.io
       http:
         paths:
-          - path: /api
-            pathType: Prefix
-            backend:
-              service:
-                name: eco-api-svc
-                port:
-                  number: 3000
-          - path: /auth
-            pathType: Prefix
-            backend:
-              service:
-                name: eco-api-svc
-                port:
-                  number: 3000
-          - path: /health
-            pathType: Exact
-            backend:
-              service:
-                name: eco-gateway-svc
-                port:
-                  number: 8000
-          - path: /metrics
-            pathType: Exact
-            backend:
-              service:
-                name: eco-gateway-svc
-                port:
-                  number: 8000
-          - path: /v1
-            pathType: Prefix
-            backend:
-              service:
-                name: eco-gateway-svc
-                port:
-                  number: 8000
           - path: /
             pathType: Prefix
             backend:
@@ -77,18 +42,28 @@ spec:
                 name: eco-web-svc
                 port:
                   number: 80
-    - host: api-production.autoecoops.io
+    - host: api.autoecoops.io
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: eco-gateway-svc
+                name: eco-api-svc
                 port:
-                  number: 8000
+                  number: 3000
+    - host: ai.autoecoops.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: eco-ai-svc
+                port:
+                  number: 8001
 ---
-# GKE Managed Certificate for production
+# GKE Managed Certificate for API and AI
 apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
 metadata:
@@ -100,14 +75,28 @@ metadata:
     environment: production
 spec:
   domains:
-    - production.autoecoops.io
-    - api-production.autoecoops.io
+    - api.autoecoops.io
+    - ai.autoecoops.io
+---
+# GKE Managed Certificate for Web
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: eco-web-cert
+  namespace: eco-production
+  labels:
+    app.kubernetes.io/name: eco-web-cert
+    app.kubernetes.io/part-of: indestructibleeco
+    environment: production
+spec:
+  domains:
+    - autoecoops.io
 ---
 # YAML Toolkit v8 — Governance Block
 document_metadata:
   unique_id: "eco-prod-ig-0001-0001-000000000001"
   uri: "indestructibleeco://k8s/eco-production/ingress/main"
-  urn: "urn:indestructibleeco:k8s:eco-production:ingress:main:eco-prod-ig-0001-0001-000000000001"
+  urn: "urn:indestructibleeco:k8s:eco-production:ingress:main:eco-prod-ig-0001-000000000001"
   target_system: gke-eco-production
   cross_layer_binding: [api-gateway, api-service, web-frontend]
   schema_version: v8
@@ -119,7 +108,7 @@ governance_info:
   compliance_tags: [zero-trust, soc2, tls-required, edge, production]
   lifecycle_policy: active
 registry_binding:
-  service_endpoint: "https://production.autoecoops.io"
+  service_endpoint: "https://autoecoops.io"
   discovery_protocol: gke-ingress
   health_check_path: "/health"
   registry_ttl: 30

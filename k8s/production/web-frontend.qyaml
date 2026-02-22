@@ -25,14 +25,21 @@ spec:
       serviceAccountName: eco-sa
       securityContext:
         runAsNonRoot: true
-        runAsUser: 1000
-        fsGroup: 1000
+        runAsUser: 101
+        fsGroup: 101
       containers:
         - name: eco-web-frontend
-          image: ghcr.io/indestructibleorg/web:latest
+          image: asia-east1-docker.pkg.dev/my-project-ops-1991/indestructibleeco/web:v1.0.0
           ports:
             - containerPort: 80
               protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
           envFrom:
             - configMapRef:
                 name: eco-config

@@ -4,27 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "react": "^18.3.0",
-    "react-dom": "^18.3.0",
-    "react-router-dom": "^6.24.0",
-    "zustand": "^4.5.0",
-    "@tanstack/react-query": "^5.50.0",
-    "@supabase/supabase-js": "^2.44.0",
-    "@indestructibleeco/ui-kit": "workspace:*",
-    "@indestructibleeco/api-client": "workspace:*",
-    "@indestructibleeco/shared-types": "workspace:*"
+    "react-dom": "^18.3.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.0",
-    "tailwindcss": "^3.4.0",
-    "vite": "^5.3.0",
-    "typescript": "^5.5.0",
-    "vitest": "^2.0.0"
+    "vite": "^5.3.0"
   }
 }

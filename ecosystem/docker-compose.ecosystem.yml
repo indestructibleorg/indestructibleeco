@@ -156,6 +156,12 @@ services:
       env: development
 
   # cAdvisor — Container metrics
+  # SECURITY NOTE: cAdvisor requires privileged mode to access host system metrics.
+  # This is a documented exception for observability infrastructure.
+  # In production, consider:
+  # 1. Running cAdvisor on a dedicated monitoring node
+  # 2. Using alternative metrics collection (e.g., kubelet metrics in GKE)
+  # 3. Restricting network access to cAdvisor endpoint
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: eco_cadvisor
@@ -301,6 +307,12 @@ services:
       env: development
 
   # Promtail — Log collector (ship Docker logs → Loki)
+  # SECURITY NOTE: Promtail requires Docker socket access to collect container logs.
+  # This is a documented exception for observability infrastructure.
+  # In production, consider:
+  # 1. Using read-only Docker socket mount
+  # 2. Restricting Promtail's access to specific log files
+  # 3. Using alternative log collection (e.g., Fluent Bit with limited permissions)
   promtail:
     image: grafana/promtail:3.1.0
     container_name: eco_promtail

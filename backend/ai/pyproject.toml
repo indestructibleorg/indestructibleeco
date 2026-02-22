@@ -22,19 +22,8 @@ packages = [{include = "src"}]
 python = "^3.11"
 fastapi = "~0.111.0"
 uvicorn = { extras = ["standard"], version = "~0.30.1" }
-celery = "~5.4.0"
-redis = "~5.0.7"
 pydantic = "~2.7.4"
-numpy = "~1.26.4"
 prometheus-client = "~0.20.0"
-grpcio = "~1.64.1"
-grpcio-tools = "~1.64.1"
-
-[tool.poetry.extras]
-faiss = ["faiss-cpu"]
-elasticsearch = ["elasticsearch"]
-neo4j = ["neo4j"]
-all-indexes = ["faiss-cpu", "elasticsearch", "neo4j"]
 
 [build-system]
 requires = ["poetry-core>=1.9.0"]

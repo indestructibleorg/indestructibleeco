@@ -1,0 +1,196 @@
+# Prometheus Alert Rules for Supabase
+# IndestructibleEco Production Alerts
+
+groups:
+  - name: supabase_database
+    interval: 30s
+    rules:
+      # High CPU usage
+      - alert: SupabaseHighCPUUsage
+        expr: supabase_cpu_usage_percent > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: supabase
+        annotations:
+          summary: "Supabase database CPU usage is high"
+          description: "Database CPU usage is {{ $value }}% for project {{ $labels.project }}"
+
+      - alert: SupabaseCriticalCPUUsage
+        expr: supabase_cpu_usage_percent > 95
+        for: 2m
+        labels:
+          severity: critical
+          service: supabase
+        annotations:
+          summary: "Supabase database CPU usage is critical"
+          description: "Database CPU usage is {{ $value }}% for project {{ $labels.project }}"
+
+      # High memory usage
+      - alert: SupabaseHighMemoryUsage
+        expr: supabase_memory_usage_percent > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: supabase
+        annotations:
+          summary: "Supabase database memory usage is high"
+          description: "Database memory usage is {{ $value }}% for project {{ $labels.project }}"
+
+      # Disk space
+      - alert: SupabaseDiskSpaceLow
+        expr: supabase_disk_usage_percent > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: supabase
+        annotations:
+          summary: "Supabase database disk space is low"
+          description: "Database disk usage is {{ $value }}% for project {{ $labels.project }}"
+
+      - alert: SupabaseDiskSpaceCritical
+        expr: supabase_disk_usage_percent > 90
+        for: 2m
+        labels:
+          severity: critical
+          service: supabase
+        annotations:
+          summary: "Supabase database disk space is critical"
+          description: "Database disk usage is {{ $value }}% for project {{ $labels.project }}"
+
+      # Connection pool
+      - alert: SupabaseConnectionPoolHigh
+        expr: supabase_connections_active / supabase_connections_max > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          service: supabase
+        annotations:
+          summary: "Supabase connection pool is high"
+          description: "Connection pool usage is {{ $value | humanizePercentage }} for project {{ $labels.project }}"
+
+      - alert: SupabaseConnectionPoolCritical
+        expr: supabase_connections_active / supabase_connections_max > 0.95
+        for: 2m
+        labels:
+          severity: critical
+          service: supabase
+        annotations:
+          summary: "Supabase connection pool is critical"
+          description: "Connection pool usage is {{ $value | humanizePercentage }} for project {{ $labels.project }}"
+
+      # Long-running queries
+      - alert: SupabaseLongRunningQuery
+        expr: supabase_query_duration_seconds{quantile="0.99"} > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: supabase
+        annotations:
+          summary: "Supabase has long-running queries"
+          description: "99th percentile query duration is {{ $value }}s for project {{ $labels.project }}"
+
+      # Replication lag
+      - alert: SupabaseReplicationLag
+        expr: supabase_replication_lag_seconds > 30
+        for: 5m
+        labels:
+          severity: warning
+          service: supabase
+        annotations:
+          summary: "Supabase replication lag is high"
+          description: "Replication lag is {{ $value }}s for project {{ $labels.project }}"
+
+      # WAL size
+      - alert: SupabaseWALSizeHigh
+        expr: supabase_wal_size_bytes > 1073741824  # 1GB
+        for: 10m
+        labels:
+          severity: warning
+          service: supabase
+        annotations:
+          summary: "Supabase WAL size is high"
+          description: "WAL size is {{ $value | humanize }} for project {{ $labels.project }}"
+
+  - name: supabase_api
+    interval: 30s
+    rules:
+      # API error rate
+      - alert: SupabaseHighErrorRate
+        expr: rate(supabase_api_errors_total[5m]) / rate(supabase_api_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          service: supabase
+        annotations:
+          summary: "Supabase API error rate is high"
+          description: "API error rate is {{ $value | humanizePercentage }} for project {{ $labels.project }}"
+
+      # API latency
+      - alert: SupabaseHighLatency
+        expr: supabase_api_duration_seconds{quantile="0.99"} > 5
+        for: 5m
+        labels:
+          severity: warning
+          service: supabase
+        annotations:
+          summary: "Supabase API latency is high"
+          description: "99th percentile API latency is {{ $value }}s for project {{ $labels.project }}"
+
+      # Request rate
+      - alert: SupabaseLowRequestRate
+        expr: rate(supabase_api_requests_total[5m]) < 10
+        for: 10m
+        labels:
+          severity: info
+          service: supabase
+        annotations:
+          summary: "Supabase API request rate is low"
+          description: "API request rate is {{ $value }}/s for project {{ $labels.project }}"
+
+  - name: kubernetes_cluster
+    interval: 30s
+    rules:
+      # Node CPU
+      - alert: NodeCPUHigh
+        expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: kubernetes
+        annotations:
+          summary: "Node CPU usage is high"
+          description: "Node {{ $labels.instance }} CPU usage is {{ $value }}%"
+
+      # Node memory
+      - alert: NodeMemoryHigh
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: kubernetes
+        annotations:
+          summary: "Node memory usage is high"
+          description: "Node {{ $labels.instance }} memory usage is {{ $value }}%"
+
+      # Pod crash looping
+      - alert: PodCrashLooping
+        expr: rate(kube_pod_container_status_restarts_total[15m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          service: kubernetes
+        annotations:
+          summary: "Pod is crash looping"
+          description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is crash looping"
+
+      # Pod not ready
+      - alert: PodNotReady
+        expr: kube_pod_status_ready{condition="false"} == 1
+        for: 10m
+        labels:
+          severity: warning
+          service: kubernetes
+        annotations:
+          summary: "Pod is not ready"
+          description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is not ready"

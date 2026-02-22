@@ -4,31 +4,29 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy package.json and strip workspace:* dependencies that don't resolve in Docker
-COPY package.json ./
-RUN node -e " \
-  const pkg = JSON.parse(require('fs').readFileSync('package.json','utf8')); \
-  for (const section of ['dependencies','devDependencies','peerDependencies']) { \
-    if (pkg[section]) { \
-      for (const [k,v] of Object.entries(pkg[section])) { \
-        if (String(v).includes('workspace:')) delete pkg[section][k]; \
-      } \
-    } \
-  } \
-  pkg.scripts = pkg.scripts || {}; \
-  pkg.scripts.build = 'vite build'; \
-  require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2)); \
-" && npm install --legacy-peer-deps
+# Copy package files
+COPY ./package.json ./
+COPY ./vite.config.js ./
+
+# Install dependencies
+RUN npm install --legacy-peer-deps
 
 # Copy app source and build
-COPY app/ ./app/
-RUN cd app && npx vite build --outDir ../dist
+COPY ./app/ ./app/
+COPY ./index.html ./
+RUN npm run build
 
 FROM nginx:1.25-alpine AS production
 LABEL org.opencontainers.image.title="IndestructibleEco Web Frontend" \
       org.opencontainers.image.version="1.0.0" \
       org.opencontainers.image.vendor="IndestructibleOrg" \
       org.opencontainers.image.source="https://github.com/indestructibleorg/indestructibleeco"
+
+# SECURITY NOTE: Nginx runs as root (uid 0) to bind privileged port 80.
+# This is a documented exception. In production, consider:
+# 1. Using a reverse proxy (e.g., Envoy) that handles port 80/443
+# 2. Running nginx on unprivileged port (e.g., 8080) with port mapping
+# 3. Using Linux capabilities (CAP_NET_BIND_SERVICE) instead of full root
 
 # Nginx config with API proxy, WebSocket, SPA fallback, health check
 RUN printf 'server {\n\
@@ -44,7 +42,7 @@ RUN printf 'server {\n\
     }\n\
 \n\
     location /api/ {\n\
-        proxy_pass http://eco-express-svc:3000;\n\
+        proxy_pass http://eco-api-svc:3000;\n\
         proxy_set_header Host $host;\n\
         proxy_set_header X-Real-IP $remote_addr;\n\
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n\
@@ -52,7 +50,7 @@ RUN printf 'server {\n\
     }\n\
 \n\
     location /ws {\n\
-        proxy_pass http://eco-express-svc:3000;\n\
+        proxy_pass http://eco-api-svc:3000;\n\
         proxy_http_version 1.1;\n\
         proxy_set_header Upgrade $http_upgrade;\n\
         proxy_set_header Connection "upgrade";\n\

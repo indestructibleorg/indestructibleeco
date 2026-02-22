@@ -21,11 +21,6 @@ jobs:
           git clone --depth 1 https://github.com/${{ github.repository }}.git .
           git checkout ${{ github.sha }}
 
-      - name: Setup Node.js
-        run: |
-          curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-          sudo apt-get install -y nodejs
-
       - name: Install Node.js 20
         run: |
           curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -

@@ -55,7 +55,6 @@ jobs:
           echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
           TMP_DIR="$(mktemp -d)"
           chmod 700 "$TMP_DIR"
-          trap 'rm -rf "$TMP_DIR"' EXIT
           KEY_FILE="$(mktemp "$TMP_DIR/gcp-sa-key-XXXXXX.json")"
           echo "$GCP_SA_KEY" > "$KEY_FILE"
           chmod 600 "$KEY_FILE"
@@ -95,7 +94,6 @@ jobs:
           ENVIRONMENT: ${{ github.event.inputs.environment }}
         run: |
           echo "OAuth setup completed successfully for $ENVIRONMENT"
-          echo "OAuth setup completed successfully for ${ENVIRONMENT}"
 
       - name: Cleanup credentials
         if: always()

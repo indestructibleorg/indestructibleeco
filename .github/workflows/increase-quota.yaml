@@ -28,8 +28,8 @@ env:
   GCP_PROJECT: my-project-ops-1991
 
 jobs:
-  manage-quota:
-    name: Check and Request Quota Increase
+  check-current-quota:
+    name: Check Current Quota
     runs-on: ubuntu-latest
     outputs:
       current_usage: ${{ steps.check-quota.outputs.usage }}
@@ -98,14 +98,14 @@ jobs:
             cat increase_quota.log
             echo "::endgroup::"
           fi
-          
+
           OUTPUT_DELIMITER="EOF_QUOTA_STATUS_$(date +%s)"
           echo "usage=$(jq -r '.usage' quota_status.json)" >> $GITHUB_OUTPUT
           echo "limit=$(jq -r '.limit' quota_status.json)" >> $GITHUB_OUTPUT
           echo "quota_status_json<<$OUTPUT_DELIMITER" >> $GITHUB_OUTPUT
           cat quota_status.json >> $GITHUB_OUTPUT
           echo "$OUTPUT_DELIMITER" >> $GITHUB_OUTPUT
-          
+
           cat quota_status.json
 
       - name: Cleanup credentials
@@ -153,12 +153,6 @@ jobs:
           QUOTA_STATUS_JSON: ${{ needs.check-current-quota.outputs.quota_status_json }}
         run: |
           printf '%s' "$QUOTA_STATUS_JSON" > quota_status.json
-            --region $REGION \
-            --output-json > quota_status.json
-
-          echo "usage=$(jq -r '.usage' quota_status.json)" >> $GITHUB_OUTPUT
-          echo "limit=$(jq -r '.limit' quota_status.json)" >> $GITHUB_OUTPUT
-
           cat quota_status.json
 
       - name: Request quota increase
@@ -280,44 +274,6 @@ jobs:
               raise RuntimeError(f"Failed to create issue: HTTP {exc.code} - {error_message}") from exc
           PY
 
-      - name: Create GitHub issue for tracking
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          USAGE: ${{ steps.check-quota.outputs.usage }}
-          REGION: ${{ github.event.inputs.region }}
-          CURRENT_LIMIT: ${{ github.event.inputs.current_limit }}
-          REQUESTED_LIMIT: ${{ github.event.inputs.requested_limit }}
-          JUSTIFICATION: ${{ github.event.inputs.justification }}
-          CURRENT_USAGE: ${{ needs.check-current-quota.outputs.current_usage }}
-          REPOSITORY: ${{ github.repository }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          REQUEST_ID=$(jq -r '.request_id // "N/A"' quota_request.json)
-          STATUS=$(jq -r '.status // "Submitted"' quota_request.json)
-
-          printf '## SSD Quota Increase Request\n\n' > issue_body.txt
-          printf '**Region**: %s\n' "$REGION" >> issue_body.txt
-          printf '**Current Limit**: %s GB\n' "$CURRENT_LIMIT" >> issue_body.txt
-          printf '**Requested Limit**: %s GB\n' "$REQUESTED_LIMIT" >> issue_body.txt
-          printf '**Current Usage**: %s GB\n\n' "$USAGE" >> issue_body.txt
-          printf '**Justification**:\n%s\n\n' "$JUSTIFICATION" >> issue_body.txt
-          printf '**Request ID**: `%s`\n' "$REQUEST_ID" >> issue_body.txt
-          printf '**Status**: `%s`\n\n' "$STATUS" >> issue_body.txt
-          printf '### Next Steps\n' >> issue_body.txt
-          printf '1. Monitor approval status in GCP Console\n' >> issue_body.txt
-          printf '2. Once approved, recreate production cluster\n' >> issue_body.txt
-          printf '3. Deploy production workloads\n\n' >> issue_body.txt
-          printf '### References\n' >> issue_body.txt
-          printf '- [GCP Quotas Console](https://console.cloud.google.com/iam-admin/quotas?project=my-project-ops-1991)\n' >> issue_body.txt
-          printf '- [Quota Guide](docs/gcp-quota-guide.md)\n' >> issue_body.txt
-
-          gh issue create \
-            --title "SSD Quota Increase Request - ${REGION}" \
-            --body-file issue_body.txt \
-            --label "quota" \
-            --label "infrastructure" \
-            --label "gcp"
-
       - name: Notify on success
         if: success()
         run: |
@@ -336,7 +292,3 @@ jobs:
           if [ -n "${GCP_CREDENTIALS_DIR+x}" ] && [ -n "$GCP_CREDENTIALS_DIR" ]; then
             rm -rf "$GCP_CREDENTIALS_DIR"
           fi
-
-      - name: Cleanup credentials
-        if: always()
-        run: rm -f /tmp/gcp-sa-key.json

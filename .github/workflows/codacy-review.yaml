@@ -1,0 +1,86 @@
+name: Codacy Review Trigger
+
+on:
+  pull_request_target:
+    types: [labeled]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  request-codacy-review:
+    if: github.event.label.name == 'codacy-review'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request Codacy Production bot AI review
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import sys
+          import urllib.error
+          import urllib.request
+
+          repository = os.environ["GITHUB_REPOSITORY"]
+          pr_number = os.environ["PR_NUMBER"]
+          token = os.environ["GH_TOKEN"]
+          bot_command = "@codacy-production[bot] review"
+          headers = {
+              "Authorization": f"Bearer {token}",
+              "Accept": "application/vnd.github+json",
+              "X-GitHub-Api-Version": "2022-11-28",
+              "User-Agent": "codacy-review-workflow",
+          }
+
+          comments_url = f"https://api.github.com/repos/{repository}/issues/{pr_number}/comments?per_page=100"
+          comments = []
+          while comments_url:
+              comments_request = urllib.request.Request(comments_url, headers=headers, method="GET")
+              try:
+                  with urllib.request.urlopen(comments_request) as response:
+                      comments.extend(json.loads(response.read().decode("utf-8")))
+                      link_header = response.headers.get("Link", "")
+              except urllib.error.HTTPError as error:
+                  details = error.read().decode("utf-8", errors="replace")
+                  raise RuntimeError(f"Failed to list PR comments: {error.code} {details}") from error
+              next_page = None
+              for link_part in link_header.split(","):
+                  if 'rel="next"' not in link_part:
+                      continue
+                  start = link_part.find("<")
+                  end = link_part.find(">")
+                  if start != -1 and end != -1:
+                      next_page = link_part[start + 1:end]
+                      break
+              comments_url = next_page
+
+          if any(comment.get("body", "").strip().startswith(bot_command) for comment in comments):
+              print("Codacy review request already exists; skipping duplicate comment.")
+              sys.exit(0)
+
+          payload = {
+              "body": f"{bot_command}\n\nTriggered by `codacy-review` label."
+          }
+          create_comment_url = f"https://api.github.com/repos/{repository}/issues/{pr_number}/comments"
+          create_comment_request = urllib.request.Request(
+              create_comment_url,
+              data=json.dumps(payload).encode("utf-8"),
+              headers=headers,
+              method="POST",
+          )
+          try:
+              with urllib.request.urlopen(create_comment_request) as response:
+                  if response.status not in (200, 201):
+                      raise RuntimeError(f"Unexpected status code when creating comment: {response.status}")
+          except urllib.error.HTTPError as error:
+              details = error.read().decode("utf-8", errors="replace")
+              raise RuntimeError(f"Failed to create Codacy review request comment: {error.code} {details}") from error
+
+          print("Codacy Production bot review request comment posted successfully.")
+          PY

@@ -1,0 +1,9 @@
+name: Test Workflow With Issue
+on: workflow_dispatch
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+        COUNT=$(python3 -c "import json; print(42)")
+        echo "count=$COUNT"

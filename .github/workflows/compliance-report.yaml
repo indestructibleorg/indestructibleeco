@@ -52,7 +52,7 @@ jobs:
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
       with:
         fetch-depth: 0
-        token: ${{ secrets.AUTO_FIX_TOKEN }}
+        token: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
 
     - name: Determine report period
       id: period
@@ -206,7 +206,7 @@ jobs:
     - name: Create compliance report issue
       uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
       with:
-        github-token: ${{ secrets.AUTO_FIX_TOKEN }}
+        github-token: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
         script: |
           const fs = require('fs');
           const period = '${{ steps.period.outputs.period }}';

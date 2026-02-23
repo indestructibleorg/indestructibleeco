@@ -205,7 +205,7 @@ jobs:
     - name: Create or update drift incident issue
       uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
       with:
-        github-token: ${{ secrets.AUTO_FIX_TOKEN }}
+        github-token: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
         script: |
           const driftedApps = '${{ needs.detect-drift.outputs.drifted_apps }}'.trim();
           const syncSuccess = '${{ needs.auto-sync.outputs.sync_success }}';
@@ -287,7 +287,7 @@ jobs:
     - name: Close resolved drift issues
       uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
       with:
-        github-token: ${{ secrets.AUTO_FIX_TOKEN }}
+        github-token: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
         script: |
           const existing = await github.rest.issues.listForRepo({
             owner: context.repo.owner,

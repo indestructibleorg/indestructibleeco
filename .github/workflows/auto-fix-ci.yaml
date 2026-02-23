@@ -42,7 +42,7 @@ jobs:
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
       with:
         fetch-depth: 0
-        token: ${{ secrets.AUTO_FIX_TOKEN }}
+        token: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Configure git
       run: |
         git config user.name "IndestructibleAutoOps"
@@ -291,7 +291,7 @@ jobs:
 
         Triggered by: ${{ github.event_name }}
         Run: ${{ github.run_id }}"
-          git remote set-url origin https://x-access-token:${{ secrets.AUTO_FIX_TOKEN }}@github.com/${{ github.repository }}.git
+          git remote set-url origin https://x-access-token:${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git push origin "$BRANCH"
           echo "has_changes=true" >> "$GITHUB_OUTPUT"
           echo "Branch pushed: $BRANCH"

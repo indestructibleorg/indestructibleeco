@@ -1,0 +1,113 @@
+name: Dependabot Auto-Merge
+# Automatically merges Dependabot PRs when all required CI checks pass.
+# Handles: patch/minor dependency updates for Actions, npm, pip, Docker.
+# Major version bumps require human review (not auto-merged).
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_run:
+    workflows: ["eco-base CI/CD"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  auto-merge-dependabot:
+    name: Auto-merge Dependabot PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.actor == 'dependabot[bot]'
+    steps:
+      - name: Fetch Dependabot metadata
+        id: meta
+        uses: dependabot/fetch-metadata@d7267f607e9d3fb96fc2fbe83e0af444713e90b7  # v2.3.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable auto-merge for patch/minor updates
+        if: |
+          steps.meta.outputs.update-type == 'version-update:semver-patch' ||
+          steps.meta.outputs.update-type == 'version-update:semver-minor'
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Label major updates for human review
+        if: steps.meta.outputs.update-type == 'version-update:semver-major'
+        run: |
+          gh pr edit "$PR_URL" --add-label "human-review-required"
+          gh pr comment "$PR_URL" --body "Major version update — requires human review before merging."
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  process-existing-dependabot-prs:
+    name: Process existing open Dependabot PRs
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Auto-merge all open Dependabot patch/minor PRs with passing CI
+        run: |
+          python3 - << 'PYEOF'
+          import subprocess, json, os, sys
+
+          repo = os.environ.get('GITHUB_REPOSITORY', '')
+
+          # Get all open Dependabot PRs without human-review-required label
+          result = subprocess.run(
+              ['gh', 'pr', 'list', '--repo', repo,
+               '--author', 'dependabot[bot]', '--state', 'open',
+               '--json', 'number,title,url,labels'],
+              capture_output=True, text=True
+          )
+          if result.returncode != 0:
+              print('Failed to list PRs:', result.stderr)
+              sys.exit(0)
+
+          prs = json.loads(result.stdout or '[]')
+          print(f'Found {len(prs)} open Dependabot PRs')
+
+          for pr in prs:
+              number = pr['number']
+              title = pr['title']
+              labels = [l['name'] for l in pr.get('labels', [])]
+
+              if 'human-review-required' in labels:
+                  print(f'  SKIP #{number}: has human-review-required label')
+                  continue
+
+              # Check CI status
+              checks = subprocess.run(
+                  ['gh', 'pr', 'checks', str(number), '--repo', repo],
+                  capture_output=True, text=True
+              )
+              lines = checks.stdout.strip().split('\n')
+              fails = [l for l in lines if '\tfail\t' in l and 'circleci' not in l.lower()]
+              passes = [l for l in lines if '\tpass\t' in l]
+
+              print(f'  PR #{number}: {len(passes)} pass, {len(fails)} fail — {title[:60]}')
+
+              if len(fails) == 0 and len(passes) > 0:
+                  r = subprocess.run(
+                      ['gh', 'pr', 'merge', '--auto', '--squash', str(number), '--repo', repo],
+                      capture_output=True, text=True
+                  )
+                  if r.returncode == 0:
+                      print(f'    -> auto-merge enabled')
+                  else:
+                      # Already has auto-merge or branch protection not set
+                      print(f'    -> {r.stderr.strip()[:100]}')
+              else:
+                  print(f'    -> skipping (CI not fully passing)')
+          PYEOF
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}

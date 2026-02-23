@@ -33,17 +33,16 @@ class SSDQuotaManager:
             region_obj = self.regions_client.get(project=self.project_id, region=region)
             
             for quota in region_obj.quotas:
-                if quota.metric == "SSD_TOTAL_STORAGE_GB":
+                if quota.metric == "SSD_TOTAL_GB":
                     return {
                         "metric": quota.metric,
                         "limit": quota.limit,
                         "usage": quota.usage,
-                        "unit": quota.unit,
                         "region": region,
                         "timestamp": datetime.now().isoformat()
                     }
             
-            return {"error": "SSD_TOTAL_STORAGE_GB quota not found"}
+            return {"error": "SSD_TOTAL_GB quota not found"}
         except Exception as e:
             return {"error": str(e)}
     
@@ -62,7 +61,7 @@ class SSDQuotaManager:
             "request_id": f"quota-{region}-{datetime.now().strftime('%Y%m%d%H%M%S')}",
             "project_id": self.project_id,
             "region": region,
-            "metric": "SSD_TOTAL_STORAGE_GB",
+            "metric": "SSD_TOTAL_GB",
             "current_limit": current_limit,
             "requested_limit": requested_limit,
             "increase_amount": requested_limit - current_limit,

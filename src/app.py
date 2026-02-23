@@ -85,8 +85,8 @@ class ServiceProxy:
             if response.status_code >= 400:
                 return {
                     "_proxy_error": True,
-                    "status_code": response.status_code,
-                    "detail": response.text[:500],
+                    "status_code": 502,
+                    "detail": f"Upstream returned {response.status_code}: {response.text[:500]}",
                 }
             return response.json()
         except Exception as exc:

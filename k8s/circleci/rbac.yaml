@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: circleci-runner
+  namespace: circleci-runner
+  labels:
+    app: circleci-runner
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: circleci-runner
+  namespace: circleci-runner
+  labels:
+    app: circleci-runner
+rules:
+  # Allow creating and managing pods for job execution
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "pods/exec"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+    
+  # Allow creating and managing secrets for job execution
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+    
+  # Allow creating and managing configmaps
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+    
+  # Allow reading events
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: circleci-runner
+  namespace: circleci-runner
+  labels:
+    app: circleci-runner
+subjects:
+  - kind: ServiceAccount
+    name: circleci-runner
+    namespace: circleci-runner
+roleRef:
+  kind: Role
+  name: circleci-runner
+  apiGroup: rbac.authorization.k8s.io
+---
+# ClusterRole for wider permissions (optional, if needed)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: circleci-runner
+  labels:
+    app: circleci-runner
+rules:
+  # Allow creating pods in any namespace (if cross-namespace access needed)
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "pods/exec"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: circleci-runner
+  labels:
+    app: circleci-runner
+subjects:
+  - kind: ServiceAccount
+    name: circleci-runner
+    namespace: circleci-runner
+roleRef:
+  kind: ClusterRole
+  name: circleci-runner
+  apiGroup: rbac.authorization.k8s.io

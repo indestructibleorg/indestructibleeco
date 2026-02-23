@@ -15,5 +15,5 @@ zone_name = "autoecoops.io"
 
 [[kv_namespaces]]
 binding = "WEBHOOK_KV"
-id = "eco-webhook-kv-prod"
-preview_id = "eco-webhook-kv-preview"
+id = "b46d5cece6454657ba5aa633541053b9"
+preview_id = "66d0d5a1502640408414989935862f88"

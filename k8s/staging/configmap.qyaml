@@ -9,7 +9,7 @@ metadata:
     environment: staging
 data:
   ECO_ENVIRONMENT: staging
-  ECO_LOG_LEVEL: DEBUG
+  ECO_LOG_LEVEL: debug
   ECO_HOST: 0.0.0.0
   ECO_PORT: '8000'
   ECO_API_PORT: '3000'

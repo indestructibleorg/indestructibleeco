@@ -9,7 +9,7 @@ name: Auto-Repair
 
 on:
   workflow_run:
-    workflows: ["IndestructibleEco CI/CD"]
+    workflows: ["CI"]
     types: [completed]
 
 permissions:
@@ -19,12 +19,14 @@ permissions:
 jobs:
   diagnose:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     if: github.event.workflow_run.conclusion == 'failure'
     steps:
     - name: Checkout (failed commit)
-      run: |
-        git clone --depth 5 https://github.com/${{ github.repository }}.git .
-        git checkout ${{ github.event.workflow_run.head_sha }}
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      with:
+        ref: ${{ github.event.workflow_run.head_sha }}
+        fetch-depth: 5
 
     - name: Collect failure context
       id: context
@@ -59,24 +61,21 @@ jobs:
     - name: Fetch failed job logs
       run: |
         echo "=== Failed Job Logs ==="
-        # Use GitHub API to fetch workflow run jobs
-        cat > /tmp/fetch_logs.py << 'PYEOF'
+        RUN_ID="${{ steps.context.outputs.run_id }}" \
+        GITHUB_TOKEN="${{ github.token }}" \
+        python3 - << 'PYEOF'
         import json, os, urllib.request
-
         run_id = os.environ.get("RUN_ID", "")
         repo = os.environ.get("GITHUB_REPOSITORY", "")
         token = os.environ.get("GITHUB_TOKEN", "")
-
         if not all([run_id, repo, token]):
             print("Missing environment variables for log fetch")
             exit(0)
-
         url = f"https://api.github.com/repos/{repo}/actions/runs/{run_id}/jobs"
         req = urllib.request.Request(url, headers={
             "Authorization": f"token {token}",
             "Accept": "application/vnd.github.v3+json",
         })
-
         try:
             with urllib.request.urlopen(req) as resp:
                 data = json.loads(resp.read())
@@ -93,16 +92,14 @@ jobs:
         except Exception as e:
             print(f"Could not fetch logs: {e}")
         PYEOF
-        RUN_ID="${{ steps.context.outputs.run_id }}" \
-        GITHUB_TOKEN="${{ github.token }}" \
-        python3 /tmp/fetch_logs.py
 
     - name: Generate repair report
       run: |
-        cat > /tmp/generate_report.py << 'PYEOF'
+        RUN_ID="${{ steps.context.outputs.run_id }}" \
+        COMMIT_SHA="${{ steps.context.outputs.commit_sha }}" \
+        python3 - << 'PYEOF'
         import json, os
         from datetime import datetime, timezone
-
         report = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "trigger": {
@@ -114,15 +111,11 @@ jobs:
             "autofix": {},
             "recommendations": [],
         }
-
-        # Load validator report
         try:
             with open("/tmp/validator-report.json") as f:
                 report["validator"] = json.load(f)
         except Exception:
             report["validator"] = {"error": "Report not available"}
-
-        # Load autofix report
         try:
             with open("/tmp/autofix-report.json") as f:
                 af = json.load(f)
@@ -137,18 +130,12 @@ jobs:
                     )
         except Exception:
             report["autofix"] = {"error": "Report not available"}
-
         if not report["recommendations"]:
             report["recommendations"].append(
                 "No auto-fixable issues detected — review CI logs for root cause"
             )
-
         print("=== Consolidated Repair Report ===")
         print(json.dumps(report, indent=2))
-
         with open("/tmp/repair-report.json", "w") as f:
             json.dump(report, f, indent=2)
         PYEOF
-        RUN_ID="${{ steps.context.outputs.run_id }}" \
-        COMMIT_SHA="${{ steps.context.outputs.commit_sha }}" \
-        python3 /tmp/generate_report.py

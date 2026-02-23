@@ -55,6 +55,10 @@ __pycache__/
 # GCP Service Account Keys
 .gcp/
 *.json
+# Allow essential config JSON files (not secrets)
+!**/package.json
+!**/tsconfig.json
+!**/tsconfig.*.json
 
 # Cloudflare Certificates
 .cloudflare/

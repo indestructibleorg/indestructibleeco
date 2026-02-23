@@ -31,26 +31,23 @@ jobs:
   check-current-quota:
     name: Check Current Quota
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     outputs:
       current_usage: ${{ steps.check-quota.outputs.usage }}
       current_limit: ${{ steps.check-quota.outputs.limit }}
       quota_status_json: ${{ steps.check-quota.outputs.quota_status_json }}
     steps:
       - name: Checkout repository
-        run: |
-          git clone --depth 1 https://github.com/${{ github.repository }}.git .
-          git checkout ${{ github.sha }}
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
-      - name: Install Python 3.11
-        run: |
-          sudo add-apt-repository ppa:deadsnakes/ppa -y
-          sudo apt-get update -y
-          sudo apt-get install -y python3.11 python3.11-venv python3.11-pip
-          python3.11 --version
+      - name: Setup Python 3.11
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
-          python3.11 -m pip install google-cloud-compute google-auth
+          pip install google-cloud-compute google-auth
 
       - name: Configure service account credentials
         env:
@@ -65,21 +62,15 @@ jobs:
           echo "GCP_CREDENTIALS_DIR=$TMP_DIR" >> $GITHUB_ENV
       - name: Install gcloud CLI and authenticate
         run: |
-          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
-          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
-          sudo apt-get update -y && sudo apt-get install -y google-cloud-cli
-          echo '${{ secrets.GCP_SA_KEY }}' > /tmp/gcp-sa-key.json
-          chmod 600 /tmp/gcp-sa-key.json
-          gcloud auth activate-service-account --key-file=/tmp/gcp-sa-key.json
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS"
           gcloud config set project $GCP_PROJECT
-          echo "GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp-sa-key.json" >> $GITHUB_ENV
 
       - name: Check current quota
         id: check-quota
         env:
           REGION: ${{ github.event.inputs.region }}
         run: |
-          python3.11 scripts/increase_ssd_quota.py \
+          python3 scripts/increase_ssd_quota.py \
             --action check \
             --region "$REGION" \
             --output-json > quota_status.raw
@@ -118,23 +109,20 @@ jobs:
   request-quota-increase:
     name: Request Quota Increase
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: check-current-quota
     steps:
       - name: Checkout repository
-        run: |
-          git clone --depth 1 https://github.com/${{ github.repository }}.git .
-          git checkout ${{ github.sha }}
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
-      - name: Install Python 3.11
-        run: |
-          sudo add-apt-repository ppa:deadsnakes/ppa -y
-          sudo apt-get update -y
-          sudo apt-get install -y python3.11 python3.11-venv python3.11-pip
-          python3.11 --version
+      - name: Setup Python 3.11
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
-          python3.11 -m pip install google-cloud-compute google-auth
+          pip install google-cloud-compute google-auth
 
       - name: Configure service account credentials
         env:
@@ -162,7 +150,7 @@ jobs:
           REQUESTED_LIMIT: ${{ github.event.inputs.requested_limit }}
           JUSTIFICATION: ${{ github.event.inputs.justification }}
         run: |
-          python3.11 scripts/increase_ssd_quota.py \
+          python3 scripts/increase_ssd_quota.py \
             --action request \
             --region "$REGION" \
             --current-limit "$CURRENT_LIMIT" \
@@ -200,7 +188,7 @@ jobs:
           REPOSITORY: ${{ github.repository }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python3.11 <<'PY'
+          python3 <<'PY'
           import json
           import os
           import textwrap

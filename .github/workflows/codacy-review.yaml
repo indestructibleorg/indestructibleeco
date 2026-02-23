@@ -13,6 +13,7 @@ jobs:
   request-codacy-review:
     if: github.event.label.name == 'codacy-review'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Request Codacy Production bot AI review
         env:

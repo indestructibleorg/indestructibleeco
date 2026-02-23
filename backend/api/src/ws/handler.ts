@@ -1,4 +1,4 @@
-import { Server as SocketIOServer, Socket } from "socket.io";
+import { Server as SocketIOServer, Socket, ExtendedError } from "socket.io";
 import { Logger } from "pino";
 import jwt from "jsonwebtoken";
 
@@ -6,14 +6,14 @@ const config = {
   jwtSecret: process.env.JWT_SECRET || "dev-secret-change-in-production",
 };
 
-interface AuthenticatedSocket extends Socket {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-    urn: string;
-  };
+interface UserPayload {
+  id: string;
+  email: string;
+  role: string;
+  urn: string;
 }
+// Use intersection type to avoid Socket interface extension conflicts
+type AuthenticatedSocket = Socket & { user?: UserPayload };
 
 // ─── Event Types (AsyncAPI 2.6 compliant) ───
 // Server → Client:
@@ -28,7 +28,7 @@ interface AuthenticatedSocket extends Socket {
 
 export function setupWebSocket(io: SocketIOServer, logger: Logger): void {
   // ─── Auth Middleware ───
-  io.use((socket: AuthenticatedSocket, next) => {
+  io.use((socket: AuthenticatedSocket, next: (err?: ExtendedError) => void) => {
     const token =
       socket.handshake.auth?.token ||
       socket.handshake.headers?.authorization?.replace("Bearer ", "");
@@ -57,15 +57,16 @@ export function setupWebSocket(io: SocketIOServer, logger: Logger): void {
     }
   });
 
-  io.on("connection", (socket: AuthenticatedSocket) => {
-    const user = socket.user!;
-    logger.info({ userId: user.id, socketId: socket.id, msg: "WebSocket connected" });
+  io.on("connection", (socket: Socket) => {
+    const authSocket = socket as AuthenticatedSocket;
+    const user = authSocket.user!;
+    logger.info({ userId: user.id, socketId: authSocket.id, msg: "WebSocket connected" });
 
     // Join user-specific room
-    socket.join(`user:${user.id}`);
+    authSocket.join(`user:${user.id}`);
 
     // ─── Client → Server: platform:register ───
-    socket.on("platform:register", (data: { platformId: string; capabilities: string[] }) => {
+    authSocket.on("platform:register", (data: { platformId: string; capabilities: string[] }) => {
       logger.info({
         msg: "Platform registered via WebSocket",
         platformId: data.platformId,
@@ -73,7 +74,7 @@ export function setupWebSocket(io: SocketIOServer, logger: Logger): void {
         userId: user.id,
       });
 
-      socket.join(`platform:${data.platformId}`);
+      authSocket.join(`platform:${data.platformId}`);
 
       // Broadcast status to all connected clients
       io.emit("platform:status", {
@@ -84,13 +85,13 @@ export function setupWebSocket(io: SocketIOServer, logger: Logger): void {
     });
 
     // ─── Disconnect ───
-    socket.on("disconnect", (reason) => {
-      logger.info({ userId: user.id, socketId: socket.id, reason, msg: "WebSocket disconnected" });
+    authSocket.on("disconnect", (reason: string) => {
+      logger.info({ userId: user.id, socketId: authSocket.id, reason, msg: "WebSocket disconnected" });
     });
 
     // ─── Error ───
-    socket.on("error", (err) => {
-      logger.error({ userId: user.id, socketId: socket.id, err: err.message, msg: "WebSocket error" });
+    authSocket.on("error", (err: Error) => {
+      logger.error({ userId: user.id, socketId: authSocket.id, err: err.message, msg: "WebSocket error" });
     });
   });
 }

@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { getSupabase } from "../services/supabase";
+import { getSupabaseOrThrow } from "../services/supabase";
 import { requireAuth, AuthenticatedRequest } from "../middleware/auth";
 import { v1 as uuidv1 } from "uuid";
 
@@ -24,6 +24,7 @@ authRouter.post("/signup", async (req: Request, res: Response, next: NextFunctio
     }
 
     const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await getSupabaseOrThrow().auth.signUp({
       email,
       password,
       options: {
@@ -73,6 +74,7 @@ authRouter.post("/login", async (req: Request, res: Response, next: NextFunction
     }
 
     const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await getSupabaseOrThrow().auth.signInWithPassword({
       email,
       password,
     });
@@ -117,6 +119,7 @@ authRouter.post("/refresh", async (req: Request, res: Response, next: NextFuncti
     }
 
     const { data, error } = await supabase.auth.refreshSession({
+    const { data, error } = await getSupabaseOrThrow().auth.refreshSession({
       refresh_token,
     });
 
@@ -149,6 +152,8 @@ authRouter.post("/logout", requireAuth, async (req: Request, res: Response, next
     const token = req.headers.authorization?.replace("Bearer ", "");
     if (token && supabase) {
       await supabase.auth.admin.signOut(token);
+    if (token) {
+      await getSupabaseOrThrow().auth.admin.signOut(token);
     }
     res.status(200).json({ ok: true });
   } catch (err) {

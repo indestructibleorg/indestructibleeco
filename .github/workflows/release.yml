@@ -11,12 +11,13 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
     - name: Checkout
-      run: |
-        git clone --depth 1 https://github.com/${{ github.repository }}.git .
-        git fetch --tags
-        git checkout ${{ github.ref_name }}
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      with:
+        ref: ${{ github.ref }}
+        fetch-depth: 0
 
     - name: Extract version from tag
       id: version

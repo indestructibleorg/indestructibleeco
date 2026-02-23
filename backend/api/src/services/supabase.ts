@@ -30,6 +30,18 @@ export function getSupabase(): SupabaseClient | null {
   return _client;
 }
 
+/**
+ * Returns the Supabase client or throws if not configured.
+ * Use this in all DB operations that require a valid client.
+ */
+export function getSupabaseOrThrow(): SupabaseClient {
+  const client = getSupabase();
+  if (!client) {
+    throw new Error("Supabase client not initialized — check SUPABASE_URL and SUPABASE_KEY env vars");
+  }
+  return client;
+}
+
 // ── Row Types ────────────────────────────────────────────────────────────────
 
 export interface UserRow {
@@ -104,6 +116,7 @@ export async function getUserById(userId: string): Promise<UserRow | null> {
   }
 
   const { data, error } = await supabase
+  const { data, error } = await getSupabaseOrThrow()
     .from("users")
     .select("*")
     .eq("id", userId)
@@ -126,6 +139,7 @@ export async function updateUser(
   }
 
   const { data, error } = await supabase
+  const { data, error } = await getSupabaseOrThrow()
     .from("users")
     .update(updates)
     .eq("id", userId)
@@ -144,6 +158,7 @@ export async function listPlatforms(): Promise<PlatformRow[]> {
   }
 
   const { data, error } = await supabase
+  const { data, error } = await getSupabaseOrThrow()
     .from("platforms")
     .select("*")
     .order("created_at", { ascending: false });
@@ -159,6 +174,7 @@ export async function getPlatformById(id: string): Promise<PlatformRow | null> {
   }
 
   const { data, error } = await supabase
+  const { data, error } = await getSupabaseOrThrow()
     .from("platforms")
     .select("*")
     .eq("id", id)
@@ -181,6 +197,7 @@ export async function createPlatform(
   }
 
   const { data, error } = await supabase
+  const { data, error } = await getSupabaseOrThrow()
     .from("platforms")
     .insert(record)
     .select()
@@ -199,6 +216,7 @@ export async function updatePlatform(
   }
 
   const { data, error } = await supabase
+  const { data, error } = await getSupabaseOrThrow()
     .from("platforms")
     .update(updates)
     .eq("id", id)
@@ -215,6 +233,7 @@ export async function deletePlatform(id: string): Promise<void> {
   }
 
   const { error } = await supabase
+  const { error } = await getSupabaseOrThrow()
     .from("platforms")
     .delete()
     .eq("id", id);
@@ -233,6 +252,7 @@ export async function createAiJob(
   }
 
   const { data, error } = await supabase
+  const { data, error } = await getSupabaseOrThrow()
     .from("ai_jobs")
     .insert({ ...record, status: "pending" })
     .select()
@@ -249,6 +269,7 @@ export async function getAiJob(jobId: string): Promise<AiJobRow | null> {
   }
 
   const { data, error } = await supabase
+  const { data, error } = await getSupabaseOrThrow()
     .from("ai_jobs")
     .select("*")
     .eq("id", jobId)
@@ -271,6 +292,7 @@ export async function updateAiJob(
   }
 
   const { data, error } = await supabase
+  const { data, error } = await getSupabaseOrThrow()
     .from("ai_jobs")
     .update(updates)
     .eq("id", jobId)
@@ -290,6 +312,7 @@ export async function listAiJobsByUser(
   }
 
   const { data, error } = await supabase
+  const { data, error } = await getSupabaseOrThrow()
     .from("ai_jobs")
     .select("*")
     .eq("user_id", userId)
@@ -306,6 +329,7 @@ export async function getPendingJobs(limit = 20): Promise<AiJobRow[]> {
   }
 
   const { data, error } = await supabase
+  const { data, error } = await getSupabaseOrThrow()
     .from("ai_jobs")
     .select("*")
     .in("status", ["pending", "running"])
@@ -327,6 +351,7 @@ export async function insertGovernanceRecord(
   }
 
   const { data, error } = await supabase
+  const { data, error } = await getSupabaseOrThrow()
     .from("governance_records")
     .insert(record)
     .select()
@@ -345,6 +370,7 @@ export async function listGovernanceRecords(
   }
 
   let query = supabase
+  let query = getSupabaseOrThrow()
     .from("governance_records")
     .select("*")
     .order("created_at", { ascending: false })

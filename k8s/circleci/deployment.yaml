@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: circleci-agent
+  namespace: circleci-runner
+  labels:
+    app: circleci-runner
+    component: agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: circleci-runner
+      component: agent
+  template:
+    metadata:
+      labels:
+        app: circleci-runner
+        component: agent
+    spec:
+      containers:
+      - name: runner-agent
+        image: circleci/runner:launch-agent
+        imagePullPolicy: Always
+        env:
+        # Resource class configuration
+        - name: CIRCLECI_RESOURCE_CLASS
+          valueFrom:
+            configMapKeyRef:
+              name: circleci-agent-config
+              key: CIRCLECI_RUNNER_RESOURCE_CLASS
+              
+        # Runner token
+        - name: CIRCLECI_RUNNER_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: circleci-runner-secrets
+              key: CIRCLECI_RUNNER_TOKEN
+              
+        # API token (optional)
+        - name: CIRCLECI_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: circleci-runner-secrets
+              key: CIRCLECI_API_TOKEN
+          optional: true
+              
+        # Logging
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: circleci-agent-config
+              key: LOG_LEVEL
+              
+        # Agent name
+        - name: AGENT_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: circleci-agent-config
+              key: CIRCLECI_RUNNER_NAME
+              
+        # Agent mode
+        - name: LAUNCH_AGENT_MODE
+          valueFrom:
+            configMapKeyRef:
+              name: circleci-agent-config
+              key: CIRCLECI_RUNNER_MODE
+              
+        # Working directory
+        - name: WORKING_DIRECTORY
+          valueFrom:
+            configMapKeyRef:
+              name: circleci-agent-config
+              key: WORKING_DIRECTORY
+              
+        # Cleanup workspace
+        - name: CLEANUP_WORKSPACE
+          valueFrom:
+            configMapKeyRef:
+              name: circleci-agent-config
+              key: CLEANUP_WORKSPACE
+              
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "512Mi"
+          limits:
+            cpu: "2000m"
+            memory: "4Gi"
+            
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "pgrep -f launch-agent || exit 1"
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+          
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "pgrep -f launch-agent || exit 1"
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+          
+      serviceAccountName: circleci-runner
+      restartPolicy: Always
+</create_file>

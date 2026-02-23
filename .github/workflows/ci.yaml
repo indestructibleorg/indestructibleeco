@@ -416,7 +416,6 @@ jobs:
         fail-build: false
         severity-cutoff: critical
         output-format: sarif
-      continue-on-error: true
 
     - name: Upload Grype SARIF to GitHub Security
       uses: github/codeql-action/upload-sarif@ce28f5bb42b7a9f2c824e633a3f6ee835bab6858  # v3.29.0
@@ -457,7 +456,9 @@ jobs:
         echo "|-------|--------|" >> "$GITHUB_STEP_SUMMARY"
         SBOM_FILE="indestructibleeco-sbom-${{ github.sha }}.json"
         if [ -f "$SBOM_FILE" ]; then
-          COMP=$(python3 -c "import json; d=json.load(open('$SBOM_FILE')); print(len(d.get('components',[])))")
+          python3 << 'PYEOF'
+          import json; d=json.load(open('$SBOM_FILE')); print(len(d.get('components',[])))
+          PYEOF
           echo "| SBOM (CycloneDX) | Generated — $COMP components |" >> "$GITHUB_STEP_SUMMARY"
         else
           echo "| SBOM (CycloneDX) | Failed |" >> "$GITHUB_STEP_SUMMARY"

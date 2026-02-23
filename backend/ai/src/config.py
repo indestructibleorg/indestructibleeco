@@ -25,7 +25,7 @@ class Settings:
 
     # ── Vector Alignment ──────────────────────────────────────────────
     vector_dim: int = int(os.getenv("ECO_VECTOR_DIM", "1024"))
-    alignment_model: str = os.getenv("ECO_ALIGNMENT_MODEL", "quantum-bert-xxl-v1")
+    alignment_model: str = os.getenv("ECO_ALIGNMENT_MODEL", "BAAI/bge-large-en-v1.5")
     alignment_tolerance: float = float(os.getenv("ECO_ALIGNMENT_TOLERANCE", "0.001"))
 
     # ── FAISS Index ───────────────────────────────────────────────────

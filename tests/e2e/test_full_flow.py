@@ -110,13 +110,13 @@ class TestAIServiceE2E:
         resp = ai_client.post("/api/v1/vector/align", json={
             "tokens": ["kubernetes", "deployment", "service"],
             "target_dim": 1024,
-            "alignment_model": "quantum-bert-xxl-v1",
+            "alignment_model": "BAAI/bge-large-en-v1.5",
             "tolerance": 0.001,
         })
         assert resp.status_code == 200
         data = resp.json()
         assert data["dimension"] == 1024
-        assert data["alignment_model"] == "quantum-bert-xxl-v1"
+        assert data["alignment_model"] == "BAAI/bge-large-en-v1.5"
         assert 0.0 < data["alignment_score"] <= 1.0
         assert len(data["coherence_vector"]) == 10
         assert data["uri"].startswith("eco-base://")

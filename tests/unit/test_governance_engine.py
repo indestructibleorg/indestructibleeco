@@ -54,7 +54,7 @@ def _make_valid_qyaml():
             "health_check_path": "/health",
         },
         "vector_alignment_map": {
-            "alignment_model": "quantum-bert-xxl-v1",
+            "alignment_model": "BAAI/bge-large-en-v1.5",
             "coherence_vector_dim": 1024,
         },
     }

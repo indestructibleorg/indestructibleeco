@@ -201,6 +201,13 @@ updates:
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
+    ignore:
+      # Python 3.14 is BETA until Oct 2026 — use 3.13 instead
+      - dependency-name: "python"
+        versions: ["3.14.*", "3.15.*", "3.16.*"]
+      # Node odd = experimental (not LTS): 21, 23, 25, 27
+      - dependency-name: "node"
+        versions: ["21.*", "23.*", "25.*", "27.*"]
 
   # ── Docker (backend/api) ─────────────────────────────────────
   - package-ecosystem: "docker"
@@ -219,6 +226,9 @@ updates:
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
+    ignore:
+      - dependency-name: "node"
+        versions: ["21.*", "23.*", "25.*", "27.*"]
 
   # ── Docker (backend/ai) ──────────────────────────────────────
   - package-ecosystem: "docker"
@@ -237,6 +247,9 @@ updates:
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
+    ignore:
+      - dependency-name: "python"
+        versions: ["3.14.*", "3.15.*", "3.16.*"]
 
   # ── Docker (platforms/web) ───────────────────────────────────
   - package-ecosystem: "docker"
@@ -255,3 +268,6 @@ updates:
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
+    ignore:
+      - dependency-name: "node"
+        versions: ["21.*", "23.*", "25.*", "27.*"]

@@ -11,11 +11,12 @@
 #   - workflow_dispatch: manual trigger for specific PR
 #
 # Behavior:
-#   1. Detect blocked PRs (BLOCKED / DIRTY / UNSTABLE mergeStateStatus)
-#   2. Diagnose root cause (failing check names + error messages)
-#   3. Auto-fix if possible (dependabot.yml syntax, CircleCI false positive, merge conflicts)
-#   4. If not auto-fixable: label PR + create/update Issue + post PR comment
-#   5. Never silently ignore a blocked PR
+#   1. Detect BEHIND PRs → auto update-branch + enable auto-merge
+#   2. Detect blocked PRs (BLOCKED / DIRTY / UNSTABLE mergeStateStatus)
+#   3. Diagnose root cause: check runs + commit statuses (CircleCI false positive)
+#   4. Auto-fix if possible (dependabot.yml syntax, CircleCI false positive, merge conflicts, BEHIND)
+#   5. If not auto-fixable: label PR + create/update Issue + post PR comment
+#   6. Never silently ignore a blocked PR
 
 name: PR Blocked Response
 
@@ -27,7 +28,7 @@ on:
       - "eco-base CI/CD"
     types: [completed]
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "*/15 * * * *"
   workflow_dispatch:
     inputs:
       pr_number:
@@ -45,6 +46,7 @@ permissions:
   issues: write
   checks: read
   statuses: read
+  actions: read
 
 jobs:
   respond:

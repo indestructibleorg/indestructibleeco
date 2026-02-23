@@ -39,7 +39,7 @@
     "url": "https://github.com/indestructibleorg/eco-base/issues"
   },
   "dependencies": {
-    "socket.io-client": "~4.7.5"
+    "socket.io-client": "~4.8.3"
   },
   "devDependencies": {
     "openapi-typescript-codegen": "~0.30.0",

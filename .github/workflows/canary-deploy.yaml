@@ -107,14 +107,12 @@ jobs:
       with:
         workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
         service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-      continue-on-error: true  # graceful degradation if GCP not configured
 
     - name: Get GKE credentials
       uses: google-github-actions/get-gke-credentials@7a108e64ed8546fe38316b4086e91da13f4785e1  # v2.3.1
       with:
         cluster_name: ${{ env.GKE_CLUSTER }}
         location: ${{ env.GKE_REGION }}
-      continue-on-error: true
 
     - name: Deploy to staging via ArgoCD sync
       id: deploy
@@ -271,7 +269,6 @@ jobs:
         SLO_AVAILABILITY_MIN: ${{ env.SLO_AVAILABILITY_MIN }}
         SLO_P95_LATENCY_MAX_MS: ${{ env.SLO_P95_LATENCY_MAX_MS }}
         SLO_ERROR_RATE_MAX_PCT: ${{ env.SLO_ERROR_RATE_MAX_PCT }}
-      continue-on-error: true
 
     - name: SLO gate summary
       run: |
@@ -314,7 +311,6 @@ jobs:
       with:
         cluster_name: ${{ env.GKE_CLUSTER }}
         location: ${{ env.GKE_REGION }}
-      continue-on-error: true
 
     - name: Promote to production
       run: |

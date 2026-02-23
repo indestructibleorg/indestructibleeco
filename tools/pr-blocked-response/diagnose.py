@@ -158,13 +158,38 @@ def commit_auto_fixes():
         return
     subprocess.run(["git", "config", "user.email", "bot@eco-base.dev"])
     subprocess.run(["git", "config", "user.name", "eco-base-bot"])
+    # Best practice: never push directly to main — create branch → PR → auto-merge
+    import time
+    branch = f"bot/auto-fix-blocked-{int(time.time())}"
+    subprocess.run(["git", "checkout", "-b", branch])
     subprocess.run(["git", "add", "-A"])
     subprocess.run(["git", "commit", "-m",
                     "fix(bot): auto-fix PR blocked issues\n\n"
                     "- Added .circleci/config.yml to suppress CircleCI false positive\n"
                     "- Fixed dependabot.yml invalid Docker ignore version rules"])
-    r = subprocess.run(["git", "push", "origin", "main"], capture_output=True, text=True)
-    print(f"\n[GIT] Pushed auto-fixes: {'OK' if r.returncode == 0 else r.stderr[:80]}")
+    r_push = subprocess.run(["git", "push", "origin", branch], capture_output=True, text=True)
+    if r_push.returncode != 0:
+        print(f"\n[GIT] Push failed: {r_push.stderr[:80]}")
+        return
+    # Create PR and enable auto-merge
+    r_pr = subprocess.run([
+        "gh", "pr", "create",
+        "--title", "fix(bot): auto-fix PR blocked issues",
+        "--body", "Automated fix by PR Blocked Response workflow.\n\n"
+                  "- Added .circleci/config.yml to suppress CircleCI false positive\n"
+                  "- Fixed dependabot.yml invalid Docker ignore version rules\n\n"
+                  "This PR was created automatically and will auto-merge once required checks pass.",
+        "--label", "automated,bot-pr",
+        "--base", "main",
+        "--head", branch
+    ], capture_output=True, text=True)
+    if r_pr.returncode == 0:
+        pr_url = r_pr.stdout.strip()
+        print(f"\n[GIT] Created PR: {pr_url}")
+        subprocess.run(["gh", "pr", "merge", pr_url, "--auto", "--squash"])
+        print("[GIT] Auto-merge enabled")
+    else:
+        print(f"\n[GIT] PR creation failed: {r_pr.stderr[:80]}")
 
 
 def main():

@@ -27,12 +27,27 @@ jobs:
       id: version_check
       run: |
         cd backend/ai
-        PKG_NAME=$(python3 -c "import tomllib; d=tomllib.load(open('pyproject.toml','rb')); print(d['tool']['poetry']['name'].replace('-','_'))" 2>/dev/null || \
-                   python3 -c "import tomllib; d=tomllib.load(open('pyproject.toml','rb')); print(d['project']['name'].replace('-','_'))" 2>/dev/null || \
-                   grep -m1 '^name' pyproject.toml | sed 's/.*= *"\(.*\)"/\1/' | tr '-' '_')
-        PKG_VERSION=$(python3 -c "import tomllib; d=tomllib.load(open('pyproject.toml','rb')); print(d['tool']['poetry']['version'])" 2>/dev/null || \
-                      python3 -c "import tomllib; d=tomllib.load(open('pyproject.toml','rb')); print(d['project']['version'])" 2>/dev/null || \
-                      grep -m1 '^version' pyproject.toml | sed 's/.*= *"\(.*\)"/\1/')
+        # Extract package name and version using heredoc to avoid YAML parse errors
+        PKG_NAME=$(python3 - << 'PYEOF'
+        import tomllib, sys
+        try:
+            d = tomllib.load(open('pyproject.toml', 'rb'))
+            name = d.get('tool', {}).get('poetry', {}).get('name') or d.get('project', {}).get('name', '')
+            print(name.replace('-', '_'))
+        except Exception:
+            sys.exit(1)
+        PYEOF
+        ) || PKG_NAME=$(grep -m1 '^name' pyproject.toml | sed 's/.*= *"\(.*\)"/\1/' | tr '-' '_')
+        PKG_VERSION=$(python3 - << 'PYEOF'
+        import tomllib, sys
+        try:
+            d = tomllib.load(open('pyproject.toml', 'rb'))
+            version = d.get('tool', {}).get('poetry', {}).get('version') or d.get('project', {}).get('version', '')
+            print(version)
+        except Exception:
+            sys.exit(1)
+        PYEOF
+        ) || PKG_VERSION=$(grep -m1 '^version' pyproject.toml | sed 's/.*= *"\(.*\)"/\1/')
         echo "pkg_name=$PKG_NAME" >> "$GITHUB_OUTPUT"
         echo "pkg_version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
         echo "Checking if ${PKG_NAME}==${PKG_VERSION} is already on PyPI..."

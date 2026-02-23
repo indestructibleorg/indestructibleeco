@@ -284,12 +284,17 @@ def validate_dockerfile_paths(repo: Path) -> list[dict]:
     build_contexts: dict[str, str] = {}
 
     # Source 1: GitHub Actions workflows — pattern: -f <dockerfile> <context>
+    # Supports both single-line and multi-line (backslash continuation) docker build commands
     for wf in (repo / ".github" / "workflows").glob("*.y*ml") if (repo / ".github" / "workflows").exists() else []:
         content = wf.read_text()
-        for m in re.finditer(r"-f\s+(\S+Dockerfile\S*)\s+(\S+)", content):
+        # Normalize backslash-newline continuations for multi-line commands
+        normalized = re.sub(r"\\\s*\n\s*", " ", content)
+        for m in re.finditer(r"-f\s+(\S+Dockerfile\S*)\s+(\S+)", normalized):
             df_path = m.group(1)
             ctx = m.group(2)
-            build_contexts[df_path] = ctx
+            # Skip flags (e.g., --platform, --tag) that appear after -f <dockerfile>
+            if not ctx.startswith("-"):
+                build_contexts[df_path] = ctx
 
     # Source 2: docker-compose files — pattern: context: <path>, dockerfile: <name>
     compose_files = list(repo.glob("docker-compose*.yml")) + list(repo.glob("docker-compose*.yaml"))

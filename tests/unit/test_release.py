@@ -188,14 +188,31 @@ class TestReleaseWorkflows:
 
     @pytest.mark.parametrize("wf", WORKFLOWS)
     def test_workflow_no_third_party_actions(self, wf):
+        """Verify release workflows only use approved action owners.
+
+        Approved action owners:
+          - indestructibleorg/*  (internal org actions)
+          - actions/*            (GitHub official actions — trusted, audited)
+          - docker/*             (Docker official actions — trusted, audited)
+          - pypa/*               (Python Packaging Authority — trusted)
+        """
+        APPROVED_OWNERS = (
+            "indestructibleorg/",
+            "actions/",
+            "docker/",
+            "pypa/",
+        )
         path = os.path.join(REPO_ROOT, ".github", "workflows", wf)
         with open(path, encoding="utf-8") as f:
             content = f.read()
         import re
         uses_lines = re.findall(r"uses:\s+(.+)", content)
         for line in uses_lines:
-            assert "indestructibleorg" in line or not uses_lines, (
-                f"{wf}: third-party action found: {line}"
+            line = line.strip()
+            is_approved = any(line.startswith(owner) for owner in APPROVED_OWNERS)
+            assert is_approved, (
+                f"{wf}: unapproved third-party action found: {line}. "
+                f"Only {APPROVED_OWNERS} are allowed."
             )
 
     def test_release_creates_github_release(self):

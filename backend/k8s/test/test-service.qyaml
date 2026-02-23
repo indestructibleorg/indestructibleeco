@@ -18,3 +18,29 @@ spec:
   ports:
     - port: 80
       targetPort: 8080
+---
+# YAML Toolkit v1 — Governance Block (auto-generated, manual editing prohibited)
+document_metadata:
+  unique_id: "eco-auto-916172"
+  uri: "indestructibleeco://backend/k8s/test/test-service"
+  urn: "urn:indestructibleeco:backend:k8s:test:test-service:eco-auto-916172"
+  target_system: gke-production
+  cross_layer_binding: []
+  schema_version: v8
+  generated_by: yaml-toolkit-v8
+  created_at: "2026-02-23T05:12:00.000Z"
+governance_info:
+  owner: platform-team
+  approval_chain: [platform-team]
+  compliance_tags: [zero-trust, soc2, internal]
+  lifecycle_policy: active
+registry_binding:
+  service_endpoint: "http://localhost:8000"
+  discovery_protocol: consul
+  health_check_path: "/health"
+  registry_ttl: 30
+vector_alignment_map:
+  alignment_model: quantum-bert-xxl-v1
+  coherence_vector_dim: 1024
+  function_keyword: [auto-generated]
+  contextual_binding: "auto-generated"

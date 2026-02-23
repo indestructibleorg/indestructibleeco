@@ -464,6 +464,48 @@ def fix_heredoc_replacement(finding: dict, repo: Path, dry_run: bool = False) ->
     result["details"] = f"Could not parse python -c pattern at L{line_num}: {target_line.strip()[:80]}"
     return result
 
+@register_fix("remove-continue-on-error")
+def fix_remove_continue_on_error(finding: dict, repo: Path, dry_run: bool = False) -> dict:
+    """Remove prohibited continue-on-error lines from workflow files."""
+    result = {"applied": False, "details": ""}
+    file_path = repo / finding["file"]
+    if not file_path.exists():
+        result["details"] = f"File not found: {finding['file']}"
+        return result
+
+    lines = file_path.read_text(encoding="utf-8").splitlines(keepends=True)
+    line_num = finding.get("line", 0) - 1  # 0-indexed
+
+    if line_num < 0 or line_num >= len(lines):
+        result["details"] = f"Line {finding.get('line')} out of range"
+        return result
+
+    target_line = lines[line_num]
+    if "continue-on-error" not in target_line:
+        # Search nearby lines
+        for offset in range(-2, 5):
+            idx = line_num + offset
+            if 0 <= idx < len(lines) and "continue-on-error" in lines[idx]:
+                line_num = idx
+                target_line = lines[idx]
+                break
+        else:
+            result["details"] = f"Could not find continue-on-error near L{finding.get('line')}"
+            return result
+
+    if dry_run:
+        result["applied"] = True
+        result["details"] = f"Would remove continue-on-error at L{line_num + 1}: {target_line.strip()}"
+        return result
+
+    # Remove the line entirely
+    del lines[line_num]
+    file_path.write_text("".join(lines), encoding="utf-8")
+    result["applied"] = True
+    result["details"] = f"Removed continue-on-error at L{line_num + 1}: {target_line.strip()}"
+    return result
+
+
 # ── CLI Entry Point ──────────────────────────────────────────
 
 if __name__ == "__main__":

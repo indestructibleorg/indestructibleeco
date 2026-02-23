@@ -6,7 +6,7 @@ Enforces:
 - UUID v1 for all identifiers
 - URI/URN dual identification on all resources
 - .qyaml 4-block governance compliance (via YAML parsing)
-- Vector alignment via quantum-bert-xxl-v1
+- Vector alignment via BAAI/bge-large-en-v1.5
 - Persistent audit log (append-only JSONL file + in-memory ring buffer)
 """
 

@@ -363,7 +363,7 @@ paths:
               required: [input]
               properties:
                 input: { type: string }
-                model: { type: string, default: "quantum-bert-xxl-v1" }
+                model: { type: string, default: "BAAI/bge-large-en-v1.5" }
                 dimensions: { type: integer, default: 1024 }
       responses:
         "200":
@@ -385,7 +385,7 @@ paths:
               properties:
                 text_a: { type: string }
                 text_b: { type: string }
-                model: { type: string, default: "quantum-bert-xxl-v1" }
+                model: { type: string, default: "BAAI/bge-large-en-v1.5" }
       responses:
         "200":
           description: Similarity result
@@ -702,7 +702,7 @@ components:
       properties:
         tokens: { type: array, items: { type: string } }
         target_dim: { type: integer, default: 1024 }
-        alignment_model: { type: string, default: "quantum-bert-xxl-v1" }
+        alignment_model: { type: string, default: "BAAI/bge-large-en-v1.5" }
         tolerance: { type: number, default: 0.001 }
 
     VectorAlignResponse:

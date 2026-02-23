@@ -43,7 +43,7 @@ class StreamChunk:
 @dataclass
 class EmbeddingRequest:
     texts: List[str] = field(default_factory=list)
-    model_id: str = "quantum-bert-xxl-v1"
+    model_id: str = "BAAI/bge-large-en-v1.5"
     dimensions: int = 1024
 
 

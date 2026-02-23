@@ -1,6 +1,20 @@
 version: 2.1
+
 # eco-base uses GitHub Actions for CI/CD.
-# This file exists solely to prevent CircleCI from attempting to parse
-# GitHub Actions workflow files as CircleCI configuration.
+# This CircleCI config provides a no-op workflow to prevent CircleCI
+# from reporting "error" commit status on every PR.
 # The actual CI/CD pipeline is defined in .github/workflows/ci.yaml
-# No CircleCI workflows are defined or used in this project.
+
+jobs:
+  noop:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run:
+          name: "No-op — CI handled by GitHub Actions"
+          command: echo "eco-base CI/CD is managed by GitHub Actions."
+
+workflows:
+  ci-placeholder:
+    jobs:
+      - noop

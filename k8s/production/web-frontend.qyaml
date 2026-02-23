@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/part-of: eco-base
     environment: production
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: eco-web-frontend
@@ -29,7 +29,7 @@ spec:
         fsGroup: 101
       containers:
         - name: eco-web-frontend
-          image: asia-east1-docker.pkg.dev/my-project-ops-1991/eco-base/web:v1.0.0
+          image: asia-east1-docker.pkg.dev/my-project-ops-1991/indestructibleeco/web:v1.0.2
           ports:
             - containerPort: 80
               protocol: TCP

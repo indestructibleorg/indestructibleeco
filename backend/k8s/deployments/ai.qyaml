@@ -74,7 +74,7 @@ registry_binding:
   health_check_path: "/health"
   registry_ttl: 30
 vector_alignment_map:
-  alignment_model: quantum-bert-xxl-v1
+  alignment_model: BAAI/bge-large-en-v1.5
   coherence_vector_dim: 1024
   function_keyword: [ai, inference, generation, grpc, vector]
   contextual_binding: "ai-service -> [redis, celery]"

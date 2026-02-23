@@ -3,6 +3,15 @@
 Supports batch embedding, dimension reduction, similarity computation,
 and integration with the vector alignment pipeline.
 
+Default model: BAAI/bge-large-en-v1.5 (1024-dim, multilingual, Apache-2.0)
+  HuggingFace: https://huggingface.co/BAAI/bge-large-en-v1.5
+  Strong MTEB benchmark performance; supports Chinese and English.
+
+Fallback chain:
+  1. Engine adapter (vLLM / TGI / Ollama via /v1/embeddings)
+  2. sentence-transformers local inference (requires ``pip install sentence-transformers``)
+  3. Deterministic hash-based vectors (offline, no GPU/network — semantically meaningless)
+
 URI: eco-base://backend/ai/services/embedding
 """
 
@@ -23,7 +32,13 @@ DEFAULT_EMBEDDING_DIM = 1024
 MAX_EMBEDDING_DIM = 4096
 MIN_EMBEDDING_DIM = 64
 MAX_BATCH_SIZE = 256
-DEFAULT_MODEL = "quantum-bert-xxl-v1"
+
+# Real model: BAAI/bge-large-en-v1.5 — 1024-dim multilingual embedding model
+# Apache-2.0 license; replaces the previously fictitious "quantum-bert-xxl-v1".
+DEFAULT_MODEL = "BAAI/bge-large-en-v1.5"
+
+# Lightweight alternative for resource-constrained / CPU-only environments
+_FALLBACK_ST_MODEL = "sentence-transformers/all-MiniLM-L6-v2"  # 384-dim, Apache-2.0
 
 
 class EmbeddingResult:
@@ -97,8 +112,8 @@ class EmbeddingService:
     """Generates vector embeddings via engine adapters with local fallback.
 
     In production, dispatches to engine endpoints that support /v1/embeddings
-    (vLLM, TGI, Ollama). Falls back to deterministic hash-based vectors
-    when no engine is available.
+    (vLLM, TGI, Ollama). Falls back to sentence-transformers local inference,
+    then to deterministic hash-based vectors when no engine is available.
 
     Features:
         - Batch embedding with configurable dimensions
@@ -117,6 +132,7 @@ class EmbeddingService:
         self._engine_manager = engine_manager
         self._default_model = default_model
         self._default_dimensions = default_dimensions
+        self._st_model: Any = None  # cached sentence-transformers model
 
         # Metrics
         self.total_requests: int = 0
@@ -145,8 +161,8 @@ class EmbeddingService:
     ) -> EmbeddingResult:
         """Generate embeddings for a batch of texts.
 
-        Dispatches to engine if available, otherwise uses deterministic
-        hash-based fallback vectors.
+        Dispatches to engine if available, otherwise falls back through
+        sentence-transformers local inference and finally hash-based vectors.
         """
         model = model_id or self._default_model
         dim = dimensions or self._default_dimensions
@@ -351,12 +367,50 @@ class EmbeddingService:
         texts: List[str],
         dimensions: int,
     ) -> Tuple[List[List[float]], int]:
-        """Deterministic hash-based embedding fallback.
+        """Embedding fallback chain.
 
-        Produces normalized vectors seeded by text content hash.
-        Consistent: same text always produces same vector.
+        Priority:
+          1. sentence-transformers local inference
+             (requires ``pip install sentence-transformers``)
+          2. Deterministic hash-based vectors (offline, no dependencies)
+
+        The hash-based path guarantees the service remains functional without
+        any network access or GPU, but produces semantically meaningless vectors.
+        It is intended only for unit-test / CI environments where a real model
+        is not available.
         """
-        embeddings: List[List[float]] = []
+        # --- Attempt 1: local sentence-transformers ---
+        try:
+            from sentence_transformers import SentenceTransformer  # type: ignore[import]
+
+            # Use lightweight model for dims <= 384, full model otherwise
+            st_model_name = _FALLBACK_ST_MODEL if dimensions <= 384 else DEFAULT_MODEL
+            cached = self._st_model
+            if cached is None or getattr(cached, "_eco_model_name", None) != st_model_name:
+                logger.info("Loading sentence-transformers model: %s", st_model_name)
+                self._st_model = SentenceTransformer(st_model_name)
+                self._st_model._eco_model_name = st_model_name  # type: ignore[attr-defined]
+
+            raw = self._st_model.encode(texts, normalize_embeddings=True)
+            embeddings: List[List[float]] = []
+            total_tokens = 0
+            for i, vec in enumerate(raw):
+                total_tokens += len(texts[i].split())
+                v: List[float] = list(vec[:dimensions]) if len(vec) >= dimensions else list(vec)
+                # Pad with zeros if model native dim < requested dim
+                if len(v) < dimensions:
+                    v += [0.0] * (dimensions - len(v))
+                embeddings.append([round(float(x), 6) for x in v])
+            return embeddings, total_tokens
+
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("sentence-transformers unavailable, using hash fallback: %s", exc)
+
+        # --- Attempt 2: deterministic hash-based fallback (offline) ---
+        # WARNING: these vectors carry NO semantic meaning.
+        # They are deterministic (same text → same vector) and L2-normalised,
+        # but cosine similarity between unrelated texts will be near-random.
+        embeddings = []
         total_tokens = 0
 
         for text in texts:

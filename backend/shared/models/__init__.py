@@ -184,7 +184,7 @@ class QYAMLDocument:
     discovery_protocol: str = "consul"
     health_check_path: str = "/health"
     registry_ttl: int = 30
-    alignment_model: str = "quantum-bert-xxl-v1"
+    alignment_model: str = "BAAI/bge-large-en-v1.5"
     coherence_vector: List[float] = field(default_factory=list)
     function_keywords: List[str] = field(default_factory=list)
     contextual_binding: str = ""

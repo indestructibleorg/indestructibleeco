@@ -9,4 +9,6 @@ jobs:
     steps:
     - name: Test step with python -c issue
       run: |
-        python3 -c "import json; data = {'key': 'value'}; print(json.dumps(data))"
+        python3 << 'PYEOF'
+        import json; data = {'key': 'value'}; print(json.dumps(data))
+        PYEOF

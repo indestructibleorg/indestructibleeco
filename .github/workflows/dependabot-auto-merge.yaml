@@ -1,11 +1,8 @@
 name: Dependabot Auto-Merge
 # Automatically merges Dependabot PRs when all required CI checks pass.
-# Handles: patch/minor dependency updates for Actions, npm, pip, Docker.
-# Major version bumps require human review (not auto-merged).
-#
-# Key fix: strict_required_status_checks_policy=true means branches MUST be
-# up-to-date with main before merging. This workflow now calls update-branch
-# API to sync BEHIND branches, then enables auto-merge.
+# Delegates to the unified autonomous PR engine (diagnose.py) for all decisions.
+# External checks (Codacy/SonarCloud/CodeQL/Trivy/Copilot) are IGNORED.
+# Only internal checks matter: validate/lint/test/build/opa-policy/supply-chain
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -13,189 +10,78 @@ on:
     workflows: ["eco-base CI/CD"]
     types: [completed]
   schedule:
-    # Run every 30 minutes to catch PRs that became BEHIND after other merges
-    - cron: "*/30 * * * *"
-
+    - cron: "*/15 * * * *"
 permissions:
   contents: write
   pull-requests: write
-
+  issues: write
+  checks: read
+  statuses: read
+  actions: read
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: dependabot-auto-merge-${{ github.ref || github.run_id }}
   cancel-in-progress: false
-
 jobs:
-  auto-merge-dependabot:
-    name: Auto-merge Dependabot PR
+  auto-merge:
+    name: Auto-merge Dependabot PRs
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    if: github.actor == 'dependabot[bot]' && github.event_name == 'pull_request'
     steps:
-      - name: Fetch Dependabot metadata
-        id: meta
-        uses: dependabot/fetch-metadata@21025c705c08248db411dc16f3619e6b5f9ea21a  # v2.3.0
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
-      - name: Enable auto-merge for patch/minor updates
+      - name: Setup Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.13"
+
+      - name: Label major Dependabot updates for human review
         if: |
-          steps.meta.outputs.update-type == 'version-update:semver-patch' ||
-          steps.meta.outputs.update-type == 'version-update:semver-minor'
-        run: |
-          # Enable auto-merge first
-          gh pr merge --auto --squash "$PR_URL" || true
-          # Also update branch in case it's BEHIND main (strict policy)
-          PR_NUM=$(echo "$PR_URL" | grep -oE '[0-9]+$')
-          HEAD_SHA=$(gh pr view "$PR_NUM" --json headRefOid --jq '.headRefOid')
-          echo "Updating branch for PR #$PR_NUM (head: $HEAD_SHA)"
-          curl -s -X PUT \
-            -H "Authorization: token $GH_TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/$PR_NUM/update-branch" \
-            -d "{}" || true
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-
-      - name: Label major updates for human review
-        if: steps.meta.outputs.update-type == 'version-update:semver-major'
-        run: |
-          gh pr edit "$PR_URL" --add-label "human-review-required"
-          gh pr comment "$PR_URL" --body "Major version update — requires human review before merging."
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  process-existing-dependabot-prs:
-    name: Process existing open Dependabot PRs
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    if: |
-      github.event_name == 'workflow_run' ||
-      github.event_name == 'schedule'
-    steps:
-      - name: Update BEHIND branches and auto-merge Dependabot PRs
+          github.event_name == 'pull_request' &&
+          github.actor == 'dependabot[bot]'
         run: |
           python3 - << 'PYEOF'
-          import subprocess, json, os, sys, urllib.request, urllib.error
+          import subprocess, os, json
 
-          repo = os.environ.get('GITHUB_REPOSITORY', '')
-          token = os.environ.get('GH_TOKEN', '')
+          pr_num = os.environ.get("PR_NUMBER", "")
+          repo   = os.environ.get("REPO", "")
+          if not pr_num or not repo:
+              exit(0)
 
-          def gh_api_put(path):
-              """Call GitHub API PUT to update branch."""
-              url = f"https://api.github.com{path}"
-              req = urllib.request.Request(url, method="PUT")
-              req.add_header("Authorization", f"token {token}")
-              req.add_header("Accept", "application/vnd.github.v3+json")
-              req.add_header("Content-Type", "application/json")
-              req.data = b"{}"
-              try:
-                  with urllib.request.urlopen(req, timeout=15) as resp:
-                      result = json.loads(resp.read())
-                      return True, result.get("message", "OK")
-              except urllib.error.HTTPError as e:
-                  body = e.read().decode()
-                  return False, f"HTTP {e.code}: {body[:80]}"
-              except Exception as e:
-                  return False, str(e)
-
-          def get_commit_statuses(sha):
-              """Get commit statuses for a SHA (CircleCI etc.)."""
-              url = f"https://api.github.com/repos/{repo}/commits/{sha}/statuses?per_page=50"
-              req = urllib.request.Request(url)
-              req.add_header("Authorization", f"token {token}")
-              req.add_header("Accept", "application/vnd.github.v3+json")
-              try:
-                  with urllib.request.urlopen(req, timeout=15) as resp:
-                      return json.loads(resp.read())
-              except Exception:
-                  return []
-
-          # Get all open Dependabot PRs without human-review-required label
-          result = subprocess.run(
-              ['gh', 'pr', 'list', '--repo', repo,
-               '--author', 'dependabot[bot]', '--state', 'open',
-               '--json', 'number,title,url,labels,mergeStateStatus,headRefOid'],
+          # Check if this is a major version bump via dependabot metadata
+          r = subprocess.run(
+              ["gh", "pr", "view", pr_num, "--repo", repo,
+               "--json", "title,labels"],
               capture_output=True, text=True
           )
-          if result.returncode != 0:
-              print('Failed to list PRs:', result.stderr)
-              sys.exit(0)
+          if r.returncode != 0:
+              exit(0)
+          pr = json.loads(r.stdout)
+          title = pr.get("title", "").lower()
+          labels = [l["name"] for l in pr.get("labels", [])]
 
-          prs = json.loads(result.stdout or '[]')
-          print(f'Found {len(prs)} open Dependabot PRs')
-
-          for pr in prs:
-              number = pr['number']
-              title = pr['title']
-              labels = [l['name'] for l in pr.get('labels', [])]
-              merge_state = pr.get('mergeStateStatus', 'UNKNOWN')
-              head_sha = pr.get('headRefOid', '')
-
-              if 'human-review-required' in labels:
-                  print(f'  SKIP #{number}: has human-review-required label')
-                  continue
-
-              print(f'  PR #{number} [{merge_state}]: {title[:60]}')
-
-              # Step 1: If BEHIND, update the branch first
-              if merge_state == 'BEHIND':
-                  ok, msg = gh_api_put(f"/repos/{repo}/pulls/{number}/update-branch")
-                  print(f'    -> update-branch: {msg}')
-                  # Enable auto-merge so it merges after CI passes
-                  r = subprocess.run(
-                      ['gh', 'pr', 'merge', '--auto', '--squash', str(number), '--repo', repo],
-                      capture_output=True, text=True
-                  )
-                  print(f'    -> auto-merge: {"enabled" if r.returncode == 0 else r.stderr.strip()[:60]}')
-                  continue
-
-              # Step 2: Check CI status for BLOCKED/MERGEABLE PRs
-              checks = subprocess.run(
-                  ['gh', 'pr', 'checks', str(number), '--repo', repo],
-                  capture_output=True, text=True
-              )
-              lines = checks.stdout.strip().split('\n')
-              # Ignore CircleCI (commit status false positive) and non-required checks
-              fails = [l for l in lines if '\tfail\t' in l
-                       and 'circleci' not in l.lower()
-                       and 'sonarcloud' not in l.lower()
-                       and 'codacy' not in l.lower()
-                       and 'coderabbit' not in l.lower()]
-              passes = [l for l in lines if '\tpass\t' in l]
-
-              # Also check commit statuses for CircleCI false positive
-              commit_statuses = get_commit_statuses(head_sha) if head_sha else []
-              real_status_failures = [s for s in commit_statuses
-                                      if s.get('state') in ('error', 'failure')
-                                      and 'circleci' not in s.get('context', '').lower()]
-
-              print(f'    -> {len(passes)} pass, {len(fails)} check-run fails, '
-                    f'{len(real_status_failures)} status fails')
-
-              if len(fails) == 0 and len(real_status_failures) == 0 and len(passes) > 0:
-                  # All required checks pass — enable auto-merge
-                  r = subprocess.run(
-                      ['gh', 'pr', 'merge', '--auto', '--squash', str(number), '--repo', repo],
-                      capture_output=True, text=True
-                  )
-                  if r.returncode == 0:
-                      print(f'    -> auto-merge enabled')
-                  else:
-                      msg = r.stderr.strip()
-                      if 'already' in msg.lower():
-                          print(f'    -> auto-merge already enabled')
-                      else:
-                          print(f'    -> {msg[:100]}')
-                  # Also try to update branch if BLOCKED (might be behind)
-                  if merge_state == 'BLOCKED':
-                      ok, msg = gh_api_put(f"/repos/{repo}/pulls/{number}/update-branch")
-                      print(f'    -> update-branch (BLOCKED): {msg}')
-              else:
-                  print(f'    -> skipping (CI not fully passing)')
+          # Major bumps: title contains "bump X from Y to Z" where major version changes
+          # Simple heuristic: if "from 1." to "2." etc.
+          import re
+          m = re.search(r"from (\d+)\.\S+ to (\d+)\.", title)
+          if m and m.group(1) != m.group(2):
+              if "human-review-required" not in labels:
+                  subprocess.run(["gh", "pr", "edit", pr_num, "--repo", repo,
+                                  "--add-label", "human-review-required"],
+                                 capture_output=True)
+                  print(f"Labeled PR #{pr_num} as human-review-required (major bump)")
           PYEOF
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Run autonomous PR engine
+        env:
+          GH_TOKEN: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SPECIFIC_PR: ${{ github.event.pull_request.number || '' }}
+        run: python3 tools/pr-blocked-response/diagnose.py

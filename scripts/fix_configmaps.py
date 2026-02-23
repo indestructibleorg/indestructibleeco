@@ -62,7 +62,7 @@ else:
             'registry_ttl': 0
         },
         'vector_alignment_map': {
-            'alignment_model': 'quantum-bert-xxl-v1',
+            'alignment_model': 'BAAI/bge-large-en-v1.5',
             'coherence_vector_dim': 1024,
             'function_keyword': ['configmap', 'production', 'environment', 'config'],
             'contextual_binding': 'eco-config -> [api-gateway, ai-service, api-service, web-frontend]'

@@ -63,7 +63,7 @@ class GenerateResponse(BaseModel):
 class VectorAlignRequest(BaseModel):
     tokens: List[str]
     target_dim: int = 1024
-    alignment_model: str = "quantum-bert-xxl-v1"
+    alignment_model: str = "BAAI/bge-large-en-v1.5"
     tolerance: float = 0.001
 
 
@@ -482,22 +482,35 @@ async def generate(req: GenerateRequest, request: Request):
 
 @router.post("/vector/align", response_model=VectorAlignResponse)
 async def vector_align(req: VectorAlignRequest):
-    """Compute vector alignment using quantum-bert-xxl-v1."""
+    """Compute vector alignment via real embedding similarity.
+
+    Embeds the provided tokens as a single sentence using EmbeddingService,
+    which dispatches to an engine adapter when available and falls back to
+    sentence-transformers local inference or deterministic hash-based vectors.
+    """
     if req.target_dim < 1024 or req.target_dim > 4096:
         raise HTTPException(status_code=400, detail="target_dim must be between 1024 and 4096")
     if req.tolerance < 0.0001 or req.tolerance > 0.005:
         raise HTTPException(status_code=400, detail="tolerance must be between 0.0001 and 0.005")
 
-    random.seed(hash(tuple(req.tokens)))
-    coherence_vector = [
-        round(random.gauss(0, 1) / math.sqrt(req.target_dim), 6)
-        for _ in range(req.target_dim)
-    ]
-    norm = math.sqrt(sum(v * v for v in coherence_vector))
-    if norm > 0:
-        coherence_vector = [round(v / norm, 6) for v in coherence_vector]
+    from .services.embedding import EmbeddingService  # local import to avoid circular deps
 
-    alignment_score = round(0.85 + random.random() * 0.14, 4)
+    svc = EmbeddingService(
+        default_model=req.alignment_model,
+        default_dimensions=req.target_dim,
+    )
+    sentence = " ".join(req.tokens) if req.tokens else "<empty>"
+    result = await svc.embed(sentence, model_id=req.alignment_model, dimensions=req.target_dim)
+
+    coherence_vector = result.embeddings[0] if result.embeddings else []
+
+    # Alignment score: L2-norm of the coherence vector normalised to [0, 1].
+    # A well-formed unit vector has norm = 1.0; partial or zero vectors score lower.
+    if coherence_vector:
+        raw_norm = math.sqrt(sum(v * v for v in coherence_vector))
+        alignment_score = round(min(1.0, raw_norm), 4)
+    else:
+        alignment_score = 0.0
     uid = uuid.uuid1()
 
     return VectorAlignResponse(

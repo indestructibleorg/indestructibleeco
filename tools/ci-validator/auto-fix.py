@@ -167,7 +167,16 @@ def fix_governance_block(finding: dict, repo: Path, dry_run: bool = False) -> di
     missing = [b for b in required_blocks if b not in content]
 
     if not missing:
-        result["details"] = "All governance blocks present"
+        result["details"] = "All governance blocks present (idempotent — no action needed)"
+        result["applied"] = True  # Mark as resolved so validator doesn't re-flag
+        return result
+    # Idempotency: if document_metadata already exists, only inject missing sub-blocks
+    if "document_metadata:" in content and len(missing) < len(required_blocks):
+        # Partial injection: only add the specific missing blocks
+        result["details"] = f"Partial blocks already present; missing: {', '.join(missing)}"
+        # For partial injection, we skip to avoid corrupting existing structure
+        # The validator will re-flag on next run with specific missing blocks
+        result["applied"] = False
         return result
 
     # Generate governance block

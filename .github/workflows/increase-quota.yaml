@@ -27,6 +27,10 @@ permissions:
 env:
   GCP_PROJECT: my-project-ops-1991
 
+concurrency:
+  group: increase-quota-${{ github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   check-current-quota:
     name: Check Current Quota

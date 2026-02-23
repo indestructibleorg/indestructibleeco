@@ -17,6 +17,10 @@ on:
         type: boolean
         default: false
 
+concurrency:
+  group: auto-fix-ci
+  cancel-in-progress: false
+
 permissions:
   contents: write
   issues: write
@@ -181,9 +185,27 @@ jobs:
         echo "total_fixable=$TOTAL" >> "$GITHUB_OUTPUT"
         echo "Total fixable issues: $TOTAL"
 
+    - name: Check for existing open auto-fix PR (idempotency guard)
+      id: idempotency
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: |
+        OPEN_COUNT=$(gh pr list \
+          --repo "$GITHUB_REPOSITORY" \
+          --label "automated" \
+          --state open \
+          --json number \
+          --jq 'length' 2>/dev/null || echo "0")
+        echo "open_autofix_prs=$OPEN_COUNT" >> "$GITHUB_OUTPUT"
+        if [ "$OPEN_COUNT" -gt "0" ]; then
+          echo "⏭️  Skipping: $OPEN_COUNT open auto-fix PR(s) already exist. Will not create another."
+          echo "skip=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+        fi
     - name: Create fix branch and apply all fixes
       id: apply_fixes
-      if: steps.check_fixable.outputs.total_fixable > 0 && inputs.dry_run != true
+      if: steps.check_fixable.outputs.total_fixable > 0 && inputs.dry_run != true && steps.idempotency.outputs.skip != 'true'
       run: |
         BRANCH="auto-fix/ci-$(date +%Y%m%d-%H%M%S)"
         echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"

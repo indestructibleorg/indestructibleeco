@@ -24,6 +24,10 @@ permissions:
   security-events: write
   actions: read
 
+concurrency:
+  group: scheduled-health-check
+  cancel-in-progress: true
+
 jobs:
   health-check:
     name: System Health Check

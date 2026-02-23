@@ -1,0 +1,53 @@
+# Shared strategy name mapping — single source of truth
+# Both validate.py and auto-fix.py MUST reference these names
+# to prevent version drift between detector and fixer.
+#
+# Format:
+#   rule_id: strategy_name
+#
+# URI: indestructibleeco://tools/ci-validator/rules/strategies
+---
+strategies:
+  # Workflow rules
+  workflow-syntax:
+    fix_strategy: heredoc-replacement
+    auto_fixable: true
+    description: "Replace python3 -c inline scripts with heredoc syntax"
+
+  unpinned-action:
+    fix_strategy: pin-actions
+    auto_fixable: true
+    description: "Pin GitHub Actions to full commit SHA"
+
+  continue-on-error:
+    fix_strategy: remove-continue-on-error
+    auto_fixable: true
+    description: "Remove continue-on-error from non-graceful-degradation steps"
+
+  # Governance rules
+  governance-block:
+    fix_strategy: governance-block
+    auto_fixable: true
+    description: "Inject missing governance blocks into .qyaml files"
+
+  schema-field:
+    fix_strategy: schema-field
+    auto_fixable: true
+    description: "Add missing required fields to skill.json manifests"
+
+  dockerfile-path:
+    fix_strategy: dockerfile-paths
+    auto_fixable: true
+    description: "Fix incorrect Dockerfile paths"
+
+  # Identity rules
+  identity-field:
+    fix_strategy: identity-field
+    auto_fixable: false
+    description: "Missing identity fields require manual review"
+
+  # Cross-reference rules
+  cross-reference:
+    fix_strategy: cross-reference
+    auto_fixable: false
+    description: "Cross-reference violations require manual resolution"

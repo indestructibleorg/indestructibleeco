@@ -53,6 +53,10 @@ permissions:
   contents: read
   issues: write
 
+concurrency:
+  group: memory-hub-sync
+  cancel-in-progress: true
+
 jobs:
   detect-changes:
     runs-on: ubuntu-latest
@@ -266,7 +270,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: `[Memory Hub] Sync failure — commit ${sha}`,
-              body: `Memory Hub sync failed for commit ${sha}.\n\nFiles attempted: ${fileCount}\nFiles synced: ${synced}\n\nCheck workflow logs: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
-              labels: ['memory-hub', 'automated', 'incident'],
+              body: `Memory Hub sync failed for commit ${sha}.\n\nFiles attempted: ${fileCount}\nFiles synced: ${synced}\n\n**Retry**: Re-run this workflow manually after Memory Hub recovers.\n\nCheck workflow logs: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              labels: ['memory-hub', 'automated', 'incident', 'retry-queue'],
             });
           }

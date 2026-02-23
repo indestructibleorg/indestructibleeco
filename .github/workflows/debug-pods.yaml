@@ -12,6 +12,10 @@ env:
   CLUSTER: ${{ vars.GKE_CLUSTER_STAGING }}
   NAMESPACE: ${{ vars.K8S_NAMESPACE_STAGING }}
 
+concurrency:
+  group: debug-pods-${{ github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   debug:
     runs-on: ubuntu-latest

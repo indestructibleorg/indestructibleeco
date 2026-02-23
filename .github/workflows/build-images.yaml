@@ -34,6 +34,10 @@ env:
 permissions:
   contents: read
 
+concurrency:
+  group: build-images-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate-input:
     runs-on: ubuntu-latest

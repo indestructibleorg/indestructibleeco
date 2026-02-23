@@ -39,6 +39,10 @@ permissions:
   actions: read
   security-events: read
 
+concurrency:
+  group: compliance-report
+  cancel-in-progress: true
+
 jobs:
   generate-compliance-report:
     runs-on: ubuntu-latest
@@ -228,6 +232,79 @@ jobs:
           });
           console.log(`Compliance report issue created for ${period}`);
 
+    - name: Persist compliance metrics to Supabase (long-term audit trail)
+      if: always()
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      run: |
+        # Persist key metrics to Supabase for >90-day audit window
+        # GitHub API only retains 90 days of workflow history; Supabase provides
+        # the long-term immutable audit store required for SOC2/ISO27001.
+        if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_KEY" ]; then
+          echo "⚠️  Supabase not configured — metrics stored in repo only (90-day limit applies)"
+          echo "   To enable long-term compliance storage, set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY"
+          exit 0
+        fi
+        python3 << 'PYEOF'
+        import os, json, urllib.request, urllib.error
+        from datetime import datetime, timezone
+
+        supabase_url = os.environ.get('SUPABASE_URL', '').rstrip('/')
+        service_key = os.environ.get('SUPABASE_SERVICE_KEY', '')
+        period = os.environ.get('REPORT_PERIOD', datetime.now(timezone.utc).strftime('%Y-%m'))
+
+        if not supabase_url or not service_key:
+            print('Supabase not configured — skipping persistence')
+            exit(0)
+
+        # Read collected evidence
+        evidence_file = '/tmp/compliance-evidence.json'
+        if not os.path.exists(evidence_file):
+            print('No evidence file found — skipping Supabase persistence')
+            exit(0)
+
+        evidence = json.load(open(evidence_file))
+
+        # Build compliance record
+        record = {
+            'period': period,
+            'recorded_at': datetime.now(timezone.utc).isoformat(),
+            'workflow_run_id': os.environ.get('GITHUB_RUN_ID', ''),
+            'commit_sha': os.environ.get('GITHUB_SHA', ''),
+            'evidence': evidence,
+            'source': 'github-actions-compliance-report',
+        }
+
+        # Upsert to Supabase compliance_records table
+        url = f'{supabase_url}/rest/v1/compliance_records'
+        data = json.dumps(record).encode()
+        req = urllib.request.Request(
+            url,
+            data=data,
+            headers={
+                'apikey': service_key,
+                'Authorization': f'Bearer {service_key}',
+                'Content-Type': 'application/json',
+                'Prefer': 'resolution=merge-duplicates',
+            },
+            method='POST',
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                print(f'✅ Compliance record persisted to Supabase for period: {period}')
+        except urllib.error.HTTPError as e:
+            body = e.read().decode()
+            if 'relation "compliance_records" does not exist' in body:
+                print('⚠️  compliance_records table not yet created in Supabase.')
+                print('   Run: CREATE TABLE compliance_records (period TEXT PRIMARY KEY, recorded_at TIMESTAMPTZ, workflow_run_id TEXT, commit_sha TEXT, evidence JSONB, source TEXT);')
+            else:
+                print(f'⚠️  Supabase persistence failed: {e.code} {body[:200]}')
+        except Exception as e:
+            print(f'⚠️  Supabase persistence error: {e}')
+        PYEOF
+      env:
+        REPORT_PERIOD: ${{ steps.period.outputs.period }}
     - name: Upload compliance artifacts
       uses: actions/upload-artifact@ea165f8d9b4b5d2c2b7e4b8b5e4b8b5e4b8b5e4b8  # v48  # v4
       if: always()

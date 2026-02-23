@@ -13,6 +13,10 @@ name: Canary Deployment — Staging SLO Gate → Production
 #   4. If SLO passed → auto-promote to production
 #   5. If SLO failed → auto-rollback via ArgoCD + open incident issue
 
+concurrency:
+  group: canary-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
 on:
   workflow_dispatch:
     inputs:
@@ -233,9 +237,14 @@ jobs:
             f'100 * sum(rate(http_requests_total{{namespace="{namespace}",status=~"5.."}}[5m])) / sum(rate(http_requests_total{{namespace="{namespace}"}}[5m]))'
         )
 
-        # If Prometheus not configured, use simulated healthy values
-        if availability_pct is None:
-            print('WARNING: Prometheus not configured — using simulated metrics')
+        # Fail-Closed: if Prometheus unreachable, BLOCK promotion (do not assume healthy)
+        if availability_pct is None and prometheus_url:
+            print('ERROR: Prometheus configured but unreachable — cannot validate SLO.')
+            print('Blocking promotion to prevent fail-open deployment.')
+            sys.exit(2)  # Exit code 2 = infrastructure failure (distinct from SLO failure)
+        elif availability_pct is None:
+            print('WARNING: PROMETHEUS_URL not set — SLO validation skipped (staging only).')
+            print('Assuming healthy for non-production environment.')
             availability_pct = 99.99
             p95_latency_ms = 45.2
             error_rate_pct = 0.01

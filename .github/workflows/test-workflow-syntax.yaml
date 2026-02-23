@@ -3,6 +3,10 @@ name: Test Workflow Syntax Issue
 on:
   workflow_dispatch:
 
+concurrency:
+  group: test-workflow-syntax-${{ github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest

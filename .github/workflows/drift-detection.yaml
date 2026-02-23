@@ -37,6 +37,10 @@ env:
   GKE_REGION: asia-east1
   ARGOCD_APPS: "eco-production eco-staging eco-monitoring eco-core"
 
+concurrency:
+  group: drift-detection
+  cancel-in-progress: true
+
 jobs:
   # ══════════════════════════════════════════════════════════════════
   # Job 1: Detect drift across all ArgoCD applications

@@ -22,6 +22,10 @@ permissions:
   pull-requests: write
   issues: write
 
+concurrency:
+  group: pr-automation-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   # ══════════════════════════════════════════════════════════════════
   # Job 1: Auto-label PR by changed paths

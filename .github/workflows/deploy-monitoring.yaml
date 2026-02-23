@@ -28,6 +28,10 @@ env:
 permissions:
   contents: read
 
+concurrency:
+  group: deploy-monitoring-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy-monitoring:
     name: Deploy Monitoring Stack

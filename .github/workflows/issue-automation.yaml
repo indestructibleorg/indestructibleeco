@@ -60,6 +60,7 @@ jobs:
         GH_TOKEN: ${{ github.token }}
         ISSUE_TITLE: ${{ github.event.issue.title }}
         ISSUE_BODY: ${{ github.event.issue.body }}
+        # Security: values are read via os.environ (not shell-interpolated) for injection safety
         ISSUE_NUMBER: ${{ github.event.issue.number }}
       run: |
         python3 - << 'PYEOF'

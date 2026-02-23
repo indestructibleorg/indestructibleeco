@@ -190,7 +190,9 @@ jobs:
           /tmp/compliance-evidence.json \
           "docs/compliance/compliance-${PERIOD}.md"
 
-    - name: Commit compliance report to repo
+    - name: Commit compliance report to repo via PR
+      env:
+        GH_TOKEN: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
       run: |
         git config user.email "github-actions[bot]@users.noreply.github.com"
         git config user.name "github-actions[bot]"
@@ -198,9 +200,18 @@ jobs:
         if git diff --cached --quiet; then
           echo "No new compliance report to commit"
         else
-          git commit -m "docs(compliance): add compliance report for ${{ steps.period.outputs.period }} [skip ci]"
-          git push origin main
-          echo "Compliance report committed"
+          # Best practice: never push directly to main — use PR flow
+          PERIOD="${{ steps.period.outputs.period }}"
+          BRANCH="bot/compliance-report-${PERIOD}"
+          git checkout -b "$BRANCH"
+          git commit -m "docs(compliance): add compliance report for ${PERIOD} [skip ci]"
+          git push origin "$BRANCH"
+          # Create PR and enable auto-merge
+          PR_BODY="Automated compliance report for ${PERIOD}. SOC2/ISO27001 readiness. Auto-merges once CI passes."
+          PR_URL=$(gh pr create             --title "docs(compliance): compliance report for ${PERIOD}"             --body "$PR_BODY"             --label "automated,bot-pr,compliance"             --base main             --head "$BRANCH")
+          echo "Created PR: $PR_URL"
+          gh pr merge "$PR_URL" --auto --squash || true
+          echo "Auto-merge enabled"
         fi
 
     - name: Create compliance report issue

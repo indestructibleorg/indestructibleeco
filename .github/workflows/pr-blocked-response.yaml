@@ -1,0 +1,78 @@
+# eco-base — PR Blocked Response
+# URI: eco-base://github/pr-blocked-response
+# Purpose: When a PR is blocked (CI fails, merge conflicts, invalid config),
+#          automatically diagnose the root cause, attempt auto-fix,
+#          and escalate to a labeled Issue if auto-fix is not possible.
+#
+# Triggers:
+#   - pull_request: on open/sync/reopen
+#   - workflow_run: after CI completes
+#   - schedule: every 30 minutes (scan all open blocked PRs)
+#   - workflow_dispatch: manual trigger for specific PR
+#
+# Behavior:
+#   1. Detect blocked PRs (BLOCKED / DIRTY / UNSTABLE mergeStateStatus)
+#   2. Diagnose root cause (failing check names + error messages)
+#   3. Auto-fix if possible (dependabot.yml syntax, CircleCI false positive, merge conflicts)
+#   4. If not auto-fixable: label PR + create/update Issue + post PR comment
+#   5. Never silently ignore a blocked PR
+
+name: PR Blocked Response
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_run:
+    workflows:
+      - "eco-base CI/CD"
+    types: [completed]
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "Specific PR number to diagnose (leave empty for all open PRs)"
+        required: false
+        type: string
+
+concurrency:
+  group: pr-blocked-response-${{ github.ref || github.run_id }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  checks: read
+  statuses: read
+
+jobs:
+  respond:
+    name: Diagnose and Respond to Blocked PRs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          token: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: pip3 install pyyaml
+
+      - name: Configure git
+        run: |
+          git config user.email "bot@eco-base.dev"
+          git config user.name "eco-base-bot"
+
+      - name: Run PR blocked response
+        env:
+          GH_TOKEN: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SPECIFIC_PR: ${{ github.event.inputs.pr_number || '' }}
+        run: python3 tools/pr-blocked-response/diagnose.py

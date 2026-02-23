@@ -145,14 +145,14 @@ class TestEmbeddingServiceE2E:
 
         self.svc = EmbeddingService(
             engine_manager=None,
-            default_model="quantum-bert-xxl-v1",
+            default_model="BAAI/bge-large-en-v1.5",
             default_dimensions=1024,
         )
 
     @pytest.mark.asyncio
     async def test_single_embed(self):
         result = await self.svc.embed("hello world")
-        assert result.model_id == "quantum-bert-xxl-v1"
+        assert result.model_id == "BAAI/bge-large-en-v1.5"
         assert len(result.embeddings[0]) == 1024
         assert result.total_tokens > 0
 
@@ -300,7 +300,7 @@ class TestGrpcServicerContracts:
 
         req = EmbeddingRequest(
             texts=["hello", "world"],
-            model_id="quantum-bert-xxl-v1",
+            model_id="BAAI/bge-large-en-v1.5",
             dimensions=1024,
         )
         assert len(req.texts) == 2
@@ -312,7 +312,7 @@ class TestGrpcServicerContracts:
         resp = EmbeddingResponse(
             request_id="emb-456",
             embeddings=[[0.1, 0.2], [0.3, 0.4]],
-            model_id="quantum-bert-xxl-v1",
+            model_id="BAAI/bge-large-en-v1.5",
             dimensions=2,
             total_tokens=4,
         )
@@ -450,7 +450,7 @@ class TestConfigValidation:
 
         s = Settings()
         assert s.vector_dim == 1024
-        assert s.alignment_model == "quantum-bert-xxl-v1"
+        assert s.alignment_model == "BAAI/bge-large-en-v1.5"
 
     def test_default_redis(self):
         from backend.ai.src.config import Settings

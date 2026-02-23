@@ -86,5 +86,5 @@ class TestExistingConfigPreserved:
         assert s.http_port == 8001
         assert s.grpc_port == 8000
         assert s.vector_dim == 1024
-        assert s.alignment_model == "quantum-bert-xxl-v1"
+        assert s.alignment_model == "BAAI/bge-large-en-v1.5"
         assert s.redis_url == "redis://localhost:6379"

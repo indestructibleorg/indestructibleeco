@@ -2,7 +2,7 @@
 
 Runtime: Python 3.11 + FastAPI + Uvicorn
 Ports: 8000 (gRPC internal) + 8001 (HTTP)
-Vector alignment: quantum-bert-xxl-v1, dim 1024-4096, tol 0.0001-0.005
+Vector alignment: BAAI/bge-large-en-v1.5, dim 1024-4096, tol 0.0001-0.005
 Queuing: Async worker + RequestQueue for inference jobs
 Engine management: 7 adapters with connection pools + circuit breakers
 Embedding: Batch embedding via engine adapters with fallback

@@ -115,7 +115,7 @@ def build_qyaml_metadata(
             "registry_ttl": 30,
         },
         "vector_alignment_map": {
-            "alignment_model": "quantum-bert-xxl-v1",
+            "alignment_model": "BAAI/bge-large-en-v1.5",
             "coherence_vector_dim": 1024,
             "function_keyword": function_keywords or [name, kind, namespace],
             "contextual_binding": f"{name} -> [{', '.join(cross_layer_binding or [])}]",

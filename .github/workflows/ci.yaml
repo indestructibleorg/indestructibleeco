@@ -391,11 +391,17 @@ jobs:
       uses: sigstore/cosign-installer@d7d6bc7722e3daa8354c50bcb52f4837da5e9b6a  # v3.8.1
 
     - name: Generate SBOM with Syft (CycloneDX JSON)
-      uses: anchore/syft@0a3f7bb06ee168495ee54b8b66fccb22a056fe99  # v1.42.1
+      run: |
+        # Install Syft CLI directly (avoids action temp dir symlink bug in v1.42.1)
+        curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin v1.21.0
+        syft dir:${{ github.workspace }} -o cyclonedx-json=eco-base-sbom-${{ github.sha }}.json
+        echo "SBOM_FILE=eco-base-sbom-${{ github.sha }}.json" >> $GITHUB_ENV
+    - name: Upload SBOM artifact
+      uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1  # v4.6.1
       with:
-        path: "${{ github.workspace }}"
-        artifact-name: "eco-base-sbom-${{ github.sha }}.json"
-        output-format: cyclonedx-json
+        name: "eco-base-sbom-${{ github.sha }}.json"
+        path: "eco-base-sbom-${{ github.sha }}.json"
+        if-no-files-found: warn
 
     - name: Verify SBOM was generated
       run: |

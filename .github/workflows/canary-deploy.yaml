@@ -342,7 +342,9 @@ jobs:
             echo "Production promotion simulated (kubectl not configured)"
         fi
 
-    - name: Commit production image tag update
+    - name: Commit production image tag update via PR
+      env:
+        GH_TOKEN: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
       run: |
         IMAGE_TAG="${{ needs.preflight.outputs.image_tag }}"
         git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -351,10 +353,18 @@ jobs:
         if git diff --cached --quiet; then
           echo "No kustomization changes to commit"
         else
+          # Best practice: never push directly to main — use PR flow
+          BRANCH="bot/promote-${IMAGE_TAG//[^a-zA-Z0-9]/-}-$(date +%s)"
+          git checkout -b "$BRANCH"
           COMMIT_MSG="chore(deploy): promote $IMAGE_TAG to production [skip ci]"
           git commit -m "$COMMIT_MSG"
-          git push origin main
-          echo "Committed production promotion"
+          git push origin "$BRANCH"
+          # Create PR and enable auto-merge (will merge once CI passes)
+          PR_BODY="Automated production image tag promotion. Image: ${IMAGE_TAG}. SLO gates: all passed. Auto-merges once CI passes."
+          PR_URL=$(gh pr create             --title "$COMMIT_MSG"             --body "$PR_BODY"             --label "automated,bot-pr"             --base main             --head "$BRANCH")
+          echo "Created PR: $PR_URL"
+          gh pr merge "$PR_URL" --auto --squash || true
+          echo "Auto-merge enabled"
         fi
 
     - name: Production promotion summary

@@ -519,7 +519,7 @@ jobs:
         for f in $(find . -name "Dockerfile*" -not -path "*/node_modules/*" 2>/dev/null); do
           echo "Checking $f"
           conftest test "$f" --policy policy/dockerfile.rego --output json 2>/dev/null | \
-            python3 -c 'import sys,json; raw=sys.stdin.read().strip(); r=json.loads(raw) if raw else []; failures=[x for x in r if x.get("failures")]; [print(f"  FAIL: {m[\"msg\"]}") for f in failures for m in f.get("failures",[])] if failures else print("  PASS")' || true
+            python3 -c 'import sys,json; raw=sys.stdin.read().strip(); r=json.loads(raw) if raw else []; failures=[x for x in r if x.get("failures")]; [print("  FAIL: " + m.get("msg","")) for f in failures for m in f.get("failures",[])] if failures else print("  PASS")' || true
         done
         echo "Dockerfile policy check complete"
 

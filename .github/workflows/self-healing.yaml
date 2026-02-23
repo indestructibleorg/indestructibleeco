@@ -290,7 +290,8 @@ jobs:
 
           token = os.environ["GITHUB_TOKEN"]
           repo = os.environ["GITHUB_REPOSITORY"]
-          run_url = f"https://github.com/{repo}/actions/runs/{os.environ.get(\"GITHUB_RUN_ID\", \"\")}"
+          _run_id = os.environ.get("GITHUB_RUN_ID", "")
+          run_url = f"https://github.com/{repo}/actions/runs/{_run_id}"
 
           body = f"""## SLO Breach Incident — Auto-Rollback Triggered
 
@@ -326,9 +327,11 @@ jobs:
                   headers={"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json"})
               with urllib.request.urlopen(req2) as r:
                   issue = json.loads(r.read())
-              print(f"Incident issue created: #{issue[\"number\"]}")
+              _inum = issue["number"]
+              print(f"Incident issue created: #{_inum}")
           else:
-              print(f"Existing incident issue: #{existing[0][\"number\"]}")
+              _enum = existing[0]["number"]
+              print(f"Existing incident issue: #{_enum}")
           '
 
   self-healing-summary:

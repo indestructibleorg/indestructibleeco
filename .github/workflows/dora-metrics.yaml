@@ -202,7 +202,8 @@ jobs:
               existing = json.loads(r.read())
 
           if existing:
-              print(f"SLO breach issue already open: #{existing[0][\"number\"]}")
+              _n = existing[0]["number"]
+              print(f"SLO breach issue already open: #{_n}")
           else:
               body = f"""## SLO Breach: Change Failure Rate Exceeded
 
@@ -229,7 +230,8 @@ jobs:
                   headers={"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json"})
               with urllib.request.urlopen(req2) as r:
                   issue = json.loads(r.read())
-              print(f"Created SLO breach issue: #{issue[\"number\"]}")
+              _in = issue["number"]
+              print(f"Created SLO breach issue: #{_in}")
           '
 
       - name: Write DORA audit log

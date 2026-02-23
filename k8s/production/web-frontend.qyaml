@@ -23,6 +23,10 @@ spec:
         environment: production
     spec:
       serviceAccountName: eco-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        fsGroup: 101
       containers:
         - name: eco-web-frontend
           image: asia-east1-docker.pkg.dev/my-project-ops-1991/indestructibleeco/web:v1.0.2

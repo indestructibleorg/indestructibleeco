@@ -61,95 +61,81 @@ jobs:
     - name: Fetch failed job logs
       run: |
         echo "=== Failed Job Logs ==="
-        cat > /tmp/fetch_logs.py << 'PYEOF'
-import json, os, urllib.request
-
-run_id = os.environ.get("RUN_ID", "")
-repo = os.environ.get("GITHUB_REPOSITORY", "")
-token = os.environ.get("GITHUB_TOKEN", "")
-
-if not all([run_id, repo, token]):
-    print("Missing environment variables for log fetch")
-    exit(0)
-
-url = f"https://api.github.com/repos/{repo}/actions/runs/{run_id}/jobs"
-req = urllib.request.Request(url, headers={
-    "Authorization": f"token {token}",
-    "Accept": "application/vnd.github.v3+json",
-})
-
-try:
-    with urllib.request.urlopen(req) as resp:
-        data = json.loads(resp.read())
-        failed_jobs = [j for j in data.get("jobs", []) if j.get("conclusion") == "failure"]
-        for job in failed_jobs:
-            print(f"\n--- Failed Job: {job['name']} ---")
-            for step in job.get("steps", []):
-                if step.get("conclusion") == "failure":
-                    print(f"  Failed Step: {step['name']}")
-                    print(f"  Started: {step.get('started_at', 'N/A')}")
-                    print(f"  Completed: {step.get('completed_at', 'N/A')}")
-        if not failed_jobs:
-            print("No failed jobs found in this run")
-except Exception as e:
-    print(f"Could not fetch logs: {e}")
-PYEOF
         RUN_ID="${{ steps.context.outputs.run_id }}" \
         GITHUB_TOKEN="${{ github.token }}" \
-        python3 /tmp/fetch_logs.py
+        python3 - << 'PYEOF'
+        import json, os, urllib.request
+        run_id = os.environ.get("RUN_ID", "")
+        repo = os.environ.get("GITHUB_REPOSITORY", "")
+        token = os.environ.get("GITHUB_TOKEN", "")
+        if not all([run_id, repo, token]):
+            print("Missing environment variables for log fetch")
+            exit(0)
+        url = f"https://api.github.com/repos/{repo}/actions/runs/{run_id}/jobs"
+        req = urllib.request.Request(url, headers={
+            "Authorization": f"token {token}",
+            "Accept": "application/vnd.github.v3+json",
+        })
+        try:
+            with urllib.request.urlopen(req) as resp:
+                data = json.loads(resp.read())
+                failed_jobs = [j for j in data.get("jobs", []) if j.get("conclusion") == "failure"]
+                for job in failed_jobs:
+                    print(f"\n--- Failed Job: {job['name']} ---")
+                    for step in job.get("steps", []):
+                        if step.get("conclusion") == "failure":
+                            print(f"  Failed Step: {step['name']}")
+                            print(f"  Started: {step.get('started_at', 'N/A')}")
+                            print(f"  Completed: {step.get('completed_at', 'N/A')}")
+                if not failed_jobs:
+                    print("No failed jobs found in this run")
+        except Exception as e:
+            print(f"Could not fetch logs: {e}")
+        PYEOF
 
     - name: Generate repair report
       run: |
-        cat > /tmp/generate_report.py << 'PYEOF'
-import json, os
-from datetime import datetime, timezone
-
-report = {
-    "timestamp": datetime.now(timezone.utc).isoformat(),
-    "trigger": {
-        "run_id": os.environ.get("RUN_ID", ""),
-        "commit": os.environ.get("COMMIT_SHA", ""),
-        "repository": os.environ.get("GITHUB_REPOSITORY", ""),
-    },
-    "validator": {},
-    "autofix": {},
-    "recommendations": [],
-}
-
-# Load validator report
-try:
-    with open("/tmp/validator-report.json") as f:
-        report["validator"] = json.load(f)
-except Exception:
-    report["validator"] = {"error": "Report not available"}
-
-# Load autofix report
-try:
-    with open("/tmp/autofix-report.json") as f:
-        af = json.load(f)
-        report["autofix"] = af
-        if af.get("auto_fixable", 0) > 0:
-            report["recommendations"].append(
-                "Run 'python3 tools/ci-validator/auto-fix.py' locally to apply automatic fixes"
-            )
-        if af.get("manual_required", 0) > 0:
-            report["recommendations"].append(
-                "Manual review required for some issues — see autofix report details"
-            )
-except Exception:
-    report["autofix"] = {"error": "Report not available"}
-
-if not report["recommendations"]:
-    report["recommendations"].append(
-        "No auto-fixable issues detected — review CI logs for root cause"
-    )
-
-print("=== Consolidated Repair Report ===")
-print(json.dumps(report, indent=2))
-
-with open("/tmp/repair-report.json", "w") as f:
-    json.dump(report, f, indent=2)
-PYEOF
         RUN_ID="${{ steps.context.outputs.run_id }}" \
         COMMIT_SHA="${{ steps.context.outputs.commit_sha }}" \
-        python3 /tmp/generate_report.py
+        python3 - << 'PYEOF'
+        import json, os
+        from datetime import datetime, timezone
+        report = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "trigger": {
+                "run_id": os.environ.get("RUN_ID", ""),
+                "commit": os.environ.get("COMMIT_SHA", ""),
+                "repository": os.environ.get("GITHUB_REPOSITORY", ""),
+            },
+            "validator": {},
+            "autofix": {},
+            "recommendations": [],
+        }
+        try:
+            with open("/tmp/validator-report.json") as f:
+                report["validator"] = json.load(f)
+        except Exception:
+            report["validator"] = {"error": "Report not available"}
+        try:
+            with open("/tmp/autofix-report.json") as f:
+                af = json.load(f)
+                report["autofix"] = af
+                if af.get("auto_fixable", 0) > 0:
+                    report["recommendations"].append(
+                        "Run 'python3 tools/ci-validator/auto-fix.py' locally to apply automatic fixes"
+                    )
+                if af.get("manual_required", 0) > 0:
+                    report["recommendations"].append(
+                        "Manual review required for some issues — see autofix report details"
+                    )
+        except Exception:
+            report["autofix"] = {"error": "Report not available"}
+        if not report["recommendations"]:
+            report["recommendations"].append(
+                "No auto-fixable issues detected — review CI logs for root cause"
+            )
+        print("=== Consolidated Repair Report ===")
+        print(json.dumps(report, indent=2))
+        with open("/tmp/repair-report.json", "w") as f:
+            json.dump(report, f, indent=2)
+        PYEOF

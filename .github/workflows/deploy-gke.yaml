@@ -105,16 +105,16 @@ jobs:
       - name: Apply staging manifests
         run: |
           mkdir -p /tmp/k8s-staging
-          python3 << 'CONVERT_EOF'
-import yaml, os, glob
-for f in sorted(glob.glob('k8s/staging/*.qyaml')):
-    with open(f) as fh:
-        docs = list(yaml.safe_load_all(fh))
-    k8s_docs = [d for d in docs if d and isinstance(d, dict) and 'apiVersion' in d]
-    name = os.path.basename(f).replace('.qyaml', '.yaml')
-    with open(f'/tmp/k8s-staging/{name}', 'w') as fh:
-        yaml.dump_all(k8s_docs, fh, default_flow_style=False)
-CONVERT_EOF
+          python3 - << 'CONVERT_EOF'
+          import yaml, os, glob
+          for f in sorted(glob.glob('k8s/staging/*.qyaml')):
+              with open(f) as fh:
+                  docs = list(yaml.safe_load_all(fh))
+              k8s_docs = [d for d in docs if d and isinstance(d, dict) and 'apiVersion' in d]
+              name = os.path.basename(f).replace('.qyaml', '.yaml')
+              with open(f'/tmp/k8s-staging/{name}', 'w') as fh:
+                  yaml.dump_all(k8s_docs, fh, default_flow_style=False)
+          CONVERT_EOF
 
           echo "Applying namespace..."
           kubectl apply -f /tmp/k8s-staging/namespace.yaml || true

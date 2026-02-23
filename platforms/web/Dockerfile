@@ -1,7 +1,7 @@
 # IndestructibleEco v1.0 — Web Frontend
 # Build: docker build -t eco-web:latest platforms/web/
 # Context: platforms/web/
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
 
 # Copy the app/ subdirectory which contains the TypeScript React app
@@ -14,7 +14,7 @@ RUN npm install --legacy-peer-deps
 # Build the app
 RUN npm run build
 
-FROM nginx:1.25-alpine AS production
+FROM nginx:1.29-alpine AS production
 LABEL org.opencontainers.image.title="IndestructibleEco Web Frontend" \
       org.opencontainers.image.version="1.0.2" \
       org.opencontainers.image.vendor="IndestructibleOrg" \

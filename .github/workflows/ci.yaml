@@ -393,7 +393,7 @@ jobs:
     - name: Generate SBOM with Syft (CycloneDX JSON)
       uses: anchore/syft@0a3f7bb06ee168495ee54b8b66fccb22a056fe99  # v1.42.1
       with:
-        image: "."
+        path: "${{ github.workspace }}"
         artifact-name: "eco-base-sbom-${{ github.sha }}.json"
         output-format: cyclonedx-json
 

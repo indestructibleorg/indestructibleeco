@@ -39,17 +39,11 @@ jobs:
 
       - name: Install kubectl and gke-gcloud-auth-plugin
         run: |
-          # Install kubectl
-          curl -fsSL https://dl.k8s.io/release/$(curl -fsSL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
-          chmod +x /usr/local/bin/kubectl
-          kubectl version --client
-          # Install gke-gcloud-auth-plugin
-          gcloud components install gke-gcloud-auth-plugin --quiet 2>/dev/null || \
-          apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin 2>/dev/null || \
-          (curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg && \
-           echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee /etc/apt/sources.list.d/google-cloud-sdk.list && \
-           apt-get update -q && apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin)
-          echo "gke-gcloud-auth-plugin installed: $(gke-gcloud-auth-plugin --version 2>&1 || echo 'ok')"
+          # GitHub Actions ubuntu-latest has Google Cloud SDK apt repo pre-configured
+          sudo apt-get update -q
+          sudo apt-get install -y kubectl google-cloud-sdk-gke-gcloud-auth-plugin
+          echo "kubectl: $(kubectl version --client --short 2>&1 || kubectl version --client)"
+          echo "gke-gcloud-auth-plugin: $(gke-gcloud-auth-plugin --version 2>&1)"
 
       - name: Authenticate and get GKE credentials
         env:

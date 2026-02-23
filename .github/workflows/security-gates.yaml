@@ -35,7 +35,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
-        continue-on-error: false
 
   trivy-fs-scan:
     name: Trivy Filesystem Scan

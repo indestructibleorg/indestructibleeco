@@ -192,10 +192,9 @@ jobs:
       run: |
         OPEN_COUNT=$(gh pr list \
           --repo "$GITHUB_REPOSITORY" \
-          --label "automated" \
           --state open \
-          --json number \
-          --jq 'length' 2>/dev/null || echo "0")
+          --json headRefName \
+          --jq '[.[] | select(.headRefName | startswith("auto-fix/"))] | length' 2>/dev/null || echo "0")
         echo "open_autofix_prs=$OPEN_COUNT" >> "$GITHUB_OUTPUT"
         if [ "$OPEN_COUNT" -gt "0" ]; then
           echo "⏭️  Skipping: $OPEN_COUNT open auto-fix PR(s) already exist. Will not create another."

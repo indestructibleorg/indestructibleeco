@@ -55,7 +55,7 @@ ai:
     ECO_ENVIRONMENT: production
     ECO_AI_MODELS: "vllm,ollama,tgi,sglang"
     ECO_VECTOR_DIM: "1024"
-    ECO_ALIGNMENT_MODEL: "quantum-bert-xxl-v1"
+    ECO_ALIGNMENT_MODEL: "BAAI/bge-large-en-v1.5"
 
 # ── vLLM Engine ───────────────────────────────────────────────────────
 vllm:

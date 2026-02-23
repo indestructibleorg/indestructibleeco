@@ -155,7 +155,7 @@ jobs:
             assert s.http_port == 8001
             assert s.grpc_port == 8000
             assert s.vector_dim == 1024
-            assert s.alignment_model == 'quantum-bert-xxl-v1'
+            assert s.alignment_model == 'BAAI/bge-large-en-v1.5'
             print('Config tests passed')
         except Exception as e:
             print(f'Config tests skipped (module not found): {e}')
@@ -178,7 +178,7 @@ jobs:
             assert stamp['document_metadata']['generated_by'] == 'yaml-toolkit-v1'
             assert 'eco-base://' in stamp['document_metadata']['uri']
             assert 'urn:eco-base:' in stamp['document_metadata']['urn']
-            assert stamp['vector_alignment_map']['alignment_model'] == 'quantum-bert-xxl-v1'
+            assert stamp['vector_alignment_map']['alignment_model'] == 'BAAI/bge-large-en-v1.5'
             log = g.get_audit_log()
             assert len(log) >= 2
             print('Governance engine tests passed')

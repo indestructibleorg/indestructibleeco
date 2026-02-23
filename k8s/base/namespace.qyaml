@@ -63,7 +63,7 @@ registry_binding:
   health_check_path: "n/a"
   registry_ttl: 0
 vector_alignment_map:
-  alignment_model: quantum-bert-xxl-v1
+  alignment_model: BAAI/bge-large-en-v1.5
   coherence_vector_dim: 1024
   function_keyword: [namespace, platform, cluster, rbac]
   contextual_binding: "eco-base -> []"

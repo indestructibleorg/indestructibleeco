@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
-"""Autonomous Bot — Phase 2: Create GitHub Issues (deduplicated)."""
-import json, os, urllib.request
-from datetime import datetime, timezone
+"""Autonomous Bot — Phase 2: Create GitHub Issues (deduplicated).
+
+Dedup guard checks BOTH open AND recently closed (48h) issues to prevent
+the close-then-recreate infinite loop.
+"""
+import json
+import os
+import re
+import urllib.request
+from datetime import datetime, timezone, timedelta
 
 token = os.environ.get("GITHUB_TOKEN", "")
 repo = os.environ.get("GITHUB_REPOSITORY", "")
@@ -9,10 +16,20 @@ dry_run = os.environ.get("DRY_RUN", "false") == "true"
 problems_raw = os.environ.get("PROBLEMS_JSON", "[]")
 problems = json.loads(problems_raw.replace('%0A', '\n').replace('%0D', '\r').replace('%25', '%'))
 
+COOLDOWN_HOURS = 48
+
+
 def gh_api(path, method="GET", data=None):
     url = f"https://api.github.com/repos/{repo}{path}"
-    headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json"}
-    req = urllib.request.Request(url, headers=headers, method=method, data=json.dumps(data).encode() if data else None)
+    headers = {
+        "Authorization": f"token {token}",
+        "Accept": "application/vnd.github.v3+json",
+        "Content-Type": "application/json",
+    }
+    req = urllib.request.Request(
+        url, headers=headers, method=method,
+        data=json.dumps(data).encode() if data else None,
+    )
     try:
         with urllib.request.urlopen(req) as r:
             return json.loads(r.read())
@@ -20,11 +37,44 @@ def gh_api(path, method="GET", data=None):
         print(f"API error {path}: {e}")
         return {}
 
-existing = gh_api("/issues?state=open&per_page=100&labels=autonomous-bot")
-existing_titles = {i["title"] for i in existing} if isinstance(existing, list) else set()
+
+def normalize(s: str) -> str:
+    """Strip dates, percentages, and special chars for fuzzy title matching."""
+    s = re.sub(r"\d{4}-\d{2}-\d{2}", "", s)
+    s = re.sub(r"\d+\.?\d*%", "", s)
+    s = re.sub(r"[^a-zA-Z0-9 ]", "", s)
+    return " ".join(s.split()).lower()
+
+
+# ── Build dedup index: open + recently closed ──
+open_issues = gh_api("/issues?state=open&per_page=100&labels=autonomous-bot")
+open_titles = set()
+open_map = {}  # title -> issue number
+if isinstance(open_issues, list):
+    for i in open_issues:
+        norm = normalize(i.get("title", ""))
+        open_titles.add(norm)
+        open_map[norm] = i["number"]
+
+closed_issues = gh_api(
+    "/issues?state=closed&per_page=50&labels=autonomous-bot&sort=updated&direction=desc"
+)
+recently_closed_titles = set()
+cutoff = datetime.now(timezone.utc) - timedelta(hours=COOLDOWN_HOURS)
+if isinstance(closed_issues, list):
+    for i in closed_issues:
+        closed_at = i.get("closed_at", "")
+        if closed_at:
+            closed_dt = datetime.fromisoformat(closed_at.replace("Z", "+00:00"))
+            if closed_dt > cutoff:
+                recently_closed_titles.add(normalize(i.get("title", "")))
+
+# Merged dedup set
+all_known_titles = open_titles | recently_closed_titles
 
 issue_map = {}
 issues_created = 0
+issues_skipped = 0
 severity_labels = {
     "critical": ["autonomous-bot", "critical", "security"],
     "high": ["autonomous-bot", "high-priority", "bug"],
@@ -34,12 +84,15 @@ severity_labels = {
 
 for p in problems:
     title = f"[bot] {p['title']}"
-    if title in existing_titles:
-        print(f"Skipping (already exists): {title}")
-        for i in (existing if isinstance(existing, list) else []):
-            if i["title"] == title:
-                issue_map[p["id"]] = i["number"]
-                break
+    norm_title = normalize(title)
+
+    # Check dedup: open OR recently closed
+    if norm_title in all_known_titles:
+        reason = "open" if norm_title in open_titles else f"closed within {COOLDOWN_HOURS}h"
+        print(f"DEDUP ({reason}): {title}")
+        if norm_title in open_map:
+            issue_map[p["id"]] = open_map[norm_title]
+        issues_skipped += 1
         continue
 
     now = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
@@ -70,11 +123,14 @@ for p in problems:
         if result.get("number"):
             issue_map[p["id"]] = result["number"]
             issues_created += 1
+            # Add to dedup set so subsequent problems in same run don't duplicate
+            all_known_titles.add(norm_title)
+            open_map[norm_title] = result["number"]
             print(f"Created issue #{result['number']}: {title}")
         else:
             print(f"Failed to create issue: {title}")
 
-print(f"\nTotal issues created: {issues_created}")
+print(f"\nTotal: {issues_created} created, {issues_skipped} skipped (dedup)")
 with open(os.environ.get("GITHUB_OUTPUT", "/dev/null"), "a") as f:
     f.write(f"issues_created={issues_created}\n")
     escaped = json.dumps(issue_map).replace('%', '%25').replace('\n', '%0A')

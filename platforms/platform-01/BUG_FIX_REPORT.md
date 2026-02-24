@@ -111,9 +111,9 @@ def generate_plans(self, service: str, forecast: Dict[str, Any], constraints: Di
     # 检查预测值，生成扩容计划
 ```
 
-### 10. WorkflowEngine.create_workflow() 字典接口
+### 10. WorkflowEngine.create_workflow_from_dict() 字典接口
 ```python
-def create_workflow(self, workflow_def: Dict[str, Any]) -> Dict[str, Any]:
+def create_workflow_from_dict(self, workflow_def: Dict[str, Any]) -> Dict[str, Any]:
     """从字典创建工作流 (简化接口)"""
     # 解析 workflow_def，调用原始 create_workflow 方法
 ```

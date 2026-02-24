@@ -33,7 +33,7 @@
 | 测试运行 | `pytest` | ✅ |
 | 覆盖率 | `>= 80%` | ✅ |
 
-### 3. 硬约束版本服务 (`platform_integration_service_v2.py`)
+### 3. 硬约束版本服务 (`platform_integration_service.py`)
 
 #### 3.1 自定义异常体系
 ```python
@@ -212,9 +212,8 @@ def get_data(self) -> List[DataType]:
 mv eco-backend/app/services/platform_integration_service.py \
    eco-backend/app/services/platform_integration_service_old.py
 
-# 使用新版本
-mv eco-backend/app/services/platform_integration_service_v2.py \
-   eco-backend/app/services/platform_integration_service.py
+# 使用新版本（当前仓库已对齐为 platform_integration_service.py）
+ls eco-backend/app/services/platform_integration_service.py
 ```
 
 ### 2. 更新应用启动代码

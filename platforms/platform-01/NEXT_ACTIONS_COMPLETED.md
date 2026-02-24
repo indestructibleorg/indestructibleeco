@@ -10,7 +10,7 @@
 
 ```bash
 # 执行结果
-mv platform_integration_service_v2.py platform_integration_service.py
+ls platform_integration_service.py
 ```
 
 **状态**: ✅ 完成

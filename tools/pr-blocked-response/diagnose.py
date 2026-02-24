@@ -423,6 +423,85 @@ def classify_checks(check_runs):
     return passing, failing, pending, all_pass, any_pending
 
 
+def collect_non_required_gate_anomalies(check_runs):
+    """Collect failed/skipped non-required gates for centralized issue tracking."""
+    anomalies = []
+    for run in check_runs:
+        name = run.get("name", "")
+        status = (run.get("status") or "").lower()
+        conclusion = (run.get("conclusion") or "").lower()
+        name_lower = name.lower()
+
+        if not name or name in REQUIRED_CHECKS or name in EXPECTED_SKIPS or status != "completed":
+            continue
+
+        if conclusion in ("failure", "error", "timed_out", "cancelled", "startup_failure", "action_required"):
+            anomalies.append((name, conclusion))
+        elif conclusion == "skipped" and ("gate" in name_lower or "ci" in name_lower):
+            anomalies.append((name, conclusion))
+
+    return anomalies
+
+
+def find_open_auto_anomaly_issue(pr_num):
+    data = gh_api(f"/repos/{REPO}/issues?state=open&per_page=100&labels=blocked")
+    if not isinstance(data, list):
+        return None
+    title_key = f"[Auto] PR #{pr_num} CI anomaly tracking"
+    for issue in data:
+        if issue.get("title", "") == title_key:
+            return issue
+    return None
+
+
+def upsert_auto_anomaly_issue(pr_num, anomalies):
+    title = f"[Auto] PR #{pr_num} CI anomaly tracking"
+    body_lines = "\n".join(f"- `{name}`: `{conclusion}`" for name, conclusion in sorted(set(anomalies)))
+    body = (
+        f"## Auto-detected CI/Gate anomalies for PR #{pr_num}\n\n"
+        f"The following non-required gates are not healthy and need follow-up:\n\n"
+        f"{body_lines}\n\n"
+        f"This issue is automatically maintained and will be auto-closed once anomalies disappear.\n\n"
+        f"> AutoEcoOps PR Governance Engine"
+    )
+
+    issue = find_open_auto_anomaly_issue(pr_num)
+    if issue:
+        gh_api(f"/repos/{REPO}/issues/{issue['number']}/comments", method="POST", data={"body": body})
+        print(f"  [ANOMALY-ISSUE] Updated issue #{issue['number']}")
+        return issue["number"]
+
+    created = gh_api(
+        f"/repos/{REPO}/issues",
+        method="POST",
+        data={"title": title, "body": body, "labels": ["blocked", "ci/cd", "needs-attention"]},
+    )
+    issue_number = created.get("number")
+    if issue_number:
+        print(f"  [ANOMALY-ISSUE] Created issue #{issue_number}")
+    return issue_number
+
+
+def close_auto_anomaly_issue_if_clean(pr_num):
+    issue = find_open_auto_anomaly_issue(pr_num)
+    if not issue:
+        return
+    issue_num = issue["number"]
+    gh_api(
+        f"/repos/{REPO}/issues/{issue_num}/comments",
+        method="POST",
+        data={
+            "body": (
+                f"## Auto-closed\n\n"
+                f"PR #{pr_num} no longer has detected non-required gate anomalies.\n\n"
+                f"> AutoEcoOps PR Governance Engine"
+            )
+        },
+    )
+    gh_api(f"/repos/{REPO}/issues/{issue_num}", method="PATCH", data={"state": "closed", "state_reason": "completed"})
+    print(f"  [ANOMALY-ISSUE] Closed issue #{issue_num}")
+
+
 # ── Issue cleanup: close [Auto] PR blocked issues when PR is resolved ────────
 
 def close_resolved_pr_issues(pr_num):
@@ -535,9 +614,16 @@ def process_pr(pr_num, pr_title, pr_branch, head_sha, merge_status, labels):
 
     check_runs = get_check_runs(head_sha) if head_sha else []
     passing, failing, pending, all_pass, any_pending = classify_checks(check_runs)
+    anomalies = collect_non_required_gate_anomalies(check_runs)
 
     print(f"  passing={sorted(passing)} failing={sorted(failing)} pending={sorted(pending)}")
     print(f"  all_pass={all_pass} any_pending={any_pending} merge_status={merge_status}")
+    if anomalies:
+        print(f"  [ANOMALIES] Non-required gate anomalies: {anomalies}")
+        upsert_auto_anomaly_issue(pr_num, anomalies)
+        add_label(pr_num, "blocked")
+    else:
+        close_auto_anomaly_issue_if_clean(pr_num)
 
     # ── 1. All required checks pass → MERGE NOW ───────────────────────────────
     if all_pass and not failing:

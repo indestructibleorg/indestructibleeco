@@ -614,4 +614,6 @@ class RetryExecutor:
                 else:
                     logger.error(f"All {self.policy.max_retries + 1} attempts failed")
         
-        raise last_exception
+        if last_exception is not None:
+            raise last_exception
+        raise RuntimeError("RetryExecutor: execution failed but no exception was captured")

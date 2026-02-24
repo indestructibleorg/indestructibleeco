@@ -26,6 +26,7 @@ on:
   workflow_run:
     workflows:
       - "eco-base CI/CD"
+      - "Security Gates — Trivy + Checkov + Gitleaks"
     types: [completed]
   schedule:
     - cron: "*/15 * * * *"

@@ -32,6 +32,7 @@ Decision tree per PR:
   Required check SKIPPED?       → treat as pending, re-trigger CI
 """
 import os, json, subprocess, sys, re, urllib.request, urllib.error
+from datetime import datetime, timezone
 
 REPO           = os.environ.get("REPO", "indestructibleorg/eco-base")
 SPECIFIC_PR    = os.environ.get("SPECIFIC_PR", "").strip()
@@ -417,6 +418,89 @@ def classify_checks(check_runs):
     return passing, failing, pending, all_pass, any_pending
 
 
+# ── Issue cleanup: close [Auto] PR blocked issues when PR is resolved ────────
+
+def close_resolved_pr_issues(pr_num):
+    """Close all [Auto] PR #N blocked issues for a given PR number."""
+    data = gh_api(f"/repos/{REPO}/issues?state=open&per_page=100&labels=blocked")
+    if not isinstance(data, list):
+        return 0
+    closed = 0
+    for issue in data:
+        title = issue.get("title", "")
+        if f"PR #{pr_num}" in title and "[Auto]" in title:
+            inum = issue["number"]
+            # Post closing comment
+            gh_api(f"/repos/{REPO}/issues/{inum}/comments", method="POST", data={
+                "body": (
+                    f"## Auto-closed\n\n"
+                    f"PR #{pr_num} has been merged/closed. This notification issue is no longer relevant.\n\n"
+                    f"> AutoEcoOps PR Governance Engine"
+                )
+            })
+            # Close the issue
+            gh_api(f"/repos/{REPO}/issues/{inum}", method="PATCH", data={
+                "state": "closed", "state_reason": "completed"
+            })
+            closed += 1
+            print(f"  [ISSUE-CLEANUP] Closed issue #{inum}: {title[:60]}")
+    return closed
+
+
+def close_all_stale_auto_issues():
+    """Close all [Auto] PR blocked issues where the referenced PR is no longer open."""
+    data = gh_api(f"/repos/{REPO}/issues?state=open&per_page=100&labels=blocked")
+    if not isinstance(data, list):
+        return 0
+    closed = 0
+    for issue in data:
+        title = issue.get("title", "")
+        if "[Auto]" not in title:
+            continue
+        pr_match = re.search(r'PR #(\d+)', title)
+        if not pr_match:
+            continue
+        ref_pr = pr_match.group(1)
+        pr_data = gh_api(f"/repos/{REPO}/pulls/{ref_pr}")
+        if isinstance(pr_data, dict) and pr_data.get("state") in ("closed", "merged"):
+            inum = issue["number"]
+            gh_api(f"/repos/{REPO}/issues/{inum}/comments", method="POST", data={
+                "body": (
+                    f"## Auto-closed\n\n"
+                    f"Referenced PR #{ref_pr} is now {pr_data.get('state')}. "
+                    f"This notification is no longer relevant.\n\n"
+                    f"> AutoEcoOps PR Governance Engine"
+                )
+            })
+            gh_api(f"/repos/{REPO}/issues/{inum}", method="PATCH", data={
+                "state": "closed", "state_reason": "completed"
+            })
+            closed += 1
+            print(f"  [STALE-ISSUE] Closed issue #{inum}: {title[:60]}")
+    # Also close Supabase deploy failure issues older than 24h
+    supabase_data = gh_api(f"/repos/{REPO}/issues?state=open&per_page=100&labels=supabase")
+    if isinstance(supabase_data, list):
+        now = datetime.now(timezone.utc)
+        for issue in supabase_data:
+            created = issue.get("created_at", "")
+            if created:
+                try:
+                    created_dt = datetime.fromisoformat(created.replace("Z", "+00:00"))
+                    if (now - created_dt).total_seconds() > 86400:  # 24h
+                        inum = issue["number"]
+                        gh_api(f"/repos/{REPO}/issues/{inum}/comments", method="POST", data={
+                            "body": "## Auto-closed\n\nSupabase deploy failure older than 24h — transient.\n\n> AutoEcoOps"
+                        })
+                        gh_api(f"/repos/{REPO}/issues/{inum}", method="PATCH", data={
+                            "state": "closed", "state_reason": "completed"
+                        })
+                        closed += 1
+                        print(f"  [STALE-SUPABASE] Closed issue #{inum}")
+                except (ValueError, TypeError):
+                    pass
+    return closed
+
+
 # ── Main PR processor ─────────────────────────────────────────────────────────
 
 def process_pr(pr_num, pr_title, pr_branch, head_sha, merge_status, labels):
@@ -454,6 +538,8 @@ def process_pr(pr_num, pr_title, pr_branch, head_sha, merge_status, labels):
     if all_pass and not failing:
         direct_merge(pr_num, pr_title)
         remove_label(pr_num, "blocked")
+        # Close all [Auto] PR blocked issues for this PR
+        close_resolved_pr_issues(pr_num)
         return
 
     # ── 2. Checks still running → enable auto-merge and wait ─────────────────
@@ -527,6 +613,11 @@ def main():
         process_pr(pr_num, pr_title, pr_branch, head_sha, merge_status, labels)
 
     print("\n[DONE] All PRs processed.")
+
+    # ── Phase 2: Clean up stale auto-generated issues ──────────────────────────
+    print("\n=== Phase 2: Cleaning stale auto-generated issues ===")
+    stale_closed = close_all_stale_auto_issues()
+    print(f"[DONE] Closed {stale_closed} stale auto-generated issues.")
 
 
 if __name__ == "__main__":

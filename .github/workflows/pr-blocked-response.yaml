@@ -73,9 +73,30 @@ jobs:
           git config user.email "bot@eco-base.dev"
           git config user.name "eco-base-bot"
 
-      - name: Run PR blocked response
+      - name: Run PR blocked response (diagnose.py)
         env:
           GH_TOKEN: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           SPECIFIC_PR: ${{ github.event.inputs.pr_number || '' }}
         run: python3 tools/pr-blocked-response/diagnose.py
+
+      - name: Run AutoEcoOps High-Governance Engine
+        env:
+          GH_TOKEN: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          DRY_RUN: "false"
+          ARTIFACTS_DIR: artifacts
+        run: |
+          if [ -n "${{ github.event.inputs.pr_number }}" ]; then
+            python3 tools/autoecops-governance/engine.py --pr ${{ github.event.inputs.pr_number }}
+          else
+            python3 tools/autoecops-governance/engine.py
+          fi
+
+      - name: Upload governance artifacts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: governance-run-${{ github.run_id }}
+          path: artifacts/
+          retention-days: 90

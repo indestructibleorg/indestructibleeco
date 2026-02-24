@@ -183,56 +183,12 @@ jobs:
                   f.write("slo_breach=false\n")
           PYEOF
 
-      - name: Create SLO breach issue if CFR > 5%
+      - name: Create SLO breach issue if CFR > 5% (dedup-guarded)
         if: steps.metrics.outputs.slo_breach == 'true'
         env:
           GITHUB_TOKEN: ${{ github.token }}
           CFR_PCT: ${{ steps.metrics.outputs.cfr_pct }}
-        run: |
-          python3 -c '
-          import json, os, urllib.request
-          token = os.environ["GITHUB_TOKEN"]
-          repo = os.environ["GITHUB_REPOSITORY"]
-          cfr = os.environ["CFR_PCT"]
-
-          # Check for existing open SLO breach issue
-          url = f"https://api.github.com/repos/{repo}/issues?labels=slo-breach,dora&state=open"
-          req = urllib.request.Request(url, headers={"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"})
-          with urllib.request.urlopen(req) as r:
-              existing = json.loads(r.read())
-
-          if existing:
-              _n = existing[0]["number"]
-              print(f"SLO breach issue already open: #{_n}")
-          else:
-              body = f"""## SLO Breach: Change Failure Rate Exceeded
-
-          **Threshold:** 5%
-          **Current CFR:** {cfr}%
-
-          The Change Failure Rate has exceeded the SLO threshold. This means more than 5% of deployments to main are failing.
-
-          ### Recommended Actions
-          1. Review recent failed CI/CD runs
-          2. Check if recent merges introduced regressions
-          3. Consider pausing auto-merge until CFR returns below 5%
-
-          ### DORA Reference
-          - Elite: ≤5% CFR
-          - High: ≤10% CFR
-          - Medium: ≤15% CFR
-          - Low: >15% CFR
-
-          cc: @indestructiblemachinen
-          """
-              data = json.dumps({"title": f"SLO Breach: CFR {cfr}% exceeds 5% threshold", "body": body, "labels": ["slo-breach", "dora", "incident"]}).encode()
-              req2 = urllib.request.Request(f"https://api.github.com/repos/{repo}/issues", data=data, method="POST",
-                  headers={"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json"})
-              with urllib.request.urlopen(req2) as r:
-                  issue = json.loads(r.read())
-              _in = issue["number"]
-              print(f"Created SLO breach issue: #{_in}")
-          '
+        run: python3 tools/issue-dedup/slo_breach_issue.py
 
       - name: Write DORA audit log
         if: always()

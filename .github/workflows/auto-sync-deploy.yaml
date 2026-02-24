@@ -199,18 +199,22 @@ jobs:
           echo "status=skipped" >> "$GITHUB_OUTPUT"
           echo "status=skipped" >> "$GITHUB_OUTPUT"
 
-      - name: Open incident on failure
+      - name: Open incident on failure (dedup-guarded)
         if: failure()
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
         with:
           github-token: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `🚨 [AUTO-SYNC] Supabase deploy failed — ${new Date().toISOString().slice(0,10)}`,
-              body: `## Supabase Edge Function Deployment Failed\n\n**Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n**SHA:** ${context.sha}\n**Time:** ${new Date().toISOString()}\n\n### Action Required\nCheck the workflow run logs and fix the failing function.\n\n/label incident`,
-              labels: ['incident', 'deployment', 'supabase']
+            const title = `🚨 [AUTO-SYNC] Supabase deploy failed — ${new Date().toISOString().slice(0,10)}`;
+            const labels = ['incident', 'deployment', 'supabase'];
+            const norm = s => s.replace(/\d{4}-\d{2}-\d{2}/g, '').replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+            const open = await github.rest.issues.listForRepo({ owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: labels.join(','), per_page: 50 });
+            if (open.data.some(i => norm(i.title) === norm(title))) { console.log('DEDUP: open issue exists, skipping'); return; }
+            const closed = await github.rest.issues.listForRepo({ owner: context.repo.owner, repo: context.repo.repo, state: 'closed', labels: labels.join(','), per_page: 20, sort: 'updated', direction: 'desc' });
+            const cutoff = new Date(Date.now() - 48*3600*1000);
+            if (closed.data.some(i => norm(i.title) === norm(title) && new Date(i.closed_at) > cutoff)) { console.log('DEDUP: recently closed, skipping'); return; }
+            await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title, labels,
+              body: `## Supabase Edge Function Deployment Failed\n\n**Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n**SHA:** ${context.sha}\n**Time:** ${new Date().toISOString()}\n\n### Action Required\nCheck the workflow run logs and fix the failing function.`
             });
 
   # ════════════════════════════════════════════════════════════════
@@ -346,18 +350,22 @@ jobs:
           echo "status=success" >> "$GITHUB_OUTPUT"
           echo "✅ GKE staging deployment complete"
 
-      - name: Open incident on failure
+      - name: Open incident on failure (dedup-guarded)
         if: failure()
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
         with:
           github-token: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `🚨 [AUTO-SYNC] GKE staging deploy failed — ${new Date().toISOString().slice(0,10)}`,
-              body: `## GKE Staging Deployment Failed\n\n**Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n**SHA:** ${context.sha}\n**Image Tag:** ${{ needs.gate-ci-passed.outputs.image_tag }}\n**Time:** ${new Date().toISOString()}\n\n### Action Required\nCheck the workflow run logs. GKE staging is degraded.\n\n/label incident`,
-              labels: ['incident', 'deployment', 'gke', 'staging']
+            const title = `🚨 [AUTO-SYNC] GKE staging deploy failed — ${new Date().toISOString().slice(0,10)}`;
+            const labels = ['incident', 'deployment', 'gke', 'staging'];
+            const norm = s => s.replace(/\d{4}-\d{2}-\d{2}/g, '').replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+            const open = await github.rest.issues.listForRepo({ owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: labels.join(','), per_page: 50 });
+            if (open.data.some(i => norm(i.title) === norm(title))) { console.log('DEDUP: open issue exists, skipping'); return; }
+            const closed = await github.rest.issues.listForRepo({ owner: context.repo.owner, repo: context.repo.repo, state: 'closed', labels: labels.join(','), per_page: 20, sort: 'updated', direction: 'desc' });
+            const cutoff = new Date(Date.now() - 48*3600*1000);
+            if (closed.data.some(i => norm(i.title) === norm(title) && new Date(i.closed_at) > cutoff)) { console.log('DEDUP: recently closed, skipping'); return; }
+            await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title, labels,
+              body: `## GKE Staging Deployment Failed\n\n**Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n**SHA:** ${context.sha}\n**Image Tag:** ${{ needs.gate-ci-passed.outputs.image_tag }}\n**Time:** ${new Date().toISOString()}\n\n### Action Required\nCheck the workflow run logs. GKE staging is degraded.`
             });
 
   # ════════════════════════════════════════════════════════════════
@@ -453,18 +461,22 @@ jobs:
             echo "::warning::Cloudflare deployment returned HTTP $HTTP_STATUS — may still be propagating"
           fi
 
-      - name: Open incident on failure
+      - name: Open incident on failure (dedup-guarded)
         if: failure()
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
         with:
           github-token: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `🚨 [AUTO-SYNC] Cloudflare Pages deploy failed — ${new Date().toISOString().slice(0,10)}`,
-              body: `## Cloudflare Pages Deployment Failed\n\n**Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n**SHA:** ${context.sha}\n**Time:** ${new Date().toISOString()}\n\n### Action Required\nCheck the workflow run logs and Cloudflare dashboard.\n\n/label incident`,
-              labels: ['incident', 'deployment', 'cloudflare']
+            const title = `🚨 [AUTO-SYNC] Cloudflare Pages deploy failed — ${new Date().toISOString().slice(0,10)}`;
+            const labels = ['incident', 'deployment', 'cloudflare'];
+            const norm = s => s.replace(/\d{4}-\d{2}-\d{2}/g, '').replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+            const open = await github.rest.issues.listForRepo({ owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: labels.join(','), per_page: 50 });
+            if (open.data.some(i => norm(i.title) === norm(title))) { console.log('DEDUP: open issue exists, skipping'); return; }
+            const closed = await github.rest.issues.listForRepo({ owner: context.repo.owner, repo: context.repo.repo, state: 'closed', labels: labels.join(','), per_page: 20, sort: 'updated', direction: 'desc' });
+            const cutoff = new Date(Date.now() - 48*3600*1000);
+            if (closed.data.some(i => norm(i.title) === norm(title) && new Date(i.closed_at) > cutoff)) { console.log('DEDUP: recently closed, skipping'); return; }
+            await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title, labels,
+              body: `## Cloudflare Pages Deployment Failed\n\n**Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n**SHA:** ${context.sha}\n**Time:** ${new Date().toISOString()}\n\n### Action Required\nCheck the workflow run logs and Cloudflare dashboard.`
             });
 
   # ════════════════════════════════════════════════════════════════
@@ -648,18 +660,22 @@ jobs:
           kubectl rollout undo deployment/eco-api-service -n "$NS" || true
           echo "✅ Auto-rollback complete"
 
-      - name: Open incident on failure
+      - name: Open incident on failure (dedup-guarded)
         if: failure()
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
         with:
           github-token: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `🚨 [AUTO-SYNC] GKE PRODUCTION deploy failed + auto-rollback triggered — ${new Date().toISOString().slice(0,10)}`,
-              body: `## GKE Production Deployment Failed\n\n**Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n**SHA:** ${context.sha}\n**Image Tag:** ${{ needs.gate-ci-passed.outputs.image_tag }}\n**Time:** ${new Date().toISOString()}\n\n### Auto-Rollback\nAuto-rollback has been triggered. Previous stable version should be active.\n\n### Action Required\nInvestigate the failure and fix before next deployment.\n\n/label incident /label P0`,
-              labels: ['incident', 'deployment', 'gke', 'production', 'P0']
+            const title = `🚨 [AUTO-SYNC] GKE PRODUCTION deploy failed + auto-rollback triggered — ${new Date().toISOString().slice(0,10)}`;
+            const labels = ['incident', 'deployment', 'gke', 'production', 'P0'];
+            const norm = s => s.replace(/\d{4}-\d{2}-\d{2}/g, '').replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+            const open = await github.rest.issues.listForRepo({ owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: labels.join(','), per_page: 50 });
+            if (open.data.some(i => norm(i.title) === norm(title))) { console.log('DEDUP: open issue exists, skipping'); return; }
+            const closed = await github.rest.issues.listForRepo({ owner: context.repo.owner, repo: context.repo.repo, state: 'closed', labels: labels.join(','), per_page: 20, sort: 'updated', direction: 'desc' });
+            const cutoff = new Date(Date.now() - 48*3600*1000);
+            if (closed.data.some(i => norm(i.title) === norm(title) && new Date(i.closed_at) > cutoff)) { console.log('DEDUP: recently closed, skipping'); return; }
+            await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title, labels,
+              body: `## GKE Production Deployment Failed\n\n**Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n**SHA:** ${context.sha}\n**Image Tag:** ${{ needs.gate-ci-passed.outputs.image_tag }}\n**Time:** ${new Date().toISOString()}\n\n### Auto-Rollback\nAuto-rollback has been triggered. Previous stable version should be active.\n\n### Action Required\nInvestigate the failure and fix before next deployment.`
             });
 
   # ════════════════════════════════════════════════════════════════

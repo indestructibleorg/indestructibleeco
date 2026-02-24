@@ -151,7 +151,7 @@ jobs:
     needs: health-check
     if: needs.health-check.outputs.issues_found > 0
     steps:
-    - name: Create issue for health problems
+    - name: Create issue for health problems (dedup-guarded)
       env:
         GH_TOKEN: ${{ github.token }}
         HEALTH_SCORE: ${{ needs.health-check.outputs.health_score }}
@@ -177,19 +177,35 @@ jobs:
         - [Security Alerts](https://github.com/${{ github.repository }}/security)
         "
 
+        # Dedup: check open issues
         EXISTING=$(gh issue list --repo "${{ github.repository }}" \
           --label "health-check" --state open \
           --json number --jq '.[0].number' 2>/dev/null || echo "")
 
-        if [ -z "$EXISTING" ]; then
-          gh issue create \
-            --repo "${{ github.repository }}" \
-            --title "$TITLE" \
-            --body "$BODY" 2>/dev/null || echo "Could not create issue"
-        else
+        if [ -n "$EXISTING" ]; then
+          echo "DEDUP: open health-check issue #$EXISTING exists, commenting instead"
           gh issue comment "$EXISTING" \
             --repo "${{ github.repository }}" \
             --body "$BODY" 2>/dev/null || echo "Could not comment on issue"
+        else
+          # Dedup: check recently closed issues (48h cooldown)
+          CUTOFF=$(date -u -d '48 hours ago' '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date -u -v-48H '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || echo "")
+          RECENTLY_CLOSED=""
+          if [ -n "$CUTOFF" ]; then
+            RECENTLY_CLOSED=$(gh issue list --repo "${{ github.repository }}" \
+              --label "health-check" --state closed \
+              --json number,closedAt --jq "[.[] | select(.closedAt > \"$CUTOFF\")] | .[0].number" 2>/dev/null || echo "")
+          fi
+
+          if [ -n "$RECENTLY_CLOSED" ]; then
+            echo "DEDUP: health-check issue #$RECENTLY_CLOSED closed within 48h, skipping"
+          else
+            gh issue create \
+              --repo "${{ github.repository }}" \
+              --title "$TITLE" \
+              --body "$BODY" \
+              --label "health-check" 2>/dev/null || echo "Could not create issue"
+          fi
         fi
 
   # ══════════════════════════════════════════════════════════════════

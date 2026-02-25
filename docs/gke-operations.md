@@ -118,7 +118,7 @@ Once the ManagedCertificate status is `Active`, re-enable Cloudflare proxy for p
 
 ## Cloudflare DNS Configuration
 
-### Zone: autoecoops.io (ID: 3f10062913fe82ee54594594413c3d68)
+### Zone: autoecoops.io (ID: YOUR_CLOUDFLARE_ZONE_ID)
 
 | Record | Type | Value | Proxied | Purpose |
 |--------|------|-------|---------|---------|

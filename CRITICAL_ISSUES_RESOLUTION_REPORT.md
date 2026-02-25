@@ -125,18 +125,18 @@ All critical CI/CD issues have been resolved except for the OAuth App registrati
 | `SUPABASE_URL` | `https://yrfxijooswpvdpdseswy.supabase.co` | Supabase project URL |
 | `SUPABASE_ANON_KEY` | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` | Supabase anonymous key |
 | `SUPABASE_SECRET_KEY` | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` | Supabase service role key |
-| `CLOUDFLARE_API_TOKEN` | `GAWRh-e2rxB4G4cpl9gpLqFJQYK1W2UCEtF8nZhC` | Cloudflare Global API Token |
-| `CLOUDFLARE_ACCOUNT_ID` | `2fead4a141ec2c677eb3bf0ac535f1d5` | Cloudflare Account ID |
-| `CLOUDFLARE_ZONE_ID` | `3f10062913fe82ee54594594413c3d68` | Cloudflare Zone ID |
+| `CLOUDFLARE_API_TOKEN` | `YOUR_CLOUDFLARE_API_TOKEN` | Cloudflare Global API Token |
+| `CLOUDFLARE_ACCOUNT_ID` | `YOUR_CLOUDFLARE_ACCOUNT_ID` | Cloudflare Account ID |
+| `CLOUDFLARE_ZONE_ID` | `YOUR_CLOUDFLARE_ZONE_ID` | Cloudflare Zone ID |
 | `GITHUB_PAT` | *(Configure manually)* | GitHub Personal Access Token |
 | `GRAFANA_ADMIN_PASSWORD` | *(Generate secure password)* | Grafana admin password |
 
 **GCP Service Account Details**:
 - **Email**: `eco-deploy-sa@my-project-ops-1991.iam.gserviceaccount.com`
 - **Roles**: 15 roles including Security Admin, Project IAM Admin, Kubernetes Engine Admin, etc.
-- **Key IDs**: `29f5085c952ac8f3bc845358d123385ce365adb9`, `132a0d149288e4631c6e2d2af7294864306369c7`
-- **OAuth 2 Client ID**: `109929971358789976736`
-- **Additional Token**: `lT5_7AldkQ4BDznsMsbioMwLoVe2kNTRno0NGzh_`
+- **Key IDs**: `YOUR_GCP_SA_KEY_ID_1`, `YOUR_GCP_SA_KEY_ID_2`
+- **OAuth 2 Client ID**: `YOUR_OAUTH2_CLIENT_ID`
+- **Additional Token**: `YOUR_ADDITIONAL_TOKEN`
 
 **Configuration URL**: https://github.com/organizations/indestructibleorg/settings/secrets/actions
 
@@ -208,7 +208,7 @@ All critical CI/CD issues have been resolved except for the OAuth App registrati
 1. Navigate to: https://github.com/settings/developers
 2. Login with credentials:
    - Email: `indestructible-auto-ops@outlook.com`
-   - Password: `Wei412011$`
+   - Password: `YOUR_SECURE_PASSWORD`
 3. Complete 2FA verification via GitHub Mobile app
 4. Click "New OAuth App"
 5. Fill in application details

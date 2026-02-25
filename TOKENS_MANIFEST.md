@@ -74,7 +74,7 @@ sb_secret_YOUR_SERVICE_ROLE_KEY_HERE
 
 #### Anon Key (Legacy)
 ```
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyZnhpam9vc3dwdmRwZHNlc3d5Iiwicm9s
+YOUR_SUPABASE_ANON_KEY_JWT_TOKEN
 ```
 
 - **Usage**: Legacy authentication
@@ -117,7 +117,7 @@ postgresql://postgres:YOUR_PASSWORD@db.yrfxijooswpvdpdseswy.supabase.co:5432/pos
 - **Endpoint**: `https://yrfxijooswpvdpdseswy.storage.supabase.co/storage/v1/s3`
 - **Region**: `ap-south-1`
 - **Bucket**: `autoecoops_keys`
-- **Access Key**: `7bc8a0a036fbd497ba54ef47d76b5be4`
+- **Access Key**: `YOUR_S3_ACCESS_KEY`
 
 ### Edge Functions
 

@@ -208,7 +208,7 @@ Create a new user account via Supabase Auth.
 ```json
 {
   "email": "dev@example.com",
-  "password": "securePassword123",
+  "password": "YOUR_SECURE_PASSWORD",
   "display_name": "Dev User"
 }
 ```
@@ -241,7 +241,7 @@ Sign in with email and password.
 ```json
 {
   "email": "dev@example.com",
-  "password": "securePassword123"
+  "password": "YOUR_SECURE_PASSWORD"
 }
 ```
 

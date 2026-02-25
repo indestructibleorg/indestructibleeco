@@ -40,8 +40,9 @@ pull_request_rules:
   - name: Auto-merge autonomous bot PRs (non-sensitive)
     description: Merge bot PRs automatically when CI passes and no sensitive paths touched
     conditions:
-      - label = autonomous-bot
-      - label = auto-merge
+      - or:
+        - label = autonomous-bot
+        - label = auto-repair
       - check-success = validate
       - check-success = lint
       - check-success = opa-policy

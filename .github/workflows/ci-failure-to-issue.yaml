@@ -1,0 +1,76 @@
+name: CI Failure to Issue
+
+on:
+  workflow_run:
+    workflows: ["eco-base CI/CD"]
+    types: [completed]
+
+permissions:
+  contents: read
+  issues: write
+  actions: read
+
+jobs:
+  on-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Identify Failed Gates and Create Issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+        run: |
+          FAILED_JOBS=$(gh api /repos/$REPO/actions/runs/$RUN_ID/jobs --jq '.jobs[] | select(.conclusion=="failure") | {name: .name, id: .id}')
+          
+          if [ -z "$FAILED_JOBS" ]; then
+            echo "No failed jobs found in metadata, checking steps..."
+            exit 0
+          fi
+
+          echo "$FAILED_JOBS" | jq -c '.' | while read -r job; do
+            JOB_NAME=$(echo "$job" | jq -r '.name')
+            JOB_ID=$(echo "$job" | jq -r '.id')
+            
+            LOGS=$(gh api /repos/$REPO/actions/jobs/$JOB_ID/logs | tail -n 100)
+            LOG_HASH=$(echo "$LOGS" | sha256sum | cut -d' ' -f1)
+            
+            ISSUE_TITLE="CI Gate [$JOB_NAME] Failed in PR #$PR_NUMBER"
+            
+            EXISTING_ISSUE=$(gh issue list --repo $REPO --search "$LOG_HASH" --state open --json number --jq '.[0].number')
+            
+            if [ -n "$EXISTING_ISSUE" ]; then
+              echo "Issue already exists for this failure: #$EXISTING_ISSUE"
+              gh issue comment $EXISTING_ISSUE --repo $REPO --body "Detected recurring failure in PR #$PR_NUMBER. Logs hash: $LOG_HASH"
+              continue
+            fi
+
+            ISSUE_BODY=$(cat <<EOT
+    ## CI Failure Detected
+    - **Gate**: $JOB_NAME
+    - **PR**: #$PR_NUMBER
+    - **Run**: [View Workflow Run](https://github.com/$REPO/actions/runs/$RUN_ID)
+    - **Logs Hash**: $LOG_HASH
+
+    ### Failed Logs (Tail)
+    \`\`\`
+    $LOGS
+    \`\`\`
+
+    ### Automation Context
+    - **Status**: Awaiting Auto-Repair
+    - **Policy**: ci-issue-governance.rego
+    - **Timestamp**: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+EOT
+    )
+            
+            gh issue create --repo $REPO \
+              --title "$ISSUE_TITLE" \
+              --body "$ISSUE_BODY" \
+              --label "ci-failure,gate-$JOB_NAME,auto-repair" \
+              --assignee "AutoEcoOps-Bot"
+          done

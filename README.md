@@ -113,9 +113,9 @@ eco-base/
 
 All adapters implement a unified interface (`BaseInferenceAdapter`) with `generate()`, `stream()`, `health_check()`, and `list_models()`. The `EngineManager` provides automatic failover: if the preferred engine fails, it routes to the next healthy engine.
 
-## CI/CD
+## CI/CD & Autonomous Repair
 
-5-gate pipeline (`.github/workflows/ci.yaml`):
+5-gate pipeline (`.github/workflows/ci.yaml`) with **Autonomous Closed-Loop Repair**:
 
 | Gate | Name | Description |
 |------|------|-------------|
@@ -123,7 +123,16 @@ All adapters implement a unified interface (`BaseInferenceAdapter`) with `genera
 | 2 | lint | Python compile + JS syntax + YAML governance |
 | 3 | test | 500 tests (unit + integration + e2e + skill) |
 | 4 | build | Docker build + structure verification |
-| 5 | auto-fix | Diagnostic mode on failure |
+| 5 | auto-fix | Autonomous repair engine (L1-L5) |
+
+### Autonomous Closed-Loop System
+eco-base implements a **100% human-free** CI failure resolution system:
+1. **Detection**: `ci-failure-to-issue.yaml` detects failed gates and creates tracked issues with log hashes.
+2. **Diagnosis**: `ci-issue-repair-engine.py` (L2 AI) analyzes logs and identifies root causes.
+3. **Repair**: Automated fix commits are pushed to a repair branch, and a fix PR is created.
+4. **Validation**: Mergify auto-merges the fix PR once CI passes.
+5. **Closure**: The issue is automatically closed, completing the loop.
+6. **Governance**: OPA policies (`ci-issue-governance.rego`) ensure all repairs are idempotent and compliant.
 
 ## Documentation
 

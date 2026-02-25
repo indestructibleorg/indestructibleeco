@@ -1,6 +1,7 @@
 name: eco-base CI/CD
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
@@ -23,7 +24,8 @@ jobs:
   # Gate 1: Centralized Validation Engine
   # ════════════════════════════════════════════════════════════════
   validate:
-    runs-on: ubuntu-latest
+    runs-on:
+  workflow_dispatch: ubuntu-latest
     timeout-minutes: 15
     outputs:
       error_count: ${{ steps.validator.outputs.error_count }}
@@ -49,7 +51,8 @@ jobs:
   # Gate 2: Python Lint & Compile
   # ════════════════════════════════════════════════════════════════
   lint:
-    runs-on: ubuntu-latest
+    runs-on:
+  workflow_dispatch: ubuntu-latest
     timeout-minutes: 15
     needs: validate
     steps:
@@ -131,7 +134,8 @@ jobs:
   # Gate 3: Unit & Integration Tests
   # ════════════════════════════════════════════════════════════════
   test:
-    runs-on: ubuntu-latest
+    runs-on:
+  workflow_dispatch: ubuntu-latest
     timeout-minutes: 20
     needs: lint
     steps:
@@ -229,7 +233,8 @@ jobs:
   # Gate 4: Docker Build
   # ════════════════════════════════════════════════════════════════
   build:
-    runs-on: ubuntu-latest
+    runs-on:
+  workflow_dispatch: ubuntu-latest
     timeout-minutes: 30
     needs: test
     steps:
@@ -348,7 +353,8 @@ jobs:
   # Gate 5: Auto-Fix Engine (runs on failure, attempts automated repair)
   # ══════════════════════════════════════════════════════════════════
   auto-fix:
-    runs-on: ubuntu-latest
+    runs-on:
+  workflow_dispatch: ubuntu-latest
     timeout-minutes: 15
     needs: [validate, lint, test, build]
     if: failure() && github.ref == 'refs/heads/main'
@@ -374,7 +380,8 @@ jobs:
   # vulnerability scanning with fail threshold.
   # ══════════════════════════════════════════════════════════════════
   supply-chain:
-    runs-on: ubuntu-latest
+    runs-on:
+  workflow_dispatch: ubuntu-latest
     timeout-minutes: 20
     needs: [build]
     if: success()
@@ -503,7 +510,8 @@ jobs:
   # in the policy/ directory.
   # ══════════════════════════════════════════════════════════════════
   opa-policy:
-    runs-on: ubuntu-latest
+    runs-on:
+  workflow_dispatch: ubuntu-latest
     timeout-minutes: 10
     needs: [validate]
     steps:

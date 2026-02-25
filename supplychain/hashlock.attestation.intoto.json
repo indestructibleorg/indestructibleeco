@@ -4,17 +4,17 @@
     {
       "name": "supplychain/hashlock.json",
       "digest": {
-        "sha256": "90fe9ad513d09289efd07d061490434302437021f670d6cae982a11a5ff15ff7"
+        "sha256": "8e742a0878dbd4c0f2afb0dc3df37cf2ce8ea17b4b17036ea149db94d6545ac2"
       }
     }
   ],
   "predicateType": "https://eco-base.io/Attestation/SupplyChain/v1",
   "predicate": {
     "generator": "eco-supplychain-attest-tool",
-    "generatedAt": "2026-02-25T18:16:39.796625+00:00",
+    "generatedAt": "2026-02-25T22:58:28.026983+00:00",
     "workflowRunId": "local",
     "commitSha": "local",
-    "entriesCount": 151,
-    "hashlockSha256": "90fe9ad513d09289efd07d061490434302437021f670d6cae982a11a5ff15ff7"
+    "entriesCount": 310,
+    "hashlockSha256": "8e742a0878dbd4c0f2afb0dc3df37cf2ce8ea17b4b17036ea149db94d6545ac2"
   }
 }

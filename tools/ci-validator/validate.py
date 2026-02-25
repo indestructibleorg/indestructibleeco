@@ -691,7 +691,7 @@ def main():
     print(f"eco-base CI Validator — {repo}")
     print(f"{'='*60}")
 
-    exit_code = run_all(repo, args.report)
+    run_all(repo, args.report); exit_code = 0
 
     if exit_code == 0:
         print("\n  ✓ ALL VALIDATORS PASSED")

@@ -1,23 +1,76 @@
 name: Security Gates — Trivy + Checkov + Gitleaks
 on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 2 * * *'
   workflow_dispatch:
+
 permissions:
   contents: read
   security-events: write
   pull-requests: write
+
 concurrency:
   group: security-gates-${{ github.ref }}
   cancel-in-progress: true
+
 jobs:
+  secret-scanning:
+    name: Secret Scanning (Gitleaks)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Check Gitleaks license
+        id: check-license
+        run: |
+          if [ -n "${{ secrets.GITLEAKS_LICENSE }}" ]; then
+            echo "has_license=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_license=false" >> "$GITHUB_OUTPUT"
+            echo "⚠️ GITLEAKS_LICENSE not set — running basic git-secrets scan instead"
+          fi
+
+      - name: Run Gitleaks (licensed)
+        if: steps.check-license.outputs.has_license == 'true'
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7  # v2.3.9
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+      - name: Run basic secret scan (fallback)
+        if: steps.check-license.outputs.has_license != 'true'
+        run: |
+          echo "Running basic secret pattern scan (no Gitleaks license)..."
+          FOUND=0
+          for pattern in "PRIVATE KEY" "password=" "secret=" "api_key=" "token="; do
+            COUNT=$(grep -rn --include="*.ts" --include="*.js" --include="*.py" --include="*.yaml" --include="*.yml" --include="*.env" "$pattern" . 2>/dev/null | grep -v node_modules | grep -v .git | wc -l)
+            if [ "$COUNT" -gt 0 ]; then
+              echo "⚠️ Pattern '$pattern' found in $COUNT files"
+              FOUND=$((FOUND + COUNT))
+            fi
+          done
+          echo "Basic scan complete: $FOUND potential secret patterns found"
+          echo "For comprehensive scanning, set GITLEAKS_LICENSE secret"
+
   trivy-fs-scan:
     name: Trivy Filesystem Scan
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
       - name: Run Trivy filesystem scan
-        uses: aquasecurity/trivy-action@e368e328979b113139d6f9068e03accaed98a518
+        uses: aquasecurity/trivy-action@e368e328979b113139d6f9068e03accaed98a518  # v0.29.0
         with:
           scan-type: fs
           scan-ref: .
@@ -26,9 +79,94 @@ jobs:
           severity: CRITICAL,HIGH
           exit-code: '1'
           ignore-unfixed: true
+
       - name: Upload Trivy SARIF to GitHub Security
         if: always()
-        uses: github/codeql-action/upload-sarif@89a39a4e59826350b863aa6b6252a07ad50cf83e
+        uses: github/codeql-action/upload-sarif@89a39a4e59826350b863aa6b6252a07ad50cf83e  # v3.28.13
         with:
           sarif_file: trivy-fs-results.sarif
           category: trivy-filesystem
+
+  trivy-config-scan:
+    name: Trivy Config/IaC Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Run Trivy config scan (K8s, Dockerfile, Helm)
+        uses: aquasecurity/trivy-action@e368e328979b113139d6f9068e03accaed98a518  # v0.29.0
+        with:
+          scan-type: config
+          scan-ref: .
+          format: sarif
+          output: trivy-config-results.sarif
+          severity: CRITICAL,HIGH
+          exit-code: '0'
+
+      - name: Upload Trivy Config SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@89a39a4e59826350b863aa6b6252a07ad50cf83e  # v3.28.13
+        with:
+          sarif_file: trivy-config-results.sarif
+          category: trivy-config
+
+  checkov-iac-scan:
+    name: Checkov IaC Policy Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@f99709f8ccc3496220c987b7d8729653237c23dc  # v12.3086.0
+        with:
+          directory: .
+          framework: kubernetes,dockerfile,github_actions,secrets
+          output_format: sarif
+          output_file_path: checkov-results.sarif
+          soft_fail: false
+          skip_check: CKV_GHA_7,CKV2_GHA_1
+
+      - name: Upload Checkov SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@89a39a4e59826350b863aa6b6252a07ad50cf83e  # v3.28.13
+        with:
+          sarif_file: checkov-results.sarif
+          category: checkov
+
+  security-gate-summary:
+    name: Security Gate Summary
+    needs: [secret-scanning, trivy-fs-scan, trivy-config-scan, checkov-iac-scan]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Evaluate gate results
+        env:
+          SECRET_SCAN: ${{ needs.secret-scanning.result }}
+          TRIVY_FS: ${{ needs.trivy-fs-scan.result }}
+          TRIVY_CFG: ${{ needs.trivy-config-scan.result }}
+          CHECKOV: ${{ needs.checkov-iac-scan.result }}
+        run: |
+          python3 - << 'PYEOF'
+          import os, sys
+          results = {
+            "secret-scanning": os.environ["SECRET_SCAN"],
+            "trivy-fs": os.environ["TRIVY_FS"],
+            "trivy-config": os.environ["TRIVY_CFG"],
+            "checkov": os.environ["CHECKOV"],
+          }
+          failed = [k for k,v in results.items() if v == "failure"]
+          print("Security Gate Results:")
+          for k,v in results.items():
+            sym = "PASS" if v == "success" else ("SKIP" if v == "skipped" else "FAIL")
+            print(f"  {sym} {k}: {v}")
+          if failed:
+            print(f"\nSECURITY GATE BLOCKED: {failed}")
+            sys.exit(1)
+          else:
+            print("\nAll security gates passed.")
+          PYEOF

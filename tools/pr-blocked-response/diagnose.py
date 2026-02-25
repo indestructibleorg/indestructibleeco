@@ -749,6 +749,9 @@ def close_auto_anomaly_issue_if_clean(pr_num):
         return
     print(f"  [ANOMALY-ISSUE] Closed issue #{issue_num}")
 
+
+# ── Issue cleanup: close [Auto] PR blocked issues when PR is resolved ────────
+
 def close_resolved_pr_issues(pr_num):
     """Close all [Auto] PR #N blocked issues for a given PR number."""
     data = gh_api(f"/repos/{REPO}/issues?state=open&per_page=100&labels=blocked")
@@ -898,6 +901,9 @@ def process_pr(pr_num, pr_title, pr_branch, head_sha, merge_status, labels, is_d
         if failing:
             print(f"  [DRAFT] Required checks failed: {failing}. Re-triggering...")
             retrigger_ci(pr_num, head_sha, set(failing))
+        if merge_status in ("BEHIND", "UNKNOWN"):
+            print(f"  [DRAFT] Branch is {merge_status}. Triggering update-branch maintenance.")
+            update_branch(pr_num)
         print("  [DRAFT] Continuous maintenance enabled; merge actions skipped.")
         return
 

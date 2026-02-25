@@ -208,3 +208,96 @@ def test_process_pr_draft_retriggers_failures_without_merge(monkeypatch):
     assert retriggered
     assert not merged
     assert not auto_merged
+
+
+class _DummyAuditTrail:
+    def __init__(self, *_args, **_kwargs):
+        self.final_action = None
+        self.final_outcome = None
+
+    def record_step(self, *_args, **_kwargs):
+        return None
+
+    def record_decision(self, *_args, **_kwargs):
+        return None
+
+    def compute_risk_score(self, *_args, **_kwargs):
+        return 0
+
+    def save(self):
+        return None
+
+
+def test_engine_draft_pending_enters_maintenance_without_automerge(monkeypatch):
+    monkeypatch.setattr(engine, "circuit_breaker_check", lambda: False)
+    monkeypatch.setattr(engine, "AuditTrail", _DummyAuditTrail)
+    monkeypatch.setattr(engine, "capture_pr_snapshot", lambda _pr: {"state_hash": "x", "tarball_path": "/tmp/x"})
+    monkeypatch.setattr(engine, "evaluate_bot_governance", lambda _pr: {"decision": "ok", "max_tier": "TIER-2", "has_escalation": False, "comments": [], "state_hash": "h"})
+
+    def fake_gh_api(path, method="GET", data=None):
+        if path.endswith("/pulls/280"):
+            return {
+                "head": {"sha": "abc", "ref": "branch"},
+                "mergeable": True,
+                "mergeable_state": "clean",
+                "labels": [],
+                "title": "t",
+                "draft": True,
+                "auto_merge": None,
+                "user": {"login": "dev"},
+            }
+        if "check-runs" in path:
+            return {"check_runs": [{"name": "validate", "status": "queued", "conclusion": None}]}
+        return {}
+
+    monkeypatch.setattr(engine, "gh_api", fake_gh_api)
+    merge_calls = []
+    monkeypatch.setattr(engine, "gh_cli", lambda args: merge_calls.append(args) or (0, "", ""))
+
+    result = engine.process_pr_with_governance(280)
+
+    assert result["action"] == "MONITOR_DRAFT"
+    assert result["outcome"] == "ci_in_progress_draft"
+    assert not merge_calls
+
+
+def test_engine_draft_all_pass_does_not_merge(monkeypatch):
+    monkeypatch.setattr(engine, "circuit_breaker_check", lambda: False)
+    monkeypatch.setattr(engine, "AuditTrail", _DummyAuditTrail)
+    monkeypatch.setattr(engine, "capture_pr_snapshot", lambda _pr: {"state_hash": "x", "tarball_path": "/tmp/x"})
+    monkeypatch.setattr(engine, "evaluate_bot_governance", lambda _pr: {"decision": "ok", "max_tier": "TIER-2", "has_escalation": False, "comments": [], "state_hash": "h"})
+
+    def fake_gh_api(path, method="GET", data=None):
+        if path.endswith("/pulls/280"):
+            return {
+                "head": {"sha": "abc", "ref": "branch"},
+                "mergeable": True,
+                "mergeable_state": "clean",
+                "labels": [],
+                "title": "t",
+                "draft": True,
+                "auto_merge": None,
+                "user": {"login": "dev"},
+            }
+        if "check-runs" in path:
+            return {
+                "check_runs": [
+                    {"name": "validate", "status": "completed", "conclusion": "success"},
+                    {"name": "lint", "status": "completed", "conclusion": "success"},
+                    {"name": "test", "status": "completed", "conclusion": "success"},
+                    {"name": "build", "status": "completed", "conclusion": "success"},
+                    {"name": "opa-policy", "status": "completed", "conclusion": "success"},
+                    {"name": "supply-chain", "status": "completed", "conclusion": "success"},
+                ]
+            }
+        return {}
+
+    monkeypatch.setattr(engine, "gh_api", fake_gh_api)
+    merge_calls = []
+    monkeypatch.setattr(engine, "gh_cli", lambda args: merge_calls.append(args) or (0, "", ""))
+
+    result = engine.process_pr_with_governance(280)
+
+    assert result["action"] == "DRAFT_MAINTENANCE"
+    assert result["outcome"] == "ready_but_draft"
+    assert not merge_calls

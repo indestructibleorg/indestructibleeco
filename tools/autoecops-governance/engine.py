@@ -106,6 +106,12 @@ MAX_RETRIES = 5
 RETRY_BASE_DELAY = 2.0  # seconds
 RETRY_MAX_DELAY = 60.0  # seconds
 
+# Draft maintenance mode action/outcome constants
+DRAFT_MONITOR_ACTION = "MONITOR_DRAFT"
+DRAFT_MONITOR_OUTCOME = "ci_in_progress_draft"
+DRAFT_READY_ACTION = "DRAFT_MAINTENANCE"
+DRAFT_READY_OUTCOME = "ready_but_draft"
+
 # ─── State ────────────────────────────────────────────────────────────────────
 
 _circuit_breaker_failures = 0
@@ -912,15 +918,10 @@ def process_pr_with_governance(pr_number: int) -> dict:
         "is_draft": is_draft,
     })
 
-    # Step 2: Skip drafts
-    if is_draft:
-        audit.record_decision("is_draft", True, "SKIP")
-        result["action"] = "SKIP"
-        result["outcome"] = "draft_pr"
-        audit.final_action = "SKIP"
-        audit.final_outcome = "draft_pr"
-        audit.save()
-        return result
+    # Step 2: Draft PRs run in maintenance mode (no merge operations)
+    draft_maintenance_mode = is_draft
+    if draft_maintenance_mode:
+        audit.record_decision("is_draft", True, "MAINTENANCE_MODE")
 
     # Step 3: Fetch check runs (zero-trust: direct REST API)
     try:
@@ -981,6 +982,13 @@ def process_pr_with_governance(pr_number: int) -> dict:
     # ── Branch B: CI still running ─────────────────────────────────────────────
     if check_summary["any_required_pending"]:
         audit.record_decision("any_required_pending", True, "MONITOR")
+        if draft_maintenance_mode:
+            result["action"] = DRAFT_MONITOR_ACTION
+            result["outcome"] = DRAFT_MONITOR_OUTCOME
+            audit.final_action = DRAFT_MONITOR_ACTION
+            audit.final_outcome = DRAFT_MONITOR_OUTCOME
+            audit.save()
+            return result
         if not auto_merge_enabled and not DRY_RUN:
             gh_cli(["pr", "merge", str(pr_number), "--auto", "--squash", "--repo", REPO])
             print(f"  ✅ Auto-merge enabled (CI in progress)")
@@ -1072,6 +1080,14 @@ def process_pr_with_governance(pr_number: int) -> dict:
 
     # All checks pass, no bot escalation → MERGE
     audit.record_decision("safe_to_merge", True, "MERGE")
+
+    if draft_maintenance_mode:
+        result["action"] = DRAFT_READY_ACTION
+        result["outcome"] = DRAFT_READY_OUTCOME
+        audit.final_action = DRAFT_READY_ACTION
+        audit.final_outcome = DRAFT_READY_OUTCOME
+        audit.save()
+        return result
 
     # Remove human-review-required if present
     if "human-review-required" in labels and not DRY_RUN:

@@ -7,8 +7,8 @@ metadata:
     eco-base/governance: aligned
     eco-base/part-of: eco-base
     environment: production
-    name: machine-native-ops-gateway
-    namespace: production
+  name: machine-native-ops-gateway
+  namespace: production
 spec:
   selector:
     istio: ingressgateway
@@ -49,7 +49,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/machine-native-ops-lb
-    eco-base/urn: urn:eco-base:k8s:core:service:machine-native-ops-lb:sha256-45664ce29fe809b989ab6df8c57a9c3ceaf3e64bb8d46472abb59f65b6490d57
+    eco-base/urn: urn:eco-base:k8s:core:service:machine-native-ops-lb:sha256-9100ad9bddbbeb707ff975f7a81cf8f4be476087da71db2c2b3779a3b58769f9
     service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
     service.beta.kubernetes.io/aws-load-balancer-type: nlb
   labels:
@@ -64,8 +64,8 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     environment: production
-    name: machine-native-ops-lb
-    namespace: production
+  name: machine-native-ops-lb
+  namespace: production
 spec:
   ports:
   - name: http

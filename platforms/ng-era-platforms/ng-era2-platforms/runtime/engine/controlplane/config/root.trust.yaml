@@ -11,8 +11,8 @@ metadata:
     machinenativeops.io/component: trust-configuration
     machinenativeops.io/tier: trust
     machinenativeops.io/version: v1.0.0
-    name: trust-baseline-config
-    namespace: machinenativenops-trust
+  name: trust-baseline-config
+  namespace: machinenativenops-trust
 spec:
   attestation_bundles:
   - attesters:
@@ -418,7 +418,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/trust-schema
-    eco-base/urn: urn:eco-base:k8s:core:configmap:trust-schema:sha256-804db327487f655a8e11dd81f47f36807cbf9743fb70141ae44ff66fb2870053
+    eco-base/urn: urn:eco-base:k8s:core:configmap:trust-schema:sha256-bd2cb2804d7cbd5178d85cc02a9cae2a1b93b608a4484dd894d7cb4d142123da
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -428,5 +428,5 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: trust-schema
-    namespace: machinenativenops-trust
+  name: trust-schema
+  namespace: machinenativenops-trust

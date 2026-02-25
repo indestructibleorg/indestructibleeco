@@ -37,7 +37,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/velero-enhanced-backup-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:velero-enhanced-backup-config:sha256-bb0699ca56b285550c6c2fdde0229796d2fd0145e67cac7d9de3aca7c226a88c
+    eco-base/urn: urn:eco-base:k8s:core:configmap:velero-enhanced-backup-config:sha256-e171cd0459db26829efc3b360d952e9cca1b300470c25fbaf6642913f2457556
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -47,5 +47,5 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: velero-enhanced-backup-config
-    namespace: velero
+  name: velero-enhanced-backup-config
+  namespace: velero

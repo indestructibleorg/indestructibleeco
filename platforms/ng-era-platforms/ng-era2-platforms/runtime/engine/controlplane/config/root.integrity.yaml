@@ -12,8 +12,8 @@ metadata:
     machinenativeops.io/component: integrity-configuration
     machinenativeops.io/tier: integrity
     machinenativeops.io/version: v1.0.0
-    name: integrity-baseline-config
-    namespace: machinenativenops-integrity
+  name: integrity-baseline-config
+  namespace: machinenativenops-integrity
 spec:
   compliance_verification:
   - compliance_controls:
@@ -487,5 +487,5 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: integrity-schema
-    namespace: machinenativenops-integrity
+  name: integrity-schema
+  namespace: machinenativenops-integrity

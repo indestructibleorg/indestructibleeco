@@ -12,8 +12,8 @@ metadata:
     machinenativeops.io/component: provenance-configuration
     machinenativeops.io/tier: provenance
     machinenativeops.io/version: v1.0.0
-    name: provenance-baseline-config
-    namespace: machinenativenops-provenance
+  name: provenance-baseline-config
+  namespace: machinenativenops-provenance
 spec:
   audit_trails:
   - access_control:
@@ -550,5 +550,5 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: provenance-schema
-    namespace: machinenativenops-provenance
+  name: provenance-schema
+  namespace: machinenativenops-provenance

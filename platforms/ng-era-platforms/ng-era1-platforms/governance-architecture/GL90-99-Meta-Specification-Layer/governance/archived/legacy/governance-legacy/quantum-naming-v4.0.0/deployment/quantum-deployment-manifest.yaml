@@ -7,8 +7,8 @@ metadata:
     app.kubernetes.io/version: v4.0.0-quantum
     eco-base/governance: aligned
     eco-base/part-of: eco-base
-    name: quantum-governance
-    name: quantum-governance
+  name: quantum-governance
+  name: quantum-governance
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -18,8 +18,8 @@ metadata:
     app.kubernetes.io/name: quantum-governance
     eco-base/governance: aligned
     eco-base/part-of: eco-base
-    name: quantum-governance-sa
-    namespace: quantum-governance
+  name: quantum-governance-sa
+  namespace: quantum-governance
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -29,7 +29,7 @@ metadata:
     app.kubernetes.io/name: quantum-governance
     eco-base/governance: aligned
     eco-base/part-of: eco-base
-    name: quantum-governance-role
+  name: quantum-governance-role
 rules:
 - apiGroups:
   - ''
@@ -106,7 +106,7 @@ metadata:
     app.kubernetes.io/name: quantum-governance
     eco-base/governance: aligned
     eco-base/part-of: eco-base
-    name: quantum-governance-binding
+  name: quantum-governance-binding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -164,8 +164,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: quantum-governance-config
-    namespace: quantum-governance
+  name: quantum-governance-config
+  namespace: quantum-governance
 ---
 apiVersion: v1
 data:
@@ -190,8 +190,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: quantum-governance-secrets
-    namespace: quantum-governance
+  name: quantum-governance-secrets
+  namespace: quantum-governance
 type: Opaque
 ---
 apiVersion: apps/v1
@@ -213,8 +213,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: quantum-governance-service
-    namespace: quantum-governance
+  name: quantum-governance-service
+  namespace: quantum-governance
 spec:
   replicas: 3
   selector:
@@ -333,8 +333,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: quantum-governance-service
-    namespace: quantum-governance
+  name: quantum-governance-service
+  namespace: quantum-governance
 spec:
   ports:
   - name: http
@@ -412,8 +412,8 @@ metadata:
     eco-base/governance: aligned
     eco-base/part-of: eco-base
     release: prometheus
-    name: quantum-governance-monitor
-    namespace: quantum-governance
+  name: quantum-governance-monitor
+  namespace: quantum-governance
 spec:
   endpoints:
   - honorLabels: true
@@ -440,8 +440,8 @@ metadata:
     eco-base/governance: aligned
     eco-base/part-of: eco-base
     release: prometheus
-    name: quantum-governance-rules
-    namespace: quantum-governance
+  name: quantum-governance-rules
+  namespace: quantum-governance
 spec:
   groups:
   - name: quantum-naming-governance
@@ -475,8 +475,8 @@ metadata:
     app.kubernetes.io/name: quantum-governance
     eco-base/governance: aligned
     eco-base/part-of: eco-base
-    name: quantum-governance-netpol
-    namespace: quantum-governance
+  name: quantum-governance-netpol
+  namespace: quantum-governance
 spec:
   egress:
   - ports:
@@ -523,8 +523,8 @@ metadata:
     app.kubernetes.io/name: quantum-governance
     eco-base/governance: aligned
     eco-base/part-of: eco-base
-    name: quantum-governance-pdb
-    namespace: quantum-governance
+  name: quantum-governance-pdb
+  namespace: quantum-governance
 spec:
   minAvailable: 2
   selector:
@@ -540,8 +540,8 @@ metadata:
     app.kubernetes.io/name: quantum-governance
     eco-base/governance: aligned
     eco-base/part-of: eco-base
-    name: quantum-governance-tls
-    namespace: quantum-governance
+  name: quantum-governance-tls
+  namespace: quantum-governance
 spec:
   dnsNames:
   - gov.quantum.machinenativeops.io
@@ -578,8 +578,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: quantum-governance-ingress
-    namespace: quantum-governance
+  name: quantum-governance-ingress
+  namespace: quantum-governance
 spec:
   rules:
   - host: gov.quantum.machinenativeops.io

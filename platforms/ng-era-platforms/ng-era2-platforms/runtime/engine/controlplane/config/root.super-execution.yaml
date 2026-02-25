@@ -12,8 +12,8 @@ metadata:
     machinenativeops.io/component: super-execution
     machinenativeops.io/tier: execution
     machinenativeops.io/version: v1.0.0
-    name: super-execution-config
-    namespace: machinenativenops-execution
+  name: super-execution-config
+  namespace: machinenativenops-execution
 spec:
   execution_flows:
   - criticality: critical
@@ -488,5 +488,5 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: super-execution-schema
-    namespace: machinenativenops-execution
+  name: super-execution-schema
+  namespace: machinenativenops-execution

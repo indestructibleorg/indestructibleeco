@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/instant-service
-    eco-base/urn: urn:eco-base:k8s:core:service:instant-service:sha256-7befa889305529da57189dcc10aa03c1d8f74215e65211d33892d3f1e531d8a0
+    eco-base/urn: urn:eco-base:k8s:core:service:instant-service:sha256-e448f14b0ed08aa749a071bfe37687ed4a1f615c1d2eb1e7b8b6c3e2bbff70b8
   labels:
     app.kubernetes.io/app.kubernetes.io/component: data
     app.kubernetes.io/component: eco-component
@@ -20,8 +20,8 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     governance.machinenativeops.io/charter-version: 2.0.0
-    name: instant-service
-    namespace: platform-03
+  name: instant-service
+  namespace: platform-03
 spec:
   ports:
   - name: http

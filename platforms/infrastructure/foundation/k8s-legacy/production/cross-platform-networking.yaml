@@ -144,7 +144,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/cross-platform-networking-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:cross-platform-networking-config:sha256-44c0ba205e3b5616a976be16f16363de39bb70bc11ae4e4f41c7941891411c48
+    eco-base/urn: urn:eco-base:k8s:core:configmap:cross-platform-networking-config:sha256-73e0881534465267aaac4b61c52cad4b1a4056fa6ad97258f6101fb473c8e958
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -154,5 +154,5 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: cross-platform-networking-config
-    namespace: production
+  name: cross-platform-networking-config
+  namespace: production

@@ -7,7 +7,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/postgres-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:postgres-backup:sha256-a30bfd8f5de09f815386a8af5260f6ff1b8a3b6842f5f622a52760ca83058a58
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:postgres-backup:sha256-68928803f9133d3300fe582797004a9e37ba1dcc8eb2d266f2a580749aa9f5ba
   labels:
     app.kubernetes.io/component: backup
     app.kubernetes.io/instance: eco-instance
@@ -19,8 +19,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: postgres-backup
-    namespace: platform-03
+  name: postgres-backup
+  namespace: platform-03
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 3
@@ -102,7 +102,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/redis-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:redis-backup:sha256-82db3b7772ef25a35566da260aedbbbe1533ee087ea76d78e7fe1808fc71ddd1
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:redis-backup:sha256-433b424bbc1d8392578281d1ac566a24cb2cd9b6569f1282ff908d0a56f725ea
   labels:
     app.kubernetes.io/component: backup
     app.kubernetes.io/instance: eco-instance
@@ -114,8 +114,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: redis-backup
-    namespace: platform-03
+  name: redis-backup
+  namespace: platform-03
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 5
@@ -195,7 +195,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/config-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:config-backup:sha256-7923dc53184feda12d8e488916cc75cfc30b9a4ad2e8beb545d9061b67d425f7
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:config-backup:sha256-2a06c1551b1de062e2f0df8b508ed05dfadba0983cf29cb5f8610d3eda05e395
   labels:
     app.kubernetes.io/component: backup
     app.kubernetes.io/instance: eco-instance
@@ -207,8 +207,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: config-backup
-    namespace: platform-03
+  name: config-backup
+  namespace: platform-03
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 10
@@ -296,7 +296,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/backup-validation
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:backup-validation:sha256-9711ca16cb5b09ae4f2320fb50cf8e053a0b96641632f5fcce36c7233d7a0a56
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:backup-validation:sha256-3731f852455c5fdf22dd77c3c1475d18ffacdf09cebe5ebafba58c5b07276c33
   labels:
     app.kubernetes.io/component: backup
     app.kubernetes.io/instance: eco-instance
@@ -308,8 +308,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: backup-validation
-    namespace: platform-03
+  name: backup-validation
+  namespace: platform-03
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 7
@@ -388,8 +388,8 @@ metadata:
   annotations:
     eco-base/uri: eco-base://platform/resource/infrastructure/k8s-legacy/disaster-recovery/jobs/database-backup-jobs.yaml
     eco-base/urn: urn:eco-base:platform:resource:infrastructure:k8s-legacy:disaster-recovery:jobs:database-backup-jobs.yaml
-    name: backup-service-account
-    namespace: platform-03
+  name: backup-service-account
+  namespace: platform-03
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -397,8 +397,8 @@ metadata:
   annotations:
     eco-base/uri: eco-base://platform/resource/infrastructure/k8s-legacy/disaster-recovery/jobs/database-backup-jobs.yaml
     eco-base/urn: urn:eco-base:platform:resource:infrastructure:k8s-legacy:disaster-recovery:jobs:database-backup-jobs.yaml
-    name: backup-role
-    namespace: platform-03
+  name: backup-role
+  namespace: platform-03
 rules:
 - apiGroups:
   - ''

@@ -53,7 +53,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/backup-compliance-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:backup-compliance-config:sha256-9cd220faef3a773b89dcc9c5a5be3cb4980efc6d7fe5b70c4da4e83cf99ba977
+    eco-base/urn: urn:eco-base:k8s:core:configmap:backup-compliance-config:sha256-4cb48aaedb341ce6b7471481aa96dbf57957d2eb56935a159f70a71f8e1a7d81
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -63,8 +63,8 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: backup-compliance-config
-    namespace: velero
+  name: backup-compliance-config
+  namespace: velero
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -73,7 +73,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/backup-compliance-report
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:backup-compliance-report:sha256-30809e572d9f39e799ed61e271137572a0f0695fe312113ce957616a2eaf8986
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:backup-compliance-report:sha256-66a79333f99157c2c0100fd8b40bde44db33097271310c1452b7bb35a3d59818
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -83,8 +83,8 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: backup-compliance-report
-    namespace: velero
+  name: backup-compliance-report
+  namespace: velero
 spec:
   failedJobsHistoryLimit: 1
   jobTemplate:

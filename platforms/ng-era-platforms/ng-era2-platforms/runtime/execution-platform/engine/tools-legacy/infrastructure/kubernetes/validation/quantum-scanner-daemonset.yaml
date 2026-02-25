@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/daemonset/quantum-scanner
-    eco-base/urn: urn:eco-base:k8s:core:daemonset:quantum-scanner:sha256-2429ea1692da072af3e979a59e0aa7b99f036794892917066214d0fd0f81030e
+    eco-base/urn: urn:eco-base:k8s:core:daemonset:quantum-scanner:sha256-9ed24ff554c57a71ba74d3270c177102407542eac8d2b949851545a2187f1090
   labels:
     app.kubernetes.io/component: quantum-scanner
     app.kubernetes.io/instance: eco-instance
@@ -19,14 +19,9 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     version: v1.0.0
-    name: quantum-scanner
-    namespace: gl-runtime-verification
+  name: quantum-scanner
+  namespace: gl-runtime-verification
 spec:
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: quantum-scanner
-  template:
-    metadata:
   annotations:
     prometheus.io/port: '8080'
     prometheus.io/scrape: 'true'
@@ -34,7 +29,6 @@ spec:
     app.kubernetes.io/name: quantum-scanner
     eco-base/governance: aligned
     eco-base/part-of: eco-base
-    version: v1.0.0
     spec:
       containers:
       - env:
@@ -114,6 +108,12 @@ spec:
           path: /proc
           type: Directory
         name: host-proc
+    version: v1.0.0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: quantum-scanner
+  template:
+    metadata: null
   updateStrategy:
     rollingUpdate:
       maxUnavailable: 1
@@ -134,7 +134,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/quantum-scanner-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:quantum-scanner-config:sha256-9c6551ca05c1317c3daf88195484d6f58ff2e627550234cb0bea460f94ff7805
+    eco-base/urn: urn:eco-base:k8s:core:configmap:quantum-scanner-config:sha256-f1d112ca90072afea30eaa60794975a89cac3e1b61c1b138c8d7c53f8fa1da7c
   labels:
     app.kubernetes.io/component: quantum-scanner
     app.kubernetes.io/instance: eco-instance
@@ -146,8 +146,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: quantum-scanner-config
-    namespace: gl-runtime-verification
+  name: quantum-scanner-config
+  namespace: gl-runtime-verification
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -156,8 +156,8 @@ metadata:
     app.kubernetes.io/name: validation-system
     eco-base/governance: aligned
     eco-base/part-of: eco-base
-    name: validation-system-sa
-    namespace: gl-runtime-verification
+  name: validation-system-sa
+  namespace: gl-runtime-verification
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -166,7 +166,7 @@ metadata:
     app.kubernetes.io/name: validation-system
     eco-base/governance: aligned
     eco-base/part-of: eco-base
-    name: quantum-scanner-role
+  name: quantum-scanner-role
 rules:
 - apiGroups:
   - ''

@@ -19,8 +19,8 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     version: v1.0.0
-    name: hybrid-decider-service
-    namespace: gl-runtime-verification
+  name: hybrid-decider-service
+  namespace: gl-runtime-verification
 spec:
   ports:
   - name: http
@@ -59,8 +59,8 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     version: v1.0.0
-    name: hybrid-decider
-    namespace: gl-runtime-verification
+  name: hybrid-decider
+  namespace: gl-runtime-verification
 spec:
   replicas: 2
   selector:
@@ -183,8 +183,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: hybrid-decider-config
-    namespace: gl-runtime-verification
+  name: hybrid-decider-config
+  namespace: gl-runtime-verification
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler

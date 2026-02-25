@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/circleci-agent
-    eco-base/urn: urn:eco-base:k8s:core:deployment:circleci-agent:sha256-7f26b3edd361ca73ccb56290c3cd571b1377e59a3d50ad90aa0f217eee98efa1
+    eco-base/urn: urn:eco-base:k8s:core:deployment:circleci-agent:sha256-4f642040fdc31a7d5057dd41dc49344e6d5821df73930ee590436c565dd91614
   labels:
     app: circleci-runner
     app.kubernetes.io/component: eco-component
@@ -18,16 +18,9 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: circleci-agent
-    namespace: circleci-runner
+  name: circleci-agent
+  namespace: circleci-runner
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: circleci-runner
-      component: agent
-  template:
-    metadata:
   labels:
     app: circleci-runner
     component: agent
@@ -107,3 +100,10 @@ spec:
             memory: 512Mi
       restartPolicy: Always
       serviceAccountName: circleci-runner
+  replicas: 1
+  selector:
+    matchLabels:
+      app: circleci-runner
+      component: agent
+  template:
+    metadata: null

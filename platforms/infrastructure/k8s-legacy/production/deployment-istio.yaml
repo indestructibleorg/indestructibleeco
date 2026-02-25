@@ -21,8 +21,8 @@ metadata:
     environment: production
     istio-injection: enabled
     version: v1
-    name: machine-native-ops
-    namespace: production
+  name: machine-native-ops
+  namespace: production
 spec:
   replicas: 3
   selector:
@@ -204,8 +204,8 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     environment: production
-    name: machine-native-ops
-    namespace: production
+  name: machine-native-ops
+  namespace: production
 spec:
   ports:
   - name: http

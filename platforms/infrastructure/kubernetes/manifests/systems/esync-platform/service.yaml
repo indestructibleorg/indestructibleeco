@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/esync-platform-service
-    eco-base/urn: urn:eco-base:k8s:core:service:esync-platform-service:sha256-a93897155546eacd7c2a24fc07d05d8b7b203ce64f269dab46783995cbbb95c6
+    eco-base/urn: urn:eco-base:k8s:core:service:esync-platform-service:sha256-48d079b713cb2e40e83da6ad804528dbabe7543aeb9fdfe8ec17388ba68e3bd5
   labels:
     app.kubernetes.io/app.kubernetes.io/component: platform
     app.kubernetes.io/component: eco-component
@@ -20,8 +20,8 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     governance.machinenativeops.io/charter-version: 2.0.0
-    name: esync-platform-service
-    namespace: platform-03
+  name: esync-platform-service
+  namespace: platform-03
 spec:
   ports:
   - name: http

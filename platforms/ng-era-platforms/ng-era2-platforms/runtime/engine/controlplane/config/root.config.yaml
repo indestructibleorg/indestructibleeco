@@ -12,8 +12,8 @@ metadata:
     machinenativeops.io/component: global-configuration
     machinenativeops.io/tier: baseline
     machinenativeops.io/version: v1.0.0
-    name: global-baseline-config
-    namespace: machinenativeops-root
+  name: global-baseline-config
+  namespace: machinenativeops-root
 spec:
   backup:
     enabled: true
@@ -212,5 +212,5 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: root-config-schema
-    namespace: machinenativenops-root
+  name: root-config-schema
+  namespace: machinenativenops-root

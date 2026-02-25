@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/dr-health-check
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:dr-health-check:sha256-888fa4d476953832c09aa2aedef7a63f68afe65bffe3e87482e15dbdbbaea4eb
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:dr-health-check:sha256-9d427d657c0a68755bd2d49a24a0d5cc4a7d79125554e17dfc7a7ade3f001c08
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -20,8 +20,8 @@ metadata:
     eco-base/platform: core
     environment: production
     test-type: health-check
-    name: dr-health-check
-    namespace: production
+  name: dr-health-check
+  namespace: production
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 3
@@ -93,7 +93,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/dr-backup-verification
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:dr-backup-verification:sha256-ef0351b82ec1e94266efc9e0af5944ad20f657456f77d2c3620a8b52b727343f
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:dr-backup-verification:sha256-8da3a74b0edf231c74b6d96b1f2f9b60784e863b84dbb0a001e0d4ba796ff9c8
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -107,8 +107,8 @@ metadata:
     eco-base/platform: core
     environment: production
     test-type: backup-verification
-    name: dr-backup-verification
-    namespace: production
+  name: dr-backup-verification
+  namespace: production
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 3

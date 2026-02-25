@@ -7,7 +7,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/machine-native-ops
-    eco-base/urn: urn:eco-base:k8s:core:service:machine-native-ops:sha256-da36fcdd83762daa32d19af94c101669f5431cb576d2d0340b296bcff1146954
+    eco-base/urn: urn:eco-base:k8s:core:service:machine-native-ops:sha256-db08964191a4ccef66f493d715e1f7bea6395b9d80dcaa8bbc600bd6bc219dd5
     prometheus.io/port: '9090'
     prometheus.io/scrape: 'true'
     service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
@@ -30,8 +30,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: machine-native-ops
-    namespace: platform-03
+  name: machine-native-ops
+  namespace: platform-03
 spec:
   externalTrafficPolicy: Local
   ports:
@@ -62,7 +62,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/machine-native-ops-api
-    eco-base/urn: urn:eco-base:k8s:core:service:machine-native-ops-api:sha256-0618de1e39f064fb438e2368c1041fd0d34c623ac4d61d76af4c0ea9d9770164
+    eco-base/urn: urn:eco-base:k8s:core:service:machine-native-ops-api:sha256-7801b7234c5e12112d50e389d3c3e1d4fa7f1f0009c316168e9c63f5b3a48861
     prometheus.io/port: '9090'
     prometheus.io/scrape: 'true'
   labels:
@@ -76,8 +76,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: machine-native-ops-api
-    namespace: platform-03
+  name: machine-native-ops-api
+  namespace: platform-03
 spec:
   ports:
   - name: http
@@ -99,7 +99,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/machine-native-ops-worker
-    eco-base/urn: urn:eco-base:k8s:core:service:machine-native-ops-worker:sha256-a12656891ede989e8123dd48c1081a7ce97cf3501ee30b46ef72fc71a64720f6
+    eco-base/urn: urn:eco-base:k8s:core:service:machine-native-ops-worker:sha256-b27f960e76af2f9e60cc2beee70e3dca4bddfb3a15cde7ef384d950b5e595c02
   labels:
     app.kubernetes.io/component: worker
     app.kubernetes.io/instance: eco-instance
@@ -111,8 +111,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: machine-native-ops-worker
-    namespace: platform-03
+  name: machine-native-ops-worker
+  namespace: platform-03
 spec:
   clusterIP: None
   ports:
@@ -131,7 +131,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/redis-cluster
-    eco-base/urn: urn:eco-base:k8s:core:service:redis-cluster:sha256-970e4420b7a58401bf8d4698e6952c29a5b39e35721087a45321b693e3034e92
+    eco-base/urn: urn:eco-base:k8s:core:service:redis-cluster:sha256-b9d330f9ce1488de1dbbcb568498067dd1708df4dc82419e90f9e9e13cc0101d
   labels:
     app.kubernetes.io/component: cache
     app.kubernetes.io/instance: eco-instance
@@ -143,8 +143,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: redis-cluster
-    namespace: platform-03
+  name: redis-cluster
+  namespace: platform-03
 spec:
   ports:
   - name: redis
@@ -166,7 +166,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/postgres
-    eco-base/urn: urn:eco-base:k8s:core:service:postgres:sha256-49fba70770e667040bd31cf8dced47dec7bcf24b2584c0d42d716536066816d4
+    eco-base/urn: urn:eco-base:k8s:core:service:postgres:sha256-412d6a097b380d6f5ecf0a1c424c2d1e5edac57411c152108253c160ca463d61
     prometheus.io/port: '9187'
     prometheus.io/scrape: 'true'
   labels:
@@ -180,8 +180,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: postgres
-    namespace: platform-03
+  name: postgres
+  namespace: platform-03
 spec:
   ports:
   - name: postgres
@@ -203,7 +203,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/monitoring
-    eco-base/urn: urn:eco-base:k8s:core:service:monitoring:sha256-b6f2dcffa0e253d0ef41bc1eac6ee71061e54e56d39660d4bd82033b238a4630
+    eco-base/urn: urn:eco-base:k8s:core:service:monitoring:sha256-202bf685823cc07e805202403fefa4fe14cb17ccffe3f98a2bc48a0564b192aa
   labels:
     app.kubernetes.io/component: observability
     app.kubernetes.io/instance: eco-instance
@@ -215,8 +215,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: monitoring
-    namespace: monitoring
+  name: monitoring
+  namespace: monitoring
 spec:
   externalTrafficPolicy: Local
   ports:
@@ -240,8 +240,8 @@ metadata:
     eco-base/governance: aligned
     eco-base/part-of: eco-base
     release: prometheus
-    name: machine-native-ops
-    namespace: platform-03
+  name: machine-native-ops
+  namespace: platform-03
 spec:
   endpoints:
   - interval: 30s
@@ -260,8 +260,8 @@ metadata:
     eco-base/governance: aligned
     eco-base/part-of: eco-base
     release: prometheus
-    name: machine-native-ops-api
-    namespace: platform-03
+  name: machine-native-ops-api
+  namespace: platform-03
 spec:
   endpoints:
   - interval: 15s
@@ -280,8 +280,8 @@ metadata:
     eco-base/governance: aligned
     eco-base/part-of: eco-base
     release: prometheus
-    name: machine-native-ops-worker
-    namespace: platform-03
+  name: machine-native-ops-worker
+  namespace: platform-03
 spec:
   endpoints:
   - interval: 60s
@@ -300,8 +300,8 @@ metadata:
     eco-base/governance: aligned
     eco-base/part-of: eco-base
     release: prometheus
-    name: redis-cluster
-    namespace: platform-03
+  name: redis-cluster
+  namespace: platform-03
 spec:
   endpoints:
   - interval: 30s
@@ -320,8 +320,8 @@ metadata:
     eco-base/governance: aligned
     eco-base/part-of: eco-base
     release: prometheus
-    name: postgres
-    namespace: platform-03
+  name: postgres
+  namespace: platform-03
 spec:
   endpoints:
   - interval: 30s

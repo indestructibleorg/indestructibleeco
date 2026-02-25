@@ -15,8 +15,8 @@ metadata:
     machinenativeops.io/governance-closure: required
     machinenativeops.io/tier: artifact
     machinenativeops.io/version: ${ARTIFACT_VERSION}
-    name: ${ARTIFACT_NAME}
-    namespace: ${NAMESPACE}
+  name: ${ARTIFACT_NAME}
+  namespace: ${NAMESPACE}
     version: ${ARTIFACT_VERSION}
 spec:
   artifact:
@@ -277,5 +277,5 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: filex-template-schema
-    namespace: machinenativeops-artifacts
+  name: filex-template-schema
+  namespace: machinenativeops-artifacts

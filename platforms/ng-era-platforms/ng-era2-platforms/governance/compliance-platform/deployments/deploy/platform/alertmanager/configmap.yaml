@@ -58,7 +58,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/alertmanager
-    eco-base/urn: urn:eco-base:k8s:core:configmap:alertmanager:sha256-33df56f9b082c2de4086d2238e4a8d4681768e02b805280cddc6b5d5be6560d7
+    eco-base/urn: urn:eco-base:k8s:core:configmap:alertmanager:sha256-0e68ef4afe48369498c5d9eb98cbd45ab112493037965bef46d32319e4627dcb
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -73,8 +73,8 @@ metadata:
     environment: dev
     managed-by: gl-platform
     version: 1.0.0
-    name: alertmanager
-    namespace: monitoring
+  name: alertmanager
+  namespace: monitoring
 ---
 apiVersion: v1
 kind: Secret
@@ -83,7 +83,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/secret/alertmanager-secrets
-    eco-base/urn: urn:eco-base:k8s:core:secret:alertmanager-secrets:sha256-95104e9a7d57b6aa6b7f9f0bd959ad99a040ca99eefe0efa6015f95e0526db30
+    eco-base/urn: urn:eco-base:k8s:core:secret:alertmanager-secrets:sha256-144ab382aa9ee77ca287d37003a59e13b035a375edc4284fa8ad40bb4feb3e82
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -93,8 +93,8 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: alertmanager-secrets
-    namespace: monitoring
+  name: alertmanager-secrets
+  namespace: monitoring
 stringData:
   pagerduty-service-key: ${PAGERDUTY_SERVICE_KEY}
   slack-webhook-id: ${SLACK_WEBHOOK_ID}

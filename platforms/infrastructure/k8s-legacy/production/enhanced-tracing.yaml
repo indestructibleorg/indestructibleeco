@@ -21,7 +21,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/jaeger-enhanced-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:jaeger-enhanced-config:sha256-9448d8eb8b9e50cff34ac9a015ba1f301b330e249d39355908ea093f8c8871aa
+    eco-base/urn: urn:eco-base:k8s:core:configmap:jaeger-enhanced-config:sha256-57f48126e46226a5945a1804501249e6cad2fba51edeb8af4496fcd8e50930ae
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -31,8 +31,8 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: jaeger-enhanced-config
-    namespace: istio-system
+  name: jaeger-enhanced-config
+  namespace: istio-system
 ---
 apiVersion: v1
 data:
@@ -46,7 +46,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/tracing-context-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:tracing-context-config:sha256-f3ca9b101b031edc67751f42a189e66725081633b41e281848f69b3aa1bfc829
+    eco-base/urn: urn:eco-base:k8s:core:configmap:tracing-context-config:sha256-f5ca621502c2d3617b5aae335fd7d6c9f07d0e2f17bfcba543f9e67fcf56ba36
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -56,8 +56,8 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: tracing-context-config
-    namespace: istio-system
+  name: tracing-context-config
+  namespace: istio-system
 ---
 apiVersion: v1
 data:
@@ -77,7 +77,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/trace-retention-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:trace-retention-config:sha256-2307a37c733c4915dd6be441c60f577c2dd46f1059e189e237a6d8437dc2b572
+    eco-base/urn: urn:eco-base:k8s:core:configmap:trace-retention-config:sha256-b6ad4b33aa14d276ab66677a28d298018fceccfb1960fed2bb1169933a48921f
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -87,8 +87,8 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: trace-retention-config
-    namespace: istio-system
+  name: trace-retention-config
+  namespace: istio-system
 ---
 apiVersion: telemetry.istio.io/v1alpha1
 kind: Telemetry
@@ -96,8 +96,8 @@ metadata:
   annotations:
     eco-base/uri: eco-base://platform/resource/infrastructure/k8s-legacy/production/enhanced-tracing.yaml
     eco-base/urn: urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:enhanced-tracing.yaml
-    name: enhanced-tracing
-    namespace: istio-system
+  name: enhanced-tracing
+  namespace: istio-system
 spec:
   accessLogging:
   - filter:

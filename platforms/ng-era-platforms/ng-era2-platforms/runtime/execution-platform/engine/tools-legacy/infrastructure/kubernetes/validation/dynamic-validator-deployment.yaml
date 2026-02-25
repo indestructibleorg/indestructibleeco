@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/dynamic-validator-core
-    eco-base/urn: urn:eco-base:k8s:core:deployment:dynamic-validator-core:sha256-4e8b8a55c2fad06142ce95835bf9f98da6aa260873630e78e77eb297956b3d30
+    eco-base/urn: urn:eco-base:k8s:core:deployment:dynamic-validator-core:sha256-1f3204d3c386a085f9163bf0a65971a1bc8b361182046211ab4e587228019ae6
   labels:
     app.kubernetes.io/component: dynamic-validator
     app.kubernetes.io/instance: eco-instance
@@ -19,20 +19,9 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     version: v1.0.0
-    name: dynamic-validator-core
-    namespace: gl-runtime-verification
+  name: dynamic-validator-core
+  namespace: gl-runtime-verification
 spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: dynamic-validator
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
-    type: RollingUpdate
-  template:
-    metadata:
   annotations:
     prometheus.io/path: /metrics
     prometheus.io/port: '8080'
@@ -41,7 +30,6 @@ spec:
     app.kubernetes.io/name: dynamic-validator
     eco-base/governance: aligned
     eco-base/part-of: eco-base
-    version: v1.0.0
     spec:
       affinity:
         podAntiAffinity:
@@ -137,6 +125,18 @@ spec:
           claimName: evidence-storage-pvc
       - emptyDir: {}
         name: reports
+    version: v1.0.0
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dynamic-validator
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata: null
 ---
 apiVersion: v1
 kind: Service
@@ -145,7 +145,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/dynamic-validator-service
-    eco-base/urn: urn:eco-base:k8s:core:service:dynamic-validator-service:sha256-d2d073fa29fb25aa974806f319da6363ba3c25faf4cd670f3c24ed2dc41a0538
+    eco-base/urn: urn:eco-base:k8s:core:service:dynamic-validator-service:sha256-0395420141d305ab3017032535d0530f1c1ed44b165307cdb57dce9cd424fa83
   labels:
     app.kubernetes.io/component: dynamic-validator
     app.kubernetes.io/instance: eco-instance
@@ -157,8 +157,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: dynamic-validator-service
-    namespace: gl-runtime-verification
+  name: dynamic-validator-service
+  namespace: gl-runtime-verification
 spec:
   ports:
   - name: http
@@ -190,7 +190,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/validation-system-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:validation-system-config:sha256-03ec5fc557e7224d7b40e3628515725b6e258e9b4762af8972aeeac8bc10028a
+    eco-base/urn: urn:eco-base:k8s:core:configmap:validation-system-config:sha256-fd4dd5baad66bfdbf7499607a02e5ecfea45ef727dfd86e89f3e5557d9461a5f
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -202,8 +202,8 @@ metadata:
     eco-base/owner: eco-system
     eco-base/part-of: eco-base
     eco-base/platform: core
-    name: validation-system-config
-    namespace: gl-runtime-verification
+  name: validation-system-config
+  namespace: gl-runtime-verification
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -212,8 +212,8 @@ metadata:
     app.kubernetes.io/name: validation-system
     eco-base/governance: aligned
     eco-base/part-of: eco-base
-    name: evidence-storage-pvc
-    namespace: gl-runtime-verification
+  name: evidence-storage-pvc
+  namespace: gl-runtime-verification
 spec:
   accessModes:
   - ReadWriteOnce

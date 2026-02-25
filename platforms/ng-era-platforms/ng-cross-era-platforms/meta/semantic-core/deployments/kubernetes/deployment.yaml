@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/gl-spec-core
-    eco-base/urn: urn:eco-base:k8s:core:deployment:gl-spec-core:sha256-35813769f5f60208d75b57f1a74eb0eee48b8760ebb2943aa075e0b350373fa3
+    eco-base/urn: urn:eco-base:k8s:core:deployment:gl-spec-core:sha256-be71691053e2fa35746ecb90260664a448057c92f527d557fe3e2d42d37194b6
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -23,21 +23,9 @@ metadata:
     gl.semantic/component-type: semantic-engine
     platform: gl-platform-services
     version: v1.0.0
-    name: gl-spec-core
-    namespace: gl-platform-spec-core
+  name: gl-spec-core
+  namespace: gl-platform-spec-core
 spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: spec-core
-      version: v1.0.0
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
-    type: RollingUpdate
-  template:
-    metadata:
   annotations:
     prometheus.io/path: /metrics
     prometheus.io/port: '9090'
@@ -47,7 +35,6 @@ spec:
     eco-base/governance: aligned
     eco-base/part-of: eco-base
     gl.platform/semantic.core: 'true'
-    version: v1.0.0
     spec:
       affinity:
         nodeAffinity:
@@ -156,3 +143,16 @@ spec:
       - emptyDir:
           sizeLimit: 10Gi
         name: cache-volume
+    version: v1.0.0
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: spec-core
+      version: v1.0.0
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata: null

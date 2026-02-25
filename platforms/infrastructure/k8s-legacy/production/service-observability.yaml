@@ -28,7 +28,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/istio-custom-metrics
-    eco-base/urn: urn:eco-base:k8s:core:configmap:istio-custom-metrics:sha256-1a60b534a5a0477cd814ad6fe1205cee1dbb0967594eb2715cde546c65137003
+    eco-base/urn: urn:eco-base:k8s:core:configmap:istio-custom-metrics:sha256-6a9edb3b88a18e459fef5b67eeb52feb9d78833f9917b9a4ef883ba8d03af1ac
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -38,8 +38,8 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: istio-custom-metrics
-    namespace: istio-system
+  name: istio-custom-metrics
+  namespace: istio-system
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -51,8 +51,8 @@ metadata:
     app.kubernetes.io/name: istio-pilot
     eco-base/governance: aligned
     eco-base/part-of: eco-base
-    name: istio-custom-metrics-monitor
-    namespace: istio-system
+  name: istio-custom-metrics-monitor
+  namespace: istio-system
 spec:
   endpoints:
   - interval: 15s
@@ -95,7 +95,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/service-mesh-dashboard
-    eco-base/urn: urn:eco-base:k8s:core:configmap:service-mesh-dashboard:sha256-bfc972a223b611cc4e5d6e9afb36e294940fe972bb10dc522ebf44098208de6a
+    eco-base/urn: urn:eco-base:k8s:core:configmap:service-mesh-dashboard:sha256-918dc22360a8b73f915095ba6dfe08a5d6524a96f184fa4bc867b13a2a005e55
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -108,8 +108,8 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     grafana_dashboard: '1'
-    name: service-mesh-dashboard
-    namespace: istio-system
+  name: service-mesh-dashboard
+  namespace: istio-system
 ---
 apiVersion: telemetry.istio.io/v1alpha1
 kind: Telemetry
@@ -117,8 +117,8 @@ metadata:
   annotations:
     eco-base/uri: eco-base://platform/resource/infrastructure/k8s-legacy/production/service-observability.yaml
     eco-base/urn: urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:service-observability.yaml
-    name: mesh-default
-    namespace: istio-system
+  name: mesh-default
+  namespace: istio-system
 spec:
   accessLogging:
   - providers:

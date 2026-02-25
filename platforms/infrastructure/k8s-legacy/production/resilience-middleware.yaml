@@ -19,8 +19,8 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     environment: production
-    name: resilience-middleware
-    namespace: production
+  name: resilience-middleware
+  namespace: production
 spec:
   replicas: 2
   selector:
@@ -110,8 +110,8 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     environment: production
-    name: resilience-middleware
-    namespace: production
+  name: resilience-middleware
+  namespace: production
 spec:
   ports:
   - name: http

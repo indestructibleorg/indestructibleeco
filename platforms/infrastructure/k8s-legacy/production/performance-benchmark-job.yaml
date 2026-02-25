@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-smoke
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-smoke:sha256-738cafe141c2aa887a6d475e31360cc5d15c35ed55d8acba1308e316e698b5f1
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-smoke:sha256-7fddb9e366bd05b2665d10d7dabfa0230a0df53c7f09ffb554a90e48e097d826
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -20,8 +20,8 @@ metadata:
     eco-base/platform: core
     environment: production
     test-type: smoke
-    name: performance-benchmark-smoke
-    namespace: production
+  name: performance-benchmark-smoke
+  namespace: production
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 3
@@ -75,7 +75,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-load
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-load:sha256-6ba6bab6994de0f7999dd3738d038189ec8af9384d9b7964925f007c5c5a1a5d
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-load:sha256-12bd5b60b86e0f1fa24195133233bd15893003dc22f546c23bdcbc7006923d2e
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -89,8 +89,8 @@ metadata:
     eco-base/platform: core
     environment: production
     test-type: load
-    name: performance-benchmark-load
-    namespace: production
+  name: performance-benchmark-load
+  namespace: production
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 3
@@ -144,7 +144,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-stress
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-stress:sha256-b27cedc5641cda6dd0183aeb64fa4b99dcd960e2e09c573ad6c52299362cb950
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-stress:sha256-93e5bee6944c2669179a19643d1743d185978de15dd5c4bd3c5eb46ed4ad9829
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -158,8 +158,8 @@ metadata:
     eco-base/platform: core
     environment: production
     test-type: stress
-    name: performance-benchmark-stress
-    namespace: production
+  name: performance-benchmark-stress
+  namespace: production
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 2
@@ -213,7 +213,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-endurance
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-endurance:sha256-465db89c2bae8f3a908d5bac4c0a398aea6af759b455cfd97145211cae6e5484
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-endurance:sha256-36075e562370a0e5f982ce7ca876a65fc294e71de2bfee0af7e44f7552e8cdd0
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -227,8 +227,8 @@ metadata:
     eco-base/platform: core
     environment: production
     test-type: endurance
-    name: performance-benchmark-endurance
-    namespace: production
+  name: performance-benchmark-endurance
+  namespace: production
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 1

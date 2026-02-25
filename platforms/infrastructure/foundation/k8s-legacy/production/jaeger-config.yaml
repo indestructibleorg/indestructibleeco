@@ -19,7 +19,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/jaeger-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:jaeger-config:sha256-3341a1301a60868498feefd6b286bb059725920cb8a7e258d2b337927951fd1e
+    eco-base/urn: urn:eco-base:k8s:core:configmap:jaeger-config:sha256-20eb9e1cd7329e3e8af53fbcd2b7a6f80ef5d45376b21b90d98d7386c0ac3547
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -32,8 +32,8 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     environment: production
-    name: jaeger-config
-    namespace: production
+  name: jaeger-config
+  namespace: production
 ---
 apiVersion: v1
 data:
@@ -51,7 +51,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/tracing-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:tracing-config:sha256-cc5580a4011e1b7dfa0150bd165b87bb135de52c39c6b20618f7e0d0eedcaeac
+    eco-base/urn: urn:eco-base:k8s:core:configmap:tracing-config:sha256-4f32e3b89af79521d1ff2d46451021511bc0bbf239675269fbe5a8907023d6d5
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -64,5 +64,5 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     environment: production
-    name: tracing-config
-    namespace: production
+  name: tracing-config
+  namespace: production

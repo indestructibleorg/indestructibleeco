@@ -7,7 +7,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/machine-native-ops
-    eco-base/urn: urn:eco-base:k8s:core:deployment:machine-native-ops:sha256-3ec1cc4bcd294a0d2c5e68540e7fb15f2c6431c8cb3a9ec083f23fcc984a81e6
+    eco-base/urn: urn:eco-base:k8s:core:deployment:machine-native-ops:sha256-d6bd09dd928c709167d335f411e5ea4580d9c5fccbe823f0f9c2214186908775
   labels:
     app.kubernetes.io/component: application
     app.kubernetes.io/instance: eco-instance
@@ -20,20 +20,9 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     tier: backend
-    name: machine-native-ops
-    namespace: platform-03
+  name: machine-native-ops
+  namespace: platform-03
 spec:
-  replicas: 9
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: machine-native-ops
-  strategy:
-    rollingUpdate:
-      maxSurge: 3
-      maxUnavailable: 1
-    type: RollingUpdate
-  template:
-    metadata:
   annotations:
     prometheus.io/path: /metrics
     prometheus.io/port: '9090'
@@ -43,8 +32,6 @@ spec:
     app.kubernetes.io/name: machine-native-ops
     eco-base/governance: aligned
     eco-base/part-of: eco-base
-    tier: backend
-    version: v1.0.0
     spec:
       affinity:
         nodeAffinity:
@@ -180,6 +167,19 @@ spec:
         name: config
       - emptyDir: {}
         name: logs
+    tier: backend
+    version: v1.0.0
+  replicas: 9
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: machine-native-ops
+  strategy:
+    rollingUpdate:
+      maxSurge: 3
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata: null
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -188,7 +188,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/machine-native-ops-api
-    eco-base/urn: urn:eco-base:k8s:core:deployment:machine-native-ops-api:sha256-fd3e1772d08a4b4fb6a8077f99c73c06e2381a35a1ca719cac74755fd4e7a4f6
+    eco-base/urn: urn:eco-base:k8s:core:deployment:machine-native-ops-api:sha256-1fcddbf8b70b41e895625329471b0cfcf948dede762ab378436d7c757ccad680
   labels:
     app.kubernetes.io/component: api
     app.kubernetes.io/instance: eco-instance
@@ -201,20 +201,9 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     tier: backend
-    name: machine-native-ops-api
-    namespace: platform-03
+  name: machine-native-ops-api
+  namespace: platform-03
 spec:
-  replicas: 6
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: machine-native-ops-api
-  strategy:
-    rollingUpdate:
-      maxSurge: 2
-      maxUnavailable: 1
-    type: RollingUpdate
-  template:
-    metadata:
   annotations:
     prometheus.io/path: /metrics
     prometheus.io/port: '9090'
@@ -224,8 +213,6 @@ spec:
     app.kubernetes.io/name: machine-native-ops-api
     eco-base/governance: aligned
     eco-base/part-of: eco-base
-    tier: backend
-    version: v1.0.0
     spec:
       affinity:
         nodeAffinity:
@@ -322,6 +309,19 @@ spec:
       - configMap:
           name: machine-native-ops-config
         name: config
+    tier: backend
+    version: v1.0.0
+  replicas: 6
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: machine-native-ops-api
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata: null
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -330,7 +330,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/machine-native-ops-worker
-    eco-base/urn: urn:eco-base:k8s:core:deployment:machine-native-ops-worker:sha256-2f5224a03795b2b754ed423d72d42f7d7ecfacaf0a612638c381c6ff31bf5e8a
+    eco-base/urn: urn:eco-base:k8s:core:deployment:machine-native-ops-worker:sha256-c8b2f2ce7c674784d443242834c1f38b11a606fa39d37e27a0aeefdebf8cc4d1
   labels:
     app.kubernetes.io/component: worker
     app.kubernetes.io/instance: eco-instance
@@ -344,28 +344,14 @@ metadata:
     eco-base/platform: core
     tier: backend
     type: background
-    name: machine-native-ops-worker
-    namespace: platform-03
+  name: machine-native-ops-worker
+  namespace: platform-03
 spec:
-  replicas: 6
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: machine-native-ops-worker
-  strategy:
-    rollingUpdate:
-      maxSurge: 2
-      maxUnavailable: 1
-    type: RollingUpdate
-  template:
-    metadata:
   labels:
     app.kubernetes.io/component: worker
     app.kubernetes.io/name: machine-native-ops-worker
     eco-base/governance: aligned
     eco-base/part-of: eco-base
-    tier: backend
-    type: background
-    version: v1.0.0
     spec:
       affinity:
         nodeAffinity:
@@ -454,6 +440,20 @@ spec:
         maxSkew: 1
         topologyKey: topology.kubernetes.io/zone
         whenUnsatisfiable: DoNotSchedule
+    tier: backend
+    type: background
+    version: v1.0.0
+  replicas: 6
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: machine-native-ops-worker
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata: null
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget

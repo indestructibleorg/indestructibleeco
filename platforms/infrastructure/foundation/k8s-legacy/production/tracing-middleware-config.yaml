@@ -6,10 +6,10 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/machine-native-ops
-    eco-base/urn: urn:eco-base:k8s:core:deployment:machine-native-ops:sha256-5d7ca95e6fe0874b5290aa068abb347988f2955ce7bfdf8537a5037b2258ec9a
+    eco-base/urn: urn:eco-base:k8s:core:deployment:machine-native-ops:sha256-d8a448c707f8bfd5c18f031ca2a4c2f746a25ce3e9e62ba1652b52d0f145fbd3
     sidecar.istio.io/interceptionMode: TPROXY
     sidecar.istio.io/proxyConfig: "proxyStatsMatcher:\n  inclusionRegexps:\n  - \"\
-  .*_outbound.*\"\n  - \".*_inbound.*\"\n"
+      .*_outbound.*\"\n  - \".*_inbound.*\"\n"
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -19,14 +19,14 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: machine-native-ops
-    namespace: production
+  name: machine-native-ops
+  namespace: production
 spec:
-  template:
-    metadata:
   annotations:
     instrumentation.opentelemetry.io/inject-java: 'true'
     instrumentation.opentelemetry.io/inject-python: 'true'
     prometheus.io/path: /stats/prometheus
     prometheus.io/port: '15020'
     prometheus.io/scrape: 'true'
+  template:
+    metadata: null

@@ -45,7 +45,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/backup-lifecycle-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:backup-lifecycle-config:sha256-65c227e9229f633152a5deb13582563baa31898339eb8f4a0d6fe9b55c529196
+    eco-base/urn: urn:eco-base:k8s:core:configmap:backup-lifecycle-config:sha256-f551b732c68b86b7105926c9c38e038865ee026a6359be7746d73690740478b7
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -55,8 +55,8 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: backup-lifecycle-config
-    namespace: velero
+  name: backup-lifecycle-config
+  namespace: velero
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -65,7 +65,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/backup-lifecycle-manager
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:backup-lifecycle-manager:sha256-a4b55128626e7cf64be0fb4882bffbb360e9ca0ec23174b076733724c5363bac
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:backup-lifecycle-manager:sha256-21f8ec04bc0baaba034d0d78df79b7d4e4e501cacf932a73689cd30a80f02fc8
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -75,8 +75,8 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: backup-lifecycle-manager
-    namespace: velero
+  name: backup-lifecycle-manager
+  namespace: velero
 spec:
   failedJobsHistoryLimit: 1
   jobTemplate:
@@ -125,7 +125,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/secret/backup-notification-config
-    eco-base/urn: urn:eco-base:k8s:core:secret:backup-notification-config:sha256-3326befb0cb0a28c11b91b92f4812deff18c22d7af506b06b67728600ac197fc
+    eco-base/urn: urn:eco-base:k8s:core:secret:backup-notification-config:sha256-c0c55bd3495c05adb663599de152a1cfe37cf14cdb45d151bad0e5d038cfbb91
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -135,8 +135,8 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: backup-notification-config
-    namespace: velero
+  name: backup-notification-config
+  namespace: velero
 stringData:
   email-from: backups@machine-native-ops.com
   email-smtp-port: '587'

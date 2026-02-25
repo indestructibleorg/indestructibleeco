@@ -6,22 +6,14 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/ingress/gl-spec-core-ingress
-    eco-base/urn: urn:eco-base:k8s:core:ingress:gl-spec-core-ingress:sha256-efe0835f0ff687bbeef22d47243cfcb8c2e18ce979b5c0495217217a739cffa3
+    eco-base/urn: urn:eco-base:k8s:core:ingress:gl-spec-core-ingress:sha256-1bfc32d253fb0c8767cd70f17b45818b0d9fc0bc28dfdfe3a11d216413d4d3ed
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/configuration-snippet: 'more_set_headers "ECO-Platform:
-  spec-core";
+      spec-core";
 
-  more_set_headers "ECO-Version: v1.0.0";
+      more_set_headers "ECO-Version: v1.0.0";
 
-  '
-  nginx.ingress.kubernetes.io/cors-allow-headers: DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,ECO-Platform,ECO-Version
-  nginx.ingress.kubernetes.io/cors-allow-methods: GET, POST, PUT, DELETE, OPTIONS
-  nginx.ingress.kubernetes.io/cors-allow-origin: '*'
-  nginx.ingress.kubernetes.io/enable-cors: 'true'
-  nginx.ingress.kubernetes.io/limit-connections: '1000'
-  nginx.ingress.kubernetes.io/limit-rps: '100'
-  nginx.ingress.kubernetes.io/rewrite-target: /$2
-  nginx.ingress.kubernetes.io/use-regex: 'true'
+      '
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -34,8 +26,16 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     platform: gl-platform-services
-    name: gl-spec-core-ingress
-    namespace: gl-platform-spec-core
+  name: gl-spec-core-ingress
+  namespace: gl-platform-spec-core
+  nginx.ingress.kubernetes.io/cors-allow-headers: DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,ECO-Platform,ECO-Version
+  nginx.ingress.kubernetes.io/cors-allow-methods: GET, POST, PUT, DELETE, OPTIONS
+  nginx.ingress.kubernetes.io/cors-allow-origin: '*'
+  nginx.ingress.kubernetes.io/enable-cors: 'true'
+  nginx.ingress.kubernetes.io/limit-connections: '1000'
+  nginx.ingress.kubernetes.io/limit-rps: '100'
+  nginx.ingress.kubernetes.io/rewrite-target: /$2
+  nginx.ingress.kubernetes.io/use-regex: 'true'
 spec:
   rules:
   - host: spec-core.gl-enterprise-architecture.example.com

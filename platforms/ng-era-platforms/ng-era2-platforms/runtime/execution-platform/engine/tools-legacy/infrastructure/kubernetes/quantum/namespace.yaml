@@ -13,7 +13,7 @@ metadata:
   labels:
     eco-base/part-of: eco-base
     eco-base/governance: aligned
-    name: quantumflow
+  name: quantumflow
     app.kubernetes.io/name: quantumflow
     app.kubernetes.io/version: "1.0.0"
 

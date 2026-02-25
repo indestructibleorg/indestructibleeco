@@ -15,7 +15,7 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/governance: aligned
     istio-injection: enabled
-    name: machine-native-ops
+  name: machine-native-ops
     pod-security.kubernetes.io/enforce: restricted
     pod-security.kubernetes.io/audit: restricted
     pod-security.kubernetes.io/warn: restricted

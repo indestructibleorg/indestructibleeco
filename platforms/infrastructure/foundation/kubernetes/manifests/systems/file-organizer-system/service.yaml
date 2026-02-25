@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/file-organizer-service
-    eco-base/urn: urn:eco-base:k8s:core:service:file-organizer-service:sha256-1df851b2af7b95ae200f2b764aeec06d464e51a8b0c8420529c60db4ebdc795d
+    eco-base/urn: urn:eco-base:k8s:core:service:file-organizer-service:sha256-74257d2ed4a40df74f5f19867937196302ee39ce013485b5299202dda0422b50
   labels:
     app.kubernetes.io/app.kubernetes.io/component: application
     app.kubernetes.io/component: eco-component
@@ -20,8 +20,8 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     governance.machinenativeops.io/charter-version: 2.0.0
-    name: file-organizer-service
-    namespace: platform-03
+  name: file-organizer-service
+  namespace: platform-03
 spec:
   ports:
   - name: http

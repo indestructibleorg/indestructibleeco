@@ -27,7 +27,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/backup-encryption-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:backup-encryption-config:sha256-d852a1af04a66a85d46e8e24dcc292c09d003abbd5dcd2b58729e149b0ee76bd
+    eco-base/urn: urn:eco-base:k8s:core:configmap:backup-encryption-config:sha256-937c9c64d3fe691c356d910e1f08df7f574353ef0c0cefcffd0225c3742d63e5
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -37,8 +37,8 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: backup-encryption-config
-    namespace: velero
+  name: backup-encryption-config
+  namespace: velero
 ---
 apiVersion: v1
 kind: Secret
@@ -47,7 +47,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/secret/velero-encryption-keys
-    eco-base/urn: urn:eco-base:k8s:core:secret:velero-encryption-keys:sha256-656bbbd308abb3396ba4f419d29881a762825b1d6dd7c43f9e2d6891329a74a1
+    eco-base/urn: urn:eco-base:k8s:core:secret:velero-encryption-keys:sha256-3bb85a3f025ad5dfa6830903db698c53cde9562725a818c5a493871e55fb9b88
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -57,8 +57,8 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: velero-encryption-keys
-    namespace: velero
+  name: velero-encryption-keys
+  namespace: velero
 stringData:
   cross-region-keys.yaml: 'us-east-1-key: arn:aws:kms:us-east-1:123456789012:key/key1
 
@@ -92,8 +92,8 @@ metadata:
   annotations:
     eco-base/uri: eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/backup-encryption.yaml
     eco-base/urn: urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:backup-encryption.yaml
-    name: primary-backup
-    namespace: velero
+  name: primary-backup
+  namespace: velero
 spec:
   accessMode: ReadWrite
   config:
@@ -112,8 +112,8 @@ metadata:
   annotations:
     eco-base/uri: eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/backup-encryption.yaml
     eco-base/urn: urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:backup-encryption.yaml
-    name: dr-backup-us-west-2
-    namespace: velero
+  name: dr-backup-us-west-2
+  namespace: velero
 spec:
   accessMode: ReadWrite
   config:
@@ -132,8 +132,8 @@ metadata:
   annotations:
     eco-base/uri: eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/backup-encryption.yaml
     eco-base/urn: urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:backup-encryption.yaml
-    name: dr-backup-eu-west-1
-    namespace: velero
+  name: dr-backup-eu-west-1
+  namespace: velero
 spec:
   accessMode: ReadWrite
   config:

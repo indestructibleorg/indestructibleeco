@@ -12,8 +12,8 @@ metadata:
     machinenativeops.io/app.kubernetes.io/component: modules-registry
     machinenativeops.io/tier: modules
     machinenativeops.io/version: v1.0.0
-    name: modules-registry-config
-    namespace: machinenativenops-modules
+  name: modules-registry-config
+  namespace: machinenativenops-modules
 spec:
   dependency_graph:
     config-manager: []
@@ -598,5 +598,5 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: modules-schema
-    namespace: machinenativenops-modules
+  name: modules-schema
+  namespace: machinenativenops-modules

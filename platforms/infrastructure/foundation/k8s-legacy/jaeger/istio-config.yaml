@@ -5,8 +5,8 @@ metadata:
   annotations:
     eco-base/uri: eco-base://platform/resource/infrastructure/foundation/k8s-legacy/jaeger/istio-config.yaml
     eco-base/urn: urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:jaeger:istio-config.yaml
-    name: istio-tracing-config
-    namespace: istio-system
+  name: istio-tracing-config
+  namespace: istio-system
 spec:
   meshConfig:
     defaultConfig:
@@ -63,7 +63,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/jaeger-tracing-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:jaeger-tracing-config:sha256-bdf4c7a58fdcc4e511b50795979e09edad315d56378ae3e6463a6f861cafd579
+    eco-base/urn: urn:eco-base:k8s:core:configmap:jaeger-tracing-config:sha256-f5e5ed276b55c3f7f86642ed4cbfa836e5e57486259251aa3a4308cb142d603c
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -73,8 +73,8 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: jaeger-tracing-config
-    namespace: platform-03
+  name: jaeger-tracing-config
+  namespace: platform-03
 ---
 apiVersion: telemetry.istio.io/v1alpha1
 kind: Telemetry
@@ -82,8 +82,8 @@ metadata:
   annotations:
     eco-base/uri: eco-base://platform/resource/infrastructure/foundation/k8s-legacy/jaeger/istio-config.yaml
     eco-base/urn: urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:jaeger:istio-config.yaml
-    name: mesh-tracing
-    namespace: istio-system
+  name: mesh-tracing
+  namespace: istio-system
 spec:
   selector:
     matchLabels:
@@ -112,8 +112,8 @@ metadata:
   annotations:
     eco-base/uri: eco-base://platform/resource/infrastructure/foundation/k8s-legacy/jaeger/istio-config.yaml
     eco-base/urn: urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:jaeger:istio-config.yaml
-    name: machine-native-ops-tracing
-    namespace: platform-03
+  name: machine-native-ops-tracing
+  namespace: platform-03
 spec:
   selector:
     matchLabels:
@@ -136,8 +136,8 @@ metadata:
   annotations:
     eco-base/uri: eco-base://platform/resource/infrastructure/foundation/k8s-legacy/jaeger/istio-config.yaml
     eco-base/urn: urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:jaeger:istio-config.yaml
-    name: background-services-tracing
-    namespace: platform-03
+  name: background-services-tracing
+  namespace: platform-03
 spec:
   selector:
     matchLabels:
@@ -157,8 +157,8 @@ metadata:
   annotations:
     eco-base/uri: eco-base://platform/resource/infrastructure/foundation/k8s-legacy/jaeger/istio-config.yaml
     eco-base/urn: urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:jaeger:istio-config.yaml
-    name: access-logging
-    namespace: istio-system
+  name: access-logging
+  namespace: istio-system
 spec:
   accessLogging:
   - filter:

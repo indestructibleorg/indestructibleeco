@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/aep-engine-service
-    eco-base/urn: urn:eco-base:k8s:core:service:aep-engine-service:sha256-c3b5a199ba273b3e3baf9aedd2e528293f157a42c90be77138b918320a5ed226
+    eco-base/urn: urn:eco-base:k8s:core:service:aep-engine-service:sha256-71938ae1432875c6e351a249e51a3d13257365e77c6f82826faa6d4f5b0e0204
   labels:
     app.kubernetes.io/app.kubernetes.io/component: engine
     app.kubernetes.io/component: eco-component
@@ -20,8 +20,8 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     governance.machinenativeops.io/charter-version: 2.0.0
-    name: aep-engine-service
-    namespace: platform-03
+  name: aep-engine-service
+  namespace: platform-03
 spec:
   ports:
   - name: http

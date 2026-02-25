@@ -12,7 +12,7 @@ metadata:
   labels:
     eco-base/part-of: eco-base
     eco-base/governance: aligned
-    name: production
+  name: production
     environment: production
     pod-security.kubernetes.io/enforce: restricted
     pod-security.kubernetes.io/enforce-version: latest

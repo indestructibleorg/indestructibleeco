@@ -8,8 +8,8 @@ metadata:
     eco-base/governance: aligned
     eco-base/part-of: eco-base
     gl.governance.level: '3'
-    name: gl-naming-governance-alerts
-    namespace: gl-monitoring
+  name: gl-naming-governance-alerts
+  namespace: gl-monitoring
 spec:
   groups:
   - interval: 60s
@@ -195,7 +195,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/gl-grafana-dashboards
-    eco-base/urn: urn:eco-base:k8s:core:configmap:gl-grafana-dashboards:sha256-f9ff74273afcab063d603eea65873367935e4e9a545c52555936f666add2d9e8
+    eco-base/urn: urn:eco-base:k8s:core:configmap:gl-grafana-dashboards:sha256-ec75eae792f0a31b6a279e3b666e9c8acc5530dc62018820c9fd1f2925f17387
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -208,5 +208,5 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     grafana_dashboard: '1'
-    name: gl-grafana-dashboards
-    namespace: gl-monitoring
+  name: gl-grafana-dashboards
+  namespace: gl-monitoring

@@ -185,7 +185,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/istio
-    eco-base/urn: urn:eco-base:k8s:core:configmap:istio:sha256-4133390ac5787fde1db8f67a6d6a919e7fa84289affca2bef183999b37510e36
+    eco-base/urn: urn:eco-base:k8s:core:configmap:istio:sha256-354e1e49507c0eff27504fdb7f75c679b9e3b8354f232df9f61e86bace48e196
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -195,8 +195,8 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: istio
-    namespace: istio-system
+  name: istio
+  namespace: istio-system
 ---
 apiVersion: v1
 data:
@@ -213,7 +213,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/multi-cluster-health-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:multi-cluster-health-config:sha256-1f7b63a22b0271b9a023c3de1cf5bf21f03ff74e53a33e939f585a15571a76c0
+    eco-base/urn: urn:eco-base:k8s:core:configmap:multi-cluster-health-config:sha256-e2ea85004d192364f19e853e77f00a51548a0b59b42edf9efa65756ed97c46af
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -223,5 +223,5 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: multi-cluster-health-config
-    namespace: production
+  name: multi-cluster-health-config
+  namespace: production

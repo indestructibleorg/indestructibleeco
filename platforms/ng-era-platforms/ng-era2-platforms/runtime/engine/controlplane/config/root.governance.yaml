@@ -12,8 +12,8 @@ metadata:
     machinenativeops.io/component: governance-configuration
     machinenativeops.io/tier: governance
     machinenativeops.io/version: v1.0.0
-    name: governance-framework-baseline-config
-    namespace: machinenativenops-governance
+  name: governance-framework-baseline-config
+  namespace: machinenativenops-governance
 spec:
   audit_rules:
   - alert_actions:
@@ -431,5 +431,5 @@ metadata:
     eco-base/environment: development
     eco-base/owner: eco-system
     eco-base/platform: core
-    name: governance-schema
-    namespace: machinenativenops-governance
+  name: governance-schema
+  namespace: machinenativenops-governance

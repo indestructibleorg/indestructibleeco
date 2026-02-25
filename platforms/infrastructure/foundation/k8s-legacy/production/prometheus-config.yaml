@@ -62,7 +62,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/prometheus-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:prometheus-config:sha256-fa14331c0e64891d53260fd661ea95664fc859aaa01a475fdb74e5ed1e2241b5
+    eco-base/urn: urn:eco-base:k8s:core:configmap:prometheus-config:sha256-bf0825f92d3b00f5842546fc194621c397a81dad865e466ad08ed48ee93ed17d
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -75,8 +75,8 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     environment: production
-    name: prometheus-config
-    namespace: monitoring
+  name: prometheus-config
+  namespace: monitoring
 ---
 apiVersion: v1
 data:
@@ -155,7 +155,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/prometheus-alerts
-    eco-base/urn: urn:eco-base:k8s:core:configmap:prometheus-alerts:sha256-2ffa4106d3ce77cfedc936cd3440a790977f6affcf152af7384303ff990fb8c6
+    eco-base/urn: urn:eco-base:k8s:core:configmap:prometheus-alerts:sha256-a81ae3a28165704c67d5c71b9b7980528c6f207b57d6752765c44bd935843dcc
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -168,5 +168,5 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     environment: production
-    name: prometheus-alerts
-    namespace: monitoring
+  name: prometheus-alerts
+  namespace: monitoring

@@ -10,7 +10,7 @@ metadata:
     eco-base/governance: aligned
     eco-base/part-of: eco-base
     environment: production
-    name: velero
+  name: velero
 ---
 apiVersion: v1
 kind: Secret
@@ -19,7 +19,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/secret/velero-s3-credentials
-    eco-base/urn: urn:eco-base:k8s:core:secret:velero-s3-credentials:sha256-cd4b6c3a7db667c6c9eaf3070b8ce79ceae233af9054eba1b6520edc177026b9
+    eco-base/urn: urn:eco-base:k8s:core:secret:velero-s3-credentials:sha256-e5a17dd442a1d99404b00287f1bb3b918177bf74f40a606586adb29fdc097807
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -32,8 +32,8 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     environment: production
-    name: velero-s3-credentials
-    namespace: velero
+  name: velero-s3-credentials
+  namespace: velero
 stringData:
   cloud: '[default]
 
@@ -55,8 +55,8 @@ metadata:
     eco-base/governance: aligned
     eco-base/part-of: eco-base
     environment: production
-    name: default
-    namespace: velero
+  name: default
+  namespace: velero
 spec:
   accessMode: ReadWrite
   config:
@@ -79,8 +79,8 @@ metadata:
     eco-base/governance: aligned
     eco-base/part-of: eco-base
     environment: production
-    name: default
-    namespace: velero
+  name: default
+  namespace: velero
 spec:
   config:
     region: us-east-1
@@ -97,8 +97,8 @@ metadata:
     eco-base/governance: aligned
     eco-base/part-of: eco-base
     environment: production
-    name: daily-cluster-backup
-    namespace: velero
+  name: daily-cluster-backup
+  namespace: velero
 spec:
   schedule: 0 2 * * *
   template:
@@ -144,8 +144,8 @@ metadata:
     eco-base/governance: aligned
     eco-base/part-of: eco-base
     environment: production
-    name: hourly-incremental-backup
-    namespace: velero
+  name: hourly-incremental-backup
+  namespace: velero
 spec:
   schedule: 0 * * * *
   template:
@@ -167,7 +167,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/postgres-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:postgres-backup:sha256-a75de539c07f146c686383c1475c17001753b8aaa37debf36cd2984e47bad120
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:postgres-backup:sha256-21497e54cc3e08d03a60cf06dabc330c3a2d0654458decf6a94edf76df126dca
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -180,8 +180,8 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     environment: production
-    name: postgres-backup
-    namespace: production
+  name: postgres-backup
+  namespace: production
 spec:
   jobTemplate:
     spec:
@@ -234,7 +234,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/redis-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:redis-backup:sha256-536e39ff0c78f672ef730cf616a3bc7ff62982a11f284b30daeb7f69ef0e7969
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:redis-backup:sha256-6eab9e0aae389975991cffe057fa49cff03a6696f72c9b1ec6143574c1af7195
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -247,8 +247,8 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/platform: core
     environment: production
-    name: redis-backup
-    namespace: production
+  name: redis-backup
+  namespace: production
 spec:
   jobTemplate:
     spec:

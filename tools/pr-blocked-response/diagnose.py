@@ -31,7 +31,13 @@ Decision tree per PR:
   Required check FAILED?        → re-trigger CI + enable auto-merge
   Required check SKIPPED?       → treat as pending, re-trigger CI
 """
-import os, json, subprocess, sys, re, urllib.request, urllib.error
+import json
+import os
+import re
+import subprocess
+import sys
+import urllib.error
+import urllib.request
 from datetime import datetime, timezone
 
 REPO           = os.environ.get("REPO", "indestructibleorg/eco-base")
@@ -214,7 +220,7 @@ def ensure_conventional_pr_title(pr_num, pr_title):
     if len(new_title) < 10:
         new_title = "chore(pr): governance update"
     gh_api(f"/repos/{REPO}/pulls/{pr_num}", method="PATCH", data={"title": new_title})
-    print(f"  [TITLE-AUTOFIX] Updated PR title to Conventional Commits format")
+    print("  [TITLE-AUTOFIX] Updated PR title to Conventional Commits format")
     return new_title
 
 
@@ -450,7 +456,7 @@ def update_branch(pr_num):
     if result.get("_http_error") == 422:
         body = result.get("_body", "")
         if "already up to date" in body.lower():
-            print(f"  [UPDATE-BRANCH] Already up-to-date")
+            print("  [UPDATE-BRANCH] Already up-to-date")
         else:
             print(f"  [UPDATE-BRANCH] 422: {body[:80]}")
     else:
@@ -686,7 +692,7 @@ def upsert_auto_anomaly_issue(pr_num, anomalies, head_sha):
     if issue_number:
         print(f"  [ANOMALY-ISSUE] Created issue #{issue_number}")
     else:
-        print(f"  [ANOMALY-ISSUE] Failed to create issue: no issue number returned")
+        print("  [ANOMALY-ISSUE] Failed to create issue: no issue number returned")
     return {"issue_number": issue_number, "anomaly_count": anomaly_count, "dedup_skipped": False}
 
 
@@ -842,13 +848,13 @@ def process_pr(pr_num, pr_title, pr_branch, head_sha, merge_status, labels, is_d
 
     # ── Human-review-required: evaluate AI/bot comments ──────────────────────
     if "human-review-required" in label_names:
-        print(f"  [HUMAN-REVIEW] Evaluating AI/bot comments for TIER-3 escalations...")
+        print("  [HUMAN-REVIEW] Evaluating AI/bot comments for TIER-3 escalations...")
         has_escalation, escalation_reasons, auto_fix_suggestions = \
             evaluate_ai_bot_comments(pr_num)
 
         if has_escalation:
             # TIER-3: keep label, post explanation, do not merge
-            print(f"  [TIER-3] Safety/correctness issue found — keeping human-review-required")
+            print("  [TIER-3] Safety/correctness issue found — keeping human-review-required")
             post_escalation_explanation(pr_num, escalation_reasons)
             # Apply any TIER-1 auto-fix suggestions that coexist
             if auto_fix_suggestions:
@@ -856,7 +862,7 @@ def process_pr(pr_num, pr_title, pr_branch, head_sha, merge_status, labels, is_d
             return
 
         # No TIER-3 escalation found → remove human-review-required and proceed
-        print(f"  [TIER-2/NONE] No safety issues found — removing human-review-required")
+        print("  [TIER-2/NONE] No safety issues found — removing human-review-required")
         remove_label(pr_num, "human-review-required")
         if auto_fix_suggestions:
             apply_auto_fix_suggestions(pr_num, auto_fix_suggestions)
@@ -932,7 +938,7 @@ def process_pr(pr_num, pr_title, pr_branch, head_sha, merge_status, labels, is_d
         if skipped_required:
             print(f"  → Required checks skipped ({sorted(skipped_required)}). Re-triggering...")
             retrigger_ci(pr_num, head_sha, skipped_required)
-            print(f"  → Re-trigger requested for skipped required checks. Enabling auto-merge...")
+            print("  → Re-trigger requested for skipped required checks. Enabling auto-merge...")
         else:
             print(f"  → CI running ({pending}). Enabling auto-merge...")
         enable_auto_merge(pr_num)

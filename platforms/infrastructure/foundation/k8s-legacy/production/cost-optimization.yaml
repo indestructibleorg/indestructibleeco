@@ -1,271 +1,86 @@
-# @ECO-governed
-# @ECO-layer: infrastructure
-# @ECO-semantic: cost-optimization
-# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
-# 
-# GL Unified Architecture Governance Framework Activated
-
-# Cost Optimization Configuration
+---
 apiVersion: v1
+data:
+  cost-optimization-policy.yaml: "# Cost optimization configuration\ncostOptimization:\n\
+    \  enabled: true\n  \n  # Budget management\n  budgets:\n    enabled: true\n \
+    \   currency: USD\n    \n    # Monthly budget targets\n    monthly:\n      total:\n\
+    \        target: 100000  # $100,000/month\n        threshold: 80  # Alert at 80%\n\
+    \        actionThreshold: 90  # Take action at 90%\n      \n      byService:\n\
+    \        machine-native-ops:\n          target: 40000\n          threshold: 80\n\
+    \        infrastructure:\n          target: 30000\n          threshold: 80\n \
+    \       monitoring:\n          target: 15000\n          threshold: 80\n      \
+    \  backup:\n          target: 10000\n          threshold: 80\n        logging:\n\
+    \          target: 5000\n          threshold: 80\n      \n      byResource:\n\
+    \        compute:\n          target: 50000\n          threshold: 75\n        storage:\n\
+    \          target: 20000\n          threshold: 80\n        network:\n        \
+    \  target: 15000\n          threshold: 85\n        database:\n          target:\
+    \ 15000\n          threshold: 80\n  \n  # Right-sizing recommendations\n  rightSizing:\n\
+    \    enabled: true\n    interval: 1h\n    cpuThreshold: 30\n    memoryThreshold:\
+    \ 40\n    lookbackPeriod: 7d\n    \n    recommendations:\n      - type: downsize\n\
+    \        condition: cpu < 30% AND memory < 40%\n        action: reduce-replicas\n\
+    \        maxReduction: 50%\n      \n      - type: downsize\n        condition:\
+    \ cpu < 30% AND memory < 40%\n        action: reduce-resources\n        maxReduction:\
+    \ 30%\n      \n      - type: rightsize\n        condition: 30% < cpu < 70% AND\
+    \ 40% < memory < 80%\n        action: optimize-resources\n        adjustment:\
+    \ proportional\n  \n  # Instance optimization\n  instanceOptimization:\n    enabled:\
+    \ true\n    strategy: cost-performance\n    \n    # Compute instances\n    compute:\n\
+    \      current:\n        type: m5.large\n        vcpus: 2\n        memory: 8Gi\n\
+    \        cost: 0.096  # $0.096/hour\n      recommendations:\n        - type: spot-instance\n\
+    \          savings: 70\n          risk: medium\n          requirements:\n    \
+    \        - stateless\n            - fault-tolerant\n        - type: reserved-instance\n\
+    \          savings: 40\n          risk: low\n          commitment: 1y\n    \n\
+    \    # Storage optimization\n    storage:\n      enabled: true\n      policies:\n\
+    \        - name: lifecycle-policy\n          rules:\n            - transition:\
+    \ standard-to-ia\n              days: 30\n              savings: 50\n        \
+    \    - transition: ia-to-glacier\n              days: 90\n              savings:\
+    \ 80\n            - expiration\n              days: 365\n        \n        - name:\
+    \ compression\n          enabled: true\n          algorithm: gzip\n          savings:\
+    \ 30\n        \n        - name: deduplication\n          enabled: true\n     \
+    \     savings: 25\n        \n        - name: tiered-storage\n          enabled:\
+    \ true\n          tiers:\n            - name: hot\n              storageClass:\
+    \ gp3\n              cost: 0.08  # $0.08/GB/month\n            - name: warm\n\
+    \              storageClass: standard\n              cost: 0.025  # $0.025/GB/month\n\
+    \            - name: cold\n              storageClass: glacier\n             \
+    \ cost: 0.004  # $0.004/GB/month\n  \n  # Network cost optimization\n  network:\n\
+    \    enabled: true\n    \n    # Data transfer optimization\n    dataTransfer:\n\
+    \      enabled: true\n      policies:\n        - name: compress-data\n       \
+    \   enabled: true\n          savings: 30\n          applyTo:\n            - api-responses\n\
+    \            - logs\n            - backups\n        \n        - name: cdn-caching\n\
+    \          enabled: true\n          savings: 40\n          applyTo:\n        \
+    \    - static-assets\n            - api-responses\n            - documentation\n\
+    \        \n        - name: regional-traffic\n          enabled: true\n       \
+    \   policy: local-preference\n          savings: 20\n    \n    # Inter-region\
+    \ data transfer\n    interRegion:\n      enabled: true\n      optimization:\n\
+    \        - name: batch-transfers\n          schedule: off-peak\n          savings:\
+    \ 25\n        - name: compression\n          enabled: true\n          savings:\
+    \ 30\n  \n  # Database cost optimization\n  database:\n    enabled: true\n   \
+    \ \n    # PostgreSQL optimization\n    postgresql:\n      enabled: true\n    \
+    \  policies:\n        - name: connection-pooling\n          enabled: true\n  \
+    \        savings: 15\n        \n        - name: read-replicas\n          enabled:\
+    \ true\n          strategy: demand-based\n          minReplicas: 1\n         \
+    \ maxReplicas: 3\n          savings: 20\n        \n        - name: query-optimization\n\
+    \          enabled: true\n          savings: 25\n          interval: 1d\n    \
+    \    \n        - name: storage-optimization\n          enabled: true\n       \
+    \   policies:\n            - vacuum-regular\n              savings: 10\n     \
+    \       - archive-old-data\n              savings: 30\n              retention:\
+    \ 90d\n    \n    # Redis optimization\n    redis:\n      enabled: true\n     \
+    \ policies:\n        - name: maxmemory-policy\n          policy: allkeys-lru\n\
+    \          savings: 20\n        \n        - name: key-expiration\n          enabled:\
+    \ true\n          defaultTTL: 3600  # 1 hour\n          savings: 30\n        \n\
+    \        - name: compression\n          enabled: true\n          savings: 25\n\
+    \  \n  # Monitoring and alerting\n  monitoring:\n    enabled: true\n    interval:\
+    \ 1h\n    metrics:\n      - total-cost\n      - cost-by-service\n      - cost-by-resource\n\
+    \      - savings-achieved\n      - optimization-recommendations\n    alerting:\n\
+    \      - budget-exceeded\n      - high-cost-anomaly\n      - cost-spike\n  \n\
+    \  # Reporting\n  reporting:\n    enabled: true\n    schedule: weekly\n    formats:\n\
+    \      - html\n      - pdf\n      - csv\n    recipients:\n      - finance@machine-native-ops.com\n\
+    \      - ops@machine-native-ops.com\n    content:\n      - cost-summary\n    \
+    \  - savings-achieved\n      - recommendations\n      - trends"
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:cost-optimization.yaml"
-    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/cost-optimization.yaml"
+    eco-base/uri: eco-base://k8s/core/configmap/cost-optimization-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:cost-optimization-config:sha256-e22eb9983067273ca1f1b819bd4d60388b6251fdf6defb5a27c159c10be1a85c
+  labels: {}
   name: cost-optimization-config
   namespace: production
-data:
-  cost-optimization-policy.yaml: |
-    # Cost optimization configuration
-    costOptimization:
-      enabled: true
-      
-      # Budget management
-      budgets:
-        enabled: true
-        currency: USD
-        
-        # Monthly budget targets
-        monthly:
-          total:
-            target: 100000  # $100,000/month
-            threshold: 80  # Alert at 80%
-            actionThreshold: 90  # Take action at 90%
-          
-          byService:
-            machine-native-ops:
-              target: 40000
-              threshold: 80
-            infrastructure:
-              target: 30000
-              threshold: 80
-            monitoring:
-              target: 15000
-              threshold: 80
-            backup:
-              target: 10000
-              threshold: 80
-            logging:
-              target: 5000
-              threshold: 80
-          
-          byResource:
-            compute:
-              target: 50000
-              threshold: 75
-            storage:
-              target: 20000
-              threshold: 80
-            network:
-              target: 15000
-              threshold: 85
-            database:
-              target: 15000
-              threshold: 80
-      
-      # Right-sizing recommendations
-      rightSizing:
-        enabled: true
-        interval: 1h
-        cpuThreshold: 30
-        memoryThreshold: 40
-        lookbackPeriod: 7d
-        
-        recommendations:
-          - type: downsize
-            condition: cpu < 30% AND memory < 40%
-            action: reduce-replicas
-            maxReduction: 50%
-          
-          - type: downsize
-            condition: cpu < 30% AND memory < 40%
-            action: reduce-resources
-            maxReduction: 30%
-          
-          - type: rightsize
-            condition: 30% < cpu < 70% AND 40% < memory < 80%
-            action: optimize-resources
-            adjustment: proportional
-      
-      # Instance optimization
-      instanceOptimization:
-        enabled: true
-        strategy: cost-performance
-        
-        # Compute instances
-        compute:
-          current:
-            type: m5.large
-            vcpus: 2
-            memory: 8Gi
-            cost: 0.096  # $0.096/hour
-          recommendations:
-            - type: spot-instance
-              savings: 70
-              risk: medium
-              requirements:
-                - stateless
-                - fault-tolerant
-            - type: reserved-instance
-              savings: 40
-              risk: low
-              commitment: 1y
-        
-        # Storage optimization
-        storage:
-          enabled: true
-          policies:
-            - name: lifecycle-policy
-              rules:
-                - transition: standard-to-ia
-                  days: 30
-                  savings: 50
-                - transition: ia-to-glacier
-                  days: 90
-                  savings: 80
-                - expiration
-                  days: 365
-            
-            - name: compression
-              enabled: true
-              algorithm: gzip
-              savings: 30
-            
-            - name: deduplication
-              enabled: true
-              savings: 25
-            
-            - name: tiered-storage
-              enabled: true
-              tiers:
-                - name: hot
-                  storageClass: gp3
-                  cost: 0.08  # $0.08/GB/month
-                - name: warm
-                  storageClass: standard
-                  cost: 0.025  # $0.025/GB/month
-                - name: cold
-                  storageClass: glacier
-                  cost: 0.004  # $0.004/GB/month
-      
-      # Network cost optimization
-      network:
-        enabled: true
-        
-        # Data transfer optimization
-        dataTransfer:
-          enabled: true
-          policies:
-            - name: compress-data
-              enabled: true
-              savings: 30
-              applyTo:
-                - api-responses
-                - logs
-                - backups
-            
-            - name: cdn-caching
-              enabled: true
-              savings: 40
-              applyTo:
-                - static-assets
-                - api-responses
-                - documentation
-            
-            - name: regional-traffic
-              enabled: true
-              policy: local-preference
-              savings: 20
-        
-        # Inter-region data transfer
-        interRegion:
-          enabled: true
-          optimization:
-            - name: batch-transfers
-              schedule: off-peak
-              savings: 25
-            - name: compression
-              enabled: true
-              savings: 30
-      
-      # Database cost optimization
-      database:
-        enabled: true
-        
-        # PostgreSQL optimization
-        postgresql:
-          enabled: true
-          policies:
-            - name: connection-pooling
-              enabled: true
-              savings: 15
-            
-            - name: read-replicas
-              enabled: true
-              strategy: demand-based
-              minReplicas: 1
-              maxReplicas: 3
-              savings: 20
-            
-            - name: query-optimization
-              enabled: true
-              savings: 25
-              interval: 1d
-            
-            - name: storage-optimization
-              enabled: true
-              policies:
-                - vacuum-regular
-                  savings: 10
-                - archive-old-data
-                  savings: 30
-                  retention: 90d
-        
-        # Redis optimization
-        redis:
-          enabled: true
-          policies:
-            - name: maxmemory-policy
-              policy: allkeys-lru
-              savings: 20
-            
-            - name: key-expiration
-              enabled: true
-              defaultTTL: 3600  # 1 hour
-              savings: 30
-            
-            - name: compression
-              enabled: true
-              savings: 25
-      
-      # Monitoring and alerting
-      monitoring:
-        enabled: true
-        interval: 1h
-        metrics:
-          - total-cost
-          - cost-by-service
-          - cost-by-resource
-          - savings-achieved
-          - optimization-recommendations
-        alerting:
-          - budget-exceeded
-          - high-cost-anomaly
-          - cost-spike
-      
-      # Reporting
-      reporting:
-        enabled: true
-        schedule: weekly
-        formats:
-          - html
-          - pdf
-          - csv
-        recipients:
-          - finance@machine-native-ops.com
-          - ops@machine-native-ops.com
-        content:
-          - cost-summary
-          - savings-achieved
-          - recommendations
-          - trends

@@ -286,7 +286,7 @@ metrics:
 # Integration Testing Requirements
 testing_requirements:
   - test_id: "it-001"
-    name: "Cross-Domain Semantic Validation Test"
+    name: "Cross-Domain Schema Validation Test"
     type: "automated"
     frequency: "pre_merge"
     script: "scripts/gl/validate-semantics.py"

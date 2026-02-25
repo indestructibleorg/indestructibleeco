@@ -190,7 +190,7 @@ Examples:
 - **PATCH**: Partially update resources (non-idempotent)
 - **DELETE**: Remove resources (idempotent)
 
-#### 4.2.2 Method Semantics
+#### 4.2.2 Method Spec
 - Use appropriate method for the intended operation
 - Ensure idempotency where required
 - Return appropriate status codes

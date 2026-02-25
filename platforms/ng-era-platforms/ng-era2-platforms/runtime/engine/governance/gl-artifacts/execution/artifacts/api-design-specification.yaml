@@ -355,7 +355,7 @@ spec:
         usage: "資源衝突 (如重複創建)"
       - code: 422
         name: "Unprocessable Entity"
-        usage: "語法正確但語義錯誤"
+        usage: "語法正確但Spec錯誤"
       - code: 429
         name: "Too Many Requests"
         usage: "超過速率限制"

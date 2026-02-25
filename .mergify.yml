@@ -52,8 +52,8 @@ pull_request_rules:
       - files~=^(?!.*(payment|security-config|secrets|\.sops|CODEOWNERS|branch-protection)).*$
     actions:
       queue:
-        name: default
-      delete_head_branch: {}
+        name: default # Mergify queue automatically handles branch updates and conflict resolution (Step 6)
+      delete_head_branch: {} # Automatically deletes the head branch after merge (Step 8)
 
   # ─── Sensitive path PRs: require human approval ──────────────────────────
   - name: Block auto-merge for sensitive paths
@@ -87,8 +87,8 @@ pull_request_rules:
       - title~=^(chore|fix)\(deps\).*bump.*from .* to .*
     actions:
       queue:
-        name: default
-      delete_head_branch: {}
+        name: default # Mergify queue automatically handles branch updates and conflict resolution (Step 6)
+      delete_head_branch: {} # Automatically deletes the head branch after merge (Step 8)
 
   # ─── Stale PRs: add label after 7 days ───────────────────────────────────
   - name: Label stale PRs

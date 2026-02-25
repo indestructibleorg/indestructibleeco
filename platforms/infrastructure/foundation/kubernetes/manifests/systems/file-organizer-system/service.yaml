@@ -1,32 +1,25 @@
-# @ECO-governed
-# @ECO-layer: infrastructure
-# @ECO-semantic: kubernetes-service-file-organizer
-# @ECO-audit-trail: ../../../engine/governance/GL_SEMANTIC_ANCHOR.json
-#
-# GL Unified Architecture Governance Framework Activated
-# File Organizer System Service Manifest
-
+---
 apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:kubernetes:manifests:systems:file-organizer-system:service.yaml"
-    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/kubernetes/manifests/systems/file-organizer-system/service.yaml"
+    eco-base/uri: eco-base://k8s/core/service/file-organizer-service
+    eco-base/urn: urn:eco-base:k8s:core:service:file-organizer-service:sha256-637d6ce2e13750d3d34f745248910cb61cfba9b10c82f43eb977ef6775d2952d
+  labels:
+    app.kubernetes.io/app.kubernetes.io/component: application
+    app.kubernetes.io/name: file-organizer-system
+    app.kubernetes.io/part-of: machine-native-ops
+    eco-base/governance: aligned
+    eco-base/part-of: eco-base
+    governance.machinenativeops.io/charter-version: 2.0.0
   name: file-organizer-service
   namespace: platform-03
-  labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-    app.kubernetes.io/name: file-organizer-system
-    app.kubernetes.io/app.kubernetes.io/component: application
-    app.kubernetes.io/part-of: machine-native-ops
-    governance.machinenativeops.io/charter-version: "2.0.0"
 spec:
-  type: ClusterIP
   ports:
-    - name: http
-      port: 80
-      targetPort: http
-      protocol: TCP
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
   selector:
     app.kubernetes.io/name: file-organizer-system
+  type: ClusterIP

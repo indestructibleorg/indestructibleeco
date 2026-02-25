@@ -11,12 +11,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gl-semantic-core
-  namespace: gl-platform-semantic-core
+  name: gl-spec-core
+  namespace: gl-platform-spec-core
   labels:
     eco-base/part-of: eco-base
     eco-base/governance: aligned
-    app.kubernetes.io/name: semantic-core
+    app.kubernetes.io/name: spec-core
     platform: gl-platform-services
     version: v1.0.0
     gl.platform/semantic.core: "true"
@@ -26,7 +26,7 @@ spec:
   replicas: 3
   selector:
     matchLabels:
-      app.kubernetes.io/name: semantic-core
+      app.kubernetes.io/name: spec-core
       version: v1.0.0
   strategy:
     type: RollingUpdate
@@ -38,7 +38,7 @@ spec:
       labels:
     eco-base/part-of: eco-base
     eco-base/governance: aligned
-        app.kubernetes.io/name: semantic-core
+        app.kubernetes.io/name: spec-core
         version: v1.0.0
         gl.platform/semantic.core: "true"
       annotations:
@@ -46,14 +46,14 @@ spec:
         prometheus.io/port: "9090"
         prometheus.io/path: "/metrics"
     spec:
-      serviceAccountName: semantic-core-serviceaccount
+      serviceAccountName: spec-core-serviceaccount
       securityContext:
         fsGroup: 1000
         runAsUser: 1000
         runAsNonRoot: true
       containers:
-      - name: semantic-folding-engine
-        image: gl-platform/semantic-core:v1.0.0
+      - name: spec-aggregation-engine
+        image: gl-platform/spec-core:v1.0.0
         imagePullPolicy: IfNotPresent
         ports:
         - name: http
@@ -125,7 +125,7 @@ spec:
       volumes:
       - name: config-volume
         configMap:
-          name: semantic-core-config
+          name: spec-core-config
       - name: data-volume
         persistentVolumeClaim:
           claimName: semantic-data-pvc
@@ -142,7 +142,7 @@ spec:
                 - key: app
                   operator: In
                   values:
-                  - semantic-core
+                  - spec-core
               topologyKey: kubernetes.io/hostname
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

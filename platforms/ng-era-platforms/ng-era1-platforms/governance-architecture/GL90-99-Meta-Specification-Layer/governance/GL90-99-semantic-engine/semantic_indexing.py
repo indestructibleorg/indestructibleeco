@@ -267,9 +267,9 @@ class SemanticIndexingEngine:
         """
         # Import here to avoid circular dependency
         try:
-            from .semantic_folding import SemanticFoldingEngine
+            from .spec_aggregation import SemanticFoldingEngine
         except ImportError:
-            from semantic_folding import SemanticFoldingEngine
+            from spec_aggregation import SemanticFoldingEngine
         
         # Create vector from text features
         folding_engine = SemanticFoldingEngine(embedding_dim=128)

@@ -41,7 +41,7 @@ metadata:
           cd ../engine
           npm ci
           
-      - name: Run GL Semantic Validation
+      - name: Run GL Schema Validation
         run: |
           npx ts-node ../engine/governance/gl_engine.ts validate --strict
           

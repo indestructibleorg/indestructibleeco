@@ -149,7 +149,7 @@ spec:
 
     # 標籤 6: app.kubernetes.io/version (應用版本)
     - key: "app.kubernetes.io/version"
-      description: "應用版本（建議使用語義版本）"
+      description: "應用版本（建議使用Spec版本）"
       validation:
         type: "regex"
         regex: "^v?[0-9]+\\.[0-9]+\\.[0-9]+(-[a-z0-9-]+)?$"

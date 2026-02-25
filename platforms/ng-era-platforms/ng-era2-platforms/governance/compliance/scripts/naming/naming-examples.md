@@ -18,7 +18,7 @@ ln -s /path/to/gl_naming_validator.py /usr/local/bin/gl-naming-validator
 
 ## 命令行使用
 
-### 1. 驗證語意節點（Semantic Node）
+### 1. 驗證語意節點（Spec Node）
 
 **有效範例**：
 ```bash

@@ -1,85 +1,50 @@
-# @ECO-governed
-# @ECO-layer: infrastructure
-# @ECO-semantic: jaeger-config
-# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
-# 
-# GL Unified Architecture Governance Framework Activated
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  annotations:
-    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:jaeger-config.yaml"
-    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/jaeger-config.yaml"
-  name: jaeger-config
-  namespace: production
-  labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-    app.kubernetes.io/name: jaeger
-    environment: production
-data:
-  JAEGER_AGENT_HOST: "jaeger-agent.istio-system.svc.cluster.local"
-  JAEGER_AGENT_PORT: "6831"
-  JAEGER_SAMPLER_TYPE: "probabilistic"
-  JAEGER_SAMPLER_PARAM: "0.1"
-  JAEGER_REPORTER_LOG_SPANS: "true"
-  JAEGER_REPORTER_MAX_QUEUE_SIZE: "1000"
-  JAEGER_REPORTER_FLUSH_INTERVAL: "1s"
-  JAEGER_TAGS: "environment=production,service=machine-native-ops"
-  OTEL_EXPORTER_JAEGER_AGENT_HOST: "jaeger-agent.istio-system.svc.cluster.local"
-  OTEL_EXPORTER_JAEGER_AGENT_PORT: "6831"
-  OTEL_SERVICE_NAME: "machine-native-ops"
-  OTEL_RESOURCE_ATTRIBUTES: "service.name=machine-native-ops,deployment.environment=production"
-
 ---
 apiVersion: v1
+data:
+  JAEGER_AGENT_HOST: jaeger-agent.istio-system.svc.cluster.local
+  JAEGER_AGENT_PORT: '6831'
+  JAEGER_REPORTER_FLUSH_INTERVAL: 1s
+  JAEGER_REPORTER_LOG_SPANS: 'true'
+  JAEGER_REPORTER_MAX_QUEUE_SIZE: '1000'
+  JAEGER_SAMPLER_PARAM: '0.1'
+  JAEGER_SAMPLER_TYPE: probabilistic
+  JAEGER_TAGS: environment=production,service=machine-native-ops
+  OTEL_EXPORTER_JAEGER_AGENT_HOST: jaeger-agent.istio-system.svc.cluster.local
+  OTEL_EXPORTER_JAEGER_AGENT_PORT: '6831'
+  OTEL_RESOURCE_ATTRIBUTES: service.name=machine-native-ops,deployment.environment=production
+  OTEL_SERVICE_NAME: machine-native-ops
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:jaeger-config.yaml"
-    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/jaeger-config.yaml"
+    eco-base/uri: eco-base://k8s/core/configmap/jaeger-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:jaeger-config:sha256-fd9518e16d462245857feba07d79c271c28c25ac03c55a679fe36a14c4dacbfe
+  labels:
+    app.kubernetes.io/name: jaeger
+    eco-base/governance: aligned
+    eco-base/part-of: eco-base
+    environment: production
+  name: jaeger-config
+  namespace: production
+---
+apiVersion: v1
+data:
+  tracing.yaml: "enabled: true\nprovider: jaeger\nsampling:\n  type: probabilistic\n\
+    \  rate: 0.1\n  environment: production\njaeger:\n  agent:\n    host: jaeger-agent.istio-system.svc.cluster.local\n\
+    \    port: 6831\n  collector:\n    endpoint: http://jaeger-collector.istio-system.svc.cluster.local:14268/api/traces\n\
+    \  sampler:\n    type: probabilistic\n    param: 0.1\n  reporter:\n    logSpans:\
+    \ true\n    maxQueueSize: 1000\n    flushInterval: 1s\npropagators:\n  - jaeger\n\
+    \  - b3\n  - trace-context\ntags:\n  environment: production\n  service: machine-native-ops\n\
+    \  version: v1\nheaders:\n  trace:\n    - uber-trace-id\n    - x-request-id\n\
+    \    - x-b3-traceid\n    - x-b3-spanid\n    - x-b3-parentspanid\n    - x-b3-sampled"
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/uri: eco-base://k8s/core/configmap/tracing-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:tracing-config:sha256-cd763121fe279c2f66afad766877262279d3dab844175137e14f88dbc000b3e2
+  labels:
+    app.kubernetes.io/name: machine-native-ops
+    eco-base/governance: aligned
+    eco-base/part-of: eco-base
+    environment: production
   name: tracing-config
   namespace: production
-  labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-    app.kubernetes.io/name: machine-native-ops
-    environment: production
-data:
-  tracing.yaml: |
-    enabled: true
-    provider: jaeger
-    sampling:
-      type: probabilistic
-      rate: 0.1
-      environment: production
-    jaeger:
-      agent:
-        host: jaeger-agent.istio-system.svc.cluster.local
-        port: 6831
-      collector:
-        endpoint: http://jaeger-collector.istio-system.svc.cluster.local:14268/api/traces
-      sampler:
-        type: probabilistic
-        param: 0.1
-      reporter:
-        logSpans: true
-        maxQueueSize: 1000
-        flushInterval: 1s
-    propagators:
-      - jaeger
-      - b3
-      - trace-context
-    tags:
-      environment: production
-      service: machine-native-ops
-      version: v1
-    headers:
-      trace:
-        - uber-trace-id
-        - x-request-id
-        - x-b3-traceid
-        - x-b3-spanid
-        - x-b3-parentspanid
-        - x-b3-sampled

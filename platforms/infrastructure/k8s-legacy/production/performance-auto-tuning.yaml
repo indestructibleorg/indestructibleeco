@@ -1,253 +1,88 @@
-# @ECO-governed
-# @ECO-layer: infrastructure
-# @ECO-semantic: performance-auto-tuning
-# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
-# 
-# GL Unified Architecture Governance Framework Activated
-
-# Performance Auto-Tuning Configuration
+---
 apiVersion: v1
+data:
+  auto-tuning-policy.yaml: "# Performance auto-tuning configuration\nperformanceAutoTuning:\n\
+    \  enabled: true\n  \n  # Application performance tuning\n  application:\n   \
+    \ enabled: true\n    interval: 5m\n    \n    # Connection pool tuning\n    connectionPool:\n\
+    \      enabled: true\n      targets:\n        - name: database-connection-pool\n\
+    \          metric: active_connections\n          optimalRange: [50, 80]\n    \
+    \      adjustment: step\n          stepSize: 10\n          maxPoolSize: 100\n\
+    \          minPoolSize: 20\n        \n        - name: redis-connection-pool\n\
+    \          metric: active_connections\n          optimalRange: [30, 70]\n    \
+    \      adjustment: step\n          stepSize: 5\n          maxPoolSize: 80\n  \
+    \        minPoolSize: 10\n    \n    # Cache tuning\n    cache:\n      enabled:\
+    \ true\n      targets:\n        - name: l1-cache-size\n          metric: cache-hit-rate\n\
+    \          optimalRange: [80, 95]\n          adjustment: proportional\n      \
+    \    minSize: 256MB\n          maxSize: 2GB\n        \n        - name: l2-cache-size\n\
+    \          metric: cache-hit-rate\n          optimalRange: [70, 90]\n        \
+    \  adjustment: proportional\n          minSize: 1GB\n          maxSize: 10GB\n\
+    \        \n        - name: ttl-optimization\n          metric: cache-eviction-rate\n\
+    \          optimalRange: [0, 5]\n          adjustment: step\n          minTTL:\
+    \ 300\n          maxTTL: 86400\n    \n    # Thread pool tuning\n    threadPool:\n\
+    \      enabled: true\n      targets:\n        - name: worker-threads\n       \
+    \   metric: queue-depth\n          optimalRange: [10, 50]\n          adjustment:\
+    \ step\n          minThreads: 4\n          maxThreads: 32\n        \n        -\
+    \ name: io-threads\n          metric: io-wait-time\n          optimalRange: [0,\
+    \ 100ms]\n          adjustment: step\n          minThreads: 2\n          maxThreads:\
+    \ 16\n    \n    # Memory tuning\n    memory:\n      enabled: true\n      targets:\n\
+    \        - name: heap-size\n          metric: gc-frequency\n          optimalRange:\
+    \ [1, 10]\n          unit: per_minute\n          adjustment: step\n          stepSize:\
+    \ 256MB\n          minHeap: 1GB\n          maxHeap: 8GB\n        \n        - name:\
+    \ young-generation-size\n          metric: young-gen-utilization\n          optimalRange:\
+    \ [50, 80]\n          adjustment: proportional\n          minSize: 256MB\n   \
+    \       maxSize: 2GB\n  \n  # Database performance tuning\n  database:\n    enabled:\
+    \ true\n    interval: 10m\n    \n    # PostgreSQL tuning\n    postgresql:\n  \
+    \    enabled: true\n      targets:\n        - name: shared-buffers\n         \
+    \ metric: buffer-cache-hit-ratio\n          optimalRange: [95, 99]\n         \
+    \ adjustment: step\n          stepSize: 256MB\n          minSize: 1GB\n      \
+    \    maxSize: 8GB\n        \n        - name: work-mem\n          metric: temp-file-usage\n\
+    \          optimalRange: [0, 100MB]\n          adjustment: step\n          stepSize:\
+    \ 4MB\n          minSize: 4MB\n          maxSize: 64MB\n        \n        - name:\
+    \ effective-cache-size\n          metric: disk-read-rate\n          optimalRange:\
+    \ [0, 10MB/s]\n          adjustment: step\n          stepSize: 512MB\n       \
+    \   minSize: 2GB\n          maxSize: 16GB\n        \n        - name: max-connections\n\
+    \          metric: connection-wait-time\n          optimalRange: [0, 100ms]\n\
+    \          adjustment: step\n          stepSize: 10\n          minConnections:\
+    \ 50\n          maxConnections: 200\n        \n        - name: random-page-cost\n\
+    \          metric: seq-scan-ratio\n          optimalRange: [0, 5]\n          adjustment:\
+    \ step\n          stepSize: 0.5\n          minCost: 1.0\n          maxCost: 4.0\n\
+    \    \n    # Query optimization\n    queryOptimization:\n      enabled: true\n\
+    \      targets:\n        - name: slow-query-threshold\n          metric: p95-query-duration\n\
+    \          optimalRange: [0, 1000ms]\n          adjustment: step\n          stepSize:\
+    \ 100ms\n          minThreshold: 500ms\n          maxThreshold: 5000ms\n     \
+    \   \n        - name: vacuum-frequency\n          metric: dead-tuple-ratio\n \
+    \         optimalRange: [0, 5]\n          adjustment: step\n          stepSize:\
+    \ 1\n          minFrequency: 1\n          maxFrequency: 24\n          unit: hours\n\
+    \  \n  # Infrastructure performance tuning\n  infrastructure:\n    enabled: true\n\
+    \    interval: 15m\n    \n    # Kubernetes resource tuning\n    kubernetes:\n\
+    \      enabled: true\n      targets:\n        - name: cpu-requests\n         \
+    \ metric: cpu-utilization\n          optimalRange: [60, 80]\n          adjustment:\
+    \ proportional\n          minRequest: 100m\n          maxRequest: 2000m\n    \
+    \      unit: cores\n        \n        - name: memory-requests\n          metric:\
+    \ memory-utilization\n          optimalRange: [70, 90]\n          adjustment:\
+    \ proportional\n          minRequest: 256Mi\n          maxRequest: 4Gi\n     \
+    \   \n        - name: pod-disruption-budget\n          metric: availability\n\
+    \          optimalRange: [95, 100]\n          adjustment: step\n          stepSize:\
+    \ 1\n          minPDB: 50%\n          maxPDB: 100%\n    \n    # Network tuning\n\
+    \    network:\n      enabled: true\n      targets:\n        - name: tcp-timeout\n\
+    \          metric: connection-timeout-rate\n          optimalRange: [0, 1]\n \
+    \         adjustment: step\n          stepSize: 30s\n          minTimeout: 30s\n\
+    \          maxTimeout: 300s\n        \n        - name: keepalive-timeout\n   \
+    \       metric: connection-reuse-rate\n          optimalRange: [80, 95]\n    \
+    \      adjustment: step\n          stepSize: 30s\n          minTimeout: 60s\n\
+    \          maxTimeout: 600s\n  \n  # Auto-tuning constraints\n  constraints:\n\
+    \    maxChangesPerCycle: 5\n    cooldownPeriod: 15m\n    verificationPeriod: 5m\n\
+    \    rollbackOnFailure: true\n    requireApprovalForCriticalChanges: true\n  \
+    \  criticalChangeThreshold: 50  # Percentage\n  \n  # Monitoring and alerting\n\
+    \  monitoring:\n    enabled: true\n    metrics:\n      - tuning-cycles-completed\n\
+    \      - tuning-changes-applied\n      - tuning-rollbacks\n      - performance-improvements\n\
+    \    alerting:\n      - too-many-changes\n      - high-rollback-rate\n      -\
+    \ performance-degradation"
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:performance-auto-tuning.yaml"
-    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/performance-auto-tuning.yaml"
+    eco-base/uri: eco-base://k8s/core/configmap/performance-auto-tuning-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:performance-auto-tuning-config:sha256-c0c85476208e5bdd5b36cfba34aec8afbc347b69554f970f7306abeb16fcd4ac
+  labels: {}
   name: performance-auto-tuning-config
   namespace: production
-data:
-  auto-tuning-policy.yaml: |
-    # Performance auto-tuning configuration
-    performanceAutoTuning:
-      enabled: true
-      
-      # Application performance tuning
-      application:
-        enabled: true
-        interval: 5m
-        
-        # Connection pool tuning
-        connectionPool:
-          enabled: true
-          targets:
-            - name: database-connection-pool
-              metric: active_connections
-              optimalRange: [50, 80]
-              adjustment: step
-              stepSize: 10
-              maxPoolSize: 100
-              minPoolSize: 20
-            
-            - name: redis-connection-pool
-              metric: active_connections
-              optimalRange: [30, 70]
-              adjustment: step
-              stepSize: 5
-              maxPoolSize: 80
-              minPoolSize: 10
-        
-        # Cache tuning
-        cache:
-          enabled: true
-          targets:
-            - name: l1-cache-size
-              metric: cache-hit-rate
-              optimalRange: [80, 95]
-              adjustment: proportional
-              minSize: 256MB
-              maxSize: 2GB
-            
-            - name: l2-cache-size
-              metric: cache-hit-rate
-              optimalRange: [70, 90]
-              adjustment: proportional
-              minSize: 1GB
-              maxSize: 10GB
-            
-            - name: ttl-optimization
-              metric: cache-eviction-rate
-              optimalRange: [0, 5]
-              adjustment: step
-              minTTL: 300
-              maxTTL: 86400
-        
-        # Thread pool tuning
-        threadPool:
-          enabled: true
-          targets:
-            - name: worker-threads
-              metric: queue-depth
-              optimalRange: [10, 50]
-              adjustment: step
-              minThreads: 4
-              maxThreads: 32
-            
-            - name: io-threads
-              metric: io-wait-time
-              optimalRange: [0, 100ms]
-              adjustment: step
-              minThreads: 2
-              maxThreads: 16
-        
-        # Memory tuning
-        memory:
-          enabled: true
-          targets:
-            - name: heap-size
-              metric: gc-frequency
-              optimalRange: [1, 10]
-              unit: per_minute
-              adjustment: step
-              stepSize: 256MB
-              minHeap: 1GB
-              maxHeap: 8GB
-            
-            - name: young-generation-size
-              metric: young-gen-utilization
-              optimalRange: [50, 80]
-              adjustment: proportional
-              minSize: 256MB
-              maxSize: 2GB
-      
-      # Database performance tuning
-      database:
-        enabled: true
-        interval: 10m
-        
-        # PostgreSQL tuning
-        postgresql:
-          enabled: true
-          targets:
-            - name: shared-buffers
-              metric: buffer-cache-hit-ratio
-              optimalRange: [95, 99]
-              adjustment: step
-              stepSize: 256MB
-              minSize: 1GB
-              maxSize: 8GB
-            
-            - name: work-mem
-              metric: temp-file-usage
-              optimalRange: [0, 100MB]
-              adjustment: step
-              stepSize: 4MB
-              minSize: 4MB
-              maxSize: 64MB
-            
-            - name: effective-cache-size
-              metric: disk-read-rate
-              optimalRange: [0, 10MB/s]
-              adjustment: step
-              stepSize: 512MB
-              minSize: 2GB
-              maxSize: 16GB
-            
-            - name: max-connections
-              metric: connection-wait-time
-              optimalRange: [0, 100ms]
-              adjustment: step
-              stepSize: 10
-              minConnections: 50
-              maxConnections: 200
-            
-            - name: random-page-cost
-              metric: seq-scan-ratio
-              optimalRange: [0, 5]
-              adjustment: step
-              stepSize: 0.5
-              minCost: 1.0
-              maxCost: 4.0
-        
-        # Query optimization
-        queryOptimization:
-          enabled: true
-          targets:
-            - name: slow-query-threshold
-              metric: p95-query-duration
-              optimalRange: [0, 1000ms]
-              adjustment: step
-              stepSize: 100ms
-              minThreshold: 500ms
-              maxThreshold: 5000ms
-            
-            - name: vacuum-frequency
-              metric: dead-tuple-ratio
-              optimalRange: [0, 5]
-              adjustment: step
-              stepSize: 1
-              minFrequency: 1
-              maxFrequency: 24
-              unit: hours
-      
-      # Infrastructure performance tuning
-      infrastructure:
-        enabled: true
-        interval: 15m
-        
-        # Kubernetes resource tuning
-        kubernetes:
-          enabled: true
-          targets:
-            - name: cpu-requests
-              metric: cpu-utilization
-              optimalRange: [60, 80]
-              adjustment: proportional
-              minRequest: 100m
-              maxRequest: 2000m
-              unit: cores
-            
-            - name: memory-requests
-              metric: memory-utilization
-              optimalRange: [70, 90]
-              adjustment: proportional
-              minRequest: 256Mi
-              maxRequest: 4Gi
-            
-            - name: pod-disruption-budget
-              metric: availability
-              optimalRange: [95, 100]
-              adjustment: step
-              stepSize: 1
-              minPDB: 50%
-              maxPDB: 100%
-        
-        # Network tuning
-        network:
-          enabled: true
-          targets:
-            - name: tcp-timeout
-              metric: connection-timeout-rate
-              optimalRange: [0, 1]
-              adjustment: step
-              stepSize: 30s
-              minTimeout: 30s
-              maxTimeout: 300s
-            
-            - name: keepalive-timeout
-              metric: connection-reuse-rate
-              optimalRange: [80, 95]
-              adjustment: step
-              stepSize: 30s
-              minTimeout: 60s
-              maxTimeout: 600s
-      
-      # Auto-tuning constraints
-      constraints:
-        maxChangesPerCycle: 5
-        cooldownPeriod: 15m
-        verificationPeriod: 5m
-        rollbackOnFailure: true
-        requireApprovalForCriticalChanges: true
-        criticalChangeThreshold: 50  # Percentage
-      
-      # Monitoring and alerting
-      monitoring:
-        enabled: true
-        metrics:
-          - tuning-cycles-completed
-          - tuning-changes-applied
-          - tuning-rollbacks
-          - performance-improvements
-        alerting:
-          - too-many-changes
-          - high-rollback-rate
-          - performance-degradation

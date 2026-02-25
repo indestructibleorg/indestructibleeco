@@ -1,10 +1,10 @@
-# GL Semantic Core Platform - Implementation Plan
+# GL Spec Core Platform - Implementation Plan
 
 ## Task List
 
 ### Phase 1: Directory Structure
 - [x] Create main platform directory structure
-- [x] Create source code directories (semantic-folding, semantic-computation, etc.)
+- [x] Create source code directories (spec-aggregation, semantic-computation, etc.)
 - [x] Create configuration directories
 - [x] Create deployment directories
 - [x] Create test directories

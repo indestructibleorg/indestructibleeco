@@ -5,9 +5,9 @@ name: Infrastructure Drift Detection & Auto-Sync
 #
 # Detects configuration drift between GitOps desired state (this repo)
 # and actual cluster state (GKE), then:
-#   - If drift detected → trigger ArgoCD sync + open issue
-#   - If sync fails → open P1 incident issue with diff
-#   - If no drift → close any existing drift issues
+#   - If drift detected  trigger ArgoCD sync + open issue
+#   - If sync fails  open P1 incident issue with diff
+#   - If no drift  close any existing drift issues
 
 on:
   schedule:
@@ -42,9 +42,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # ══════════════════════════════════════════════════════════════════
+  # 
   # Job 1: Detect drift across all ArgoCD applications
-  # ══════════════════════════════════════════════════════════════════
+  # 
   detect-drift:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -97,7 +97,7 @@ jobs:
 
         # Fallback: check kubectl diff if ArgoCD not configured
         if [ -z "${{ secrets.ARGOCD_SERVER }}" ]; then
-          echo "ArgoCD not configured — checking kubectl diff"
+          echo "ArgoCD not configured  checking kubectl diff"
           for DIR in k8s/base k8s/staging k8s/monitoring; do
             if [ -d "$DIR" ]; then
               DIFF=$(kubectl diff -k "$DIR" 2>/dev/null | head -50 || echo "")
@@ -118,12 +118,12 @@ jobs:
           echo "DRIFT DETECTED in:$DRIFTED_APPS"
           exit 0  # Don't fail here, let auto-sync job handle it
         else
-          echo "No drift detected — all apps in sync"
+          echo "No drift detected  all apps in sync"
         fi
 
-  # ══════════════════════════════════════════════════════════════════
+  # 
   # Job 2: Auto-Sync drifted applications
-  # ══════════════════════════════════════════════════════════════════
+  # 
   auto-sync:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -190,9 +190,9 @@ jobs:
         echo "sync_success=$SYNC_SUCCESS" >> "$GITHUB_OUTPUT"
         printf "sync_results=%s" "$(echo -e "$SYNC_RESULTS" | tr '\n' '|')" >> "$GITHUB_OUTPUT"
 
-  # ══════════════════════════════════════════════════════════════════
+  # 
   # Job 3: Open/update drift incident issue
-  # ══════════════════════════════════════════════════════════════════
+  # 
   manage-drift-issue:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -214,7 +214,7 @@ jobs:
           const runUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
 
           const statusEmoji = syncSuccess === 'true' ? 'Resolved' : 'Active';
-          const title = `[Drift] Infrastructure drift detected — ${new Date().toISOString().split('T')[0]}`;
+          const title = `[Drift] Infrastructure drift detected  ${new Date().toISOString().split('T')[0]}`;
 
           const body = [
             '## Infrastructure Drift Detected',
@@ -250,7 +250,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: existing.data[0].number,
-              body: `## Drift Update — ${new Date().toISOString()}\n\n${body}`,
+              body: `## Drift Update  ${new Date().toISOString()}\n\n${body}`,
             });
             console.log(`Updated existing drift issue #${existing.data[0].number}`);
             if (syncSuccess === 'true') {
@@ -275,9 +275,9 @@ jobs:
             console.log(`Opened drift issue #${issue.data.number}`);
           }
 
-  # ══════════════════════════════════════════════════════════════════
+  # 
   # Job 4: Close stale drift issues when no drift detected
-  # ══════════════════════════════════════════════════════════════════
+  # 
   close-resolved-drift:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -302,7 +302,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issue.number,
-              body: `Drift resolved — all applications are now in sync as of ${new Date().toISOString()}. Closing automatically.`,
+              body: `Drift resolved  all applications are now in sync as of ${new Date().toISOString()}. Closing automatically.`,
             });
             await github.rest.issues.update({
               owner: context.repo.owner,

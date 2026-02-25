@@ -12,9 +12,9 @@ apiVersion: semantic.gl/v1
 kind: FoldingEngineConfig
 metadata:
   annotations:
-    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-cross-era-platforms:meta:semantic-core:configs:folding-config.yaml"
-    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-cross-era-platforms/meta/semantic-core/configs/folding-config.yaml"
-  name: gl-semantic-folding-engine
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-cross-era-platforms:meta:spec-core:configs:folding-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-cross-era-platforms/meta/spec-core/configs/folding-config.yaml"
+  name: gl-spec-aggregation-engine
   version: "1.0.0"
 spec:
   folding_strategies:

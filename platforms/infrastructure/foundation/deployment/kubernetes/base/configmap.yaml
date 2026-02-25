@@ -1,53 +1,50 @@
-# @ECO-governed
-# @ECO-layer: infrastructure
-# @ECO-semantic: configmap
-# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
-# 
-# GL Unified Architecture Governance Framework Activated
-
+---
 apiVersion: v1
+data:
+  DEBUG_MODE: 'false'
+  ENVIRONMENT: production
+  LOG_LEVEL: INFO
+  MAX_WORKERS: '4'
+  METRICS_ENABLED: 'true'
+  RETRY_COUNT: '3'
+  TIMEOUT_SECONDS: '30'
+  TRACING_ENABLED: 'true'
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:deployment:kubernetes:base:configmap.yaml"
-    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/deployment/kubernetes/base/configmap.yaml"
+    eco-base/uri: eco-base://k8s/core/configmap/machine-native-ops-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:machine-native-ops-config:sha256-f705c436f1dd88d8e8ce7d6db06bfbce4f90ddec1551f581558751c5433e8441
+  labels: {}
   name: machine-native-ops-config
   namespace: platform-03
-data:
-  LOG_LEVEL: "INFO"
-  ENVIRONMENT: "production"
-  METRICS_ENABLED: "true"
-  TRACING_ENABLED: "true"
-  DEBUG_MODE: "false"
-  MAX_WORKERS: "4"
-  TIMEOUT_SECONDS: "30"
-  RETRY_COUNT: "3"
 ---
 apiVersion: v1
+data:
+  alertmanager-enabled: 'true'
+  evaluation-interval: 15s
+  grafana-replicas: '2'
+  prometheus-retention: 15d
+  scrape-interval: 15s
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:deployment:kubernetes:base:configmap.yaml"
-    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/deployment/kubernetes/base/configmap.yaml"
+    eco-base/uri: eco-base://k8s/core/configmap/monitoring-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:monitoring-config:sha256-4c31b416b781a29608fde4256604c38b9e0e61580d31a68f7957d71b9a2a7dfa
+  labels: {}
   name: monitoring-config
   namespace: platform-03
-data:
-  prometheus-retention: "15d"
-  scrape-interval: "15s"
-  evaluation-interval: "15s"
-  alertmanager-enabled: "true"
-  grafana-replicas: "2"
 ---
 apiVersion: v1
+data:
+  auto-rotation: 'true'
+  backup-enabled: 'true'
+  encryption-enabled: 'true'
+  rotation-interval: 30d
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:deployment:kubernetes:base:configmap.yaml"
-    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/deployment/kubernetes/base/configmap.yaml"
+    eco-base/uri: eco-base://k8s/core/configmap/secrets-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:secrets-config:sha256-574f0793b2066f654454bbbf602d501c95a451081db4da50819656d3c279f1c5
+  labels: {}
   name: secrets-config
   namespace: platform-03
-data:
-  encryption-enabled: "true"
-  rotation-interval: "30d"
-  auto-rotation: "true"
-  backup-enabled: "true"

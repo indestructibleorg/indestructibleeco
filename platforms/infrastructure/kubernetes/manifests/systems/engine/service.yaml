@@ -1,36 +1,29 @@
-# @ECO-governed
-# @ECO-layer: infrastructure
-# @ECO-semantic: kubernetes-service-engine
-# @ECO-audit-trail: ../../../engine/governance/GL_SEMANTIC_ANCHOR.json
-#
-# GL Unified Architecture Governance Framework Activated
-# AEP Engine Service Manifest
-
+---
 apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:kubernetes:manifests:systems:engine:service.yaml"
-    eco-base/uri: "eco-base://platform/resource/infrastructure/kubernetes/manifests/systems/engine/service.yaml"
+    eco-base/uri: eco-base://k8s/core/service/aep-engine-service
+    eco-base/urn: urn:eco-base:k8s:core:service:aep-engine-service:sha256-97d48d45a7026310a23c6c7a573d493e40a01ab560636b83527b81eb3cef6466
+  labels:
+    app.kubernetes.io/app.kubernetes.io/component: engine
+    app.kubernetes.io/name: aep-engine
+    app.kubernetes.io/part-of: machine-native-ops
+    eco-base/governance: aligned
+    eco-base/part-of: eco-base
+    governance.machinenativeops.io/charter-version: 2.0.0
   name: aep-engine-service
   namespace: platform-03
-  labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-    app.kubernetes.io/name: aep-engine
-    app.kubernetes.io/app.kubernetes.io/component: engine
-    app.kubernetes.io/part-of: machine-native-ops
-    governance.machinenativeops.io/charter-version: "2.0.0"
 spec:
-  type: ClusterIP
   ports:
-    - name: http
-      port: 80
-      targetPort: http
-      protocol: TCP
-    - name: metrics
-      port: 9090
-      targetPort: metrics
-      protocol: TCP
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  - name: metrics
+    port: 9090
+    protocol: TCP
+    targetPort: metrics
   selector:
     app.kubernetes.io/name: aep-engine
+  type: ClusterIP

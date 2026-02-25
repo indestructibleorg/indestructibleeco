@@ -1,105 +1,41 @@
-# @ECO-governed
-# @ECO-layer: infrastructure
-# @ECO-semantic: enhanced-backup-strategy
-# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
-# 
-# GL Unified Architecture Governance Framework Activated
-
-# Enhanced Backup Strategy Configuration
+---
 apiVersion: v1
+data:
+  backup-policy.yaml: "# Enhanced backup policy with cross-region replication\nbackupPolicy:\n\
+    \  # Local backups (primary region)\n  local:\n    enabled: true\n    storage:\n\
+    \      type: s3\n      endpoint: https://s3.us-east-1.amazonaws.com\n      bucket:\
+    \ machine-native-ops-backups-primary\n      region: us-east-1\n    schedules:\n\
+    \      full-cluster:\n        enabled: true\n        schedule: \"0 2 * * *\" \
+    \ # Daily at 2 AM UTC\n        retention: 30d\n        type: full\n        includeNamespaces:\n\
+    \          - production\n          - istio-system\n          - monitoring\n  \
+    \    incremental:\n        enabled: true\n        schedule: \"0 * * * *\"  # Hourly\n\
+    \        retention: 7d\n        type: incremental\n        includeNamespaces:\n\
+    \          - production\n  \n  # Cross-region replication (DR region)\n  crossRegion:\n\
+    \    enabled: true\n    regions:\n      - name: us-west-2\n        storage:\n\
+    \          type: s3\n          endpoint: https://s3.us-west-2.amazonaws.com\n\
+    \          bucket: machine-native-ops-backups-dr\n          region: us-west-2\n\
+    \        replicationMode: async\n        syncSchedule: \"0 3 * * *\"  # Daily\
+    \ at 3 AM UTC\n        retention: 90d\n      - name: eu-west-1\n        storage:\n\
+    \          type: s3\n          endpoint: https://s3.eu-west-1.amazonaws.com\n\
+    \          bucket: machine-native-ops-backups-eu\n          region: eu-west-1\n\
+    \        replicationMode: async\n        syncSchedule: \"0 4 * * *\"  # Daily\
+    \ at 4 AM UTC\n        retention: 90d\n  \n  # Database-specific backups\n  databases:\n\
+    \    postgresql:\n      enabled: true\n      primary:\n        schedule: \"0 */4\
+    \ * * *\"  # Every 4 hours\n        retention: 30d\n        storage: local\n \
+    \     crossRegion:\n        schedule: \"0 5 * * *\"  # Daily at 5 AM UTC\n   \
+    \     retention: 90d\n        storage: crossRegion\n    redis:\n      enabled:\
+    \ true\n      primary:\n        schedule: \"*/30 * * * *\"  # Every 30 minutes\n\
+    \        retention: 7d\n        storage: local\n      crossRegion:\n        schedule:\
+    \ \"0 6 * * *\"  # Daily at 6 AM UTC\n        retention: 30d\n        storage:\
+    \ crossRegion\n  \n  # Configuration backups\n  configuration:\n    enabled: true\n\
+    \    schedule: \"*/30 * * * *\"  # Every 30 minutes\n    retention: 90d\n    includeResources:\n\
+    \      - configmaps\n      - secrets\n      - deployments\n      - services\n\
+    \      - ingress\n      - networkpolicies\n      - poddisruptionbudgets"
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:enhanced-backup-strategy.yaml"
-    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/enhanced-backup-strategy.yaml"
+    eco-base/uri: eco-base://k8s/core/configmap/velero-enhanced-backup-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:velero-enhanced-backup-config:sha256-ef03ebc3d61bd4a81213424b4f0c23ff85a625cacb05793555697726a4141d13
+  labels: {}
   name: velero-enhanced-backup-config
   namespace: velero
-data:
-  backup-policy.yaml: |
-    # Enhanced backup policy with cross-region replication
-    backupPolicy:
-      # Local backups (primary region)
-      local:
-        enabled: true
-        storage:
-          type: s3
-          endpoint: https://s3.us-east-1.amazonaws.com
-          bucket: machine-native-ops-backups-primary
-          region: us-east-1
-        schedules:
-          full-cluster:
-            enabled: true
-            schedule: "0 2 * * *"  # Daily at 2 AM UTC
-            retention: 30d
-            type: full
-            includeNamespaces:
-              - production
-              - istio-system
-              - monitoring
-          incremental:
-            enabled: true
-            schedule: "0 * * * *"  # Hourly
-            retention: 7d
-            type: incremental
-            includeNamespaces:
-              - production
-      
-      # Cross-region replication (DR region)
-      crossRegion:
-        enabled: true
-        regions:
-          - name: us-west-2
-            storage:
-              type: s3
-              endpoint: https://s3.us-west-2.amazonaws.com
-              bucket: machine-native-ops-backups-dr
-              region: us-west-2
-            replicationMode: async
-            syncSchedule: "0 3 * * *"  # Daily at 3 AM UTC
-            retention: 90d
-          - name: eu-west-1
-            storage:
-              type: s3
-              endpoint: https://s3.eu-west-1.amazonaws.com
-              bucket: machine-native-ops-backups-eu
-              region: eu-west-1
-            replicationMode: async
-            syncSchedule: "0 4 * * *"  # Daily at 4 AM UTC
-            retention: 90d
-      
-      # Database-specific backups
-      databases:
-        postgresql:
-          enabled: true
-          primary:
-            schedule: "0 */4 * * *"  # Every 4 hours
-            retention: 30d
-            storage: local
-          crossRegion:
-            schedule: "0 5 * * *"  # Daily at 5 AM UTC
-            retention: 90d
-            storage: crossRegion
-        redis:
-          enabled: true
-          primary:
-            schedule: "*/30 * * * *"  # Every 30 minutes
-            retention: 7d
-            storage: local
-          crossRegion:
-            schedule: "0 6 * * *"  # Daily at 6 AM UTC
-            retention: 30d
-            storage: crossRegion
-      
-      # Configuration backups
-      configuration:
-        enabled: true
-        schedule: "*/30 * * * *"  # Every 30 minutes
-        retention: 90d
-        includeResources:
-          - configmaps
-          - secrets
-          - deployments
-          - services
-          - ingress
-          - networkpolicies
-          - poddisruptionbudgets

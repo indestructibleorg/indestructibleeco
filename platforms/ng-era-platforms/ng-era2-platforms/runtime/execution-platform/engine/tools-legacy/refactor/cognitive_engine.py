@@ -35,7 +35,7 @@ import yaml
 class CognitiveLevel(Enum):
     """認知層級"""
     PERCEPTION = "perception"  # 感知層：接收原始輸入
-    UNDERSTANDING = "understanding"  # 理解層：語義解析
+    UNDERSTANDING = "understanding"  # 理解層：Spec解析
     REASONING = "reasoning"  # 推理層：邏輯分析
     SEARCH = "search"  # 搜尋層：外部資源
     INTEGRATION = "integration"  # 整合層：綜合決策

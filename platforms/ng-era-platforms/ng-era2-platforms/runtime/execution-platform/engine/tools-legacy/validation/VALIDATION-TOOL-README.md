@@ -35,7 +35,7 @@ The Artifact Validation Tool implements a comprehensive 5-level validation pipel
 - Nested structure validation
 - apiVersion format checking
 
-### ✅ Level 2: Semantic Validation
+### ✅ Level 2: Schema Validation
 - Semantic root integration from `root/.root.semantic-root.yaml`
 - Concept traceability to semantic root
 - Semantic consistency checking across concepts

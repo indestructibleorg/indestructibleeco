@@ -1,126 +1,53 @@
-# @ECO-governed
-# @ECO-layer: infrastructure
-# @ECO-semantic: alertmanager-config
-# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
-# 
-# GL Unified Architecture Governance Framework Activated
-
+---
 apiVersion: v1
+data:
+  alertmanager.yml: "global:\n  resolve_timeout: 5m\n  slack_api_url: '${SLACK_WEBHOOK_URL}'\n\
+    \  pagerduty_url: '${PAGERDUTY_URL}'\n\ntemplates:\n- '/etc/alertmanager/templates/*.tmpl'\n\
+    \nroute:\n  group_by: ['alertname', 'cluster', 'service']\n  group_wait: 30s\n\
+    \  group_interval: 5m\n  repeat_interval: 4h\n  receiver: 'default'\n  routes:\n\
+    \  - match:\n      severity: critical\n    receiver: 'critical-alerts'\n    continue:\
+    \ true\n  - match:\n      severity: warning\n    receiver: 'warning-alerts'\n\
+    \  - match:\n      service: machine-native-ops\n    receiver: 'machine-native-ops-alerts'\n\
+    \nreceivers:\n- name: 'default'\n  slack_configs:\n  - channel: '#alerts'\n  \
+    \  send_resolved: true\n    title: '[{{ .Status | toUpper }}] {{ .GroupLabels.alertname\
+    \ }}'\n    text: >-\n      {{ range .Alerts }}\n      *Alert:* {{ .Labels.alertname\
+    \ }}\n      *Severity:* {{ .Labels.severity }}\n      *Description:* {{ .Annotations.description\
+    \ }}\n      *Details:*\n      {{ range .Labels.SortedPairs }} • *{{ .Name }}:*\
+    \ {{ .Value }}\n      {{ end }}\n      {{ end }}\n\n- name: 'critical-alerts'\n\
+    \  slack_configs:\n  - channel: '#critical-alerts'\n    send_resolved: true\n\
+    \    title: '[CRITICAL] {{ .GroupLabels.alertname }}'\n    text: >-\n      {{\
+    \ range .Alerts }}\n      *Alert:* {{ .Labels.alertname }}\n      *Severity:*\
+    \ {{ .Labels.severity }}\n      *Description:* {{ .Annotations.description }}\n\
+    \      *Details:*\n      {{ range .Labels.SortedPairs }} • *{{ .Name }}:* {{ .Value\
+    \ }}\n      {{ end }}\n      {{ end }}\n  pagerduty_configs:\n  - service_key:\
+    \ '${PAGERDUTY_SERVICE_KEY}'\n    description: '{{ .GroupLabels.alertname }}'\n\
+    \n- name: 'warning-alerts'\n  slack_configs:\n  - channel: '#alerts'\n    send_resolved:\
+    \ true\n    title: '[WARNING] {{ .GroupLabels.alertname }}'\n    text: >-\n  \
+    \    {{ range .Alerts }}\n      *Alert:* {{ .Labels.alertname }}\n      *Severity:*\
+    \ {{ .Labels.severity }}\n      *Description:* {{ .Annotations.description }}\n\
+    \      {{ end }}\n\n- name: 'machine-native-ops-alerts'\n  slack_configs:\n  -\
+    \ channel: '#machine-native-ops'\n    send_resolved: true\n    title: '[Machine\
+    \ Native Ops] {{ .GroupLabels.alertname }}'\n    text: >-\n      {{ range .Alerts\
+    \ }}\n      *Alert:* {{ .Labels.alertname }}\n      *Severity:* {{ .Labels.severity\
+    \ }}\n      *Description:* {{ .Annotations.description }}\n      *Service:* {{\
+    \ .Labels.service }}\n      *Instance:* {{ .Labels.instance }}\n      {{ end }}\n\
+    \  email_configs:\n  - to: 'ops@machinenativeops.com'\n    headers:\n      Subject:\
+    \ '[Machine Native Ops Alert] {{ .GroupLabels.alertname }}'\n    html: >-\n  \
+    \    {{ range .Alerts }}\n      <h3>{{ .Labels.alertname }}</h3>\n      <p><strong>Severity:</strong>\
+    \ {{ .Labels.severity }}</p>\n      <p><strong>Description:</strong> {{ .Annotations.description\
+    \ }}</p>\n      <p><strong>Service:</strong> {{ .Labels.service }}</p>\n     \
+    \ <p><strong>Instance:</strong> {{ .Labels.instance }}</p>\n      {{ end }}\n\n\
+    inhibit_rules:\n- source_match:\n    severity: 'critical'\n  target_match:\n \
+    \   severity: 'warning'\n  equal: ['alertname', 'cluster', 'service']"
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:alertmanager-config.yaml"
-    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/alertmanager-config.yaml"
+    eco-base/uri: eco-base://k8s/core/configmap/alertmanager-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:alertmanager-config:sha256-af96f7f7be9bfb7edd5b8c7f9b5e8dcc31f7e5ab4f514dad2729c5a3a7185ca8
+  labels:
+    app.kubernetes.io/name: alertmanager
+    eco-base/governance: aligned
+    eco-base/part-of: eco-base
+    environment: production
   name: alertmanager-config
   namespace: monitoring
-  labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-    app.kubernetes.io/name: alertmanager
-    environment: production
-data:
-  alertmanager.yml: |
-    global:
-      resolve_timeout: 5m
-      slack_api_url: '${SLACK_WEBHOOK_URL}'
-      pagerduty_url: '${PAGERDUTY_URL}'
-
-    templates:
-    - '/etc/alertmanager/templates/*.tmpl'
-
-    route:
-      group_by: ['alertname', 'cluster', 'service']
-      group_wait: 30s
-      group_interval: 5m
-      repeat_interval: 4h
-      receiver: 'default'
-      routes:
-      - match:
-          severity: critical
-        receiver: 'critical-alerts'
-        continue: true
-      - match:
-          severity: warning
-        receiver: 'warning-alerts'
-      - match:
-          service: machine-native-ops
-        receiver: 'machine-native-ops-alerts'
-
-    receivers:
-    - name: 'default'
-      slack_configs:
-      - channel: '#alerts'
-        send_resolved: true
-        title: '[{{ .Status | toUpper }}] {{ .GroupLabels.alertname }}'
-        text: >-
-          {{ range .Alerts }}
-          *Alert:* {{ .Labels.alertname }}
-          *Severity:* {{ .Labels.severity }}
-          *Description:* {{ .Annotations.description }}
-          *Details:*
-          {{ range .Labels.SortedPairs }} • *{{ .Name }}:* {{ .Value }}
-          {{ end }}
-          {{ end }}
-
-    - name: 'critical-alerts'
-      slack_configs:
-      - channel: '#critical-alerts'
-        send_resolved: true
-        title: '[CRITICAL] {{ .GroupLabels.alertname }}'
-        text: >-
-          {{ range .Alerts }}
-          *Alert:* {{ .Labels.alertname }}
-          *Severity:* {{ .Labels.severity }}
-          *Description:* {{ .Annotations.description }}
-          *Details:*
-          {{ range .Labels.SortedPairs }} • *{{ .Name }}:* {{ .Value }}
-          {{ end }}
-          {{ end }}
-      pagerduty_configs:
-      - service_key: '${PAGERDUTY_SERVICE_KEY}'
-        description: '{{ .GroupLabels.alertname }}'
-
-    - name: 'warning-alerts'
-      slack_configs:
-      - channel: '#alerts'
-        send_resolved: true
-        title: '[WARNING] {{ .GroupLabels.alertname }}'
-        text: >-
-          {{ range .Alerts }}
-          *Alert:* {{ .Labels.alertname }}
-          *Severity:* {{ .Labels.severity }}
-          *Description:* {{ .Annotations.description }}
-          {{ end }}
-
-    - name: 'machine-native-ops-alerts'
-      slack_configs:
-      - channel: '#machine-native-ops'
-        send_resolved: true
-        title: '[Machine Native Ops] {{ .GroupLabels.alertname }}'
-        text: >-
-          {{ range .Alerts }}
-          *Alert:* {{ .Labels.alertname }}
-          *Severity:* {{ .Labels.severity }}
-          *Description:* {{ .Annotations.description }}
-          *Service:* {{ .Labels.service }}
-          *Instance:* {{ .Labels.instance }}
-          {{ end }}
-      email_configs:
-      - to: 'ops@machinenativeops.com'
-        headers:
-          Subject: '[Machine Native Ops Alert] {{ .GroupLabels.alertname }}'
-        html: >-
-          {{ range .Alerts }}
-          <h3>{{ .Labels.alertname }}</h3>
-          <p><strong>Severity:</strong> {{ .Labels.severity }}</p>
-          <p><strong>Description:</strong> {{ .Annotations.description }}</p>
-          <p><strong>Service:</strong> {{ .Labels.service }}</p>
-          <p><strong>Instance:</strong> {{ .Labels.instance }}</p>
-          {{ end }}
-
-    inhibit_rules:
-    - source_match:
-        severity: 'critical'
-      target_match:
-        severity: 'warning'
-      equal: ['alertname', 'cluster', 'service']

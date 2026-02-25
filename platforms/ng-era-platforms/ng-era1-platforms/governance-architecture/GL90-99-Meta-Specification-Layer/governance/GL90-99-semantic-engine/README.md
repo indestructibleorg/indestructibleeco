@@ -1,12 +1,12 @@
-# GL Semantic Core Engine
+# GL Spec Core Engine
 
 A fully functional semantic engine that transforms YAML specifications into computable, reasonaable, indexable, and foldable semantic structures.
 
 ## Overview
 
-The Semantic Core Engine implements a complete semantic computing system with 6 phases:
+The Spec Core Engine implements a complete semantic computing system with 6 phases:
 
-### ⭐ Phase 2: Semantic Folding (語意折疊)
+### ⭐ Phase 2: Spec Aggregation (語意折疊)
 Transforms YAML semantic structures into computable semantic nodes with:
 - **Feature Extraction**: Extracts semantic features from domains, capabilities, resources, labels
 - **Vector Generation**: Creates 128-dimensional semantic vectors using bit vector compression
@@ -97,7 +97,7 @@ curl -X POST [EXTERNAL_URL_REMOVED] \
   -d '{"specification": "<yaml_content>"}'
 ```
 
-**Query Semantic Node**
+**Query Spec Node**
 ```bash
 curl "[EXTERNAL_URL_REMOVED]
 ```
@@ -125,7 +125,7 @@ curl -X POST [EXTERNAL_URL_REMOVED] \
 semantic_engine/
 ├── __init__.py              # Package initialization
 ├── semantic_models.py        # Core data structures
-├── semantic_folding.py        # Phase 2: Folding engine
+├── spec_aggregation.py        # Phase 2: Folding engine
 ├── semantic_parameterization.py  # Phase 3: Parameterization
 ├── semantic_indexing.py       # Phase 4: Indexing engine
 ├── semantic_inference.py     # Phase 6: Inference engine
@@ -164,7 +164,7 @@ From the test run with semantic-unification-spec.yaml:
 
 ## License
 
-GL Semantic Core Platform v1.0.0
+GL Spec Core Platform v1.0.0
 
 ## Contributing
 

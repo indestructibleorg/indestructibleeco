@@ -65,8 +65,8 @@ def test_governance_semantic_engine():
     print(f"  - Total nodes: {len(graph.nodes)}")
     print(f"  - Total edges: {len(graph.edges)}")
     
-    # ==================== Phase 2: Semantic Folding ====================
-    print_section("Phase 2: Semantic Folding (語意折疊)")
+    # ==================== Phase 2: Spec Aggregation ====================
+    print_section("Phase 2: Spec Aggregation (語意折疊)")
     
     print("Example: Folded Domain Node")
     domain_node = graph.get_node("domain.runtime")
@@ -223,12 +223,12 @@ def test_governance_semantic_engine():
     print(f"Inference Cache Size: {stats['inference_cache_size']}")
     
     # ==================== Summary ====================
-    print_section("✓ Semantic Core Engine Successfully Implemented")
+    print_section("✓ Spec Core Engine Successfully Implemented")
     
     print("""
-The Semantic Core Engine has been successfully implemented with all phases:
+The Spec Core Engine has been successfully implemented with all phases:
 
-⭐ Phase 2: Semantic Folding (語意折疊)
+⭐ Phase 2: Spec Aggregation (語意折疊)
    ✓ YAML → Semantic Nodes
    ✓ Feature extraction
    ✓ Vector generation
@@ -259,7 +259,7 @@ The Semantic Core Engine has been successfully implemented with all phases:
    ✓ Validation methods
    ✓ Mapping methods
 
-The UnificationSpecification is now a fully functional Semantic Core Engine!
+The UnificationSpecification is now a fully functional Spec Core Engine!
 """)
 
 

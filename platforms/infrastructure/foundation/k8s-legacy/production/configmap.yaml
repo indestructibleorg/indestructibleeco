@@ -1,66 +1,62 @@
-# @ECO-governed
-# @ECO-layer: infrastructure
-# @ECO-semantic: configmap
-# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
-# 
-# GL Unified Architecture Governance Framework Activated
-
+---
 apiVersion: v1
+data:
+  CACHE_ENABLED: 'true'
+  CACHE_MAX_SIZE: '10000'
+  CACHE_TTL: '3600'
+  CORS_CREDENTIALS: 'true'
+  CORS_HEADERS: Content-Type,Authorization,X-Requested-With
+  CORS_METHODS: GET,POST,PUT,DELETE,OPTIONS
+  CORS_ORIGINS: https://machinenativeops.com,https://www.machinenativeops.com
+  CSP_ENABLED: 'true'
+  CSP_POLICY: 'default-src ''self''; script-src ''self'' ''unsafe-inline'' ''unsafe-eval'';
+    style-src ''self'' ''unsafe-inline''; img-src ''self'' data: https:; font-src
+    ''self'' data:;'
+  CSRF_COOKIE_HTTPONLY: 'true'
+  CSRF_COOKIE_SAMESITE: strict
+  CSRF_COOKIE_SECURE: 'true'
+  ENABLE_CORS: 'true'
+  ENVIRONMENT: production
+  HEALTH_CHECK_ENABLED: 'true'
+  HEALTH_CHECK_INTERVAL: '30'
+  HSTS_ENABLED: 'true'
+  HSTS_MAX_AGE: '31536000'
+  LOG_FORMAT: json
+  LOG_LEVEL: INFO
+  LOG_OUTPUT: stdout
+  MAX_REQUEST_SIZE: '10485760'
+  METRICS_ENABLED: 'true'
+  METRICS_PORT: '8000'
+  POSTGRES_HOST: postgresql
+  POSTGRES_MAX_CONNECTIONS: '20'
+  POSTGRES_MIN_CONNECTIONS: '5'
+  POSTGRES_PORT: '5432'
+  RATE_LIMIT_ENABLED: 'true'
+  RATE_LIMIT_PER_MINUTE: '1000'
+  REDIS_DB: '0'
+  REDIS_HOST: redis-master
+  REDIS_PORT: '6379'
+  REDIS_SENTINEL_ENABLED: 'true'
+  REQUEST_TIMEOUT: '30'
+  RESPONSE_TIMEOUT: '60'
+  SECURE_HEADERS_ENABLED: 'true'
+  SESSION_COOKIE_HTTPONLY: 'true'
+  SESSION_COOKIE_SAMESITE: strict
+  SESSION_COOKIE_SECURE: 'true'
+  SSL_REDIRECT: 'true'
+  TRACING_ENABLED: 'true'
+  TRACING_SAMPLING_RATE: '0.1'
+  WORKER_PROCESSES: '4'
+  WORKER_THREADS: '8'
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:configmap.yaml"
-    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/configmap.yaml"
+    eco-base/uri: eco-base://k8s/core/configmap/machine-native-ops-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:machine-native-ops-config:sha256-5b9e380f39e2693d52e7a72e3ae3450c1a805970b9e2c954871bdd37a0131c17
+  labels:
+    app.kubernetes.io/name: machine-native-ops
+    eco-base/governance: aligned
+    eco-base/part-of: eco-base
+    environment: production
   name: machine-native-ops-config
   namespace: production
-  labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-    app.kubernetes.io/name: machine-native-ops
-    environment: production
-data:
-  ENVIRONMENT: "production"
-  LOG_LEVEL: "INFO"
-  REDIS_HOST: "redis-master"
-  REDIS_PORT: "6379"
-  REDIS_DB: "0"
-  REDIS_SENTINEL_ENABLED: "true"
-  POSTGRES_HOST: "postgresql"
-  POSTGRES_PORT: "5432"
-  POSTGRES_MAX_CONNECTIONS: "20"
-  POSTGRES_MIN_CONNECTIONS: "5"
-  CACHE_ENABLED: "true"
-  CACHE_TTL: "3600"
-  CACHE_MAX_SIZE: "10000"
-  METRICS_ENABLED: "true"
-  METRICS_PORT: "8000"
-  TRACING_ENABLED: "true"
-  TRACING_SAMPLING_RATE: "0.1"
-  RATE_LIMIT_ENABLED: "true"
-  RATE_LIMIT_PER_MINUTE: "1000"
-  HEALTH_CHECK_ENABLED: "true"
-  HEALTH_CHECK_INTERVAL: "30"
-  LOG_FORMAT: "json"
-  LOG_OUTPUT: "stdout"
-  WORKER_PROCESSES: "4"
-  WORKER_THREADS: "8"
-  REQUEST_TIMEOUT: "30"
-  RESPONSE_TIMEOUT: "60"
-  MAX_REQUEST_SIZE: "10485760"
-  ENABLE_CORS: "true"
-  CORS_ORIGINS: "https://machinenativeops.com,https://www.machinenativeops.com"
-  CORS_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
-  CORS_HEADERS: "Content-Type,Authorization,X-Requested-With"
-  CORS_CREDENTIALS: "true"
-  SECURE_HEADERS_ENABLED: "true"
-  SSL_REDIRECT: "true"
-  HSTS_ENABLED: "true"
-  HSTS_MAX_AGE: "31536000"
-  CSP_ENABLED: "true"
-  CSP_POLICY: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;"
-  SESSION_COOKIE_SECURE: "true"
-  SESSION_COOKIE_HTTPONLY: "true"
-  SESSION_COOKIE_SAMESITE: "strict"
-  CSRF_COOKIE_SECURE: "true"
-  CSRF_COOKIE_HTTPONLY: "true"
-  CSRF_COOKIE_SAMESITE: "strict"

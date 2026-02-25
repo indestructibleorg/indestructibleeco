@@ -1,249 +1,134 @@
-# @ECO-governed
-# @ECO-layer: infrastructure
-# @ECO-semantic: trace-analysis-dashboard
-# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
-# 
-# GL Unified Architecture Governance Framework Activated
-
-# Trace Analysis Dashboards and Monitoring
+---
 apiVersion: v1
+data:
+  trace-analysis.json: "{\n  \"dashboard\": {\n    \"title\": \"Distributed Tracing\
+    \ Analysis\",\n    \"panels\": [\n      {\n        \"title\": \"Trace Throughput\"\
+    ,\n        \"targets\": [\n          {\n            \"expr\": \"rate(jaeger_traces_started_total[5m])\"\
+    ,\n            \"legendFormat\": \"Traces/sec\"\n          }\n        ],\n   \
+    \     \"type\": \"graph\"\n      },\n      {\n        \"title\": \"Trace Duration\
+    \ Percentiles\",\n        \"targets\": [\n          {\n            \"expr\": \"\
+    histogram_quantile(0.50, sum(rate(jaeger_tracer_duration_milliseconds_bucket[5m]))\
+    \ by (le))\",\n            \"legendFormat\": \"P50\"\n          },\n         \
+    \ {\n            \"expr\": \"histogram_quantile(0.95, sum(rate(jaeger_tracer_duration_milliseconds_bucket[5m]))\
+    \ by (le))\",\n            \"legendFormat\": \"P95\"\n          },\n         \
+    \ {\n            \"expr\": \"histogram_quantile(0.99, sum(rate(jaeger_tracer_duration_milliseconds_bucket[5m]))\
+    \ by (le))\",\n            \"legendFormat\": \"P99\"\n          }\n        ],\n\
+    \        \"type\": \"graph\"\n      },\n      {\n        \"title\": \"Trace Duration\
+    \ by Service\",\n        \"targets\": [\n          {\n            \"expr\": \"\
+    histogram_quantile(0.95, sum(rate(jaeger_tracer_duration_milliseconds_bucket[5m]))\
+    \ by (le, service_name))\",\n            \"legendFormat\": \"{{service_name}}\"\
+    \n          }\n        ],\n        \"type\": \"heatmap\"\n      },\n      {\n\
+    \        \"title\": \"Span Duration Distribution\",\n        \"targets\": [\n\
+    \          {\n            \"expr\": \"histogram_quantile(0.95, sum(rate(jaeger_span_duration_milliseconds_bucket[5m]))\
+    \ by (le, operation_name))\",\n            \"legendFormat\": \"{{operation_name}}\"\
+    \n          }\n        ],\n        \"type\": \"graph\"\n      },\n      {\n  \
+    \      \"title\": \"Error Rate\",\n        \"targets\": [\n          {\n     \
+    \       \"expr\": \"sum(rate(jaeger_spans_total{error=true}[5m])) / sum(rate(jaeger_spans_total[5m]))\
+    \ * 100\",\n            \"legendFormat\": \"Error Rate %\"\n          }\n    \
+    \    ],\n        \"type\": \"graph\"\n      },\n      {\n        \"title\": \"\
+    Trace Sampling Rate\",\n        \"targets\": [\n          {\n            \"expr\"\
+    : \"sum(rate(jaeger_spans_total[5m])) / sum(rate(istio_requests_total[5m])) *\
+    \ 100\",\n            \"legendFormat\": \"Sampling Rate %\"\n          }\n   \
+    \     ],\n        \"type\": \"gauge\"\n      },\n      {\n        \"title\": \"\
+    Service Dependency Graph\",\n        \"targets\": [\n          {\n           \
+    \ \"expr\": \"sum(increase(istio_requests_total[5m])) by (source_service, destination_service)\"\
+    ,\n            \"legendFormat\": \"{{source_service}} -> {{destination_service}}\"\
+    \n          }\n        ],\n        \"type\": \"graph\"\n      },\n      {\n  \
+    \      \"title\": \"Hot Operations\",\n        \"targets\": [\n          {\n \
+    \           \"expr\": \"topk(10, sum(rate(jaeger_spans_total[5m])) by (operation_name))\"\
+    ,\n            \"legendFormat\": \"{{operation_name}}\"\n          }\n       \
+    \ ],\n        \"type\": \"table\"\n      },\n      {\n        \"title\": \"Slow\
+    \ Traces (>5s)\",\n        \"targets\": [\n          {\n            \"expr\":\
+    \ \"sum(increase(jaeger_tracer_duration_milliseconds_bucket{le=&quot;+Inf&quot;}[5m]))\
+    \ by (trace_id)\",\n            \"legendFormat\": \"{{trace_id}}\"\n         \
+    \ }\n        ],\n        \"type\": \"table\"\n      },\n      {\n        \"title\"\
+    : \"Trace Success Rate\",\n        \"targets\": [\n          {\n            \"\
+    expr\": \"sum(rate(jaeger_traces_finished_total{success=true}[5m])) / sum(rate(jaeger_traces_finished_total[5m]))\
+    \ * 100\",\n            \"legendFormat\": \"Success Rate %\"\n          }\n  \
+    \      ],\n        \"type\": \"gauge\"\n      }\n    ]\n  }\n}\n"
 kind: ConfigMap
 metadata:
+  annotations:
+    eco-base/uri: eco-base://k8s/core/configmap/trace-analysis-dashboard
+    eco-base/urn: urn:eco-base:k8s:core:configmap:trace-analysis-dashboard:sha256-8e3ae209369e1961b44c173dfdba82a66fdabd7da8fcae2f78e622d87ea89a6b
+  labels:
+    eco-base/governance: aligned
+    eco-base/part-of: eco-base
+    grafana_dashboard: '1'
   name: trace-analysis-dashboard
   namespace: istio-system
-  labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-    grafana_dashboard: "1"
-data:
-  trace-analysis.json: |
-    {
-      "dashboard": {
-        "title": "Distributed Tracing Analysis",
-        "panels": [
-          {
-            "title": "Trace Throughput",
-            "targets": [
-              {
-                "expr": "rate(jaeger_traces_started_total[5m])",
-                "legendFormat": "Traces/sec"
-              }
-            ],
-            "type": "graph"
-          },
-          {
-            "title": "Trace Duration Percentiles",
-            "targets": [
-              {
-                "expr": "histogram_quantile(0.50, sum(rate(jaeger_tracer_duration_milliseconds_bucket[5m])) by (le))",
-                "legendFormat": "P50"
-              },
-              {
-                "expr": "histogram_quantile(0.95, sum(rate(jaeger_tracer_duration_milliseconds_bucket[5m])) by (le))",
-                "legendFormat": "P95"
-              },
-              {
-                "expr": "histogram_quantile(0.99, sum(rate(jaeger_tracer_duration_milliseconds_bucket[5m])) by (le))",
-                "legendFormat": "P99"
-              }
-            ],
-            "type": "graph"
-          },
-          {
-            "title": "Trace Duration by Service",
-            "targets": [
-              {
-                "expr": "histogram_quantile(0.95, sum(rate(jaeger_tracer_duration_milliseconds_bucket[5m])) by (le, service_name))",
-                "legendFormat": "{{service_name}}"
-              }
-            ],
-            "type": "heatmap"
-          },
-          {
-            "title": "Span Duration Distribution",
-            "targets": [
-              {
-                "expr": "histogram_quantile(0.95, sum(rate(jaeger_span_duration_milliseconds_bucket[5m])) by (le, operation_name))",
-                "legendFormat": "{{operation_name}}"
-              }
-            ],
-            "type": "graph"
-          },
-          {
-            "title": "Error Rate",
-            "targets": [
-              {
-                "expr": "sum(rate(jaeger_spans_total{error=true}[5m])) / sum(rate(jaeger_spans_total[5m])) * 100",
-                "legendFormat": "Error Rate %"
-              }
-            ],
-            "type": "graph"
-          },
-          {
-            "title": "Trace Sampling Rate",
-            "targets": [
-              {
-                "expr": "sum(rate(jaeger_spans_total[5m])) / sum(rate(istio_requests_total[5m])) * 100",
-                "legendFormat": "Sampling Rate %"
-              }
-            ],
-            "type": "gauge"
-          },
-          {
-            "title": "Service Dependency Graph",
-            "targets": [
-              {
-                "expr": "sum(increase(istio_requests_total[5m])) by (source_service, destination_service)",
-                "legendFormat": "{{source_service}} -> {{destination_service}}"
-              }
-            ],
-            "type": "graph"
-          },
-          {
-            "title": "Hot Operations",
-            "targets": [
-              {
-                "expr": "topk(10, sum(rate(jaeger_spans_total[5m])) by (operation_name))",
-                "legendFormat": "{{operation_name}}"
-              }
-            ],
-            "type": "table"
-          },
-          {
-            "title": "Slow Traces (>5s)",
-            "targets": [
-              {
-                "expr": "sum(increase(jaeger_tracer_duration_milliseconds_bucket{le=&quot;+Inf&quot;}[5m])) by (trace_id)",
-                "legendFormat": "{{trace_id}}"
-              }
-            ],
-            "type": "table"
-          },
-          {
-            "title": "Trace Success Rate",
-            "targets": [
-              {
-                "expr": "sum(rate(jaeger_traces_finished_total{success=true}[5m])) / sum(rate(jaeger_traces_finished_total[5m])) * 100",
-                "legendFormat": "Success Rate %"
-              }
-            ],
-            "type": "gauge"
-          }
-        ]
-      }
-    }
 ---
-# Trace analysis alerting rules
 apiVersion: v1
+data:
+  alerts.yaml: "groups:\n- name: trace_analysis\n  rules:\n  # High error rate in\
+    \ traces\n  - alert: HighTraceErrorRate\n    expr: |\n      sum(rate(jaeger_spans_total{error=true}[5m]))\
+    \ \n      / sum(rate(jaeger_spans_total[5m])) * 100 > 5\n    for: 5m\n    labels:\n\
+    eco-base/part-of: eco-base\neco-base/governance: aligned\n      severity: warning\n\
+    \      team: platform\n    annotations:\n      summary: \"High error rate detected\
+    \ in traces\"\n      description: \"Trace error rate is {{ $value }}% for the\
+    \ last 5 minutes\"\n  \n  # Slow traces detection\n  - alert: SlowTracesDetected\n\
+    \    expr: |\n      histogram_quantile(0.95, sum(rate(jaeger_tracer_duration_milliseconds_bucket[5m]))\
+    \ by (le)) > 5000\n    for: 10m\n    labels:\neco-base/part-of: eco-base\neco-base/governance:\
+    \ aligned\n      severity: warning\n      team: platform\n    annotations:\n \
+    \     summary: \"Slow traces detected\"\n      description: \"95th percentile\
+    \ trace duration is {{ $value }}ms for the last 10 minutes\"\n  \n  # Trace sampling\
+    \ rate anomaly\n  - alert: TraceSamplingRateAnomaly\n    expr: |\n      abs(\n\
+    \        sum(rate(jaeger_spans_total[5m])) / sum(rate(istio_requests_total[5m]))\
+    \ * 100 \n        - 10\n      ) > 50\n    for: 5m\n    labels:\neco-base/part-of:\
+    \ eco-base\neco-base/governance: aligned\n      severity: info\n      team: platform\n\
+    \    annotations:\n      summary: \"Trace sampling rate anomaly detected\"\n \
+    \     description: \"Current sampling rate is {{ $value }}%, expected ~10%\"\n\
+    \  \n  # Missing trace context\n  - alert: MissingTraceContext\n    expr: |\n\
+    \      sum(rate(istio_requests_total[5m])) - sum(rate(jaeger_traces_started_total[5m]))\
+    \ > 100\n    for: 5m\n    labels:\neco-base/part-of: eco-base\neco-base/governance:\
+    \ aligned\n      severity: warning\n      team: platform\n    annotations:\n \
+    \     summary: \"Missing trace context detected\"\n      description: \"{{ $value\
+    \ }} requests per second are not being traced\"\n"
 kind: ConfigMap
 metadata:
+  annotations:
+    eco-base/uri: eco-base://k8s/core/configmap/trace-analysis-alerts
+    eco-base/urn: urn:eco-base:k8s:core:configmap:trace-analysis-alerts:sha256-7092c3a1fe73669650ab6dcbb01cb0597ab34bea20a34c6d083eddd4112e175f
+  labels: {}
   name: trace-analysis-alerts
   namespace: istio-system
-data:
-  alerts.yaml: |
-    groups:
-    - name: trace_analysis
-      rules:
-      # High error rate in traces
-      - alert: HighTraceErrorRate
-        expr: |
-          sum(rate(jaeger_spans_total{error=true}[5m])) 
-          / sum(rate(jaeger_spans_total[5m])) * 100 > 5
-        for: 5m
-        labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-          severity: warning
-          team: platform
-        annotations:
-          summary: "High error rate detected in traces"
-          description: "Trace error rate is {{ $value }}% for the last 5 minutes"
-      
-      # Slow traces detection
-      - alert: SlowTracesDetected
-        expr: |
-          histogram_quantile(0.95, sum(rate(jaeger_tracer_duration_milliseconds_bucket[5m])) by (le)) > 5000
-        for: 10m
-        labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-          severity: warning
-          team: platform
-        annotations:
-          summary: "Slow traces detected"
-          description: "95th percentile trace duration is {{ $value }}ms for the last 10 minutes"
-      
-      # Trace sampling rate anomaly
-      - alert: TraceSamplingRateAnomaly
-        expr: |
-          abs(
-            sum(rate(jaeger_spans_total[5m])) / sum(rate(istio_requests_total[5m])) * 100 
-            - 10
-          ) > 50
-        for: 5m
-        labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-          severity: info
-          team: platform
-        annotations:
-          summary: "Trace sampling rate anomaly detected"
-          description: "Current sampling rate is {{ $value }}%, expected ~10%"
-      
-      # Missing trace context
-      - alert: MissingTraceContext
-        expr: |
-          sum(rate(istio_requests_total[5m])) - sum(rate(jaeger_traces_started_total[5m])) > 100
-        for: 5m
-        labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-          severity: warning
-          team: platform
-        annotations:
-          summary: "Missing trace context detected"
-          description: "{{ $value }} requests per second are not being traced"
 ---
-# Trace analysis jobs
 apiVersion: batch/v1
 kind: CronJob
 metadata:
+  annotations:
+    eco-base/uri: eco-base://k8s/core/cronjob/trace-analysis-report
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:trace-analysis-report:sha256-4f2b0bba40626e1f641226266c96c73147b888f144a1197ca3124250fc126f69
+  labels: {}
   name: trace-analysis-report
   namespace: istio-system
 spec:
-  schedule: "0 6 * * *"  # Daily at 6 AM
-  successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
   jobTemplate:
     spec:
       template:
         spec:
           containers:
-          - name: trace-analyzer
-            image: jaegertracing/jaeger-query:latest
-            command:
+          - command:
             - /bin/sh
             - -c
-            - |
-              # Analyze traces and generate report
-              echo "=== Trace Analysis Report - $(date) ===" > /tmp/trace-report.txt
-              echo "" >> /tmp/trace-report.txt
-              
-              # Get trace statistics
-              echo "Trace Statistics:" >> /tmp/trace-report.txt
-              curl -s http://jaeger-query:16686/api/traces?service=machine-native-ops-production&limit=1000 \
-                | jq '.data | length' >> /tmp/trace-report.txt
-              
-              echo "" >> /tmp/trace-report.txt
-              echo "Slow Traces (>5s):" >> /tmp/trace-report.txt
-              curl -s "http://jaeger-query:16686/api/traces?service=machine-native-ops-production&limit=100" \
-                | jq -r '.data[] | select(.duration > 5000000) | .traceID' >> /tmp/trace-report.txt
-              
-              cat /tmp/trace-report.txt
+            - "# Analyze traces and generate report\necho \"=== Trace Analysis Report\
+              \ - $(date) ===\" > /tmp/trace-report.txt\necho \"\" >> /tmp/trace-report.txt\n\
+              \n# Get trace statistics\necho \"Trace Statistics:\" >> /tmp/trace-report.txt\n\
+              curl -s http://jaeger-query:16686/api/traces?service=machine-native-ops-production&limit=1000\
+              \ \\\n  | jq '.data | length' >> /tmp/trace-report.txt\n\necho \"\"\
+              \ >> /tmp/trace-report.txt\necho \"Slow Traces (>5s):\" >> /tmp/trace-report.txt\n\
+              curl -s \"http://jaeger-query:16686/api/traces?service=machine-native-ops-production&limit=100\"\
+              \ \\\n  | jq -r '.data[] | select(.duration > 5000000) | .traceID' >>\
+              \ /tmp/trace-report.txt\n\ncat /tmp/trace-report.txt\n"
+            image: jaegertracing/jaeger-query:latest
+            name: trace-analyzer
             volumeMounts:
-            - name: reports
-              mountPath: /tmp
-          volumes:
-          - name: reports
-            emptyDir: {}
+            - mountPath: /tmp
+              name: reports
           restartPolicy: OnFailure
+          volumes:
+          - emptyDir: {}
+            name: reports
+  schedule: 0 6 * * *
+  successfulJobsHistoryLimit: 3

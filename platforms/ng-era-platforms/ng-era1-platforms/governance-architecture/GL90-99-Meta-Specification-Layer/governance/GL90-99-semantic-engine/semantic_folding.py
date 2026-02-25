@@ -8,7 +8,7 @@
 # GL Unified Naming Charter: gl-enterprise-architecture/governance/engine/governance/gl-artifacts/meta/naming-charter/gl-unified-naming-charter.yaml
 
 """
-Semantic Folding Engine
+Spec Aggregation Engine
 Transforms YAML semantic specifications into computable semantic nodes
 """
 
@@ -34,7 +34,7 @@ from .semantic_models import (
 class SemanticFoldingEngine:
     """
     Engine for folding YAML semantic specifications into semantic nodes
-    Implements Phase 2: Semantic Folding (語意折疊)
+    Implements Phase 2: Spec Aggregation (語意折疊)
     """
     
     def __init__(self, embedding_dim: int = 128):

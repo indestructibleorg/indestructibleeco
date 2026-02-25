@@ -1,36 +1,28 @@
-# @ECO-layer: GQS-L0
-# @ECO-governed
-# @ECO-layer: governance
-# @ECO-semantic: backend-service
-# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
-# 
-# GL Unified Architecture Governance Framework Activated
-
+---
 apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:execution-platform:engine:tools-legacy:infrastructure:kubernetes:quantum:backend-service.yaml"
-    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tools-legacy/infrastructure/kubernetes/quantum/backend-service.yaml"
+    eco-base/uri: eco-base://k8s/core/service/quantumflow-backend
+    eco-base/urn: urn:eco-base:k8s:core:service:quantumflow-backend:sha256-de437085546fa549a79ac5d47401dc6417fe4ef0f0038709b1d29529cab3c976
+  labels:
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/name: quantumflow
+    eco-base/governance: aligned
+    eco-base/part-of: eco-base
   name: quantumflow-backend
   namespace: quantumflow
-  labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-    app.kubernetes.io/name: quantumflow
-    app.kubernetes.io/component: backend
 spec:
-  type: ClusterIP
   ports:
-  - port: 8000
-    targetPort: 8000
+  - name: http
+    port: 8000
     protocol: TCP
-    name: http
+    targetPort: 8000
   selector:
-    app.kubernetes.io/name: quantumflow
     app.kubernetes.io/component: backend
+    app.kubernetes.io/name: quantumflow
   sessionAffinity: ClientIP
   sessionAffinityConfig:
     clientIP:
       timeoutSeconds: 10800
-
+  type: ClusterIP

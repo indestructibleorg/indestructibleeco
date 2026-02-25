@@ -185,7 +185,7 @@ The `GovernanceEngine` class (`backend/ai/src/governance.py`) performs 5-phase v
 2. **Block Check**: Verify all 4 governance blocks are present
 3. **Field Check**: Verify required fields within each block
 4. **GKE Compatibility**: Validate Kubernetes-specific constraints
-5. **Semantic Validation**: URI/URN format, UUID v1 version check, schema_version pattern
+5. **Schema Validation**: URI/URN format, UUID v1 version check, schema_version pattern
 
 ### CI Pipeline
 

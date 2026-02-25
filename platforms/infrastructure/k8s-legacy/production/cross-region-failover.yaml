@@ -1,207 +1,71 @@
-# @ECO-governed
-# @ECO-layer: infrastructure
-# @ECO-semantic: cross-region-failover
-# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
-# 
-# GL Unified Architecture Governance Framework Activated
-
-# Cross-Region Failover Automation Configuration
+---
 apiVersion: v1
+data:
+  failover-automation.yaml: "# Cross-region failover automation\nfailoverAutomation:\n\
+    \  enabled: true\n  \n  # Failover triggers\n  triggers:\n    - name: regional-outage\n\
+    \      type: regional\n      enabled: true\n      conditions:\n        unhealthyZones:\
+    \ 2\n        unhealthyDuration: 5m\n        verificationChecks: 3\n      actions:\n\
+    \        - type: redirect-traffic\n          targetRegion: us-west-2\n       \
+    \ - type: scale-up\n          targetRegion: us-west-2\n          replicas: 9\n\
+    \        - type: promote-database\n          targetRegion: us-west-2\n      notification:\n\
+    \        channels:\n          - slack\n          - pagerduty\n          - email\n\
+    \        message: \"Regional outage detected - initiating failover to us-west-2\"\
+    \n    \n    - name: database-failure\n      type: database\n      enabled: true\n\
+    \      conditions:\n        primaryUnhealthy: true\n        standbyHealthy: true\n\
+    \        replicationLag: 10s\n      actions:\n        - type: promote-standby\n\
+    \          targetRegion: us-west-2\n        - type: update-dns\n          newPrimary:\
+    \ us-west-2\n        - type: notify-applications\n      notification:\n      \
+    \  channels:\n          - slack\n          - pagerduty\n        message: \"Database\
+    \ failure detected - promoting standby database\"\n    \n    - name: performance-degradation\n\
+    \      type: performance\n      enabled: true\n      conditions:\n        latencyThreshold:\
+    \ 1000ms\n        errorRateThreshold: 10\n        duration: 10m\n      actions:\n\
+    \        - type: redistribute-traffic\n          primaryWeight: 40\n         \
+    \ drWeight: 60\n      notification:\n        channels:\n          - slack\n  \
+    \      message: \"Performance degradation detected - redistributing traffic\"\n\
+    \    \n    - name: manual-failover\n      type: manual\n      enabled: true\n\
+    \      requiresApproval: true\n      approvalTimeout: 30m\n      actions:\n  \
+    \      - type: redirect-traffic\n          targetRegion: us-west-2\n        -\
+    \ type: promote-database\n          targetRegion: us-west-2\n        - type: scale-up\n\
+    \          targetRegion: us-west-2\n      notification:\n        channels:\n \
+    \         - slack\n          - email\n        message: \"Manual failover initiated\
+    \ by {user}\"\n  \n  # Failover workflow\n  workflow:\n    steps:\n      - name:\
+    \ pre-failover-checks\n        actions:\n          - verify-target-region-health\n\
+    \          - verify-database-replication-status\n          - verify-dns-health-checks\n\
+    \          - verify-capacity-in-target\n        timeout: 2m\n        onFail: abort\n\
+    \    \n      - name: initiate-failover\n        actions:\n          - scale-up-target-region\n\
+    \          - promote-standby-database\n          - verify-database-promotion\n\
+    \        timeout: 5m\n        onFail: rollback\n    \n      - name: update-dns\n\
+    \        actions:\n          - update-dns-records\n          - verify-dns-propagation\n\
+    \          - verify-health-checks\n        timeout: 10m\n        onFail: rollback\n\
+    \    \n      - name: verify-failover\n        actions:\n          - verify-traffic-redirect\n\
+    \          - verify-application-health\n          - verify-database-connectivity\n\
+    \          - verify-critical-services\n        timeout: 5m\n        onFail: rollback\n\
+    \    \n      - name: post-failover\n        actions:\n          - send-notifications\n\
+    \          - update-monitoring\n          - create-incident-report\n         \
+    \ - schedule-failback-review\n        timeout: 2m\n    \n    rollback:\n     \
+    \ enabled: true\n      triggers:\n        - failover-failed\n        - verification-failed\n\
+    \        - target-region-unhealthy\n      steps:\n        - revert-dns-changes\n\
+    \        - demote-promoted-database\n        - scale-down-target-region\n    \
+    \    - verify-rollback\n  \n  # Failover cooldown\n  cooldown:\n    enabled: true\n\
+    \    duration: 5m\n    maxFailoversPerHour: 1\n    maxFailoversPerDay: 3\n  \n\
+    \  # Failback configuration\n  failback:\n    enabled: true\n    mode: manual\n\
+    \    prerequisites:\n      - source-region-healthy: true\n      - minimum-duration:\
+    \ 4h\n      - manual-approval: true\n      - business-hours-only: false\n    notification:\n\
+    \      before: 2h\n      channels:\n        - slack\n        - email\n    workflow:\n\
+    \      steps:\n        - verify-source-region-health\n        - initiate-traffic-shift\n\
+    \        - verify-source-readiness\n        - promote-source-database\n      \
+    \  - update-dns\n        - verify-failback\n  \n  # Monitoring and metrics\n \
+    \ monitoring:\n    enabled: true\n    metrics:\n      failoverCount:\n       \
+    \ enabled: true\n        alerting:\n          threshold: 5\n          period:\
+    \ 24h\n      failoverDuration:\n        enabled: true\n        target: <300s\n\
+    \      failbackDuration:\n        enabled: true\n        target: <600s\n     \
+    \ rto:\n        enabled: true\n        target: <4h\n      rpo:\n        enabled:\
+    \ true\n        target: <1h"
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:cross-region-failover.yaml"
-    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/cross-region-failover.yaml"
+    eco-base/uri: eco-base://k8s/core/configmap/cross-region-failover-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:cross-region-failover-config:sha256-c0c008205fc1b3edc2a065a80bfa044dbd0101e151e39b16d79217019e401f55
+  labels: {}
   name: cross-region-failover-config
   namespace: production
-data:
-  failover-automation.yaml: |
-    # Cross-region failover automation
-    failoverAutomation:
-      enabled: true
-      
-      # Failover triggers
-      triggers:
-        - name: regional-outage
-          type: regional
-          enabled: true
-          conditions:
-            unhealthyZones: 2
-            unhealthyDuration: 5m
-            verificationChecks: 3
-          actions:
-            - type: redirect-traffic
-              targetRegion: us-west-2
-            - type: scale-up
-              targetRegion: us-west-2
-              replicas: 9
-            - type: promote-database
-              targetRegion: us-west-2
-          notification:
-            channels:
-              - slack
-              - pagerduty
-              - email
-            message: "Regional outage detected - initiating failover to us-west-2"
-        
-        - name: database-failure
-          type: database
-          enabled: true
-          conditions:
-            primaryUnhealthy: true
-            standbyHealthy: true
-            replicationLag: 10s
-          actions:
-            - type: promote-standby
-              targetRegion: us-west-2
-            - type: update-dns
-              newPrimary: us-west-2
-            - type: notify-applications
-          notification:
-            channels:
-              - slack
-              - pagerduty
-            message: "Database failure detected - promoting standby database"
-        
-        - name: performance-degradation
-          type: performance
-          enabled: true
-          conditions:
-            latencyThreshold: 1000ms
-            errorRateThreshold: 10
-            duration: 10m
-          actions:
-            - type: redistribute-traffic
-              primaryWeight: 40
-              drWeight: 60
-          notification:
-            channels:
-              - slack
-            message: "Performance degradation detected - redistributing traffic"
-        
-        - name: manual-failover
-          type: manual
-          enabled: true
-          requiresApproval: true
-          approvalTimeout: 30m
-          actions:
-            - type: redirect-traffic
-              targetRegion: us-west-2
-            - type: promote-database
-              targetRegion: us-west-2
-            - type: scale-up
-              targetRegion: us-west-2
-          notification:
-            channels:
-              - slack
-              - email
-            message: "Manual failover initiated by {user}"
-      
-      # Failover workflow
-      workflow:
-        steps:
-          - name: pre-failover-checks
-            actions:
-              - verify-target-region-health
-              - verify-database-replication-status
-              - verify-dns-health-checks
-              - verify-capacity-in-target
-            timeout: 2m
-            onFail: abort
-        
-          - name: initiate-failover
-            actions:
-              - scale-up-target-region
-              - promote-standby-database
-              - verify-database-promotion
-            timeout: 5m
-            onFail: rollback
-        
-          - name: update-dns
-            actions:
-              - update-dns-records
-              - verify-dns-propagation
-              - verify-health-checks
-            timeout: 10m
-            onFail: rollback
-        
-          - name: verify-failover
-            actions:
-              - verify-traffic-redirect
-              - verify-application-health
-              - verify-database-connectivity
-              - verify-critical-services
-            timeout: 5m
-            onFail: rollback
-        
-          - name: post-failover
-            actions:
-              - send-notifications
-              - update-monitoring
-              - create-incident-report
-              - schedule-failback-review
-            timeout: 2m
-        
-        rollback:
-          enabled: true
-          triggers:
-            - failover-failed
-            - verification-failed
-            - target-region-unhealthy
-          steps:
-            - revert-dns-changes
-            - demote-promoted-database
-            - scale-down-target-region
-            - verify-rollback
-      
-      # Failover cooldown
-      cooldown:
-        enabled: true
-        duration: 5m
-        maxFailoversPerHour: 1
-        maxFailoversPerDay: 3
-      
-      # Failback configuration
-      failback:
-        enabled: true
-        mode: manual
-        prerequisites:
-          - source-region-healthy: true
-          - minimum-duration: 4h
-          - manual-approval: true
-          - business-hours-only: false
-        notification:
-          before: 2h
-          channels:
-            - slack
-            - email
-        workflow:
-          steps:
-            - verify-source-region-health
-            - initiate-traffic-shift
-            - verify-source-readiness
-            - promote-source-database
-            - update-dns
-            - verify-failback
-      
-      # Monitoring and metrics
-      monitoring:
-        enabled: true
-        metrics:
-          failoverCount:
-            enabled: true
-            alerting:
-              threshold: 5
-              period: 24h
-          failoverDuration:
-            enabled: true
-            target: <300s
-          failbackDuration:
-            enabled: true
-            target: <600s
-          rto:
-            enabled: true
-            target: <4h
-          rpo:
-            enabled: true
-            target: <1h

@@ -8,7 +8,7 @@
 本文件記錄命名治理系統的所有重要變更。
 
 格式基於 [Keep a Changelog]([EXTERNAL_URL_REMOVED])，
-項目遵循 [語義化版本]([EXTERNAL_URL_REMOVED])。
+項目遵循 [Spec化版本]([EXTERNAL_URL_REMOVED])。
 
 ## [1.0.0] - 2025-01-18
 
@@ -258,7 +258,7 @@
 
 ### 版本號格式
 
-遵循語義化版本 (SemVer)：
+遵循Spec化版本 (SemVer)：
 
 ```
 MAJOR.MINOR.PATCH

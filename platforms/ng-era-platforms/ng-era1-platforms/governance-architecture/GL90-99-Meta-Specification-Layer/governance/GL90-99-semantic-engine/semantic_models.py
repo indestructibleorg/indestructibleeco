@@ -8,8 +8,8 @@
 # GL Unified Naming Charter: gl-enterprise-architecture/governance/engine/governance/gl-artifacts/meta/naming-charter/gl-unified-naming-charter.yaml
 
 """
-Semantic Core Models
-Defines the fundamental data structures for the Semantic Core Engine
+Spec Core Models
+Defines the fundamental data structures for the Spec Core Engine
 """
 
 """

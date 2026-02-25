@@ -78,7 +78,7 @@ dimensions:
     status: "PASS"
 quantum_algorithms:
   - algorithm_id: "QUANTUM-SEMANTIC"
-    name: "Quantum Semantic Validation"
+    name: "Quantum Schema Validation"
     qubits: "16-24"
     accuracy: "99.0%"
     description: "Quantum-enhanced semantic consistency validation"

@@ -1,421 +1,136 @@
-# @ECO-governed
-# @ECO-layer: infrastructure
-# @ECO-semantic: disaster-recovery-testing
-# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
-# 
-# GL Unified Architecture Governance Framework Activated
-
+---
 apiVersion: v1
+data:
+  dr-testing-config.yaml: "version: \"1.0\"\n\n# Automated DR Testing Schedule\nautomated_testing:\n\
+    \  enabled: true\n  \n  schedules:\n    health_check:\n      enabled: true\n \
+    \     schedule: \"*/15 * * * *\"  # Every 15 minutes\n      duration: 300s\n \
+    \     type: \"health_check\"\n    \n    backup_verification:\n      enabled: true\n\
+    \      schedule: \"0 */6 * * *\"  # Every 6 hours\n      duration: 900s\n    \
+    \  type: \"backup_verification\"\n    \n    failover_test:\n      enabled: true\n\
+    \      schedule: \"0 3 * * 1\"  # Monday at 3 AM UTC\n      duration: 1800s\n\
+    \      type: \"failover_test\"\n      notify_before: true\n      notification_lead_time:\
+    \ 3600s  # 1 hour\n    \n    full_disaster_recovery:\n      enabled: true\n  \
+    \    schedule: \"0 0 1 * *\"  # 1st of month at midnight UTC\n      duration:\
+    \ 3600s\n      type: \"full_dr\"\n      notify_before: true\n      notification_lead_time:\
+    \ 86400s  # 24 hours\n    \n    chaos_testing:\n      enabled: true\n      schedule:\
+    \ \"0 2 * * 3\"  # Wednesday at 2 AM UTC\n      duration: 600s\n      type: \"\
+    chaos_test\"\n      notify_before: true\n      notification_lead_time: 3600s \
+    \ # 1 hour\n\n# Chaos Engineering Practices\nchaos_engineering:\n  enabled: true\n\
+    \  \n  experiments:\n    pod_failure:\n      enabled: true\n      probability:\
+    \ 0.05\n      max_pods_to_kill: 1\n      exclude_labels:\neco-base/part-of: eco-base\n\
+    eco-base/governance: aligned\n        - \"app=postgresql\"\n        - \"app=redis-master\"\
+    \n      notification: true\n      auto_rollback: true\n    \n    network_latency:\n\
+    \      enabled: true\n      probability: 0.03\n      min_latency: 100ms\n    \
+    \  max_latency: 500ms\n      duration: 60s\n      exclude_labels:\neco-base/part-of:\
+    \ eco-base\neco-base/governance: aligned\n        - \"app=postgresql\"\n     \
+    \   - \"app=redis-master\"\n    \n    network_partition:\n      enabled: true\n\
+    \      probability: 0.01\n      duration: 30s\n      max_partitions: 2\n     \
+    \ notification: true\n      auto_recovery: true\n    \n    resource_exhaustion:\n\
+    \      enabled: true\n      probability: 0.02\n      types:\n        - \"cpu_exhaustion\"\
+    \n        - \"memory_exhaustion\"\n      duration: 60s\n      notification: true\n\
+    \      auto_recovery: true\n    \n    disk_pressure:\n      enabled: true\n  \
+    \    probability: 0.01\n      duration: 60s\n      notification: true\n      auto_recovery:\
+    \ true\n    \n    service_dependency_failure:\n      enabled: true\n      probability:\
+    \ 0.02\n      services:\n        - \"redis\"\n        - \"postgresql\"\n     \
+    \ duration: 30s\n      notification: true\n      auto_recovery: true\n  \n  safety_mechanisms:\n\
+    \    enabled: true\n    max_concurrent_experiments: 1\n    experiment_timeout:\
+    \ 600s\n    automatic_rollback: true\n    health_check_interval: 10s\n    failure_threshold:\
+    \ 3\n    \n  notification_channels:\n    - \"#chaos-engineering\"\n    - \"ops@machinenativeops.com\"\
+    \n    - \"oncall@machinenativeops.com\"\n\n# Regular Failover Drills\nfailover_drills:\n\
+    \  enabled: true\n  \n  scenarios:\n    primary_database_failover:\n      enabled:\
+    \ true\n      frequency: \"weekly\"\n      schedule: \"0 3 * * 0\"  # Sunday at\
+    \ 3 AM UTC\n      steps:\n        - \"Stop primary database\"\n        - \"Verify\
+    \ replica promotion\"\n        - \"Update application configuration\"\n      \
+    \  - \"Verify application health\"\n        - \"Restore primary\"\n        - \"\
+    Verify replication\"\n      expected_duration: 900s\n      success_criteria:\n\
+    \        - \"failover_time < 300s\"\n        - \"data_loss = 0\"\n        - \"\
+    application_error_rate < 0.01\"\n    \n    cache_cluster_failover:\n      enabled:\
+    \ true\n      frequency: \"weekly\"\n      schedule: \"0 4 * * 0\"  # Sunday at\
+    \ 4 AM UTC\n      steps:\n        - \"Stop master Redis node\"\n        - \"Verify\
+    \ slave promotion\"\n        - \"Verify cache operations\"\n        - \"Restore\
+    \ master\"\n        - \"Verify replication\"\n      expected_duration: 600s\n\
+    \      success_criteria:\n        - \"failover_time < 60s\"\n        - \"cache_hit_rate\
+    \ > 0.80\"\n        - \"application_error_rate < 0.02\"\n    \n    availability_zone_failover:\n\
+    \      enabled: true\n      frequency: \"monthly\"\n      schedule: \"0 0 1 *\
+    \ *\"  # 1st of month at midnight UTC\n      steps:\n        - \"Simulate AZ failure\"\
+    \n        - \"Verify traffic routing to other AZs\"\n        - \"Verify application\
+    \ health\"\n        - \"Restore AZ\"\n      expected_duration: 1800s\n      success_criteria:\n\
+    \        - \"failover_time < 300s\"\n        - \"application_availability > 0.95\"\
+    \n        - \"data_loss = 0\"\n    \n    network_partition_recovery:\n      enabled:\
+    \ true\n      frequency: \"monthly\"\n      schedule: \"0 1 15 * *\"  # 15th of\
+    \ month at 1 AM UTC\n      steps:\n        - \"Simulate network partition\"\n\
+    \        - \"Verify system behavior\"\n        - \"Resolve partition\"\n     \
+    \   - \"Verify consistency\"\n      expected_duration: 900s\n      success_criteria:\n\
+    \        - \"recovery_time < 300s\"\n        - \"data_consistency = true\"\n \
+    \       - \"application_error_rate < 0.05\"\n    \n    service_degradation_test:\n\
+    \      enabled: true\n      frequency: \"weekly\"\n      schedule: \"0 2 * * 2\"\
+    \  # Tuesday at 2 AM UTC\n      steps:\n        - \"Reduce resources to 50%\"\n\
+    \        - \"Verify graceful degradation\"\n        - \"Restore resources\"\n\
+    \        - \"Verify full functionality\"\n      expected_duration: 600s\n    \
+    \  success_criteria:\n        - \"degradation_time < 60s\"\n        - \"essential_services_available\
+    \ = true\"\n        - \"application_error_rate < 0.10\"\n  \n  notification:\n\
+    \    before_drill:\n      enabled: true\n      lead_time: 3600s  # 1 hour\n  \
+    \    channels:\n        - \"#ops-team\"\n        - \"ops@machinenativeops.com\"\
+    \n    \n    during_drill:\n      enabled: true\n      interval: 300s\n      channels:\n\
+    \        - \"#ops-team\"\n    \n    after_drill:\n      enabled: true\n      channels:\n\
+    \        - \"#ops-team\"\n        - \"management@machinenativeops.com\"\n    \
+    \  include_results: true\n\n# DR Performance Metrics\nperformance_metrics:\n \
+    \ enabled: true\n  \n  metrics:\n    rto:\n      description: \"Recovery Time\
+    \ Objective\"\n      target: 14400s  # 4 hours\n      warning_threshold: 10800s\
+    \  # 3 hours\n      critical_threshold: 14400s  # 4 hours\n    \n    rpo:\n  \
+    \    description: \"Recovery Point Objective\"\n      target: 3600s  # 1 hour\n\
+    \      warning_threshold: 1800s  # 30 minutes\n      critical_threshold: 3600s\
+    \  # 1 hour\n    \n    failover_time:\n      description: \"Time to failover to\
+    \ backup\"\n      target: 300s\n      warning_threshold: 200s\n      critical_threshold:\
+    \ 300s\n    \n    data_loss:\n      description: \"Amount of data lost during\
+    \ failover\"\n      target: 0\n      warning_threshold: 0\n      critical_threshold:\
+    \ 0\n    \n    backup_success_rate:\n      description: \"Percentage of successful\
+    \ backups\"\n      target: 1.0\n      warning_threshold: 0.95\n      critical_threshold:\
+    \ 0.90\n    \n    restore_success_rate:\n      description: \"Percentage of successful\
+    \ restores\"\n      target: 1.0\n      warning_threshold: 0.95\n      critical_threshold:\
+    \ 0.90\n    \n    drill_success_rate:\n      description: \"Percentage of successful\
+    \ DR drills\"\n      target: 1.0\n      warning_threshold: 0.95\n      critical_threshold:\
+    \ 0.90\n  \n  collection_interval: 60s\n  retention_days: 90\n\n# DR Test Results\
+    \ Documentation\ntest_documentation:\n  enabled: true\n  \n  storage:\n    type:\
+    \ \"s3\"\n    bucket: \"machinenativeops-dr-results\"\n    prefix: \"dr-tests/\"\
+    \n    retention_days: 365\n  \n  format: \"json\"\n  include:\n    - \"test_metadata\"\
+    \n    - \"timestamp\"\n    - \"duration\"\n    - \"success\"\n    - \"errors\"\
+    \n    - \"metrics\"\n    - \"logs\"\n    - \"screenshots\"\n    - \"test_results\"\
+    \n  \n  analysis:\n    enabled: true\n    trends:\n      - \"rto_trend\"\n   \
+    \   - \"rpo_trend\"\n      - \"failover_time_trend\"\n      - \"success_rate_trend\"\
+    \n    \n    comparison:\n      - \"vs_target\"\n      - \"vs_previous\"\n    \
+    \  - \"vs_average\"\n    \n    recommendations:\n      enabled: true\n      auto_generate:\
+    \ true\n      severity_levels:\n        - \"critical\"\n        - \"warning\"\n\
+    \        - \"info\"\n\n# DR Procedure Updates\nprocedure_updates:\n  enabled:\
+    \ true\n  \n  triggers:\n    - \"failed_dr_test\"\n    - \"missed_sla\"\n    -\
+    \ \"lessons_learned\"\n    - \"infrastructure_change\"\n    - \"security_incident\"\
+    \n  \n  approval_process:\n    required: true\n    approvers:\n      - \"ops-team\"\
+    \n      - \"engineering-team\"\n      - \"security-team\"\n    \n  version_control:\n\
+    \    enabled: true\n    track_changes: true\n    require_review: true\n  \n  communication:\n\
+    \    before_update:\n      enabled: true\n      channels:\n        - \"#ops-team\"\
+    \n        - \"#engineering-team\"\n    \n    after_update:\n      enabled: true\n\
+    \      channels:\n        - \"#ops-team\"\n        - \"#engineering-team\"\n \
+    \       - \"management\"\n      include_changelog: true\n\n# Lessons Learned\n\
+    lessons_learned:\n  enabled: true\n  \n  collection:\n    automated: true\n  \
+    \  manual_entry: true\n    sources:\n      - \"dr_tests\"\n      - \"incidents\"\
+    \n      - \"chaos_experiments\"\n      - \"postmortems\"\n  \n  categories:\n\
+    \    - \"infrastructure\"\n    - \"process\"\n    - \"people\"\n    - \"tools\"\
+    \n    - \"documentation\"\n  \n  action_items:\n    auto_create: true\n    assignee_required:\
+    \ true\n    due_date_required: true\n    priority_levels:\n      - \"critical\"\
+    \n      - \"high\"\n      - \"medium\"\n      - \"low\"\n    \n  tracking:\n \
+    \   enabled: true\n    status_updates: true\n    closure_required: true\n    retrospective:\
+    \ true\n  \n  knowledge_base:\n    enabled: true\n    auto_publish: true\n   \
+    \ search_enabled: true\n    tags:\n      - \"disaster-recovery\"\n      - \"lessons-learned\"\
+    \n      - \"improvements\""
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:disaster-recovery-testing.yaml"
-    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/disaster-recovery-testing.yaml"
+    eco-base/uri: eco-base://k8s/core/configmap/disaster-recovery-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:disaster-recovery-config:sha256-e8cc08643e08f70c35694404578cb14e595154ed55a3a82795b402e76007797a
+  labels:
+    app.kubernetes.io/name: disaster-recovery
+    eco-base/governance: aligned
+    eco-base/part-of: eco-base
+    environment: production
   name: disaster-recovery-config
   namespace: production
-  labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-    app.kubernetes.io/name: disaster-recovery
-    environment: production
-data:
-  dr-testing-config.yaml: |
-    version: "1.0"
-    
-    # Automated DR Testing Schedule
-    automated_testing:
-      enabled: true
-      
-      schedules:
-        health_check:
-          enabled: true
-          schedule: "*/15 * * * *"  # Every 15 minutes
-          duration: 300s
-          type: "health_check"
-        
-        backup_verification:
-          enabled: true
-          schedule: "0 */6 * * *"  # Every 6 hours
-          duration: 900s
-          type: "backup_verification"
-        
-        failover_test:
-          enabled: true
-          schedule: "0 3 * * 1"  # Monday at 3 AM UTC
-          duration: 1800s
-          type: "failover_test"
-          notify_before: true
-          notification_lead_time: 3600s  # 1 hour
-        
-        full_disaster_recovery:
-          enabled: true
-          schedule: "0 0 1 * *"  # 1st of month at midnight UTC
-          duration: 3600s
-          type: "full_dr"
-          notify_before: true
-          notification_lead_time: 86400s  # 24 hours
-        
-        chaos_testing:
-          enabled: true
-          schedule: "0 2 * * 3"  # Wednesday at 2 AM UTC
-          duration: 600s
-          type: "chaos_test"
-          notify_before: true
-          notification_lead_time: 3600s  # 1 hour
-    
-    # Chaos Engineering Practices
-    chaos_engineering:
-      enabled: true
-      
-      experiments:
-        pod_failure:
-          enabled: true
-          probability: 0.05
-          max_pods_to_kill: 1
-          exclude_labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-            - "app=postgresql"
-            - "app=redis-master"
-          notification: true
-          auto_rollback: true
-        
-        network_latency:
-          enabled: true
-          probability: 0.03
-          min_latency: 100ms
-          max_latency: 500ms
-          duration: 60s
-          exclude_labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-            - "app=postgresql"
-            - "app=redis-master"
-        
-        network_partition:
-          enabled: true
-          probability: 0.01
-          duration: 30s
-          max_partitions: 2
-          notification: true
-          auto_recovery: true
-        
-        resource_exhaustion:
-          enabled: true
-          probability: 0.02
-          types:
-            - "cpu_exhaustion"
-            - "memory_exhaustion"
-          duration: 60s
-          notification: true
-          auto_recovery: true
-        
-        disk_pressure:
-          enabled: true
-          probability: 0.01
-          duration: 60s
-          notification: true
-          auto_recovery: true
-        
-        service_dependency_failure:
-          enabled: true
-          probability: 0.02
-          services:
-            - "redis"
-            - "postgresql"
-          duration: 30s
-          notification: true
-          auto_recovery: true
-      
-      safety_mechanisms:
-        enabled: true
-        max_concurrent_experiments: 1
-        experiment_timeout: 600s
-        automatic_rollback: true
-        health_check_interval: 10s
-        failure_threshold: 3
-        
-      notification_channels:
-        - "#chaos-engineering"
-        - "ops@machinenativeops.com"
-        - "oncall@machinenativeops.com"
-    
-    # Regular Failover Drills
-    failover_drills:
-      enabled: true
-      
-      scenarios:
-        primary_database_failover:
-          enabled: true
-          frequency: "weekly"
-          schedule: "0 3 * * 0"  # Sunday at 3 AM UTC
-          steps:
-            - "Stop primary database"
-            - "Verify replica promotion"
-            - "Update application configuration"
-            - "Verify application health"
-            - "Restore primary"
-            - "Verify replication"
-          expected_duration: 900s
-          success_criteria:
-            - "failover_time < 300s"
-            - "data_loss = 0"
-            - "application_error_rate < 0.01"
-        
-        cache_cluster_failover:
-          enabled: true
-          frequency: "weekly"
-          schedule: "0 4 * * 0"  # Sunday at 4 AM UTC
-          steps:
-            - "Stop master Redis node"
-            - "Verify slave promotion"
-            - "Verify cache operations"
-            - "Restore master"
-            - "Verify replication"
-          expected_duration: 600s
-          success_criteria:
-            - "failover_time < 60s"
-            - "cache_hit_rate > 0.80"
-            - "application_error_rate < 0.02"
-        
-        availability_zone_failover:
-          enabled: true
-          frequency: "monthly"
-          schedule: "0 0 1 * *"  # 1st of month at midnight UTC
-          steps:
-            - "Simulate AZ failure"
-            - "Verify traffic routing to other AZs"
-            - "Verify application health"
-            - "Restore AZ"
-          expected_duration: 1800s
-          success_criteria:
-            - "failover_time < 300s"
-            - "application_availability > 0.95"
-            - "data_loss = 0"
-        
-        network_partition_recovery:
-          enabled: true
-          frequency: "monthly"
-          schedule: "0 1 15 * *"  # 15th of month at 1 AM UTC
-          steps:
-            - "Simulate network partition"
-            - "Verify system behavior"
-            - "Resolve partition"
-            - "Verify consistency"
-          expected_duration: 900s
-          success_criteria:
-            - "recovery_time < 300s"
-            - "data_consistency = true"
-            - "application_error_rate < 0.05"
-        
-        service_degradation_test:
-          enabled: true
-          frequency: "weekly"
-          schedule: "0 2 * * 2"  # Tuesday at 2 AM UTC
-          steps:
-            - "Reduce resources to 50%"
-            - "Verify graceful degradation"
-            - "Restore resources"
-            - "Verify full functionality"
-          expected_duration: 600s
-          success_criteria:
-            - "degradation_time < 60s"
-            - "essential_services_available = true"
-            - "application_error_rate < 0.10"
-      
-      notification:
-        before_drill:
-          enabled: true
-          lead_time: 3600s  # 1 hour
-          channels:
-            - "#ops-team"
-            - "ops@machinenativeops.com"
-        
-        during_drill:
-          enabled: true
-          interval: 300s
-          channels:
-            - "#ops-team"
-        
-        after_drill:
-          enabled: true
-          channels:
-            - "#ops-team"
-            - "management@machinenativeops.com"
-          include_results: true
-    
-    # DR Performance Metrics
-    performance_metrics:
-      enabled: true
-      
-      metrics:
-        rto:
-          description: "Recovery Time Objective"
-          target: 14400s  # 4 hours
-          warning_threshold: 10800s  # 3 hours
-          critical_threshold: 14400s  # 4 hours
-        
-        rpo:
-          description: "Recovery Point Objective"
-          target: 3600s  # 1 hour
-          warning_threshold: 1800s  # 30 minutes
-          critical_threshold: 3600s  # 1 hour
-        
-        failover_time:
-          description: "Time to failover to backup"
-          target: 300s
-          warning_threshold: 200s
-          critical_threshold: 300s
-        
-        data_loss:
-          description: "Amount of data lost during failover"
-          target: 0
-          warning_threshold: 0
-          critical_threshold: 0
-        
-        backup_success_rate:
-          description: "Percentage of successful backups"
-          target: 1.0
-          warning_threshold: 0.95
-          critical_threshold: 0.90
-        
-        restore_success_rate:
-          description: "Percentage of successful restores"
-          target: 1.0
-          warning_threshold: 0.95
-          critical_threshold: 0.90
-        
-        drill_success_rate:
-          description: "Percentage of successful DR drills"
-          target: 1.0
-          warning_threshold: 0.95
-          critical_threshold: 0.90
-      
-      collection_interval: 60s
-      retention_days: 90
-    
-    # DR Test Results Documentation
-    test_documentation:
-      enabled: true
-      
-      storage:
-        type: "s3"
-        bucket: "machinenativeops-dr-results"
-        prefix: "dr-tests/"
-        retention_days: 365
-      
-      format: "json"
-      include:
-        - "test_metadata"
-        - "timestamp"
-        - "duration"
-        - "success"
-        - "errors"
-        - "metrics"
-        - "logs"
-        - "screenshots"
-        - "test_results"
-      
-      analysis:
-        enabled: true
-        trends:
-          - "rto_trend"
-          - "rpo_trend"
-          - "failover_time_trend"
-          - "success_rate_trend"
-        
-        comparison:
-          - "vs_target"
-          - "vs_previous"
-          - "vs_average"
-        
-        recommendations:
-          enabled: true
-          auto_generate: true
-          severity_levels:
-            - "critical"
-            - "warning"
-            - "info"
-    
-    # DR Procedure Updates
-    procedure_updates:
-      enabled: true
-      
-      triggers:
-        - "failed_dr_test"
-        - "missed_sla"
-        - "lessons_learned"
-        - "infrastructure_change"
-        - "security_incident"
-      
-      approval_process:
-        required: true
-        approvers:
-          - "ops-team"
-          - "engineering-team"
-          - "security-team"
-        
-      version_control:
-        enabled: true
-        track_changes: true
-        require_review: true
-      
-      communication:
-        before_update:
-          enabled: true
-          channels:
-            - "#ops-team"
-            - "#engineering-team"
-        
-        after_update:
-          enabled: true
-          channels:
-            - "#ops-team"
-            - "#engineering-team"
-            - "management"
-          include_changelog: true
-    
-    # Lessons Learned
-    lessons_learned:
-      enabled: true
-      
-      collection:
-        automated: true
-        manual_entry: true
-        sources:
-          - "dr_tests"
-          - "incidents"
-          - "chaos_experiments"
-          - "postmortems"
-      
-      categories:
-        - "infrastructure"
-        - "process"
-        - "people"
-        - "tools"
-        - "documentation"
-      
-      action_items:
-        auto_create: true
-        assignee_required: true
-        due_date_required: true
-        priority_levels:
-          - "critical"
-          - "high"
-          - "medium"
-          - "low"
-        
-      tracking:
-        enabled: true
-        status_updates: true
-        closure_required: true
-        retrospective: true
-      
-      knowledge_base:
-        enabled: true
-        auto_publish: true
-        search_enabled: true
-        tags:
-          - "disaster-recovery"
-          - "lessons-learned"
-          - "improvements"

@@ -23,7 +23,7 @@ validation_pipeline:
   pipeline_id: "QUANTUM-VALIDATION-PIPELINE-001"
   stages:
     - stage_id: "STAGE-1"
-      name: "Semantic Validation"
+      name: "Schema Validation"
       algorithm: "QUANTUM-SEMANTIC"
       qubits: "16-24"
       timeout: "< 50ms"

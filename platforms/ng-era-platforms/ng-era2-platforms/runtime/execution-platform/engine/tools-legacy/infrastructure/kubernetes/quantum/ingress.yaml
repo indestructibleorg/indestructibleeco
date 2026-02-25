@@ -1,43 +1,38 @@
-# @ECO-layer: GQS-L0
-# @ECO-governed
-# @ECO-layer: governance
-# @ECO-semantic: ingress
-# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
-# 
-# GL Unified Architecture Governance Framework Activated
-
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    eco-base/uri: eco-base://k8s/core/ingress/quantumflow-ingress
+    eco-base/urn: urn:eco-base:k8s:core:ingress:quantumflow-ingress:sha256-e492d641541047e6e1d1e69c8623aeb8f4f8f7dd56c9143f6fb0dbe7f7874c98
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+    nginx.ingress.kubernetes.io/rate-limit: '100'
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+  labels: {}
   name: quantumflow-ingress
   namespace: quantumflow
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/rate-limit: "100"
 spec:
-  tls:
-  - hosts:
-    - quantumflow.example.com
-    secretName: quantumflow-tls
   rules:
   - host: quantumflow.example.com
     http:
       paths:
-      - path: /api
-        pathType: Prefix
-        backend:
+      - backend:
           service:
             name: quantumflow-backend
             port:
               number: 8000
-      - path: /
+        path: /api
         pathType: Prefix
-        backend:
+      - backend:
           service:
             name: quantumflow-frontend
             port:
               number: 80
-
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - quantumflow.example.com
+    secretName: quantumflow-tls

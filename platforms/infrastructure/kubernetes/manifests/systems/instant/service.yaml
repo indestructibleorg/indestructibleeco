@@ -1,32 +1,25 @@
-# @ECO-governed
-# @ECO-layer: infrastructure
-# @ECO-semantic: kubernetes-service-instant
-# @ECO-audit-trail: ../../../engine/governance/GL_SEMANTIC_ANCHOR.json
-#
-# GL Unified Architecture Governance Framework Activated
-# Instant System Service Manifest
-
+---
 apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:kubernetes:manifests:systems:instant:service.yaml"
-    eco-base/uri: "eco-base://platform/resource/infrastructure/kubernetes/manifests/systems/instant/service.yaml"
+    eco-base/uri: eco-base://k8s/core/service/instant-service
+    eco-base/urn: urn:eco-base:k8s:core:service:instant-service:sha256-9ed122585810802bba5d016a27976ce811d8cc4e5a533bd48f3a959754c2a9f9
+  labels:
+    app.kubernetes.io/app.kubernetes.io/component: data
+    app.kubernetes.io/name: instant-system
+    app.kubernetes.io/part-of: machine-native-ops
+    eco-base/governance: aligned
+    eco-base/part-of: eco-base
+    governance.machinenativeops.io/charter-version: 2.0.0
   name: instant-service
   namespace: platform-03
-  labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-    app.kubernetes.io/name: instant-system
-    app.kubernetes.io/app.kubernetes.io/component: data
-    app.kubernetes.io/part-of: machine-native-ops
-    governance.machinenativeops.io/charter-version: "2.0.0"
 spec:
-  type: ClusterIP
   ports:
-    - name: http
-      port: 80
-      targetPort: http
-      protocol: TCP
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
   selector:
     app.kubernetes.io/name: instant-system
+  type: ClusterIP

@@ -1,650 +1,222 @@
-# @ECO-governed
-# @ECO-layer: infrastructure
-# @ECO-semantic: extended-platforms-integrations
-# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
-# 
-# GL Unified Architecture Governance Framework Activated
-
-# Extended Platforms Integrations Configuration
-# Integrations for Cloudflare, Supabase, GitBook, and other platforms
-
+---
 apiVersion: v1
+data:
+  additional-integrations.yaml: "additionalIntegrations:\n  # Vercel Integration\n\
+    \  vercel:\n    enabled: ${VERCEL_ENABLED:-false}\n    teamId: ${VERCEL_TEAM_ID:-}\n\
+    \    projectId: ${VERCEL_PROJECT_ID:-}\n    deployments:\n      preview:\n   \
+    \     branch: preview/*\n        environment:\n          - name: ENVIRONMENT\n\
+    \            value: preview\n      production:\n        branch: main\n       \
+    \ environment:\n          - name: ENVIRONMENT\n            value: production\n\
+    \    domains:\n      - machine-native-ops.com\n      - www.machine-native-ops.com\n\
+    \    env:\n      - name: DATABASE_URL\n        value: ${DATABASE_URL:-}\n    \
+    \  - name: REDIS_URL\n        value: ${REDIS_URL:-}\n      - name: NEXT_PUBLIC_API_URL\n\
+    \        value: ${NEXT_PUBLIC_API_URL:-https://api.machine-native-ops.com}\n \
+    \   build:\n      command: npm run build\n      outputDirectory: .next\n    webhooks:\n\
+    \      enabled: true\n      url: ${WEBHOOK_ENDPOINT:-https://api.machine-native-ops.com/webhooks/vercel}\n\
+    \      secret: ${VERCEL_WEBHOOK_SECRET:-}\n  \n  # Netlify Integration\n  netlify:\n\
+    \    enabled: ${NETLIFY_ENABLED:-false}\n    siteId: ${NETLIFY_SITE_ID:-}\n  \
+    \  build:\n      command: npm run build\n      publish: dist\n      functions:\
+    \ netlify/functions\n    domains:\n      - machine-native-ops.netlify.app\n  \
+    \  env:\n      - name: DATABASE_URL\n        value: ${DATABASE_URL:-}\n      -\
+    \ name: REDIS_URL\n        value: ${REDIS_URL:-}\n    headers:\n      - pattern:\
+    \ /*\n        headers:\n          - name: X-Frame-Options\n            value:\
+    \ DENY\n          - name: X-Content-Type-Options\n            value: nosniff\n\
+    \    redirects:\n      - from: /old-path/*\n        to: /new-path/:splat\n   \
+    \     status: 301\n    webhooks:\n      enabled: true\n      url: ${WEBHOOK_ENDPOINT:-https://api.machine-native-ops.com/webhooks/netlify}\n\
+    \      secret: ${NETLIFY_WEBHOOK_SECRET:-}\n  \n  # Render Integration\n  render:\n\
+    \    enabled: ${RENDER_ENABLED:-false}\n    serviceId: ${RENDER_SERVICE_ID:-}\n\
+    \    type: web_service\n    env:\n      - name: DATABASE_URL\n        value: ${DATABASE_URL:-}\n\
+    \      - name: REDIS_URL\n        value: ${REDIS_URL:-}\n    build:\n      command:\
+    \ npm run build\n      outputDirectory: dist\n    scaling:\n      instances: 1\n\
+    \      memory: 512\n      cpu: 0.5\n    healthCheck:\n      enabled: true\n  \
+    \    path: /health\n      interval: 30\n      timeout: 5\n    webhooks:\n    \
+    \  enabled: true\n      url: ${WEBHOOK_ENDPOINT:-https://api.machine-native-ops.com/webhooks/render}\n\
+    \      secret: ${RENDER_WEBHOOK_SECRET:-}\n  \n  # Railway Integration\n  railway:\n\
+    \    enabled: ${RAILWAY_ENABLED:-false}\n    projectId: ${RAILWAY_PROJECT_ID:-}\n\
+    \    environment:\n      - name: DATABASE_URL\n        value: ${DATABASE_URL:-}\n\
+    \      - name: REDIS_URL\n        value: ${REDIS_URL:-}\n    services:\n     \
+    \ - name: machine-native-ops\n        env: node\n        buildCommand: npm run\
+    \ build\n        startCommand: npm start\n        scaling:\n          minInstances:\
+    \ 1\n          maxInstances: 3\n    webhooks:\n      enabled: true\n      url:\
+    \ ${WEBHOOK_ENDPOINT:-https://api.machine-native-ops.com/webhooks/railway}\n \
+    \     secret: ${RAILWAY_WEBHOOK_SECRET:-}"
+  cloudflare-integrations.yaml: "cloudflareIntegrations:\n  # Webhook Integration\n\
+    \  webhook:\n    enabled: ${CLOUDFLARE_WEBHOOK_ENABLED:-true}\n    secret: ${CLOUDFLARE_WEBHOOK_SECRET:-}\n\
+    \    endpoints:\n      - url: ${API_WEBHOOK_URL:-https://api.machine-native-ops.com/webhooks/cloudflare}\n\
+    \        events:\n          - worker.script.published\n          - worker.script.updated\n\
+    \          - worker.script.deployed\n        headers:\n          - name: User-Agent\n\
+    \            value: Cloudflare-Webhook\n          - name: X-Cloudflare-Signature\n\
+    \            value: ${CLOUDFLARE_WEBHOOK_SECRET:-}\n  \n  # Analytics Integration\n\
+    \  analytics:\n    enabled: ${CLOUDFLARE_ANALYTICS_ENABLED:-true}\n    provider:\
+    \ ${ANALYTICS_PROVIDER:-google-analytics}\n    trackingId: ${GA_TRACKING_ID:-}\n\
+    \    metrics:\n      - pageViews\n      - uniqueVisitors\n      - bounceRate\n\
+    \      - sessionDuration\n    events:\n      - workerInvocation\n      - databaseQuery\n\
+    \      - storageOperation\n    dimensions:\n      - workerName\n      - route\n\
+    \      - status\n      - errorType\n  \n  # Logging Integration\n  logging:\n\
+    \    enabled: ${CLOUDFLARE_LOGGING_ENABLED:-true}\n    provider: ${LOGGING_PROVIDER:-cloudflare}\n\
+    \    logPush:\n      enabled: true\n      destination:\n        type: r2\n   \
+    \     bucketName: ${CLOUDFLARE_R2_BUCKET:-machine-native-ops-logs}\n        path:\
+    \ /logs/worker/{date}\n    logLevel: ${LOG_LEVEL:-info}\n    includeMetadata:\
+    \ true\n    sampling: ${LOG_SAMPLING:-1.0}\n  \n  # Monitoring Integration\n \
+    \ monitoring:\n    enabled: ${CLOUDFLARE_MONITORING_ENABLED:-true}\n    provider:\
+    \ ${MONITORING_PROVIDER:-prometheus}\n    metricsEndpoint: ${PROMETHEUS_REMOTE_WRITE_URL:-}\n\
+    \    metrics:\n      - name: worker_requests_total\n        type: counter\n  \
+    \      labels:\neco-base/part-of: eco-base\neco-base/governance: aligned\n   \
+    \       - worker_name\n          - route\n          - status\n      - name: worker_duration_seconds\n\
+    \        type: histogram\n        labels:\neco-base/part-of: eco-base\neco-base/governance:\
+    \ aligned\n          - worker_name\n          - route\n        buckets:\n    \
+    \      - 0.005\n          - 0.01\n          - 0.025\n          - 0.05\n      \
+    \    - 0.1\n          - 0.25\n          - 0.5\n          - 1\n          - 2.5\n\
+    \          - 5\n          - 10\n      - name: kv_operations_total\n        type:\
+    \ counter\n        labels:\neco-base/part-of: eco-base\neco-base/governance: aligned\n\
+    \          - operation\n          - status\n      - name: r2_operations_total\n\
+    \        type: counter\n        labels:\neco-base/part-of: eco-base\neco-base/governance:\
+    \ aligned\n          - operation\n          - status\n  \n  # D1 Database Integration\n\
+    \  d1Integration:\n    enabled: ${CLOUDFLARE_D1_INTEGRATION_ENABLED:-true}\n \
+    \   connectionPooling:\n      enabled: true\n      maxConnections: 10\n      idleTimeout:\
+    \ 30\n    queryLogging:\n      enabled: true\n      slowQueryThreshold: 1000 \
+    \ # milliseconds\n    migrations:\n      autoApply: true\n      path: ./cloudflare/d1/migrations\n\
+    \    backups:\n      enabled: true\n      schedule: \"0 2 * * *\"  # Daily at\
+    \ 2 AM\n      retention: 7\n  \n  # R2 Storage Integration\n  r2Integration:\n\
+    \    enabled: ${CLOUDFLARE_R2_INTEGRATION_ENABLED:-true}\n    lifecycle:\n   \
+    \   enabled: true\n      rules:\n        - id: transition-to-infrequent-access\n\
+    \          status: enabled\n          transitions:\n            - days: 30\n \
+    \             storageClass: INFREQUENT_ACCESS\n        - id: expire-old-files\n\
+    \          status: enabled\n          expiration:\n            days: 365\n   \
+    \ versioning:\n      enabled: true\n      maxVersions: 10\n    encryption:\n \
+    \     type: AES256\n      kmsKeyId: ${KMS_KEY_ID:-}\n  \n  # Pages Integration\n\
+    \  pagesIntegration:\n    enabled: ${CLOUDFLARE_PAGES_INTEGRATION_ENABLED:-true}\n\
+    \    previewDeployments:\n      enabled: true\n      branch: preview/*\n     \
+    \ environment:\n        - name: ENVIRONMENT\n          value: preview\n    productionBranch:\
+    \ main\n    build:\n      command: npm run build\n      outputDirectory: dist\n\
+    \      environment:\n        - name: NODE_ENV\n          value: production\n \
+    \       - name: VITE_API_URL\n          value: ${API_URL:-https://api.machine-native-ops.com}\n\
+    \    headers:\n      - pattern: /*\n        headers:\n          - name: X-Frame-Options\n\
+    \            value: DENY\n          - name: X-Content-Type-Options\n         \
+    \   value: nosniff\n          - name: X-XSS-Protection\n            value: 1;\
+    \ mode=block\n          - name: Strict-Transport-Security\n            value:\
+    \ max-age=31536000; includeSubDomains\n    redirects:\n      - source: /old-path/*\n\
+    \        destination: /new-path/:splat\n        statusCode: 301\n    rewrites:\n\
+    \      - source: /api/*\n        destination: https://api.machine-native-ops.com/:splat\n"
+  gitbook-integrations.yaml: "gitbookIntegrations:\n  # GitHub Integration\n  github:\n\
+    \    enabled: ${GITBOOK_GITHUB_INTEGRATION_ENABLED:-true}\n    repository: MachineNativeOps/machine-native-ops\n\
+    \    syncBranches:\n      - main\n      - develop\n    autoSync: true\n    syncInterval:\
+    \ 300  # 5 minutes\n    syncOptions:\n      - syncPages: true\n      - syncAssets:\
+    \ true\n      - syncNavigation: true\n      - createPullRequests: true\n    webhooks:\n\
+    \      enabled: true\n      events:\n        - push\n        - pull_request\n\
+    \        - pull_request_review\n      secret: ${GITHUB_WEBHOOK_SECRET:-}\n  \n\
+    \  # Slack Integration\n  slack:\n    enabled: ${GITBOOK_SLACK_INTEGRATION_ENABLED:-false}\n\
+    \    webhookUrl: ${SLACK_WEBHOOK_URL:-}\n    channels:\n      - name: documentation-updates\n\
+    \        events:\n          - page_published\n          - page_updated\n     \
+    \     - page_deleted\n        message: |\n          :page_facing_up: *GitBook\
+    \ Update*\n          \n          **Event**: {{event}}\n          **Page**: {{page.title}}\n\
+    \          **Author**: {{author.name}}\n          **URL**: {{page.url}}\n    \
+    \      \n          View changes: {{page.url}}\n      - name: api-updates\n   \
+    \     events:\n          - api_reference_updated\n        message: |\n       \
+    \   :books: *API Reference Updated*\n          \n          **Event**: {{event}}\n\
+    \          **API**: {{api.name}}\n          **Version**: {{api.version}}\n   \
+    \       \n          View documentation: {{api.url}}\n  \n  # Analytics Integration\n\
+    \  analytics:\n    enabled: ${GITBOOK_ANALYTICS_ENABLED:-true}\n    providers:\n\
+    \      - name: google-analytics\n        enabled: ${GA_ENABLED:-false}\n     \
+    \   trackingId: ${GA_TRACKING_ID:-}\n        anonymizeIp: true\n        allowAdPersonalizationSignals:\
+    \ false\n      - name: plausible\n        enabled: ${PLAUSIBLE_ENABLED:-false}\n\
+    \        domain: ${PLAUSIBLE_DOMAIN:-machine-native-ops.gitbook.io}\n        selfHosted:\
+    \ false\n      - name: amplitude\n        enabled: ${AMPLITUDE_ENABLED:-false}\n\
+    \        apiKey: ${AMPLITUDE_API_KEY:-}\n        serverUrl: ${AMPLITUDE_SERVER_URL:-https://api.amplitude.com}\n\
+    \    events:\n      - page_view\n      - search\n      - page_scroll\n      -\
+    \ time_on_page\n  \n  # SEO Integration\n  seo:\n    enabled: ${GITBOOK_SEO_ENABLED:-true}\n\
+    \    title: MachineNativeOps Documentation\n    description: Comprehensive documentation\
+    \ for the MachineNativeOps platform\n    keywords:\n      - MachineNativeOps\n\
+    \      - Machine Learning\n      - AI\n      - Infrastructure\n      - DevOps\n\
+    \    ogImage: ${GITBOOK_OG_IMAGE:-https://machine-native-ops.com/og-image.png}\n\
+    \    twitterCard: summary_large_image\n    canonicalUrl: ${GITBOOK_CANONICAL_URL:-https://machine-native-ops.gitbook.io}\n\
+    \    robots: index,follow\n    sitemap:\n      enabled: true\n      changefreq:\
+    \ weekly\n      priority: 0.8\n  \n  # API Reference Integration\n  apiReference:\n\
+    \    enabled: ${GITBOOK_API_REFERENCE_ENABLED:-true}\n    openApiSpec: ./openapi.yaml\n\
+    \    theme: light\n    servers:\n      - url: ${API_URL:-https://api.machine-native-ops.com}\n\
+    \        description: Production API\n      - url: https://staging-api.machine-native-ops.com\n\
+    \        description: Staging API\n    authentication:\n      type: bearer\n \
+    \     scheme: jwt\n      bearerFormat: JWT\n    codeSamples:\n      enabled: true\n\
+    \      languages:\n        - javascript\n        - python\n        - go\n    \
+    \    - rust\n        - curl\n  \n  # Webhooks\n  webhooks:\n    enabled: ${GITBOOK_WEBHOOKS_ENABLED:-true}\n\
+    \    secret: ${GITBOOK_WEBHOOK_SECRET:-}\n    events:\n      - content.published\n\
+    \      - content.updated\n      - content.deleted\n      - content.moved\n   \
+    \ endpoints:\n      - url: ${WEBHOOK_ENDPOINT:-https://api.machine-native-ops.com/webhooks/gitbook}\n\
+    \        secret: ${WEBHOOK_SECRET:-}\n        events:\n          - content.published\n\
+    \          - content.updated\n        headers:\n          - name: User-Agent\n\
+    \            value: GitBook-Webhook\n          - name: X-GitBook-Signature\n \
+    \           value: ${GITBOOK_WEBHOOK_SECRET:-}\n      - url: ${SLACK_WEBHOOK_URL:-}\n\
+    \        secret: ${SLACK_WEBHOOK_SECRET:-}\n        events:\n          - content.published\n\
+    \          - content.updated\n        format: slack\n  \n  # Search Integration\n\
+    \  search:\n    enabled: ${GITBOOK_SEARCH_ENABLED:-true}\n    provider: algolia\n\
+    \    apiKey: ${ALGOLIA_API_KEY:-}\n    appId: ${ALGOLIA_APP_ID:-}\n    indexName:\
+    \ ${ALGOLIA_INDEX_NAME:-machine-native-ops-docs}\n    searchableAttributes:\n\
+    \      - title\n      - content\n      - headings\n    attributesToRetrieve:\n\
+    \      - title\n      - content\n      - url\n      - excerpt\n    customSettings:\n\
+    \      - searchableAttributes:\n          - unordered(title)\n          - unordered(content)\n\
+    \      - attributesToSnippet:\n          - content:20\n      - snippetEllipsisText:\
+    \ \"...\"\n"
+  supabase-integrations.yaml: "supabaseIntegrations:\n  # Webhook Integration\n  webhook:\n\
+    \    enabled: ${SUPABASE_WEBHOOK_ENABLED:-true}\n    secret: ${SUPABASE_WEBHOOK_SECRET:-}\n\
+    \    endpoints:\n      - url: ${API_WEBHOOK_URL:-https://api.machine-native-ops.com/webhooks/supabase}\n\
+    \        events:\n          - database.*\n          - storage.*\n          - auth.*\n\
+    \        headers:\n          - name: User-Agent\n            value: Supabase-Webhook\n\
+    \          - name: X-Supabase-Signature\n            value: ${SUPABASE_WEBHOOK_SECRET:-}\n\
+    \  \n  # PostgreSQL Integration\n  postgresqlIntegration:\n    enabled: ${SUPABASE_POSTGRESQL_INTEGRATION_ENABLED:-true}\n\
+    \    connectionString: ${SUPABASE_DATABASE_URL:-}\n    poolSize: ${SUPABASE_POOL_SIZE:-10}\n\
+    \    connectionTimeout: 30\n    queryTimeout: 60\n    idleTimeout: 300\n    sslMode:\
+    \ require\n    migrations:\n      autoApply: true\n      path: ./supabase/migrations\n\
+    \      table: supabase_migrations\n    replication:\n      enabled: false\n  \
+    \    slotName: supabase_replication_slot\n      publicationName: supabase_publication\n\
+    \    backups:\n      enabled: true\n      retention: 7\n      schedule: \"0 2\
+    \ * * *\"  # Daily at 2 AM\n  \n  # Realtime Integration\n  realtimeIntegration:\n\
+    \    enabled: ${SUPABASE_REALTIME_INTEGRATION_ENABLED:-true}\n    channels:\n\
+    \      - name: notifications\n        config:\n          broadcast:\n        \
+    \    - self: true\n            - others: true\n          presence:\n         \
+    \   - key: user_id\n          postgresChanges:\n            - event: INSERT\n\
+    \              schema: public\n              table: notifications\n          \
+    \    filter: user_id=eq.user_id()\n    subscriptions:\n      - name: user-notifications\n\
+    \        channel: notifications\n        events:\n          - postgres_changes\n\
+    \          - broadcast\n          - presence\n    jwt:\n      issuer: https://${SUPABASE_PROJECT_ID}.supabase.co/auth/v1\n\
+    \      audience: authenticated\n      expiration: 3600\n  \n  # Storage Integration\n\
+    \  storageIntegration:\n    enabled: ${SUPABASE_STORAGE_INTEGRATION_ENABLED:-true}\n\
+    \    buckets:\n      - name: documents\n        config:\n          public: false\n\
+    \          fileSizeLimit: 10485760  # 10MB\n          allowedMimeTypes:\n    \
+    \        - application/pdf\n            - application/msword\n          cors:\n\
+    \            allowedOrigins:\n              - https://machine-native-ops.com\n\
+    \            allowedMethods:\n              - POST\n              - GET\n    \
+    \          - PUT\n              - DELETE\n    policies:\n      - name: documents-select-own\n\
+    \        bucket: documents\n        operation: SELECT\n        definition: \"\
+    auth.uid() = storage.foldername\"\n    transformations:\n      enabled: true\n\
+    \      formats:\n        - thumbnail:\n            width: 200\n            height:\
+    \ 200\n            fit: cover\n        - medium:\n            width: 800\n   \
+    \         height: 600\n            fit: inside\n  \n  # Edge Functions Integration\n\
+    \  edgeFunctionsIntegration:\n    enabled: ${SUPABASE_EDGE_FUNCTIONS_INTEGRATION_ENABLED:-true}\n\
+    \    runtime: deno\n    timeout: 60\n    memory: 512\n    functions:\n      -\
+    \ name: webhook-handler\n        path: /webhook\n        method: POST\n      \
+    \  code: ./supabase/functions/webhook-handler/index.ts\n        env:\n       \
+    \   - name: WEBHOOK_SECRET\n            value: ${WEBHOOK_SECRET:-}\n         \
+    \ - name: DATABASE_URL\n            value: ${SUPABASE_DATABASE_URL:-}\n    deployment:\n\
+    \      autoDeploy: true\n      branch: main\n    monitoring:\n      enabled: true\n\
+    \      metricsEndpoint: ${PROMETHEUS_REMOTE_WRITE_URL:-}\n      logs:\n      \
+    \  enabled: true\n        level: info\n  \n  # Auth Integration\n  authIntegration:\n\
+    \    enabled: ${SUPABASE_AUTH_INTEGRATION_ENABLED:-true}\n    providers:\n   \
+    \   - name: email\n        enabled: true\n        requireEmailConfirmation: true\n\
+    \      - name: google\n        enabled: ${GOOGLE_AUTH_ENABLED:-true}\n       \
+    \ clientId: ${GOOGLE_OAUTH_CLIENT_ID:-}\n        clientSecret: ${GOOGLE_OAUTH_CLIENT_SECRET:-}\n\
+    \        scopes:\n          - email\n          - profile\n      - name: github\n\
+    \        enabled: ${GITHUB_AUTH_ENABLED:-true}\n        clientId: ${GITHUB_OAUTH_CLIENT_ID:-}\n\
+    \        clientSecret: ${GITHUB_OAUTH_CLIENT_SECRET:-}\n        scopes:\n    \
+    \      - user:email\n          - read:user\n    session:\n      duration: 3600\
+    \  # 1 hour\n      inactivityTimeout: 300  # 5 minutes\n    mfa:\n      enabled:\
+    \ ${SUPABASE_MFA_ENABLED:-true}\n      factor: totp\n      issuer: MachineNativeOps\n\
+    \    jwt:\n      secret: ${SUPABASE_JWT_SECRET:-}\n      expiration: 3600\n  \
+    \    refreshExpiration: 604800  # 7 days\n"
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:extended-platforms-integrations.yaml"
-    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/extended-platforms-integrations.yaml"
+    eco-base/uri: eco-base://k8s/core/configmap/extended-platforms-integrations
+    eco-base/urn: urn:eco-base:k8s:core:configmap:extended-platforms-integrations:sha256-4948fda0af39a55212698a5f85ab3446d0c8c37cfe1d55763bb8744d57c536a2
+  labels: {}
   name: extended-platforms-integrations
   namespace: production
-data:
-  # Cloudflare Integrations
-  cloudflare-integrations.yaml: |
-    cloudflareIntegrations:
-      # Webhook Integration
-      webhook:
-        enabled: ${CLOUDFLARE_WEBHOOK_ENABLED:-true}
-        secret: ${CLOUDFLARE_WEBHOOK_SECRET:-}
-        endpoints:
-          - url: ${API_WEBHOOK_URL:-https://api.machine-native-ops.com/webhooks/cloudflare}
-            events:
-              - worker.script.published
-              - worker.script.updated
-              - worker.script.deployed
-            headers:
-              - name: User-Agent
-                value: Cloudflare-Webhook
-              - name: X-Cloudflare-Signature
-                value: ${CLOUDFLARE_WEBHOOK_SECRET:-}
-      
-      # Analytics Integration
-      analytics:
-        enabled: ${CLOUDFLARE_ANALYTICS_ENABLED:-true}
-        provider: ${ANALYTICS_PROVIDER:-google-analytics}
-        trackingId: ${GA_TRACKING_ID:-}
-        metrics:
-          - pageViews
-          - uniqueVisitors
-          - bounceRate
-          - sessionDuration
-        events:
-          - workerInvocation
-          - databaseQuery
-          - storageOperation
-        dimensions:
-          - workerName
-          - route
-          - status
-          - errorType
-      
-      # Logging Integration
-      logging:
-        enabled: ${CLOUDFLARE_LOGGING_ENABLED:-true}
-        provider: ${LOGGING_PROVIDER:-cloudflare}
-        logPush:
-          enabled: true
-          destination:
-            type: r2
-            bucketName: ${CLOUDFLARE_R2_BUCKET:-machine-native-ops-logs}
-            path: /logs/worker/{date}
-        logLevel: ${LOG_LEVEL:-info}
-        includeMetadata: true
-        sampling: ${LOG_SAMPLING:-1.0}
-      
-      # Monitoring Integration
-      monitoring:
-        enabled: ${CLOUDFLARE_MONITORING_ENABLED:-true}
-        provider: ${MONITORING_PROVIDER:-prometheus}
-        metricsEndpoint: ${PROMETHEUS_REMOTE_WRITE_URL:-}
-        metrics:
-          - name: worker_requests_total
-            type: counter
-            labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-              - worker_name
-              - route
-              - status
-          - name: worker_duration_seconds
-            type: histogram
-            labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-              - worker_name
-              - route
-            buckets:
-              - 0.005
-              - 0.01
-              - 0.025
-              - 0.05
-              - 0.1
-              - 0.25
-              - 0.5
-              - 1
-              - 2.5
-              - 5
-              - 10
-          - name: kv_operations_total
-            type: counter
-            labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-              - operation
-              - status
-          - name: r2_operations_total
-            type: counter
-            labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-              - operation
-              - status
-      
-      # D1 Database Integration
-      d1Integration:
-        enabled: ${CLOUDFLARE_D1_INTEGRATION_ENABLED:-true}
-        connectionPooling:
-          enabled: true
-          maxConnections: 10
-          idleTimeout: 30
-        queryLogging:
-          enabled: true
-          slowQueryThreshold: 1000  # milliseconds
-        migrations:
-          autoApply: true
-          path: ./cloudflare/d1/migrations
-        backups:
-          enabled: true
-          schedule: "0 2 * * *"  # Daily at 2 AM
-          retention: 7
-      
-      # R2 Storage Integration
-      r2Integration:
-        enabled: ${CLOUDFLARE_R2_INTEGRATION_ENABLED:-true}
-        lifecycle:
-          enabled: true
-          rules:
-            - id: transition-to-infrequent-access
-              status: enabled
-              transitions:
-                - days: 30
-                  storageClass: INFREQUENT_ACCESS
-            - id: expire-old-files
-              status: enabled
-              expiration:
-                days: 365
-        versioning:
-          enabled: true
-          maxVersions: 10
-        encryption:
-          type: AES256
-          kmsKeyId: ${KMS_KEY_ID:-}
-      
-      # Pages Integration
-      pagesIntegration:
-        enabled: ${CLOUDFLARE_PAGES_INTEGRATION_ENABLED:-true}
-        previewDeployments:
-          enabled: true
-          branch: preview/*
-          environment:
-            - name: ENVIRONMENT
-              value: preview
-        productionBranch: main
-        build:
-          command: npm run build
-          outputDirectory: dist
-          environment:
-            - name: NODE_ENV
-              value: production
-            - name: VITE_API_URL
-              value: ${API_URL:-https://api.machine-native-ops.com}
-        headers:
-          - pattern: /*
-            headers:
-              - name: X-Frame-Options
-                value: DENY
-              - name: X-Content-Type-Options
-                value: nosniff
-              - name: X-XSS-Protection
-                value: 1; mode=block
-              - name: Strict-Transport-Security
-                value: max-age=31536000; includeSubDomains
-        redirects:
-          - source: /old-path/*
-            destination: /new-path/:splat
-            statusCode: 301
-        rewrites:
-          - source: /api/*
-            destination: https://api.machine-native-ops.com/:splat
-  
-  # Supabase Integrations
-  supabase-integrations.yaml: |
-    supabaseIntegrations:
-      # Webhook Integration
-      webhook:
-        enabled: ${SUPABASE_WEBHOOK_ENABLED:-true}
-        secret: ${SUPABASE_WEBHOOK_SECRET:-}
-        endpoints:
-          - url: ${API_WEBHOOK_URL:-https://api.machine-native-ops.com/webhooks/supabase}
-            events:
-              - database.*
-              - storage.*
-              - auth.*
-            headers:
-              - name: User-Agent
-                value: Supabase-Webhook
-              - name: X-Supabase-Signature
-                value: ${SUPABASE_WEBHOOK_SECRET:-}
-      
-      # PostgreSQL Integration
-      postgresqlIntegration:
-        enabled: ${SUPABASE_POSTGRESQL_INTEGRATION_ENABLED:-true}
-        connectionString: ${SUPABASE_DATABASE_URL:-}
-        poolSize: ${SUPABASE_POOL_SIZE:-10}
-        connectionTimeout: 30
-        queryTimeout: 60
-        idleTimeout: 300
-        sslMode: require
-        migrations:
-          autoApply: true
-          path: ./supabase/migrations
-          table: supabase_migrations
-        replication:
-          enabled: false
-          slotName: supabase_replication_slot
-          publicationName: supabase_publication
-        backups:
-          enabled: true
-          retention: 7
-          schedule: "0 2 * * *"  # Daily at 2 AM
-      
-      # Realtime Integration
-      realtimeIntegration:
-        enabled: ${SUPABASE_REALTIME_INTEGRATION_ENABLED:-true}
-        channels:
-          - name: notifications
-            config:
-              broadcast:
-                - self: true
-                - others: true
-              presence:
-                - key: user_id
-              postgresChanges:
-                - event: INSERT
-                  schema: public
-                  table: notifications
-                  filter: user_id=eq.user_id()
-        subscriptions:
-          - name: user-notifications
-            channel: notifications
-            events:
-              - postgres_changes
-              - broadcast
-              - presence
-        jwt:
-          issuer: https://${SUPABASE_PROJECT_ID}.supabase.co/auth/v1
-          audience: authenticated
-          expiration: 3600
-      
-      # Storage Integration
-      storageIntegration:
-        enabled: ${SUPABASE_STORAGE_INTEGRATION_ENABLED:-true}
-        buckets:
-          - name: documents
-            config:
-              public: false
-              fileSizeLimit: 10485760  # 10MB
-              allowedMimeTypes:
-                - application/pdf
-                - application/msword
-              cors:
-                allowedOrigins:
-                  - https://machine-native-ops.com
-                allowedMethods:
-                  - POST
-                  - GET
-                  - PUT
-                  - DELETE
-        policies:
-          - name: documents-select-own
-            bucket: documents
-            operation: SELECT
-            definition: "auth.uid() = storage.foldername"
-        transformations:
-          enabled: true
-          formats:
-            - thumbnail:
-                width: 200
-                height: 200
-                fit: cover
-            - medium:
-                width: 800
-                height: 600
-                fit: inside
-      
-      # Edge Functions Integration
-      edgeFunctionsIntegration:
-        enabled: ${SUPABASE_EDGE_FUNCTIONS_INTEGRATION_ENABLED:-true}
-        runtime: deno
-        timeout: 60
-        memory: 512
-        functions:
-          - name: webhook-handler
-            path: /webhook
-            method: POST
-            code: ./supabase/functions/webhook-handler/index.ts
-            env:
-              - name: WEBHOOK_SECRET
-                value: ${WEBHOOK_SECRET:-}
-              - name: DATABASE_URL
-                value: ${SUPABASE_DATABASE_URL:-}
-        deployment:
-          autoDeploy: true
-          branch: main
-        monitoring:
-          enabled: true
-          metricsEndpoint: ${PROMETHEUS_REMOTE_WRITE_URL:-}
-          logs:
-            enabled: true
-            level: info
-      
-      # Auth Integration
-      authIntegration:
-        enabled: ${SUPABASE_AUTH_INTEGRATION_ENABLED:-true}
-        providers:
-          - name: email
-            enabled: true
-            requireEmailConfirmation: true
-          - name: google
-            enabled: ${GOOGLE_AUTH_ENABLED:-true}
-            clientId: ${GOOGLE_OAUTH_CLIENT_ID:-}
-            clientSecret: ${GOOGLE_OAUTH_CLIENT_SECRET:-}
-            scopes:
-              - email
-              - profile
-          - name: github
-            enabled: ${GITHUB_AUTH_ENABLED:-true}
-            clientId: ${GITHUB_OAUTH_CLIENT_ID:-}
-            clientSecret: ${GITHUB_OAUTH_CLIENT_SECRET:-}
-            scopes:
-              - user:email
-              - read:user
-        session:
-          duration: 3600  # 1 hour
-          inactivityTimeout: 300  # 5 minutes
-        mfa:
-          enabled: ${SUPABASE_MFA_ENABLED:-true}
-          factor: totp
-          issuer: MachineNativeOps
-        jwt:
-          secret: ${SUPABASE_JWT_SECRET:-}
-          expiration: 3600
-          refreshExpiration: 604800  # 7 days
-  
-  # GitBook Integrations
-  gitbook-integrations.yaml: |
-    gitbookIntegrations:
-      # GitHub Integration
-      github:
-        enabled: ${GITBOOK_GITHUB_INTEGRATION_ENABLED:-true}
-        repository: MachineNativeOps/machine-native-ops
-        syncBranches:
-          - main
-          - develop
-        autoSync: true
-        syncInterval: 300  # 5 minutes
-        syncOptions:
-          - syncPages: true
-          - syncAssets: true
-          - syncNavigation: true
-          - createPullRequests: true
-        webhooks:
-          enabled: true
-          events:
-            - push
-            - pull_request
-            - pull_request_review
-          secret: ${GITHUB_WEBHOOK_SECRET:-}
-      
-      # Slack Integration
-      slack:
-        enabled: ${GITBOOK_SLACK_INTEGRATION_ENABLED:-false}
-        webhookUrl: ${SLACK_WEBHOOK_URL:-}
-        channels:
-          - name: documentation-updates
-            events:
-              - page_published
-              - page_updated
-              - page_deleted
-            message: |
-              :page_facing_up: *GitBook Update*
-              
-              **Event**: {{event}}
-              **Page**: {{page.title}}
-              **Author**: {{author.name}}
-              **URL**: {{page.url}}
-              
-              View changes: {{page.url}}
-          - name: api-updates
-            events:
-              - api_reference_updated
-            message: |
-              :books: *API Reference Updated*
-              
-              **Event**: {{event}}
-              **API**: {{api.name}}
-              **Version**: {{api.version}}
-              
-              View documentation: {{api.url}}
-      
-      # Analytics Integration
-      analytics:
-        enabled: ${GITBOOK_ANALYTICS_ENABLED:-true}
-        providers:
-          - name: google-analytics
-            enabled: ${GA_ENABLED:-false}
-            trackingId: ${GA_TRACKING_ID:-}
-            anonymizeIp: true
-            allowAdPersonalizationSignals: false
-          - name: plausible
-            enabled: ${PLAUSIBLE_ENABLED:-false}
-            domain: ${PLAUSIBLE_DOMAIN:-machine-native-ops.gitbook.io}
-            selfHosted: false
-          - name: amplitude
-            enabled: ${AMPLITUDE_ENABLED:-false}
-            apiKey: ${AMPLITUDE_API_KEY:-}
-            serverUrl: ${AMPLITUDE_SERVER_URL:-https://api.amplitude.com}
-        events:
-          - page_view
-          - search
-          - page_scroll
-          - time_on_page
-      
-      # SEO Integration
-      seo:
-        enabled: ${GITBOOK_SEO_ENABLED:-true}
-        title: MachineNativeOps Documentation
-        description: Comprehensive documentation for the MachineNativeOps platform
-        keywords:
-          - MachineNativeOps
-          - Machine Learning
-          - AI
-          - Infrastructure
-          - DevOps
-        ogImage: ${GITBOOK_OG_IMAGE:-https://machine-native-ops.com/og-image.png}
-        twitterCard: summary_large_image
-        canonicalUrl: ${GITBOOK_CANONICAL_URL:-https://machine-native-ops.gitbook.io}
-        robots: index,follow
-        sitemap:
-          enabled: true
-          changefreq: weekly
-          priority: 0.8
-      
-      # API Reference Integration
-      apiReference:
-        enabled: ${GITBOOK_API_REFERENCE_ENABLED:-true}
-        openApiSpec: ./openapi.yaml
-        theme: light
-        servers:
-          - url: ${API_URL:-https://api.machine-native-ops.com}
-            description: Production API
-          - url: https://staging-api.machine-native-ops.com
-            description: Staging API
-        authentication:
-          type: bearer
-          scheme: jwt
-          bearerFormat: JWT
-        codeSamples:
-          enabled: true
-          languages:
-            - javascript
-            - python
-            - go
-            - rust
-            - curl
-      
-      # Webhooks
-      webhooks:
-        enabled: ${GITBOOK_WEBHOOKS_ENABLED:-true}
-        secret: ${GITBOOK_WEBHOOK_SECRET:-}
-        events:
-          - content.published
-          - content.updated
-          - content.deleted
-          - content.moved
-        endpoints:
-          - url: ${WEBHOOK_ENDPOINT:-https://api.machine-native-ops.com/webhooks/gitbook}
-            secret: ${WEBHOOK_SECRET:-}
-            events:
-              - content.published
-              - content.updated
-            headers:
-              - name: User-Agent
-                value: GitBook-Webhook
-              - name: X-GitBook-Signature
-                value: ${GITBOOK_WEBHOOK_SECRET:-}
-          - url: ${SLACK_WEBHOOK_URL:-}
-            secret: ${SLACK_WEBHOOK_SECRET:-}
-            events:
-              - content.published
-              - content.updated
-            format: slack
-      
-      # Search Integration
-      search:
-        enabled: ${GITBOOK_SEARCH_ENABLED:-true}
-        provider: algolia
-        apiKey: ${ALGOLIA_API_KEY:-}
-        appId: ${ALGOLIA_APP_ID:-}
-        indexName: ${ALGOLIA_INDEX_NAME:-machine-native-ops-docs}
-        searchableAttributes:
-          - title
-          - content
-          - headings
-        attributesToRetrieve:
-          - title
-          - content
-          - url
-          - excerpt
-        customSettings:
-          - searchableAttributes:
-              - unordered(title)
-              - unordered(content)
-          - attributesToSnippet:
-              - content:20
-          - snippetEllipsisText: "..."
-  
-  # Additional Platforms Integrations
-  additional-integrations.yaml: |
-    additionalIntegrations:
-      # Vercel Integration
-      vercel:
-        enabled: ${VERCEL_ENABLED:-false}
-        teamId: ${VERCEL_TEAM_ID:-}
-        projectId: ${VERCEL_PROJECT_ID:-}
-        deployments:
-          preview:
-            branch: preview/*
-            environment:
-              - name: ENVIRONMENT
-                value: preview
-          production:
-            branch: main
-            environment:
-              - name: ENVIRONMENT
-                value: production
-        domains:
-          - machine-native-ops.com
-          - www.machine-native-ops.com
-        env:
-          - name: DATABASE_URL
-            value: ${DATABASE_URL:-}
-          - name: REDIS_URL
-            value: ${REDIS_URL:-}
-          - name: NEXT_PUBLIC_API_URL
-            value: ${NEXT_PUBLIC_API_URL:-https://api.machine-native-ops.com}
-        build:
-          command: npm run build
-          outputDirectory: .next
-        webhooks:
-          enabled: true
-          url: ${WEBHOOK_ENDPOINT:-https://api.machine-native-ops.com/webhooks/vercel}
-          secret: ${VERCEL_WEBHOOK_SECRET:-}
-      
-      # Netlify Integration
-      netlify:
-        enabled: ${NETLIFY_ENABLED:-false}
-        siteId: ${NETLIFY_SITE_ID:-}
-        build:
-          command: npm run build
-          publish: dist
-          functions: netlify/functions
-        domains:
-          - machine-native-ops.netlify.app
-        env:
-          - name: DATABASE_URL
-            value: ${DATABASE_URL:-}
-          - name: REDIS_URL
-            value: ${REDIS_URL:-}
-        headers:
-          - pattern: /*
-            headers:
-              - name: X-Frame-Options
-                value: DENY
-              - name: X-Content-Type-Options
-                value: nosniff
-        redirects:
-          - from: /old-path/*
-            to: /new-path/:splat
-            status: 301
-        webhooks:
-          enabled: true
-          url: ${WEBHOOK_ENDPOINT:-https://api.machine-native-ops.com/webhooks/netlify}
-          secret: ${NETLIFY_WEBHOOK_SECRET:-}
-      
-      # Render Integration
-      render:
-        enabled: ${RENDER_ENABLED:-false}
-        serviceId: ${RENDER_SERVICE_ID:-}
-        type: web_service
-        env:
-          - name: DATABASE_URL
-            value: ${DATABASE_URL:-}
-          - name: REDIS_URL
-            value: ${REDIS_URL:-}
-        build:
-          command: npm run build
-          outputDirectory: dist
-        scaling:
-          instances: 1
-          memory: 512
-          cpu: 0.5
-        healthCheck:
-          enabled: true
-          path: /health
-          interval: 30
-          timeout: 5
-        webhooks:
-          enabled: true
-          url: ${WEBHOOK_ENDPOINT:-https://api.machine-native-ops.com/webhooks/render}
-          secret: ${RENDER_WEBHOOK_SECRET:-}
-      
-      # Railway Integration
-      railway:
-        enabled: ${RAILWAY_ENABLED:-false}
-        projectId: ${RAILWAY_PROJECT_ID:-}
-        environment:
-          - name: DATABASE_URL
-            value: ${DATABASE_URL:-}
-          - name: REDIS_URL
-            value: ${REDIS_URL:-}
-        services:
-          - name: machine-native-ops
-            env: node
-            buildCommand: npm run build
-            startCommand: npm start
-            scaling:
-              minInstances: 1
-              maxInstances: 3
-        webhooks:
-          enabled: true
-          url: ${WEBHOOK_ENDPOINT:-https://api.machine-native-ops.com/webhooks/railway}
-          secret: ${RAILWAY_WEBHOOK_SECRET:-}

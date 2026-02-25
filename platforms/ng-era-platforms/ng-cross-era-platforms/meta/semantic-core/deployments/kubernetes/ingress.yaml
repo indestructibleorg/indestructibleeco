@@ -1,69 +1,65 @@
-# @ECO-governed
-# @ECO-layer: GL00-09
-# @ECO-semantic: general-component
-# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
-#
-# GL Unified Architecture Governance Framework Activated
-# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
-# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
-
-
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: gl-semantic-core-ingress
-  namespace: gl-platform-semantic-core
-  labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-    app.kubernetes.io/name: semantic-core
-    platform: gl-platform-services
   annotations:
-    kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
-    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,ECO-Platform,ECO-Version"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      more_set_headers "ECO-Platform: semantic-core";
+    eco-base/uri: eco-base://k8s/core/ingress/gl-spec-core-ingress
+    eco-base/urn: urn:eco-base:k8s:core:ingress:gl-spec-core-ingress:sha256-b7a2477938ff734332276e742c7616addd936f67089e1aeb19e3b2b9c3d65c1a
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/configuration-snippet: 'more_set_headers "ECO-Platform:
+      spec-core";
+
       more_set_headers "ECO-Version: v1.0.0";
-    nginx.ingress.kubernetes.io/limit-rps: "100"
-    nginx.ingress.kubernetes.io/limit-connections: "1000"
+
+      '
+    nginx.ingress.kubernetes.io/cors-allow-headers: DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,ECO-Platform,ECO-Version
+    nginx.ingress.kubernetes.io/cors-allow-methods: GET, POST, PUT, DELETE, OPTIONS
+    nginx.ingress.kubernetes.io/cors-allow-origin: '*'
+    nginx.ingress.kubernetes.io/enable-cors: 'true'
+    nginx.ingress.kubernetes.io/limit-connections: '1000'
+    nginx.ingress.kubernetes.io/limit-rps: '100'
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+  labels:
+    app.kubernetes.io/name: spec-core
+    eco-base/governance: aligned
+    eco-base/part-of: eco-base
+    platform: gl-platform-services
+  name: gl-spec-core-ingress
+  namespace: gl-platform-spec-core
 spec:
   rules:
-  - host: semantic-core.gl-enterprise-architecture.example.com
+  - host: spec-core.gl-enterprise-architecture.example.com
     http:
       paths:
-      - path: /semantic(/|$)(.*)
+      - backend:
+          service:
+            name: gl-spec-core-service
+            port:
+              number: 80
+        path: /semantic(/|$)(.*)
         pathType: Prefix
-        backend:
+      - backend:
           service:
-            name: gl-semantic-core-service
+            name: gl-spec-core-service
             port:
               number: 80
-      - path: /health
+        path: /health
         pathType: Exact
-        backend:
+      - backend:
           service:
-            name: gl-semantic-core-service
-            port:
-              number: 80
-      - path: /metrics
-        pathType: Exact
-        backend:
-          service:
-            name: gl-semantic-core-service
+            name: gl-spec-core-service
             port:
               number: 9091
+        path: /metrics
+        pathType: Exact
   - host: api.semantic.gl.example.com
     http:
       paths:
-      - path: /v1(/|$)(.*)
-        pathType: Prefix
-        backend:
+      - backend:
           service:
-            name: gl-semantic-core-service
+            name: gl-spec-core-service
             port:
               number: 80
+        path: /v1(/|$)(.*)
+        pathType: Prefix

@@ -30,7 +30,7 @@ spec:
     version: v1.0.0
     description: "定義所有 domain、capability、resource、label 的語意分類"
     
-    ## Domain Semantics
+    ## Domain Spec
     domains:
       - domain_id: runtime
         abbr: rt
@@ -122,7 +122,7 @@ spec:
           - "semantic-reasoning"
           - "ontology-management"
     
-    ## Capability Semantics
+    ## Capability Spec
     capabilities:
       - capability_id: dag
         domain: runtime
@@ -184,7 +184,7 @@ spec:
           - "quantum-simulation"
           - "quantum-optimization"
     
-    ## Resource Semantics
+    ## Resource Spec
     resources:
       - resource_id: executor
         description: "執行器實例"
@@ -242,7 +242,7 @@ spec:
           - "pattern-recognition"
           - "insight-extraction"
     
-    ## Label Semantics
+    ## Label Spec
     labels:
     eco-base/part-of: eco-base
     eco-base/governance: aligned
@@ -354,7 +354,7 @@ spec:
           functional: "Multi-step reasoning and planning"
           description: "多步驟推理與規劃"
   
-  ## Semantic Validation System
+  ## Schema Validation System
   semantic-validation:
     version: v1.0.0
     description: "語意驗證規則與檢查"
@@ -381,7 +381,7 @@ spec:
         enabled: true
         rules:
           - rule_id: SEM-DUP-001
-            name: "No Duplicate Semantics"
+            name: "No Duplicate Spec"
             description: "檢測重複語意定義"
             severity: HIGH
             check: "semantic.uniqueness == true"

@@ -7,6 +7,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 import time
 from datetime import datetime, timezone
 
@@ -19,6 +20,16 @@ def gh_run(args):
 def git_run(args, cwd=None):
     return subprocess.run(["git"] + args, capture_output=True, text=True, check=False, cwd=cwd)
 
+def ensure_tool_installed(tool_command, install_command):
+    """Ensures a required tool is installed."""
+    try:
+        subprocess.run([tool_command, "--version"], capture_output=True, check=True)
+        print(f"Tool [32m{tool_command}[0m is already installed.")
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print(f"Tool [33m{tool_command}[0m not found. Installing...")
+        subprocess.run(install_command, check=True)
+        print(f"Tool [32m{tool_command}[0m installed successfully.")
+
 def get_centralized_report_issue():
     """Fetches the latest open centralized CI health report issue."""
     r = gh_run(["issue", "list", "--repo", REPO, "--label", "ci-health-report", "--state", "open", "--limit", "1", "--json", "number,title,body"])
@@ -29,7 +40,6 @@ def get_centralized_report_issue():
 
 def parse_failures_from_report(body):
     """Parses individual gate failures from the report body."""
-    # This is a simplified parser. A real implementation would be more robust.
     failures = []
     for line in body.splitlines():
         if "❌ Failed" in line:
@@ -47,14 +57,24 @@ def apply_batch_fixes(failures, repo_path):
         
         # L1/L2 Fix Logic (Example: Linting)
         if "lint" in gate_name.lower():
-            print("    -> Applying auto-linting fix...")
-            result = subprocess.run(["python3", "-m", "ruff", "check", "--fix", "."], cwd=repo_path, capture_output=True, text=True)
+            print("    -> Applying auto-linting fix (ruff)...")
+            # Ensure ruff is installed in the repair environment
+            ensure_tool_installed("ruff", [sys.executable, "-m", "pip", "install", "ruff"])
+            result = subprocess.run([sys.executable, "-m", "ruff", "check", "--fix", "."], cwd=repo_path, capture_output=True, text=True)
             if result.returncode != 0:
                 print(f"    -> Ruff fix failed: {result.stderr}")
             fixes_applied = True # Assume a fix was attempted
 
-        # Add more fix strategies here for other gates...
-        # e.g., if "test" in gate_name.lower(): ...
+        # TODO: Add more fix strategies here for other gates (e.g., validate, test, build, supply-chain)
+        # elif "validate" in gate_name.lower():
+        #     print("    -> Applying auto-validation fix...")
+        #     # Example: Run a Kustomize build and apply common fixes
+        #     result = subprocess.run(["kustomize", "build", "."], cwd=repo_path, capture_output=True, text=True)
+        #     if "error" in result.stderr.lower():
+        #         # Attempt to fix common Kustomize errors
+        #         print("    -> Attempting Kustomize fix...")
+        #         # ... add specific fix logic here ...
+        #     fixes_applied = True
 
     return fixes_applied
 
@@ -77,9 +97,18 @@ def main():
 
     # --- Git Operations ---
     repo_path = "/tmp/eco-base-repair"
-    git_run(["clone", f"https://x-access-token:{GH_TOKEN}@github.com/{REPO}.git", repo_path])
+    # Clean up previous clone if exists
+    if os.path.exists(repo_path):
+        subprocess.run(["rm", "-rf", repo_path], check=True)
+
+    print(f"Cloning {REPO} into {repo_path}...")
+    clone_result = git_run(["clone", f"https://x-access-token:{GH_TOKEN}@github.com/{REPO}.git", repo_path])
+    if clone_result.returncode != 0:
+        print(f"Failed to clone repository: {clone_result.stderr}")
+        return
     
     fix_branch = f"auto-batch-fix-{int(time.time())}"
+    print(f"Creating new branch: {fix_branch}")
     git_run(["checkout", "-b", fix_branch], cwd=repo_path)
 
     # --- Apply Fixes ---
@@ -87,12 +116,16 @@ def main():
 
     if not fixes_applied:
         print("No fixes were applied. Nothing to commit.")
+        # Clean up cloned repo
+        subprocess.run(["rm", "-rf", repo_path], check=True)
         return
 
     # --- Commit and Push ---
     status = git_run(["status", "--porcelain"], cwd=repo_path)
     if not status.stdout.strip():
         print("No changes detected after applying fixes.")
+        # Clean up cloned repo
+        subprocess.run(["rm", "-rf", repo_path], check=True)
         return
 
     print("Committing and pushing batch fixes...")
@@ -105,19 +138,23 @@ def main():
 
     if push_result.returncode != 0:
         print(f"Failed to push branch: {push_result.stderr}")
+        # Clean up cloned repo
+        subprocess.run(["rm", "-rf", repo_path], check=True)
         return
 
     # --- Create Centralized PR ---
     pr_title = f"fix(ci): Centralized Auto-Repair Batch for Report #{issue_num}"
     pr_body = f"This PR contains a batch of automated fixes for failures identified in the centralized CI Health Report **#{issue_num}**.\n\n**Affected Gates:**\n"
     for f in failures:
-        pr_body += f"- {f['gate_name']}\n"
+        pr_body += f"- {f["gate_name"]}\n"
     pr_body += "\nThis PR will be automatically merged upon successful CI validation."
 
     create_pr_result = gh_run(["pr", "create", "--repo", REPO, "--base", "main", "--head", fix_branch, "--title", pr_title, "--body", pr_body, "--label", "auto-repair,bot"])
 
     if create_pr_result.returncode != 0:
         print(f"Failed to create PR: {create_pr_result.stderr}")
+        # Clean up cloned repo
+        subprocess.run(["rm", "-rf", repo_path], check=True)
         return
 
     pr_url = create_pr_result.stdout.strip()
@@ -127,6 +164,9 @@ def main():
     comment = f"✅ **Batch Repair PR Created**: {pr_url}\n\nAll identified failures have been addressed in a single pull request. This issue will be closed automatically when the PR is merged."
     gh_run(["issue", "comment", str(issue_num), "--repo", REPO, "--body", comment])
     gh_run(["issue", "edit", str(issue_num), "--repo", REPO, "--add-label", "repair-in-progress"])
+
+    # Clean up cloned repo after successful operation
+    subprocess.run(["rm", "-rf", repo_path], check=True)
 
 if __name__ == "__main__":
     if not GH_TOKEN:

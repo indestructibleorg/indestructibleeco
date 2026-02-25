@@ -28,7 +28,7 @@ from collections import defaultdict
 from .semantic_models import (
     SemanticNode, SemanticNodeType, SemanticGraph
 )
-from .semantic_folding import SemanticFoldingEngine
+from .spec_aggregation import SemanticFoldingEngine
 from .semantic_parameterization import SemanticParameterizationEngine
 
 

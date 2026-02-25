@@ -25,7 +25,7 @@ from dataclasses import dataclass
 from .semantic_models import (
     SemanticNode, SemanticNodeType, SemanticGraph, SemanticIndex
 )
-from .semantic_folding import SemanticFoldingEngine
+from .spec_aggregation import SemanticFoldingEngine
 
 
 class SemanticParameterizationEngine:

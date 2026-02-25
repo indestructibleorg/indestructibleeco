@@ -20,7 +20,7 @@ validation_system:
   description: "9 validation rules across 5 systems"
 validation_systems:
   - system_id: "SEMANTIC"
-    name: "Semantic Validation System"
+    name: "Schema Validation System"
     rules:
       - rule_id: "SEM-001"
         name: "Semantic Consistency Check"

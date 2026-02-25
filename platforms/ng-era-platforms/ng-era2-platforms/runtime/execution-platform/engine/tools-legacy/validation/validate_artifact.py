@@ -17,7 +17,7 @@ Version: 2.0.0
 Purpose: Complete 5-level validation pipeline for Machine Native Ops artifacts
 五層驗證管道完整實現：
 1. Structural Validation (結構驗證) - Schema compliance, required fields, data types
-2. Semantic Validation (語義驗證) - Semantic root traceability, concept consistency
+2. Schema Validation (Schema 驗證) - Semantic root traceability, concept consistency
 3. Dependency Validation (依賴驗證) - DAG validation, circular dependency detection
 4. Governance Validation (治理驗證) - Naming conventions, documentation, policies
 5. Closure Validation (閉包驗證) - Dependency, semantic, and governance closure
@@ -340,7 +340,7 @@ class ArtifactValidator:
                 )
             )
     def _validate_semantic(self):
-        """Level 2: Semantic Validation - Complete Implementation
+        """Level 2: Schema Validation - Complete Implementation
         Validates:
         - Semantic root integration
         - Concept traceability to semantic root

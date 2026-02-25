@@ -5,6 +5,17 @@ on:
     workflows: [".github/workflows/ci.yaml", "YAML Governance Lint", ".github/workflows/auto-sync-deploy.yaml"]
     types: [completed]
   workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Optional: GitHub Actions Run ID to diagnose. If not provided, will find latest failed CI run.'
+        required: false
+        type: string
+      trigger_source:
+        description: 'Source of the trigger (e.g., manual, prometheus-alert)'
+        required: false
+        default: 'manual'
+  repository_dispatch:
+    types: [prometheus-alert, drift-detection]
 
 permissions:
   contents: read
@@ -14,59 +25,96 @@ permissions:
 jobs:
   on-failure:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'failure' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch' || github.event.workflow_run.conclusion == 'failure' }}
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
+      - name: Setup GitHub CLI
+        run: |
+          echo "${{ secrets.GH_TOKEN }}" | gh auth login --with-token
+
       - name: Aggregate Failures and Create Centralized Report
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
           REPO: ${{ github.repository }}
-          RUN_ID: ${{ github.event.workflow_run.id || 'manual' }}
-          TRIGGER_WORKFLOW: ${{ github.event.workflow_run.name || 'Manual' }}
+          RUN_ID: ${{ github.event.workflow_run.id || github.event.inputs.run_id || '' }}
+          TRIGGER_SOURCE: ${{ github.event.inputs.trigger_source || github.event.action }}
+          TRIGGER_WORKFLOW: ${{ github.event.workflow_run.name || 'Manual/External' }}
+          CLIENT_PAYLOAD: ${{ toJSON(github.event.client_payload) }}
         run: |
-          if [ "$RUN_ID" == "manual" ]; then
-            # 如果是手動觸發，獲取最近一個失敗的 CI Run
-            RUN_ID=$(gh run list --repo $REPO --status failure --limit 1 --json databaseId --jq '.[0].databaseId')
-            if [ -z "$RUN_ID" ]; then
-              echo "No failed CI runs found. Exiting."
-              exit 0
-            fi
+          PR_NUMBER="main"
+          if [ -n "$RUN_ID" ]; then
+            PR_NUMBER=$(gh api /repos/$REPO/actions/runs/$RUN_ID --jq ".pull_requests[0].number // \"main\"")
+            FAILED_JOBS=$(gh api /repos/$REPO/actions/runs/$RUN_ID/jobs --jq '[.jobs[] | select(.conclusion=="failure") | {name: .name, id: .id, url: .html_url}]')
+          elif [ "$TRIGGER_SOURCE" == "prometheus-alert" ]; then
+            echo "Processing Prometheus Alert..."
+            # Extract relevant info from CLIENT_PAYLOAD for Prometheus alert
+            ALERT_NAME=$(echo "$CLIENT_PAYLOAD" | jq -r ".alert.labels.alertname")
+            ALERT_MESSAGE=$(echo "$CLIENT_PAYLOAD" | jq -r ".alert.annotations.message")
+            ALERT_SEVERITY=$(echo "$CLIENT_PAYLOAD" | jq -r ".alert.labels.severity")
+            
+            REPORT_TITLE="[CI Health Report] Prometheus Alert: ${ALERT_NAME} (Severity: ${ALERT_SEVERITY})"
+            REPORT_BODY="## 集中化 CI 失敗診斷報告\n\n- **觸發來源**: Prometheus Alert\n- **警報名稱**: ${ALERT_NAME}\n- **警報訊息**: ${ALERT_MESSAGE}\n- **警報嚴重性**: ${ALERT_SEVERITY}\n- **診斷時間**: $(date -u +\"%Y-%m-%dT%H:%M:%SZ\")\n\n### 建議處理\n\n請檢查相關服務與日誌以進行根本原因分析。"
+
+            # For Prometheus alerts, we don't have FAILED_JOBS in the same way as CI runs
+            FAILED_JOBS="[]"
+          elif [ "$TRIGGER_SOURCE" == "drift-detection" ]; then
+            echo "Processing Drift Detection..."
+            # Extract relevant info from CLIENT_PAYLOAD for drift detection
+            DRIFT_DETAILS=$(echo "$CLIENT_PAYLOAD" | jq -r ".drift.details")
+            DRIFT_RESOURCE=$(echo "$CLIENT_PAYLOAD" | jq -r ".drift.resource")
+
+            REPORT_TITLE="[CI Health Report] Drift Detected: ${DRIFT_RESOURCE}"
+            REPORT_BODY="## 集中化 CI 失敗診斷報告\n\n- **觸發來源**: Drift Detection\n- **漂移資源**: ${DRIFT_RESOURCE}\n- **漂移詳情**: ${DRIFT_DETAILS}\n- **診斷時間**: $(date -u +\"%Y-%m-%dT%H:%M:%SZ\")\n\n### 建議處理\n\n請檢查 Git 狀態與實際集群狀態，並執行同步。"
+
+            FAILED_JOBS="[]"
+          else
+            echo "No valid trigger source or RUN_ID provided. Exiting."
+            exit 0
           fi
 
-          PR_NUMBER=$(gh api /repos/$REPO/actions/runs/$RUN_ID --jq '.pull_requests[0].number // "main"')
-          FAILED_JOBS=$(gh api /repos/$REPO/actions/runs/$RUN_ID/jobs --jq '[.jobs[] | select(.conclusion=="failure") | {name: .name, id: .id, url: .html_url}]')
-
-          if [ "$(echo "$FAILED_JOBS" | jq '. | length')" -eq 0 ]; then
+          if [ "$(echo "$FAILED_JOBS" | jq ". | length")" -eq 0 ] && [ "$TRIGGER_SOURCE" != "prometheus-alert" ] && [ "$TRIGGER_SOURCE" != "drift-detection" ]; then
             echo "No failed jobs found in metadata for Run $RUN_ID. Exiting."
             exit 0
           fi
 
-          REPORT_TITLE="[CI Health Report] Failures in $TRIGGER_WORKFLOW (Run ID: ${RUN_ID})"
-          REPORT_BODY="## 集中化 CI 失敗診斷報告\n\n- **觸發來源**: $TRIGGER_WORKFLOW (PR #${PR_NUMBER})\n- **Workflow Run**: [View Run](https://github.com/$REPO/actions/runs/$RUN_ID)\n- **診斷時間**: $(date -u +"%Y-%m-%dT%H:%M:%SZ")\n\n### 失敗閘門摘要\n\n| Gate Name | Status | View Logs |\n|---|---|---|"
+          if [ -z "$REPORT_TITLE" ]; then
+            REPORT_TITLE="[CI Health Report] Failures in $TRIGGER_WORKFLOW (Run ID: ${RUN_ID})"
+            REPORT_BODY="## 集中化 CI 失敗診斷報告\n\n- **觸發來源**: $TRIGGER_WORKFLOW (PR #${PR_NUMBER})\n- **Workflow Run**: [View Run](https://github.com/$REPO/actions/runs/$RUN_ID)\n- **診斷時間**: $(date -u +\"%Y-%m-%dT%H:%M:%SZ\")\n\n### 失敗閘門摘要\n\n| Gate Name | Status | View Logs |\n|---|---|---|"
 
-          FAILURE_DETAILS=""
+            FAILURE_DETAILS=""
 
-          echo "$FAILED_JOBS" | jq -c '.[]' | while read -r job; do
-            JOB_NAME=$(echo "$job" | jq -r '.name')
-            JOB_ID=$(echo "$job" | jq -r '.id')
-            JOB_URL=$(echo "$job" | jq -r '.url')
+            echo "$FAILED_JOBS" | jq -c ".[]" | while read -r job; do
+              JOB_NAME=$(echo "$job" | jq -r ".name")
+              JOB_ID=$(echo "$job" | jq -r ".id")
+              JOB_URL=$(echo "$job" | jq -r ".url")
 
-            REPORT_BODY+="\n| **${JOB_NAME}** | ❌ Failed | [Link](${JOB_URL}) |"
+              REPORT_BODY+="\n| **${JOB_NAME}** | ❌ Failed | [Link](${JOB_URL}) |"
 
-            LOGS=$(gh api /repos/$REPO/actions/jobs/$JOB_ID/logs | tail -n 50)
-            FAILURE_DETAILS+="\n\n---\n\n### 閘門: ${JOB_NAME}\n\n**錯誤日誌 (最後 50 行):**\n\`\`\`\n${LOGS}\n\`\`\`"
-          done
+              LOGS=$(gh api /repos/$REPO/actions/jobs/$JOB_ID/logs | tail -n 50)
+              FAILURE_DETAILS+="\n\n---\n\n### 閘門: ${JOB_NAME}\n\n**錯誤日誌 (最後 50 行):**\n\`\`\`\n${LOGS}\n\`\`\`"
+            done
+            FINAL_BODY="${REPORT_BODY}${FAILURE_DETAILS}"
+          else
+            FINAL_BODY="${REPORT_BODY}"
+          fi
 
-          FINAL_BODY="${REPORT_BODY}${FAILURE_DETAILS}"
+          # 使用 Run ID 或特定觸發源進行重複數據刪除
+          ISSUE_SEARCH_TERM=""
+          if [ -n "$RUN_ID" ]; then
+            ISSUE_SEARCH_TERM="in:title ${RUN_ID}"
+          elif [ "$TRIGGER_SOURCE" == "prometheus-alert" ]; then
+            ISSUE_SEARCH_TERM="in:title ${ALERT_NAME}"
+          elif [ "$TRIGGER_SOURCE" == "drift-detection" ]; then
+            ISSUE_SEARCH_TERM="in:title ${DRIFT_RESOURCE}"
+          fi
 
-          # 使用 Run ID 進行重複數據刪除
-          EXISTING_ISSUE=$(gh issue list --repo $REPO --label "ci-health-report" --search "in:title ${RUN_ID}" --state open --json number --jq '.[0].number')
+          EXISTING_ISSUE=$(gh issue list --repo $REPO --label "ci-health-report" --search "$ISSUE_SEARCH_TERM" --state open --json number --jq ".[0].number")
 
           if [ -n "$EXISTING_ISSUE" ]; then
             echo "Updating existing health report: #$EXISTING_ISSUE"
-            gh issue comment $EXISTING_ISSUE --repo $REPO --body "**Update**: New failures detected in the same run.\n\n${FINAL_BODY}"
+            gh issue comment $EXISTING_ISSUE --repo $REPO --body "**Update**: New failures detected.\n\n${FINAL_BODY}"
           else
             echo "Creating new centralized health report."
             gh issue create --repo $REPO \

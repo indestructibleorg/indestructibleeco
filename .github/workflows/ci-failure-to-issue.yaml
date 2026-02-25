@@ -2,8 +2,9 @@ name: Centralized CI Failure Diagnostics
 
 on:
   workflow_run:
-    workflows: ["eco-base CI/CD"]
+    workflows: [".github/workflows/ci.yaml"]
     types: [completed]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -13,7 +14,7 @@ permissions:
 jobs:
   on-failure:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'failure' }}
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -22,8 +23,17 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
-          RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_ID: ${{ github.event.workflow_run.id || 'manual' }}
         run: |
+          if [ "$RUN_ID" == "manual" ]; then
+            # 如果是手動觸發，獲取最近一個失敗的 CI Run
+            RUN_ID=$(gh run list --repo $REPO --workflow ".github/workflows/ci.yaml" --status failure --limit 1 --json databaseId --jq '.[0].databaseId')
+            if [ -z "$RUN_ID" ]; then
+              echo "No failed CI runs found. Exiting."
+              exit 0
+            fi
+          fi
+
           PR_NUMBER=$(gh api /repos/$REPO/actions/runs/$RUN_ID --jq '.pull_requests[0].number // "main"')
           FAILED_JOBS=$(gh api /repos/$REPO/actions/runs/$RUN_ID/jobs --jq '[.jobs[] | select(.conclusion=="failure") | {name: .name, id: .id, url: .html_url}]')
 
@@ -32,7 +42,7 @@ jobs:
             exit 0
           fi
 
-          REPORT_TITLE="[CI Health Report] Failures in Run for PR #${PR_NUMBER}"
+          REPORT_TITLE="[CI Health Report] Failures in Run for PR #${PR_NUMBER} (Run ID: ${RUN_ID})"
           REPORT_BODY="## 集中化 CI 失敗診斷報告\n\n- **觸發來源**: PR #${PR_NUMBER}\n- **Workflow Run**: [View Run](https://github.com/$REPO/actions/runs/$RUN_ID)\n- **診斷時間**: $(date -u +"%Y-%m-%dT%H:%M:%SZ")\n\n### 失敗閘門摘要\n\n| Gate Name | Status | View Logs |\n|---|---|---|"
 
           FAILURE_DETAILS=""

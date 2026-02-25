@@ -1,0 +1,377 @@
+name: PR Blocked Response Recovery
+
+on:
+  workflow_run:
+    workflows:
+      - "PR Blocked Response"
+    types: [requested, completed]
+
+permissions:
+  contents: read
+  actions: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: pr-blocked-response-recovery-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  redispatch:
+    name: Re-dispatch blocked response on action_required
+    runs-on: ubuntu-latest
+    if: |
+      github.event.workflow_run.event != 'workflow_dispatch' &&
+      github.event.workflow_run.run_attempt == 1
+    steps:
+      - name: Re-dispatch PR Blocked Response
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
+        with:
+          github-token: ${{ secrets.AUTO_FIX_TOKEN || github.token }}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const crypto = require('crypto');
+            const run = context.payload.workflow_run;
+            const status = (run.status || '').toLowerCase();
+            const conclusion = (run.conclusion || '').toLowerCase();
+            const jobs = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: run.id,
+            });
+            const shouldApprove = status === 'requested' || status === 'waiting' || conclusion === 'action_required';
+            const shouldRedispatch = conclusion === 'action_required' || jobs.data.total_count === 0;
+            if (!shouldApprove && !shouldRedispatch) {
+              core.info(`Skip recovery for status=${status}, conclusion=${conclusion}, jobs=${jobs.data.total_count}`);
+              return;
+            }
+            const prNumber = run.pull_requests?.[0]?.number;
+            if (!prNumber) {
+              core.info('No PR number associated with workflow run; skip redispatch.');
+              return;
+            }
+            const headBranch = run.head_branch;
+            if (!headBranch) {
+              core.info('No head branch associated with workflow run; skip redispatch.');
+              return;
+            }
+            const marker = '<!-- autoecoops:recovery -->';
+            const headShaLine = `- Head SHA: \`${run.head_sha || 'unknown'}\``;
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              per_page: 100,
+            });
+            const existing = comments.data.find(c => c.body && c.body.includes(marker));
+            const existingBody = existing?.body || '';
+            const countMatch = existingBody.match(/- Cumulative recovery count: `(\d+)`/);
+            const lastSuccessMatch = existingBody.match(/- Last successful recovery at: `([^`]+)`/);
+            const previousCount = countMatch ? Number(countMatch[1]) : 0;
+            let lastSuccessfulRecoveryAt = lastSuccessMatch ? lastSuccessMatch[1] : 'N/A';
+            const duplicateHeadSha = !!(existing && existing.body.includes(headShaLine));
+            let approveResult = "not-needed";
+            let approveError = "";
+            if (shouldApprove && !duplicateHeadSha) {
+              try {
+                await github.request('POST /repos/{owner}/{repo}/actions/runs/{run_id}/approve', {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: run.id,
+                });
+                approveResult = "approved";
+                core.info(`Approved workflow run ${run.id}`);
+              } catch (e) {
+                approveResult = "approve-failed";
+                approveError = e.message || String(e);
+                core.info(`Approve run skipped/failed for ${run.id}: ${e.message}`);
+              }
+            }
+            let dispatchResult = "not-required";
+            let dispatchError = "";
+            if (duplicateHeadSha) {
+              dispatchResult = "skipped-duplicate-head-sha";
+              core.info(`Recovery already attempted for head SHA ${run.head_sha}; skip redispatch.`);
+            } else if (shouldRedispatch) {
+              dispatchResult = "dispatched";
+              try {
+                await github.rest.actions.createWorkflowDispatch({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  workflow_id: 'pr-blocked-response.yaml',
+                  ref: headBranch,
+                  inputs: {
+                    pr_number: String(prNumber),
+                    autofix_details: `Recovery dispatch from run ${run.id} (status=${status}, conclusion=${conclusion}, jobs=${jobs.data.total_count}, approve=${approveResult})`,
+                  },
+                });
+                lastSuccessfulRecoveryAt = new Date().toISOString();
+              } catch (e) {
+                dispatchResult = "dispatch-failed";
+                dispatchError = e.message || String(e);
+                core.info(`Dispatch failed for run ${run.id}: ${e.message}`);
+              }
+            }
+            const warningSummary = [];
+            const errorSummary = [];
+            if (approveResult === 'approve-failed') warningSummary.push('approve-failed');
+            if (dispatchResult === 'dispatch-failed') errorSummary.push('dispatch-failed');
+            if (dispatchResult === 'not-required') warningSummary.push('redispatch-not-required');
+            if (dispatchResult === 'skipped-duplicate-head-sha') warningSummary.push('duplicate-head-sha');
+            const cumulativeCount = previousCount + (duplicateHeadSha ? 0 : 1);
+            const body = [
+              '## Auto Recovery Triggered',
+              '',
+              `- Run: \`${run.id}\``,
+              headShaLine,
+              `- Status: \`${status || 'unknown'}\``,
+              `- Conclusion: \`${conclusion || 'none'}\``,
+              `- Jobs detected: \`${jobs.data.total_count}\``,
+              `- Approve workflows to run: \`${approveResult}\``,
+              `- Redispatch: \`${dispatchResult}\` on \`${headBranch}\``,
+              `- Cumulative recovery count (累積恢復次數): \`${cumulativeCount}\``,
+              `- Last successful recovery time (最後一次恢復成功修復時間): \`${lastSuccessfulRecoveryAt}\``,
+              `- Warning summary: \`${warningSummary.length ? warningSummary.join(',') : 'none'}\``,
+              `- Error summary: \`${errorSummary.length ? errorSummary.join(',') : 'none'}\``,
+              `- Approve error detail: \`${approveError || 'none'}\``,
+              `- Dispatch error detail: \`${dispatchError || 'none'}\``,
+              '',
+              marker,
+            ].join('\n');
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
+            const metrics = {
+              run_id: run.id,
+              pr_number: prNumber,
+              head_branch: headBranch,
+              head_sha: run.head_sha || 'unknown',
+              status: status || 'unknown',
+              conclusion: conclusion || 'none',
+              jobs_detected: Number(jobs?.data?.total_count ?? 0),
+              approve_result: approveResult,
+              redispatch_result: dispatchResult,
+              cumulative_recovery_count: cumulativeCount,
+              last_successful_recovery_time: lastSuccessfulRecoveryAt,
+              warning_summary: warningSummary.length ? warningSummary.join(',') : 'none',
+              error_summary: errorSummary.length ? errorSummary.join(',') : 'none',
+              approve_error_detail: approveError || 'none',
+              dispatch_error_detail: dispatchError || 'none',
+              generated_at: new Date().toISOString(),
+            };
+            try {
+              const workspace = process.env.GITHUB_WORKSPACE || process.cwd();
+              const artifactDir = path.join(workspace, 'artifacts', 'recovery');
+              fs.mkdirSync(artifactDir, { recursive: true });
+              const artifactPath = path.join(artifactDir, `pr-${prNumber}-run-${run.id}.json`);
+              fs.writeFileSync(artifactPath, JSON.stringify(metrics, null, 2));
+              core.info(`Wrote recovery metrics artifact: ${artifactPath}`);
+              const summaryPath = path.join(artifactDir, 'recovery-summary.json');
+              let summary = {
+                summary_version: "1.5.0",
+                schema: "eco-base/recovery-summary/v1",
+                schema_url: "eco-base://schemas/recovery-summary/v1",
+                generated_at: new Date().toISOString(),
+                total_events: 0,
+                prs: {},
+                dashboard_ready: {
+                  approval_success_rate_pct: null,
+                  redispatch_success_rate_pct: null,
+                  mean_time_to_recovery_minutes: null,
+                  manual_intervention_count: 0,
+                },
+                kpi_definitions: {
+                  approval_success_rate_pct: "approved / (approved + approve-failed) * 100",
+                  redispatch_success_rate_pct: "dispatched / (dispatched + dispatch-failed) * 100",
+                  mean_time_to_recovery_minutes: "avg((now - last_successful_recovery_time) / 60000) across PRs with successful recovery",
+                  manual_intervention_count: "count(recent_runs where approve_result='approve-failed' or redispatch_result='dispatch-failed')",
+                },
+                kpi_units: {
+                  approval_success_rate_pct: "percent",
+                  redispatch_success_rate_pct: "percent",
+                  mean_time_to_recovery_minutes: "minutes",
+                  manual_intervention_count: "count",
+                },
+                kpi_targets: {
+                  approval_success_rate_pct: 95,
+                  redispatch_success_rate_pct: 98,
+                  mean_time_to_recovery_minutes: 15,
+                  manual_intervention_count: 0,
+                },
+                alert_thresholds: {
+                  approval_success_rate_pct_below: 90,
+                  redispatch_success_rate_pct_below: 95,
+                  mean_time_to_recovery_minutes_above: 30,
+                  manual_intervention_count_above: 0,
+                },
+                refresh_interval_seconds: 900,
+                implementation_config: {
+                  auto_approve_workflow_run: true,
+                  auto_redispatch_blocked_response: true,
+                  auto_update_behind_draft_branch: true,
+                  signed_autofix_commit_enabled: true,
+                  recovery_metrics_artifact_enabled: true,
+                },
+                implementation_config_descriptions: {
+                  auto_approve_workflow_run: "Attempt to approve workflow runs automatically when status indicates manual approval gating.",
+                  auto_redispatch_blocked_response: "Automatically redispatch PR blocked-response workflow when action_required/zero-job conditions are detected.",
+                  auto_update_behind_draft_branch: "Automatically update draft PR branch when merge status is BEHIND or UNKNOWN.",
+                  signed_autofix_commit_enabled: "Enable signed-off (-s) commits for safe mechanical auto-fixes.",
+                  recovery_metrics_artifact_enabled: "Emit per-run and rolling recovery metrics JSON artifacts for observability and dashboards.",
+                },
+                dashboard_contract_hash: "",
+              };
+              if (fs.existsSync(summaryPath)) {
+                try {
+                  summary = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
+                } catch (_e) {
+                  core.info('Failed to parse existing recovery-summary.json, regenerating.');
+                }
+              }
+              const prKey = String(prNumber);
+              const previous = summary.prs?.[prKey] || {};
+              const history = Array.isArray(previous.recent_runs) ? previous.recent_runs.slice(-19) : [];
+              history.push({
+                run_id: run.id,
+                generated_at: metrics.generated_at,
+                redispatch_result: metrics.redispatch_result,
+                approve_result: metrics.approve_result,
+                warning_summary: metrics.warning_summary,
+                error_summary: metrics.error_summary,
+              });
+              summary.generated_at = metrics.generated_at;
+              summary.summary_version = "1.5.0";
+              summary.schema = summary.schema || "eco-base/recovery-summary/v1";
+              summary.schema_url = summary.schema_url || "eco-base://schemas/recovery-summary/v1";
+              summary.total_events = Number(summary.total_events || 0) + 1;
+              summary.dashboard_ready = summary.dashboard_ready || {
+                approval_success_rate_pct: null,
+                redispatch_success_rate_pct: null,
+                mean_time_to_recovery_minutes: null,
+                manual_intervention_count: 0,
+              };
+              summary.kpi_definitions = summary.kpi_definitions || {
+                approval_success_rate_pct: "approved / (approved + approve-failed) * 100",
+                redispatch_success_rate_pct: "dispatched / (dispatched + dispatch-failed) * 100",
+                mean_time_to_recovery_minutes: "avg((now - last_successful_recovery_time) / 60000) across PRs with successful recovery",
+                manual_intervention_count: "count(recent_runs where approve_result='approve-failed' or redispatch_result='dispatch-failed')",
+              };
+              summary.kpi_units = summary.kpi_units || {
+                approval_success_rate_pct: "percent",
+                redispatch_success_rate_pct: "percent",
+                mean_time_to_recovery_minutes: "minutes",
+                manual_intervention_count: "count",
+              };
+              summary.kpi_targets = summary.kpi_targets || {
+                approval_success_rate_pct: 95,
+                redispatch_success_rate_pct: 98,
+                mean_time_to_recovery_minutes: 15,
+                manual_intervention_count: 0,
+              };
+              summary.alert_thresholds = summary.alert_thresholds || {
+                approval_success_rate_pct_below: 90,
+                redispatch_success_rate_pct_below: 95,
+                mean_time_to_recovery_minutes_above: 30,
+                manual_intervention_count_above: 0,
+              };
+              summary.refresh_interval_seconds = summary.refresh_interval_seconds || 900;
+              summary.implementation_config = summary.implementation_config || {
+                auto_approve_workflow_run: true,
+                auto_redispatch_blocked_response: true,
+                auto_update_behind_draft_branch: true,
+                signed_autofix_commit_enabled: true,
+                recovery_metrics_artifact_enabled: true,
+              };
+              summary.implementation_config_descriptions = summary.implementation_config_descriptions || {
+                auto_approve_workflow_run: "Attempt to approve workflow runs automatically when status indicates manual approval gating.",
+                auto_redispatch_blocked_response: "Automatically redispatch PR blocked-response workflow when action_required/zero-job conditions are detected.",
+                auto_update_behind_draft_branch: "Automatically update draft PR branch when merge status is BEHIND or UNKNOWN.",
+                signed_autofix_commit_enabled: "Enable signed-off (-s) commits for safe mechanical auto-fixes.",
+                recovery_metrics_artifact_enabled: "Emit per-run and rolling recovery metrics JSON artifacts for observability and dashboards.",
+              };
+              summary.prs[prKey] = {
+                pr_number: prNumber,
+                latest_run_id: run.id,
+                latest_head_sha: metrics.head_sha,
+                latest_status: metrics.status,
+                latest_conclusion: metrics.conclusion,
+                cumulative_recovery_count: metrics.cumulative_recovery_count,
+                last_successful_recovery_time: metrics.last_successful_recovery_time,
+                warning_summary: metrics.warning_summary,
+                error_summary: metrics.error_summary,
+                recent_runs: history,
+              };
+              const allRuns = Object.values(summary.prs || {}).flatMap(p => Array.isArray(p.recent_runs) ? p.recent_runs : []);
+              const approvals = allRuns.filter(r => ["approved", "approve-failed"].includes(r.approve_result));
+              const approvedCount = approvals.filter(r => r.approve_result === "approved").length;
+              const redispatches = allRuns.filter(r => ["dispatched", "dispatch-failed"].includes(r.redispatch_result));
+              const redispatchSuccessCount = redispatches.filter(r => r.redispatch_result === "dispatched").length;
+              const manualInterventions = allRuns.filter(
+                r => r.approve_result === "approve-failed" || r.redispatch_result === "dispatch-failed"
+              ).length;
+              const successfulTimes = Object.values(summary.prs || {})
+                .map(p => p.last_successful_recovery_time)
+                .filter(ts => ts && ts !== "N/A")
+                .map(ts => new Date(ts).getTime())
+                .filter(ts => Number.isFinite(ts));
+              let meanTimeToRecoveryMinutes = null;
+              if (successfulTimes.length > 0) {
+                const nowMs = Date.now();
+                const totalMinutes = successfulTimes.reduce((acc, ts) => acc + ((nowMs - ts) / 60000), 0);
+                meanTimeToRecoveryMinutes = Number((totalMinutes / successfulTimes.length).toFixed(2));
+              }
+              summary.dashboard_ready = {
+                approval_success_rate_pct: approvals.length
+                  ? Number(((approvedCount / approvals.length) * 100).toFixed(2))
+                  : null,
+                redispatch_success_rate_pct: redispatches.length
+                  ? Number(((redispatchSuccessCount / redispatches.length) * 100).toFixed(2))
+                  : null,
+                mean_time_to_recovery_minutes: meanTimeToRecoveryMinutes,
+                manual_intervention_count: manualInterventions,
+              };
+              const contractPayload = {
+                summary_version: summary.summary_version,
+                schema: summary.schema,
+                schema_url: summary.schema_url,
+                dashboard_ready_keys: Object.keys(summary.dashboard_ready || {}).sort(),
+                kpi_definitions: summary.kpi_definitions || {},
+                kpi_units: summary.kpi_units || {},
+                kpi_targets: summary.kpi_targets || {},
+                alert_thresholds: summary.alert_thresholds || {},
+                refresh_interval_seconds: summary.refresh_interval_seconds,
+                implementation_config: summary.implementation_config || {},
+                implementation_config_descriptions: summary.implementation_config_descriptions || {},
+              };
+              summary.dashboard_contract_hash = crypto
+                .createHash('sha256')
+                .update(JSON.stringify(contractPayload))
+                .digest('hex');
+              fs.writeFileSync(summaryPath, JSON.stringify(summary, null, 2));
+              core.info(`Wrote rolling recovery summary: ${summaryPath}`);
+            } catch (e) {
+              core.setFailed(`Failed to write recovery metrics artifact: ${e.message}`);
+              throw e;
+            }
+            core.info(`Recovery flow completed for PR #${prNumber} on ${headBranch} with ${dispatchResult}`);
+
+      - name: Upload recovery metrics artifact
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: recovery-metrics-${{ github.run_id }}
+          path: artifacts/recovery/*.json
+          if-no-files-found: warn

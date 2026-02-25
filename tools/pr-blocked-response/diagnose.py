@@ -37,6 +37,10 @@ from datetime import datetime, timezone
 REPO           = os.environ.get("REPO", "indestructibleorg/eco-base")
 SPECIFIC_PR    = os.environ.get("SPECIFIC_PR", "").strip()
 GH_TOKEN       = os.environ.get("GH_TOKEN", "")
+TRIGGER_EVENT  = os.environ.get("TRIGGER_EVENT", "").strip()
+SOURCE_WORKFLOW = os.environ.get("SOURCE_WORKFLOW", "").strip()
+AUTOFIX_DETAILS = os.environ.get("AUTOFIX_DETAILS", "").strip()
+AUTOFIX_SIGNOFF = os.environ.get("AUTOFIX_SIGNOFF", "true").strip().lower() not in {"0", "false", "no"}
 
 # Internal required checks — ONLY these matter for merge decisions
 REQUIRED_CHECKS = {"validate", "lint", "test", "build", "opa-policy", "supply-chain"}
@@ -58,6 +62,23 @@ EXPECTED_SKIPS = {
     "request-codacy-review",  # Only runs when codacy-review label is present
     "Auto-label New Issues",
 }
+
+# Non-required gate conclusions that should be tracked as anomalies
+ANOMALY_FAILURE_CONCLUSIONS = {
+    "failure", "error", "timed_out", "cancelled", "startup_failure", "action_required",
+}
+
+# Pagination size for issue list calls
+ISSUES_PAGE_SIZE = 100
+
+# Non-required skipped checks tracked as anomalies (matched by check name keywords)
+TRACKED_SKIPPED_KEYWORDS = {"gate", "ci"}
+
+# Labels attached to centralized CI anomaly tracking issues
+AUTO_ANOMALY_ISSUE_LABELS = ["blocked", "ci/cd", "needs-attention"]
+ANOMALY_ESCALATION_THRESHOLD = 3
+ANOMALY_SEVERITY_LABEL = "sev/high"
+HUMAN_REVIEW_LABEL = "human-review-required"
 
 # AI/Bot actors whose review comments are evaluated by governance policy
 AI_BOT_ACTORS = {
@@ -104,6 +125,11 @@ AUTO_FIX_PATTERNS = [
     r"typo",
 ]
 
+CONVENTIONAL_TITLE_RE = re.compile(
+    r"^(feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)(\([^)]+\))?: .{10,}$",
+    re.IGNORECASE,
+)
+
 
 # ── GitHub API helpers ────────────────────────────────────────────────────────
 
@@ -140,7 +166,7 @@ def get_open_prs():
                 "--json", "number,title,headRefName,headRefOid,mergeStateStatus,labels,isDraft"])
     if r.returncode != 0 or not r.stdout.strip():
         return []
-    return [p for p in json.loads(r.stdout) if not p.get("isDraft", False)]
+    return json.loads(r.stdout)
 
 
 def get_pr_api(pr_num):
@@ -168,6 +194,96 @@ def get_pr_reviews(pr_num):
     """Get formal PR reviews (APPROVED/CHANGES_REQUESTED/COMMENTED)."""
     data = gh_api(f"/repos/{REPO}/pulls/{pr_num}/reviews?per_page=100")
     return data if isinstance(data, list) else []
+
+def get_pr_files(pr_num):
+    data = gh_api(f"/repos/{REPO}/pulls/{pr_num}/files?per_page=100")
+    return data if isinstance(data, list) else []
+
+
+def normalize_pr_title(title):
+    clean = re.sub(r"^\s*\[(wip|draft)\]\s*", "", title or "", flags=re.IGNORECASE).strip()
+    if not clean:
+        clean = "automated governance maintenance update"
+    return f"chore(pr): {clean}"
+
+
+def ensure_conventional_pr_title(pr_num, pr_title):
+    if CONVENTIONAL_TITLE_RE.match(pr_title or ""):
+        return pr_title
+    new_title = normalize_pr_title(pr_title)
+    if len(new_title) < 10:
+        new_title = "chore(pr): governance update"
+    gh_api(f"/repos/{REPO}/pulls/{pr_num}", method="PATCH", data={"title": new_title})
+    print(f"  [TITLE-AUTOFIX] Updated PR title to Conventional Commits format")
+    return new_title
+
+
+def apply_mechanical_codacy_fixes(pr_num, pr_branch):
+    files = set()
+    for c in get_pr_review_comments(pr_num):
+        actor = c.get("user", {}).get("login", "")
+        body = c.get("body", "")
+        path = c.get("path", "")
+        if actor not in {"codacy-production", "codacy-production[bot]"}:
+            continue
+        if not path or not path.endswith(".py"):
+            continue
+        if "I001" in body or "F541" in body:
+            files.add(path)
+    if not files:
+        return False
+
+    subprocess.run(["git", "fetch", "origin", pr_branch], capture_output=True, text=True)
+    subprocess.run(["git", "checkout", "-B", pr_branch, f"origin/{pr_branch}"], capture_output=True, text=True)
+
+    result = subprocess.run(
+        [sys.executable, "-m", "ruff", "check", "--select", "I,F541", "--fix", *sorted(files)],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode not in (0, 1):
+        print(f"  [AUTOFIX] Ruff execution failed: {result.stderr[:120]}")
+        return False
+
+    changed = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
+    if not changed.stdout.strip():
+        return False
+
+    subject = f"chore(ci): auto-fix codacy mechanical issues for PR #{pr_num}"
+    body = "Automated safe fixes applied for: " + ", ".join(sorted(files))
+    if AUTOFIX_DETAILS:
+        body += f"\n\nDetails: {AUTOFIX_DETAILS}"
+
+    subprocess.run(["git", "add", *sorted(files)], capture_output=True, text=True)
+    commit_cmd = ["git", "commit", "-m", subject, "-m", body]
+    if AUTOFIX_SIGNOFF:
+        commit_cmd.append("-s")
+    commit = subprocess.run(commit_cmd, capture_output=True, text=True)
+    if commit.returncode != 0:
+        print(f"  [AUTOFIX] Commit failed: {commit.stderr[:120]}")
+        return False
+    push = subprocess.run(["git", "push", "origin", f"HEAD:{pr_branch}"], capture_output=True, text=True)
+    if push.returncode == 0:
+        sha = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True)
+        commit_sha = (sha.stdout or "").strip()
+        detail = f"\n\n- Details: {AUTOFIX_DETAILS}" if AUTOFIX_DETAILS else ""
+        gh_api(
+            f"/repos/{REPO}/issues/{pr_num}/comments",
+            method="POST",
+            data={
+                "body": (
+                    "## Auto-fix applied\n\n"
+                    f"- Commit: `{commit_sha}`\n"
+                    f"- Signed-off: `{AUTOFIX_SIGNOFF}`\n"
+                    f"- Files: {', '.join(sorted(files))}{detail}\n\n"
+                    "> AutoEcoOps PR Governance Engine"
+                )
+            },
+        )
+        print(f"  [AUTOFIX] Pushed mechanical Codacy fixes for PR #{pr_num}")
+        return True
+    print(f"  [AUTOFIX] Push failed: {push.stderr[:120]}")
+    return False
 
 
 # ── AI/Bot governance ─────────────────────────────────────────────────────────
@@ -351,12 +467,18 @@ def retrigger_ci(pr_num, head_sha, failed_check_names):
     runs = get_check_runs(head_sha)
     rerun_count = 0
     for run in runs:
-        if (run.get("name") in failed_check_names and
-                run.get("conclusion") in ("failure", "timed_out", "cancelled")):
+        status = (run.get("status") or "").lower()
+        conclusion = (run.get("conclusion") or "").lower()
+        if (
+            run.get("name") in failed_check_names and
+            status == "completed" and
+            conclusion in ("failure", "timed_out", "cancelled", "skipped", "action_required", "startup_failure")
+        ):
             result = gh_api(f"/repos/{REPO}/check-runs/{run['id']}/rerequest", method="POST")
             if not result.get("_http_error"):
                 rerun_count += 1
     print(f"  [RETRIGGER] Re-triggered {rerun_count} check run(s)")
+    return rerun_count
 
 
 def remove_label(pr_num, label):
@@ -416,6 +538,216 @@ def classify_checks(check_runs):
     all_pass    = REQUIRED_CHECKS.issubset(passing)
     any_pending = len(pending) > 0
     return passing, failing, pending, all_pass, any_pending
+
+
+def collect_non_required_gate_anomalies(check_runs):
+    """Collect failed/skipped non-required gates for centralized issue tracking."""
+    anomalies = []
+    for run in check_runs:
+        name = run.get("name", "")
+        status = (run.get("status") or "").lower()
+        conclusion = (run.get("conclusion") or "").lower()
+        name_lower = name.lower()
+
+        if not name or name in REQUIRED_CHECKS or name in EXPECTED_SKIPS or status != "completed":
+            continue
+
+        if conclusion in ANOMALY_FAILURE_CONCLUSIONS:
+            anomalies.append((name, conclusion))
+        elif conclusion == "skipped" and any(keyword in name_lower for keyword in TRACKED_SKIPPED_KEYWORDS):
+            anomalies.append((name, conclusion))
+
+    return anomalies
+
+
+def get_trigger_source_label():
+    if TRIGGER_EVENT == "workflow_run":
+        return f"workflow_run: {SOURCE_WORKFLOW or 'unknown'}"
+    return TRIGGER_EVENT or "unknown"
+
+
+def build_dedup_key(pr_num, head_sha):
+    source = SOURCE_WORKFLOW or TRIGGER_EVENT or "unknown"
+    return f"{pr_num}:{head_sha or 'unknown'}:{source}"
+
+
+def build_anomaly_signature(anomalies):
+    """Build a stable JSON signature from anomaly tuples for persistence counters."""
+    normalized = sorted(set(anomalies), key=lambda item: (item[0], item[1]))
+    return json.dumps(normalized)
+
+
+def parse_anomaly_metadata(body):
+    text = body or ""
+    dedup_key, signature, count = "", "", 0
+    for line in text.splitlines():
+        line = line.strip()
+        if line.startswith("<!-- autoecoops:dkey=") and line.endswith(" -->"):
+            dedup_key = line[len("<!-- autoecoops:dkey="):-4]
+        elif line.startswith("<!-- autoecoops:asig=") and line.endswith(" -->"):
+            signature = line[len("<!-- autoecoops:asig="):-4]
+        elif line.startswith("<!-- autoecoops:acount=") and line.endswith(" -->"):
+            raw_count = line[len("<!-- autoecoops:acount="):-4]
+            if raw_count.isdigit():
+                count = int(raw_count)
+    return {
+        "dedup_key": dedup_key,
+        "signature": signature,
+        "count": count,
+    }
+
+
+def find_open_auto_anomaly_issue(pr_num):
+    title_key = f"[Auto] PR #{pr_num} CI anomaly tracking"
+    page = 1
+    while True:
+        data = gh_api(f"/repos/{REPO}/issues?state=open&per_page={ISSUES_PAGE_SIZE}&labels=blocked&page={page}")
+        if not isinstance(data, list) or not data:
+            break
+        for issue in data:
+            if issue.get("title", "") == title_key:
+                return issue
+        page += 1
+    return None
+
+
+def upsert_auto_anomaly_issue(pr_num, anomalies, head_sha):
+    title = f"[Auto] PR #{pr_num} CI anomaly tracking"
+    dedup_key = build_dedup_key(pr_num, head_sha)
+    anomaly_signature = build_anomaly_signature(anomalies)
+    trigger_source = get_trigger_source_label()
+    observed_at = datetime.now(timezone.utc).isoformat()
+    body_lines = "\n".join(
+        f"- `{name}`: `{conclusion}`"
+        for name, conclusion in sorted(set(anomalies), key=lambda item: item[0].lower())
+    )
+
+    issue = find_open_auto_anomaly_issue(pr_num)
+    if issue:
+        meta = parse_anomaly_metadata(issue.get("body", ""))
+        if meta["dedup_key"] == dedup_key:
+            print(f"  [ANOMALY-ISSUE] Dedup hit for key {dedup_key}")
+            return {"issue_number": issue["number"], "anomaly_count": meta["count"], "dedup_skipped": True}
+        if meta["signature"] == anomaly_signature:
+            # Same anomaly set persisted → advance consecutive counter.
+            anomaly_count = meta["count"] + 1
+        else:
+            # Different anomaly set → start a new consecutive counter.
+            anomaly_count = 1
+        body = (
+            f"## Auto-detected CI/Gate anomalies for PR #{pr_num}\n\n"
+            f"- **Trigger Source:** `{trigger_source}`\n"
+            f"- **Observed At:** `{observed_at}`\n"
+            f"- **Consecutive Observations:** `{anomaly_count}` / `{ANOMALY_ESCALATION_THRESHOLD}`\n\n"
+            f"The following non-required gates are not healthy and need follow-up:\n\n"
+            f"{body_lines}\n\n"
+            f"This issue is automatically maintained and will be auto-closed once anomalies disappear.\n\n"
+            f"<!-- autoecoops:dkey={dedup_key} -->\n"
+            f"<!-- autoecoops:asig={anomaly_signature} -->\n"
+            f"<!-- autoecoops:acount={anomaly_count} -->\n\n"
+            f"> AutoEcoOps PR Governance Engine"
+        )
+        current_body = (issue.get("body", "") or "").replace("\r\n", "\n").strip()
+        next_body = (body or "").replace("\r\n", "\n").strip()
+        if current_body == next_body:
+            print(f"  [ANOMALY-ISSUE] No changes for issue #{issue['number']}")
+            return {"issue_number": issue["number"], "anomaly_count": anomaly_count, "dedup_skipped": False}
+        updated = gh_api(f"/repos/{REPO}/issues/{issue['number']}", method="PATCH", data={"body": body})
+        if updated.get("_http_error"):
+            print(f"  [ANOMALY-ISSUE] Failed to update issue #{issue['number']}: {updated.get('_http_error')}")
+            return {"issue_number": None, "anomaly_count": anomaly_count, "dedup_skipped": False}
+        print(f"  [ANOMALY-ISSUE] Updated issue #{issue['number']}")
+        return {"issue_number": issue["number"], "anomaly_count": anomaly_count, "dedup_skipped": False}
+
+    anomaly_count = 1
+    body = (
+        f"## Auto-detected CI/Gate anomalies for PR #{pr_num}\n\n"
+        f"- **Trigger Source:** `{trigger_source}`\n"
+        f"- **Observed At:** `{observed_at}`\n"
+        f"- **Consecutive Observations:** `{anomaly_count}` / `{ANOMALY_ESCALATION_THRESHOLD}`\n\n"
+        f"The following non-required gates are not healthy and need follow-up:\n\n"
+        f"{body_lines}\n\n"
+        f"This issue is automatically maintained and will be auto-closed once anomalies disappear.\n\n"
+        f"<!-- autoecoops:dkey={dedup_key} -->\n"
+        f"<!-- autoecoops:asig={anomaly_signature} -->\n"
+        f"<!-- autoecoops:acount={anomaly_count} -->\n\n"
+        f"> AutoEcoOps PR Governance Engine"
+    )
+
+    created = gh_api(
+        f"/repos/{REPO}/issues",
+        method="POST",
+        data={"title": title, "body": body, "labels": AUTO_ANOMALY_ISSUE_LABELS},
+    )
+    issue_number = created.get("number")
+    if created.get("_http_error"):
+        print(f"  [ANOMALY-ISSUE] Failed to create issue: {created.get('_http_error')}")
+        return {"issue_number": None, "anomaly_count": anomaly_count, "dedup_skipped": False}
+    if issue_number:
+        print(f"  [ANOMALY-ISSUE] Created issue #{issue_number}")
+    else:
+        print(f"  [ANOMALY-ISSUE] Failed to create issue: no issue number returned")
+    return {"issue_number": issue_number, "anomaly_count": anomaly_count, "dedup_skipped": False}
+
+
+def apply_anomaly_escalation(pr_num, issue_number, anomaly_count):
+    if not issue_number or anomaly_count < ANOMALY_ESCALATION_THRESHOLD:
+        return
+    print(
+        f"  [ANOMALY-ESCALATE] count={anomaly_count} >= {ANOMALY_ESCALATION_THRESHOLD}, "
+        f"adding {HUMAN_REVIEW_LABEL} and {ANOMALY_SEVERITY_LABEL}"
+    )
+    add_label(pr_num, HUMAN_REVIEW_LABEL)
+    issue_data = gh_api(f"/repos/{REPO}/issues/{issue_number}")
+    if not isinstance(issue_data, dict):
+        print(f"  [ANOMALY-ESCALATE] Failed to fetch issue #{issue_number}, skipping sev/high label")
+        return
+    if issue_data.get("_http_error"):
+        print(
+            f"  [ANOMALY-ESCALATE] Failed to fetch issue #{issue_number}: "
+            f"{issue_data.get('_http_error')}"
+        )
+        return
+    existing_labels = [label.get("name") for label in issue_data.get("labels", []) if isinstance(label, dict)]
+    if ANOMALY_SEVERITY_LABEL in existing_labels:
+        return
+    updated_labels = existing_labels + [ANOMALY_SEVERITY_LABEL]
+    patch_result = gh_api(f"/repos/{REPO}/issues/{issue_number}", method="PATCH", data={"labels": updated_labels})
+    if patch_result.get("_http_error"):
+        print(
+            f"  [ANOMALY-ESCALATE] Failed to set {ANOMALY_SEVERITY_LABEL} on issue #{issue_number}: "
+            f"{patch_result.get('_http_error')}"
+        )
+
+
+def close_auto_anomaly_issue_if_clean(pr_num):
+    issue = find_open_auto_anomaly_issue(pr_num)
+    if not issue:
+        return
+    issue_num = issue["number"]
+    comment_result = gh_api(
+        f"/repos/{REPO}/issues/{issue_num}/comments",
+        method="POST",
+        data={
+            "body": (
+                f"## Auto-closed\n\n"
+                f"PR #{pr_num} no longer has detected non-required gate anomalies.\n\n"
+                f"> AutoEcoOps PR Governance Engine"
+            )
+        },
+    )
+    if comment_result.get("_http_error"):
+        print(f"  [ANOMALY-ISSUE] Failed to comment before close #{issue_num}: {comment_result.get('_http_error')}")
+        return
+    closed = gh_api(
+        f"/repos/{REPO}/issues/{issue_num}",
+        method="PATCH",
+        data={"state": "closed", "state_reason": "completed"},
+    )
+    if closed.get("_http_error"):
+        print(f"  [ANOMALY-ISSUE] Failed to close issue #{issue_num}: {closed.get('_http_error')}")
+        return
+    print(f"  [ANOMALY-ISSUE] Closed issue #{issue_num}")
 
 
 # ── Issue cleanup: close [Auto] PR blocked issues when PR is resolved ────────
@@ -503,7 +835,9 @@ def close_all_stale_auto_issues():
 
 # ── Main PR processor ─────────────────────────────────────────────────────────
 
-def process_pr(pr_num, pr_title, pr_branch, head_sha, merge_status, labels):
+def process_pr(pr_num, pr_title, pr_branch, head_sha, merge_status, labels, is_draft=False):
+    pr_title = ensure_conventional_pr_title(pr_num, pr_title)
+    apply_mechanical_codacy_fixes(pr_num, pr_branch)
     label_names = {l["name"] for l in labels} if labels else set()
 
     # ── Human-review-required: evaluate AI/bot comments ──────────────────────
@@ -530,9 +864,48 @@ def process_pr(pr_num, pr_title, pr_branch, head_sha, merge_status, labels):
 
     check_runs = get_check_runs(head_sha) if head_sha else []
     passing, failing, pending, all_pass, any_pending = classify_checks(check_runs)
+    anomalies = collect_non_required_gate_anomalies(check_runs)
 
     print(f"  passing={sorted(passing)} failing={sorted(failing)} pending={sorted(pending)}")
     print(f"  all_pass={all_pass} any_pending={any_pending} merge_status={merge_status}")
+    if anomalies:
+        print(f"  [ANOMALIES] Non-required gate anomalies: {anomalies}")
+        anomaly_names = {name for name, _ in anomalies}
+        retrigger_ci(pr_num, head_sha, anomaly_names)
+        anomaly_result = upsert_auto_anomaly_issue(pr_num, anomalies, head_sha)
+        issue_number = anomaly_result.get("issue_number")
+        if issue_number:
+            add_label(pr_num, "blocked")
+            apply_anomaly_escalation(pr_num, issue_number, anomaly_result.get("anomaly_count", 0))
+    else:
+        close_auto_anomaly_issue_if_clean(pr_num)
+
+    # Draft PRs: keep continuous maintenance/retrigger, but skip merge operations.
+    if is_draft:
+        if any_pending and not failing:
+            skipped_required = set()
+            for run in check_runs:
+                name = run.get("name")
+                status = (run.get("status") or "").lower()
+                conclusion = (run.get("conclusion") or "").lower()
+                if (
+                    name in REQUIRED_CHECKS and
+                    name in pending and
+                    status == "completed" and
+                    conclusion in ("skipped", "action_required")
+                ):
+                    skipped_required.add(name)
+            if skipped_required:
+                print(f"  [DRAFT] Required checks skipped ({sorted(skipped_required)}). Re-triggering...")
+                retrigger_ci(pr_num, head_sha, skipped_required)
+        if failing:
+            print(f"  [DRAFT] Required checks failed: {failing}. Re-triggering...")
+            retrigger_ci(pr_num, head_sha, set(failing))
+        if merge_status in ("BEHIND", "UNKNOWN"):
+            print(f"  [DRAFT] Branch is {merge_status}. Triggering update-branch maintenance.")
+            update_branch(pr_num)
+        print("  [DRAFT] Continuous maintenance enabled; merge actions skipped.")
+        return
 
     # ── 1. All required checks pass → MERGE NOW ───────────────────────────────
     if all_pass and not failing:
@@ -544,7 +917,24 @@ def process_pr(pr_num, pr_title, pr_branch, head_sha, merge_status, labels):
 
     # ── 2. Checks still running → enable auto-merge and wait ─────────────────
     if any_pending and not failing:
-        print(f"  → CI running ({pending}). Enabling auto-merge...")
+        skipped_required = set()
+        for run in check_runs:
+            name = run.get("name")
+            status = (run.get("status") or "").lower()
+            conclusion = (run.get("conclusion") or "").lower()
+            if (
+                name in REQUIRED_CHECKS and
+                name in pending and
+                status == "completed" and
+                conclusion in ("skipped", "action_required")
+            ):
+                skipped_required.add(name)
+        if skipped_required:
+            print(f"  → Required checks skipped ({sorted(skipped_required)}). Re-triggering...")
+            retrigger_ci(pr_num, head_sha, skipped_required)
+            print(f"  → Re-trigger requested for skipped required checks. Enabling auto-merge...")
+        else:
+            print(f"  → CI running ({pending}). Enabling auto-merge...")
         enable_auto_merge(pr_num)
         return
 
@@ -597,6 +987,7 @@ def main():
         head_sha     = pr.get("headRefOid", "")
         merge_status = pr.get("mergeStateStatus", "UNKNOWN")
         labels       = pr.get("labels", [])
+        is_draft     = pr.get("isDraft", False)
 
         # For UNKNOWN state: get accurate data from REST API
         if merge_status == "UNKNOWN":
@@ -610,7 +1001,7 @@ def main():
         else:
             print(f"\n=== PR #{pr_num} [{merge_status}]: {pr_title[:60]} ===")
 
-        process_pr(pr_num, pr_title, pr_branch, head_sha, merge_status, labels)
+        process_pr(pr_num, pr_title, pr_branch, head_sha, merge_status, labels, is_draft=is_draft)
 
     print("\n[DONE] All PRs processed.")
 

@@ -21,11 +21,10 @@
 name: PR Blocked Response
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
   workflow_run:
     workflows:
       - "eco-base CI/CD"
+      - "Security Gates — Trivy + Checkov + Gitleaks"
     types: [completed]
   schedule:
     - cron: "*/15 * * * *"
@@ -33,6 +32,10 @@ on:
     inputs:
       pr_number:
         description: "Specific PR number to diagnose (leave empty for all open PRs)"
+        required: false
+        type: string
+      autofix_details:
+        description: "Optional detailed description appended to auto-fix commit message"
         required: false
         type: string
 
@@ -65,7 +68,7 @@ jobs:
           python-version: "3.13"
 
       - name: Install dependencies
-        run: pip3 install pyyaml
+        run: pip3 install pyyaml ruff
 
       - name: Configure git
         run: |
@@ -77,6 +80,10 @@ jobs:
           GH_TOKEN: ${{ secrets.AUTO_FIX_TOKEN || secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           SPECIFIC_PR: ${{ github.event.inputs.pr_number || '' }}
+          TRIGGER_EVENT: ${{ github.event_name }}
+          SOURCE_WORKFLOW: ${{ github.event.workflow_run.name || '' }}
+          AUTOFIX_DETAILS: ${{ github.event.inputs.autofix_details || '' }}
+          AUTOFIX_SIGNOFF: "true"
         run: python3 tools/pr-blocked-response/diagnose.py
 
       - name: Run AutoEcoOps High-Governance Engine

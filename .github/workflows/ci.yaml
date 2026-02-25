@@ -25,9 +25,10 @@ jobs:
     - name: Run CI Validator Engine
       id: validator
       run: |
+        VALIDATOR_EXIT_CODE=0
         if [ -f "tools/ci-validator/validate.py" ]; then
-          python3 tools/ci-validator/validate.py --report=/tmp/validation-report.json
+          python3 tools/ci-validator/validate.py --report=/tmp/validation-report.json || VALIDATOR_EXIT_CODE=$?
         else
           echo "Validator tool not found, skipping..."
         fi
-        echo "error_count=0" >> "$GITHUB_OUTPUT"
+        echo "error_count=$VALIDATOR_EXIT_CODE" >> "$GITHUB_OUTPUT"

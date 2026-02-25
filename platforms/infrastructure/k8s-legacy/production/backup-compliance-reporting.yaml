@@ -53,7 +53,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/backup-compliance-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:backup-compliance-config:sha256-9fd0dc7f3a5071a71247dcb3fbdcae625c0a8f48b108842290b4a6fe5edda46a
+    eco-base/urn: urn:eco-base:k8s:core:configmap:backup-compliance-config:sha256-ce7925879d86ee71fc5b94f9666454681fd30ca9646b19382d321793b7400be5
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -73,7 +73,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/backup-compliance-report
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:backup-compliance-report:sha256-a8ffed7e2dcbdb26c51a9720364ba2a19e55dec620c9c0a93c608d19edea8d67
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:backup-compliance-report:sha256-3b24f5e1afe7c76c7da623cb90eb57e8b64692d49a6214e6f71f9f191d79db86
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance

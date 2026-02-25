@@ -84,7 +84,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/performance-auto-tuning-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:performance-auto-tuning-config:sha256-0fa5f1454a0de17a4018bcc10706f95ad2d4f87cad55aed7fb070fd4ab3df96b
+    eco-base/urn: urn:eco-base:k8s:core:configmap:performance-auto-tuning-config:sha256-0058017c180dc83bd6953ef5202252523f95af05d8e89fbf809790133e3e9a69
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance

@@ -19,7 +19,7 @@ metadata:
   eco-base/owner: "platform-team"
   eco-base/compliance: "soc2,zero-trust,gitops"
   finalizers:
-  - resources-finalizer.argocd.argoproj.io
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
 

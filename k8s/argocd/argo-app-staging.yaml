@@ -18,8 +18,8 @@ metadata:
     eco-base/uri: "eco-base://k8s/argocd/application/staging"
     eco-base/owner: "platform-team"
     eco-base/compliance: "soc2,zero-trust,gitops"
-    finalizers:
-  - resources-finalizer.argocd.argoproj.io
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
 

@@ -18,8 +18,8 @@ metadata:
     notifications.argoproj.io/subscribe.on-sync-succeeded.slack: eco-deployments
     notifications.argoproj.io/subscribe.on-sync-failed.slack: eco-alerts
     notifications.argoproj.io/subscribe.on-health-degraded.slack: eco-alerts
-    finalizers:
-  - resources-finalizer.argocd.argoproj.io
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:

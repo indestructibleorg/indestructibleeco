@@ -126,7 +126,8 @@ jobs:
           TRIVY_CFG: ${{ needs.trivy-config-scan.result }}
           CHECKOV: ${{ needs.checkov-iac-scan.result }}
         run: |
-          python3 -c '
+          python3 - << 'PYEOF'
+
           import os, sys
           results = {
               "secret-scanning": os.environ["SECRET_SCAN"],
@@ -144,4 +145,5 @@ jobs:
               sys.exit(1)
           else:
               print("\nAll security gates passed.")
-          '
+          
+          PYEOF

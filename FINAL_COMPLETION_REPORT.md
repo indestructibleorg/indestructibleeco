@@ -98,7 +98,7 @@ All 5 critical issues have been successfully resolved. The infrastructure is now
 
 **Login Credentials**:
 - Email: indestructible-auto-ops@outlook.com
-- Password: Wei412011$
+- Password: YOUR_SECURE_PASSWORD
 
 ---
 
@@ -234,7 +234,7 @@ Before proceeding to Phase C, complete the following manual steps:
 
 3. **Complete OAuth App Registration**:
    - Navigate to: https://github.com/settings/developers
-   - Login with: indestructible-auto-ops@outlook.com / Wei412011$
+   - Login with: indestructible-auto-ops@outlook.com / YOUR_SECURE_PASSWORD
    - Complete 2FA verification
    - Register OAuth app with details from tracking issue
    - Add Client ID and Secret as organization secrets

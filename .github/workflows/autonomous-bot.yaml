@@ -153,7 +153,8 @@ jobs:
           PR_NUMBER: ${{ needs.open-pr.outputs.pr_number }}
           PR_URL: ${{ needs.open-pr.outputs.pr_url }}
         run: |
-          python3 -c '
+          python3 - << 'PYEOF'
+
           import json, os
           from datetime import datetime, timezone
           entry = {
@@ -169,4 +170,5 @@ jobs:
               "compliance_tags": ["SOC2", "ISO27001", "audit-trail"],
           }
           print(json.dumps(entry, indent=2))
-          '
+          
+          PYEOF

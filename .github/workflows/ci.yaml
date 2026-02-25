@@ -24,8 +24,7 @@ jobs:
   # Gate 1: Centralized Validation Engine
   # ════════════════════════════════════════════════════════════════
   validate:
-    runs-on:
-  workflow_dispatch: ubuntu-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     outputs:
       error_count: ${{ steps.validator.outputs.error_count }}
@@ -51,8 +50,7 @@ jobs:
   # Gate 2: Python Lint & Compile
   # ════════════════════════════════════════════════════════════════
   lint:
-    runs-on:
-  workflow_dispatch: ubuntu-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: validate
     steps:
@@ -134,8 +132,7 @@ jobs:
   # Gate 3: Unit & Integration Tests
   # ════════════════════════════════════════════════════════════════
   test:
-    runs-on:
-  workflow_dispatch: ubuntu-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: lint
     steps:
@@ -233,8 +230,7 @@ jobs:
   # Gate 4: Docker Build
   # ════════════════════════════════════════════════════════════════
   build:
-    runs-on:
-  workflow_dispatch: ubuntu-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: test
     steps:
@@ -353,8 +349,7 @@ jobs:
   # Gate 5: Auto-Fix Engine (runs on failure, attempts automated repair)
   # ══════════════════════════════════════════════════════════════════
   auto-fix:
-    runs-on:
-  workflow_dispatch: ubuntu-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: [validate, lint, test, build]
     if: failure() && github.ref == 'refs/heads/main'
@@ -380,8 +375,7 @@ jobs:
   # vulnerability scanning with fail threshold.
   # ══════════════════════════════════════════════════════════════════
   supply-chain:
-    runs-on:
-  workflow_dispatch: ubuntu-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: [build]
     if: success()
@@ -438,7 +432,8 @@ jobs:
         SBOM_FILE="eco-base-sbom-${{ github.sha }}.json"
         if [ -f "$SBOM_FILE" ]; then
           echo "SBOM generated successfully"
-          python3 tools/ci-validator/parse-report.py "$SBOM_FILE" sbom-summary 2>/dev/null || python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print(f"Components: {len(d.get(chr(99)+chr(111)+chr(109)+chr(112)+chr(111)+chr(110)+chr(101)+chr(110)+chr(116)+chr(115),[]))}") ' "$SBOM_FILE" 2>/dev/null || echo "SBOM parsed"
+          python3 tools/ci-validator/parse-report.py "$SBOM_FILE" sbom-summary 2>/dev/null || \
+            python3 tools/ci-helpers/sbom_summary.py "$SBOM_FILE" 2>/dev/null || echo "SBOM parsed"
         else
           echo "SBOM not found"
           exit 1
@@ -492,7 +487,7 @@ jobs:
         echo "|-------|--------|" >> "$GITHUB_STEP_SUMMARY"
         SBOM_FILE="eco-base-sbom-${{ github.sha }}.json"
         if [ -f "$SBOM_FILE" ]; then
-          COMP=$(python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print(len(d.get("components",[])))' "$SBOM_FILE")
+          COMP=$(python3 tools/ci-helpers/sbom_summary.py "$SBOM_FILE" --count-only)
           echo "| SBOM (CycloneDX) | Generated — $COMP components |" >> "$GITHUB_STEP_SUMMARY"
         else
           echo "| SBOM (CycloneDX) | Failed |" >> "$GITHUB_STEP_SUMMARY"
@@ -510,8 +505,7 @@ jobs:
   # in the policy/ directory.
   # ══════════════════════════════════════════════════════════════════
   opa-policy:
-    runs-on:
-  workflow_dispatch: ubuntu-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: [validate]
     steps:
@@ -533,7 +527,7 @@ jobs:
         for f in $(find backend/k8s k8s -name "*.qyaml" -type f 2>/dev/null); do
           TOTAL=$((TOTAL + 1))
           if { conftest test "$f" --policy policy/qyaml_governance.rego --output json 2>/dev/null || echo "[]"; } | \
-             python3 -c 'import sys,json; raw=sys.stdin.read().strip(); r=json.loads(raw) if raw else []; failures=[x for x in r if x.get("failures")]; print("\n".join([f["msg"] for f in (failures[0]["failures"] if failures else [])])) if failures else None; sys.exit(1 if failures else 0)'; then
+             python3 tools/ci-helpers/parse_conftest.py --check; then
             PASS=$((PASS + 1))
             echo "  PASS: $f"
           else
@@ -550,7 +544,7 @@ jobs:
         for f in $(find . -name "Dockerfile*" -not -path "*/node_modules/*" 2>/dev/null); do
           echo "Checking $f"
           conftest test "$f" --policy policy/dockerfile.rego --output json 2>/dev/null | \
-            python3 -c 'import sys,json; raw=sys.stdin.read().strip(); r=json.loads(raw) if raw else []; failures=[x for x in r if x.get("failures")]; [print("  FAIL: " + m.get("msg","")) for f in failures for m in f.get("failures",[])] if failures else print("  PASS")' || true
+            python3 tools/ci-helpers/parse_conftest.py --report || true
         done
         echo "Dockerfile policy check complete"
 

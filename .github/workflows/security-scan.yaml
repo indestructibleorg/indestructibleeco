@@ -64,7 +64,7 @@ jobs:
         if [ -f "pyproject.toml" ] || [ -f "requirements.txt" ]; then
           pip-audit --format=json -o /tmp/python-audit.json 2>/dev/null || true
           if [ -f /tmp/python-audit.json ]; then
-            VULNS=$(python3 -c 'import json; d=json.load(open("/tmp/python-audit.json")); vulns=[v for dep in d.get("dependencies",[]) for v in dep.get("vulns",[])]; print(len([v for v in vulns if v.get("fix_versions")]))' 2>/dev/null || echo '0')
+            VULNS=$(python3 tools/ci-helpers/count_vulns.py /tmp/python-audit.json 2>/dev/null || echo '0')
             echo "python_vulns=$VULNS" >> "$GITHUB_OUTPUT"
             echo "Python vulnerabilities with fixes: $VULNS"
           else

@@ -1,6 +1,6 @@
 # eco-base × Cloudflare 全面整合計畫
 
-**域名：autoecoops.io | Zone ID: 3f10062913fe82ee54594594413c3d68 | Account ID: 2fead4a141ec2c677eb3bf0ac535f1d5**
+**域名：autoecoops.io | Zone ID: YOUR_CLOUDFLARE_ZONE_ID | Account ID: YOUR_CLOUDFLARE_ACCOUNT_ID**
 
 ---
 

@@ -199,7 +199,8 @@ jobs:
           CFR_RATING: ${{ steps.metrics.outputs.cfr_rating }}
           MTTR_RATING: ${{ steps.metrics.outputs.mttr_rating }}
         run: |
-          python3 -c '
+          python3 - << 'PYEOF'
+
           import json, os
           from datetime import datetime, timezone
           entry = {
@@ -215,4 +216,5 @@ jobs:
               "compliance_tags": ["SOC2", "ISO27001", "DORA", "audit-trail"],
           }
           print(json.dumps(entry, indent=2))
-          '
+          
+          PYEOF

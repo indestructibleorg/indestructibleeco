@@ -12,8 +12,8 @@
 | `SUPABASE_ANON_KEY` | `REDACTED_SUPABASE_ANON_KEY` | Supabase anonymous key |
 | `SUPABASE_SECRET_KEY` | `REDACTED_SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key |
 | `CLOUDFLARE_API_TOKEN` | `REDACTED_CLOUDFLARE_API_TOKEN` | Cloudflare Global API Token |
-| `CLOUDFLARE_ACCOUNT_ID` | `2fead4a141ec2c677eb3bf0ac535f1d5` | Cloudflare Account ID |
-| `CLOUDFLARE_ZONE_ID` | `3f10062913fe82ee54594594413c3d68` | Cloudflare Zone ID |
+| `CLOUDFLARE_ACCOUNT_ID` | `YOUR_CLOUDFLARE_ACCOUNT_ID` | Cloudflare Account ID |
+| `CLOUDFLARE_ZONE_ID` | `YOUR_CLOUDFLARE_ZONE_ID` | Cloudflare Zone ID |
 | `GITHUB_PAT` | *(Configure manually)* | GitHub Personal Access Token |
 | `GRAFANA_ADMIN_PASSWORD` | *(Generate secure password)* | Grafana admin password |
 
@@ -40,10 +40,10 @@
 - Storage Admin
 
 **Key IDs**:
-- `29f5085c952ac8f3bc845358d123385ce365adb9`
-- `132a0d149288e4631c6e2d2af7294864306369c7`
+- `YOUR_GCP_SA_KEY_ID_1`
+- `YOUR_GCP_SA_KEY_ID_2`
 
-**OAuth 2 Client ID**: `109929971358789976736`
+**OAuth 2 Client ID**: `YOUR_OAUTH2_CLIENT_ID`
 
 **Additional Token**: `REDACTED_ADDITIONAL_TOKEN`
 

@@ -80,7 +80,7 @@ jobs:
           STATUS=$(curl -s \
             -H "Authorization: Bearer ${{ secrets.ARGOCD_TOKEN }}" \
             "${{ secrets.ARGOCD_SERVER }}/api/v1/applications/$APP" 2>/dev/null | \
-            python3 -c 'import sys,json; d=json.load(sys.stdin); print(d.get("status",{}).get("sync",{}).get("status","Unknown")+"|"+d.get("status",{}).get("health",{}).get("status","Unknown"))' \
+            python3 tools/ci-helpers/parse_stdin_json.py status.sync.status+status.health.status Unknown|Unknown
             2>/dev/null || echo "Unknown|Unknown")
 
           SYNC_STATUS=$(echo "$STATUS" | cut -d'|' -f1)
@@ -163,7 +163,7 @@ jobs:
               -H "Content-Type: application/json" \
               -d '{"prune":false,"dryRun":false,"strategy":{"hook":{}}}' \
               "${{ secrets.ARGOCD_SERVER }}/api/v1/applications/$APP/sync" 2>/dev/null | \
-              python3 -c 'import sys,json; d=json.load(sys.stdin); print(d.get("status",{}).get("operationState",{}).get("phase","Unknown"))' \
+              python3 tools/ci-helpers/parse_stdin_json.py status.operationState.phase Unknown
               2>/dev/null || echo "Error")
 
             if [ "$RESULT" = "Succeeded" ] || [ "$RESULT" = "Running" ]; then

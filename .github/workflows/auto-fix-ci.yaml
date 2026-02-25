@@ -221,7 +221,7 @@ jobs:
         if git diff --quiet; then
           echo "No validator auto-fixes applied"
         else
-          FIXED_COUNT=$(python3 -c 'import json; d=json.load(open("/tmp/autofix-applied.json")); print(d.get("fixed",0))' 2>/dev/null || echo '0')
+          FIXED_COUNT=$(python3 tools/ci-helpers/parse_json_field.py /tmp/autofix-applied.json fixed 0 2>/dev/null || echo '0')
           FIXES_APPLIED=$((FIXES_APPLIED + FIXED_COUNT))
           FIX_SUMMARY="${FIX_SUMMARY}\n- Applied ${FIXED_COUNT} CI validator auto-fixes"
           echo "Validator fixes applied: $FIXED_COUNT"

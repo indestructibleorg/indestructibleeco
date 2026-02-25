@@ -284,7 +284,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          python3 -c '
+          python3 - << 'PYEOF'
+
           import json, os, urllib.request
           from datetime import datetime, timezone
 
@@ -332,7 +333,8 @@ jobs:
           else:
               _enum = existing[0]["number"]
               print(f"Existing incident issue: #{_enum}")
-          '
+          
+          PYEOF
 
   self-healing-summary:
     name: Self-Healing Summary
@@ -348,7 +350,8 @@ jobs:
           ROLLOUT_APPROVED: ${{ needs.feature-flag-gate.outputs.rollout_approved }}
           SLO_RESULT: ${{ needs.slo-continuous-monitor.result }}
         run: |
-          python3 -c '
+          python3 - << 'PYEOF'
+
           import json, os
           from datetime import datetime, timezone
           entry = {
@@ -362,4 +365,5 @@ jobs:
               "compliance_tags": ["SOC2", "ISO27001", "chaos-engineering", "slo-monitoring"],
           }
           print(json.dumps(entry, indent=2))
-          '
+          
+          PYEOF

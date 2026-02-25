@@ -8,12 +8,12 @@
 # GL Unified Naming Charter: gl-enterprise-architecture/governance/engine/governance/gl-artifacts/meta/naming-charter/gl-unified-naming-charter.yaml
 
 """
-GL Semantic Core Engine
+GL Spec Core Engine
 A fully functional semantic engine that transforms YAML specifications into
 computable, reasonaable, indexable, and foldable semantic structures.
 
 Phases Implemented:
-- Phase 2: Semantic Folding (語意折疊)
+- Phase 2: Spec Aggregation (語意折疊)
 - Phase 3: Semantic Parameterization (語意參數化)
 - Phase 4: Semantic Indexing (語意索引)
 - Phase 5: Semantic Optimization (語意性能優化)
@@ -35,13 +35,13 @@ from .semantic_models import (
     SemanticGraph, 
     SemanticIndex
 )
-from .semantic_folding import SemanticFoldingEngine
+from .spec_aggregation import SemanticFoldingEngine
 from .semantic_parameterization import SemanticParameterizationEngine
 from .semantic_indexing import SemanticIndexingEngine
 from .semantic_inference import SemanticInferenceEngine
 
 __version__ = "1.0.0"
-__author__ = "GL Semantic Core Platform"
+__author__ = "GL Spec Core Platform"
 
 __all__ = [
     'SemanticEngine',

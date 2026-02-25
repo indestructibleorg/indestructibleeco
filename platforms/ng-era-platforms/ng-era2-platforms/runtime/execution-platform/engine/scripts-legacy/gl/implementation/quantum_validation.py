@@ -108,7 +108,7 @@ class QuantumValidator:
         self.dimensions = self._init_dimensions()
         self.quantum_algorithms = self._init_quantum_algorithms()
         self.classical_algorithms = {
-            "CLASSICAL-SEMANTIC": "Classical Semantic Validation",
+            "CLASSICAL-SEMANTIC": "Classical Schema Validation",
             "CLASSICAL-STRUCTURE": "Classical Structural Validation",
             "CLASSICAL-PROOF": "Classical Proof Validation",
         }
@@ -206,7 +206,7 @@ class QuantumValidator:
         return {
             "QUANTUM-SEMANTIC": QuantumAlgorithm(
                 algorithm_id="QUANTUM-SEMANTIC",
-                name="Quantum Semantic Validation",
+                name="Quantum Schema Validation",
                 qubits=(16, 24),
                 accuracy="99.0%",
                 description="Quantum-enhanced semantic consistency validation",
@@ -237,7 +237,7 @@ class QuantumValidator:
         return [
             {
                 "stage_id": "STAGE-1",
-                "name": "Semantic Validation",
+                "name": "Schema Validation",
                 "algorithm": "QUANTUM-SEMANTIC",
                 "timeout_ms": 50.0,
                 "metrics": {

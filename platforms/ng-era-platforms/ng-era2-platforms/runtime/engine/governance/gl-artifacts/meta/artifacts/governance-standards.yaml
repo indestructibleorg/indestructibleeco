@@ -137,7 +137,7 @@ spec:
     version_control:
       - rule_id: "VER-001"
         name: "Semantic Versioning"
-        description: "版本號必須遵循語義化版本規範"
+        description: "版本號必須遵循Spec化版本規範"
         format: "MAJOR.MINOR.PATCH"
         rules:
           - "MAJOR: 不兼容的API變更"

@@ -11,64 +11,131 @@ permissions:
   pull-requests: write
 
 jobs:
-  supply-chain-governance:
+  pr-autofix:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
-          # 如果是 PR，則切換到 PR 的 head 分支以利回寫
-          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref }}
+
+      - name: Block manual edits of eco-base/urn and eco-base/uri
+        run: |
+          set -euo pipefail
+          git fetch origin ${{ github.base_ref }} --depth=1
+          if git diff origin/${{ github.base_ref }}...HEAD -U0 | grep -E '^\+.*eco-base/(urn|uri):|^-.*eco-base/(urn|uri):' >/dev/null; then
+            AUTHOR="$(git log -1 --pretty=format:'%an <%ae>')"
+            if echo "$AUTHOR" | grep -qi 'eco-supplychain-bot'; then
+              echo "OK: urn/uri change authored by supplychain bot."
+            else
+              echo "ERROR: manual edits to eco-base/urn or eco-base/uri are forbidden. Run supplychain regeneration (CI/bot) instead."
+              exit 1
+            fi
+          fi
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Install deps
         run: |
           python -m pip install --upgrade pip
           pip install pyyaml
 
-      - name: Block manual edits of eco-base/urn and eco-base/uri
-        if: github.event_name == 'pull_request'
+      - name: Update URN/URI + generate hashlock.json (authoritative)
+        if: github.event.pull_request.head.repo.full_name == github.repository
         run: |
-          set -euo pipefail
-          git fetch origin ${{ github.base_ref }} --depth=1
-          # 找出 PR 相對 base 的變更，若直接改 urn/uri，先標記
-          if git diff origin/${{ github.base_ref }}...HEAD -U0 | grep -E '^\+.*eco-base/(urn|uri):|^-.*eco-base/(urn|uri):' >/dev/null; then
-            # 若這次 commit 作者不是 bot，就 fail（防手填）
-            AUTHOR="$(git log -1 --pretty=format:'%an <%ae>')"
-            if echo "$AUTHOR" | grep -qi 'eco-supplychain-bot'; then
-              echo "OK: urn/uri change authored by supplychain bot."
-            else
-              echo "ERROR: manual edits to eco-base/urn or eco-base/uri are forbidden. Run hashlock update (CI/bot) instead."
-              exit 1
-            fi
-          fi
+          python tools/eco-supplychain/hashlock.py \
+            --mode update \
+            --paths platforms k8s manifests \
+            --hashlock supplychain/hashlock.json
 
-      - name: Update URN/URI and Hashlock (PR only)
-        if: github.event_name == 'pull_request'
+      - name: Verify no drift (must pass after update)
         run: |
-          python tools/eco-supplychain/hashlock.py --mode update --paths platforms/ k8s/ manifests/
-          
-          # 檢查是否有變更並自動 commit 回 PR 分支
-          if [ -n "$(git status --porcelain)" ]; then
-            git config user.name "eco-supplychain-bot"
-            git config user.email "eco-supplychain-bot@users.noreply.github.com"
-            git add .
-            git commit -m "chore(supplychain): auto-update URN/URI and hashlock.json"
-            git push
-          else
-            echo "No supply chain drift detected."
-          fi
+          python tools/eco-supplychain/hashlock.py \
+            --mode verify \
+            --paths platforms k8s manifests \
+            --hashlock supplychain/hashlock.json
 
-      - name: Verify Supply Chain Integrity (Push to main or PR check)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Generate verification report artifacts
         run: |
-          echo "Step 1: Verify Attestation (Source & Binding)"
-          python tools/eco-supplychain/verify_attestation.py --hashlock supplychain/hashlock.json --attestation supplychain/hashlock.attestation.intoto.json
-          
-          echo "Step 2: Verify Hashlock Drift (Manifests vs SoT)"
-          python tools/eco-supplychain/hashlock.py --mode verify --paths platforms/ k8s/ manifests/ --hashlock supplychain/hashlock.json
+          python tools/eco-supplychain/report.py \
+            --hashlock supplychain/hashlock.json \
+            --out-json supplychain/reports/latest.verify.json \
+            --out-md supplychain/reports/latest.summary.md
+
+      - name: Commit back to PR branch (if changed)
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name  "eco-supplychain-bot"
+          git config user.email "eco-supplychain-bot@users.noreply.github.com"
+          git add -A
+          git commit -m "chore(eco): regenerate urn/uri + hashlock (sha256) [ci]"
+          git push
+
+      - name: Upload supplychain reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: eco-supplychain-reports-pr
+          path: |
+            supplychain/hashlock.json
+            supplychain/reports/latest.verify.json
+            supplychain/reports/latest.summary.md
+
+      - name: Block fork PR (cannot auto-write)
+        if: github.event.pull_request.head.repo.full_name != github.repository
+        run: |
+          echo "Fork PR cannot be auto-patched with GITHUB_TOKEN write permissions."
+          echo "This repo enforces CI-authored URN/URI + hashlock; fork PR is blocked by policy."
+          exit 1
+
+  main-verify:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+
+      - name: Verify attestation binds to hashlock
+        run: |
+          python tools/eco-supplychain/verify_attestation.py \
+            --hashlock supplychain/hashlock.json \
+            --attestation supplychain/hashlock.attestation.intoto.json
+
+      - name: Verify hashlock (no drift allowed on main)
+        run: |
+          python tools/eco-supplychain/hashlock.py \
+            --mode verify \
+            --paths platforms k8s manifests \
+            --hashlock supplychain/hashlock.json
+
+      - name: Generate verification report artifacts
+        run: |
+          python tools/eco-supplychain/report.py \
+            --hashlock supplychain/hashlock.json \
+            --out-json supplychain/reports/latest.verify.json \
+            --out-md supplychain/reports/latest.summary.md
+
+      - name: Upload supplychain reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: eco-supplychain-reports-main
+          path: |
+            supplychain/reports/latest.verify.json
+            supplychain/reports/latest.summary.md

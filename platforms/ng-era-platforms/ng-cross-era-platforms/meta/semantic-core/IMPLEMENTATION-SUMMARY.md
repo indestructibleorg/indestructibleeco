@@ -1,8 +1,8 @@
-# GL Semantic Core Platform v1.0.0 - Implementation Summary
+# GL Spec Core Platform v1.0.0 - Implementation Summary
 
 ## Overview
 
-GL Semantic Core Platform v1.0.0 has been successfully created as a complete semantic computing infrastructure for the MachineNativeOps platform universe. This platform provides advanced semantic computation capabilities including semantic folding, vectorization, graph computation, and inference engines.
+GL Spec Core Platform v1.0.0 has been successfully created as a complete semantic computing infrastructure for the MachineNativeOps platform universe. This platform provides advanced semantic computation capabilities including semantic folding, vectorization, graph computation, and inference engines.
 
 ## ✅ Completed Components
 
@@ -11,7 +11,7 @@ GL Semantic Core Platform v1.0.0 has been successfully created as a complete sem
 ```
 gl-platform-services/
 ├── src/                          # Source code
-│   ├── semantic-folding/         # Semantic folding engine ✅
+│   ├── spec-aggregation/         # Semantic folding engine ✅
 │   ├── semantic-computation/     # Semantic computation engine (stub)
 │   ├── semantic-indexing/        # Semantic indexing engine (stub)
 │   ├── semantic-inference/       # Semantic inference engine (stub)
@@ -45,11 +45,11 @@ gl-platform-services/
 
 ### 2. Core Engine Implementation
 
-#### Semantic Folding Engine (`src/semantic-folding/engine.py`)
+#### Spec Aggregation Engine (`src/spec-aggregation/engine.py`)
 **Features:**
 - 4 folding strategies: Vector, Graph, Hybrid, Adaptive
 - SemanticNode dataclass for node representation
-- FoldedSemantics dataclass for folded representation
+- AggregatedSpec dataclass for folded representation
 - Support for vector encoding and graph construction
 - Cosine similarity computation
 - Semantic adjacency matrix building
@@ -59,7 +59,7 @@ gl-platform-services/
 **Key Classes:**
 - `SemanticFoldingEngine`: Main engine class
 - `SemanticNode`: Semantic node representation
-- `FoldedSemantics`: Folded semantic representation
+- `AggregatedSpec`: Folded semantic representation
 - `FoldingConfig`: Engine configuration
 - `FoldingStrategy`: Strategy enumeration
 
@@ -177,7 +177,7 @@ gl-platform-services/
 
 ## 🎯 Key Features
 
-### 1. Multi-Strategy Semantic Folding
+### 1. Multi-Strategy Spec Aggregation
 ✅ **Vector Folding**: Semantic embedding-based folding  
 ✅ **Graph Folding**: Knowledge graph compression  
 ✅ **Hybrid Folding**: Vector-graph fusion  
@@ -243,10 +243,10 @@ curl "[EXTERNAL_URL_REMOVED]
 kubectl apply -f deployments/kubernetes/
 
 # Check status
-kubectl get pods -n gl-platform-semantic-core
+kubectl get pods -n gl-platform-spec-core
 
 # View logs
-kubectl logs -f deployment/gl-semantic-core -n gl-platform-semantic-core
+kubectl logs -f deployment/gl-spec-core -n gl-platform-spec-core
 ```
 
 ## 📈 Performance Targets
@@ -392,7 +392,7 @@ The platform integrates with:
 
 ## 🏆 Conclusion
 
-GL Semantic Core Platform v1.0.0 is now ready for:
+GL Spec Core Platform v1.0.0 is now ready for:
 - ✅ Semantic folding and vectorization
 - ✅ Semantic computation and analysis
 - ✅ Semantic indexing and search

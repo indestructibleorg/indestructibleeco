@@ -34,7 +34,7 @@ import sys
 # 添加 src 到路径
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
-from semantic_folding.engine import (
+from spec_aggregation.engine import (
     SemanticFoldingEngine,
     FoldingConfig,
     FoldingStrategy

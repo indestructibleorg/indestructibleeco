@@ -1,0 +1,72 @@
+name: eco-supplychain-attest
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  attest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+
+      - name: Regenerate hashlock (authoritative on main)
+        run: |
+          python tools/eco-supplychain/hashlock.py \
+            --mode update \
+            --paths platforms k8s manifests \
+            --hashlock supplychain/hashlock.json
+
+      - name: Generate in-toto attestation for hashlock.json
+        env:
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_WORKFLOW: ${{ github.workflow }}
+        run: |
+          python tools/eco-supplychain/attest.py
+
+      - name: Verify attestation binds to hashlock
+        run: |
+          python tools/eco-supplychain/verify_attestation.py \
+            --hashlock supplychain/hashlock.json \
+            --attestation supplychain/hashlock.attestation.intoto.json
+
+      - name: Commit attestation + hashlock (if changed)
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name  "eco-supplychain-bot"
+          git config user.email "eco-supplychain-bot@users.noreply.github.com"
+          git add -A
+          git commit -m "chore(eco): update hashlock + attestation [ci]"
+          git push
+
+      - name: Upload supplychain evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: eco-supplychain-evidence
+          path: |
+            supplychain/hashlock.json
+            supplychain/hashlock.attestation.intoto.json

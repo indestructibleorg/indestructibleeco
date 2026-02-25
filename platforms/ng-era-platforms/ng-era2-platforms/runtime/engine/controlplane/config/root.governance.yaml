@@ -419,7 +419,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/governance-schema
-    eco-base/urn: urn:eco-base:k8s:core:configmap:governance-schema:sha256-5ebb693db2df36581092a786cb8a933f7aff4ad7a5bf4108455b1e169445581f
+    eco-base/urn: urn:eco-base:k8s:core:configmap:governance-schema:sha256-664859ce4aa264bf20cb18fd83c4c3f8bc808be88e9eb1591a3d6dcea162536d
   labels: {}
   name: governance-schema
   namespace: machinenativenops-governance

@@ -17,7 +17,7 @@ kind: Secret
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/secret/velero-s3-credentials
-    eco-base/urn: urn:eco-base:k8s:core:secret:velero-s3-credentials:sha256-a7573a76273ad0d772c44435ee9144c583977ec57f5fc2623d9b33f8c2af8e77
+    eco-base/urn: urn:eco-base:k8s:core:secret:velero-s3-credentials:sha256-0b3764ba14ea2e97db2fad103c80af8c70f0a0e0c4463afbcbdceea995977710
   labels:
     app.kubernetes.io/name: velero
     eco-base/governance: aligned
@@ -156,7 +156,7 @@ kind: CronJob
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/cronjob/postgres-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:postgres-backup:sha256-82b563d368318879c9ad54415370b3c652dffdf44997aae4649dfeefa1e8a001
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:postgres-backup:sha256-9678d7437f9ebd71e90fe99850ded6e2d1c919ccc0ce89772f9045d9b42911be
   labels:
     app.kubernetes.io/name: postgres-backup
     eco-base/governance: aligned
@@ -214,7 +214,7 @@ kind: CronJob
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/cronjob/redis-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:redis-backup:sha256-598e42d83d68c95a013036f421b35883ddc39f090d96a3f9acb56dd58ea15520
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:redis-backup:sha256-fddf78289028112d3728d68f412dad97c204bd354f8400292df8e283eb3aa98b
   labels:
     app.kubernetes.io/name: redis-backup
     eco-base/governance: aligned

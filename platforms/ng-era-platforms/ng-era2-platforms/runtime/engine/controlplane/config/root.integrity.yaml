@@ -475,7 +475,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/integrity-schema
-    eco-base/urn: urn:eco-base:k8s:core:configmap:integrity-schema:sha256-c9882ce242d14975206d77eb35962361834e0a9670c803507717df40734d2105
+    eco-base/urn: urn:eco-base:k8s:core:configmap:integrity-schema:sha256-b890bf65a3714ad5ef7a934f7edae0fbc3c8377596f0d4b655536313b7c56192
   labels: {}
   name: integrity-schema
   namespace: machinenativenops-integrity

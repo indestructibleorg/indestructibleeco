@@ -4,7 +4,7 @@ kind: Service
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/service/aep-engine-service
-    eco-base/urn: urn:eco-base:k8s:core:service:aep-engine-service:sha256-fea9ba79d739ebac4ba7edcd2e46689bf55a9ac6c4d93acc0431b81cde34f53e
+    eco-base/urn: urn:eco-base:k8s:core:service:aep-engine-service:sha256-97d48d45a7026310a23c6c7a573d493e40a01ab560636b83527b81eb3cef6466
   labels:
     app.kubernetes.io/app.kubernetes.io/component: engine
     app.kubernetes.io/name: aep-engine

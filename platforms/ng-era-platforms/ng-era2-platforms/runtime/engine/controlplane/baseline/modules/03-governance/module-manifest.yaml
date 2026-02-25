@@ -86,7 +86,7 @@ semantic_mappings:
   - concept: "Policy Enforcement"
     mapping: "mno-governance.policy-engine"
     description: "Map policy concepts to policy engine"
-  - concept: "Semantic Validation"
+  - concept: "Schema Validation"
     mapping: "mno-governance.semantic-validator"
     description: "Map semantic validation to semantic validator"
   - concept: "Audit Trail"

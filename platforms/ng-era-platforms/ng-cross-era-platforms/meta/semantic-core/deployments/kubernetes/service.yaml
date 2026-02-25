@@ -3,18 +3,18 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/core/service/gl-semantic-core-service
-    eco-base/urn: urn:eco-base:k8s:core:service:gl-semantic-core-service:sha256-91b6576f6dbe8c8a976f4fddad06d452bc9f5de52c3f7236b9c825cd4d22958f
+    eco-base/uri: eco-base://k8s/core/service/gl-spec-core-service
+    eco-base/urn: urn:eco-base:k8s:core:service:gl-spec-core-service:sha256-08b2ce07bef56a624aa35aa3558700bc3bef1d3468930c39b663086847a92c9e
     prometheus.io/port: '9091'
     prometheus.io/scrape: 'true'
   labels:
-    app.kubernetes.io/name: semantic-core
+    app.kubernetes.io/name: spec-core
     eco-base/governance: aligned
     eco-base/part-of: eco-base
     gl.service/semantic.core: 'true'
     platform: gl-platform-services
-  name: gl-semantic-core-service
-  namespace: gl-platform-semantic-core
+  name: gl-spec-core-service
+  namespace: gl-platform-spec-core
 spec:
   ports:
   - name: http
@@ -30,7 +30,7 @@ spec:
     protocol: TCP
     targetPort: 9091
   selector:
-    app.kubernetes.io/name: semantic-core
+    app.kubernetes.io/name: spec-core
     version: v1.0.0
   type: ClusterIP
 ---
@@ -38,17 +38,17 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/core/service/gl-semantic-core-external
-    eco-base/urn: urn:eco-base:k8s:core:service:gl-semantic-core-external:sha256-7fd192b4a1053c3de27fc730ebddfe7ae72701e953d9c5ceed3bcd2787794575
+    eco-base/uri: eco-base://k8s/core/service/gl-spec-core-external
+    eco-base/urn: urn:eco-base:k8s:core:service:gl-spec-core-external:sha256-1c34f64e7022b794b9ce6e0327ad17320f9a8f0f25d5632b9c475245f8cdbe5f
     service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
     service.beta.kubernetes.io/aws-load-balancer-type: alb
   labels:
-    app.kubernetes.io/name: semantic-core-external
+    app.kubernetes.io/name: spec-core-external
     eco-base/governance: aligned
     eco-base/part-of: eco-base
     platform: gl-platform-services
-  name: gl-semantic-core-external
-  namespace: gl-platform-semantic-core
+  name: gl-spec-core-external
+  namespace: gl-platform-spec-core
 spec:
   ports:
   - name: https
@@ -56,6 +56,6 @@ spec:
     protocol: TCP
     targetPort: 8080
   selector:
-    app.kubernetes.io/name: semantic-core
+    app.kubernetes.io/name: spec-core
     version: v1.0.0
   type: LoadBalancer

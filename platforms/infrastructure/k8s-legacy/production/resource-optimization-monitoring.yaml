@@ -116,7 +116,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/resource-optimization-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:resource-optimization-config:sha256-7d80b18293bcc86701a73c7c039bca62c29b8c88ef5e33cb419a5d767a69397c
+    eco-base/urn: urn:eco-base:k8s:core:configmap:resource-optimization-config:sha256-9077bf67874de3764aca1b59ac871c3d3a125a94a8dd90f3cd3ab005e1387ca2
   labels: {}
   name: resource-optimization-config
   namespace: production

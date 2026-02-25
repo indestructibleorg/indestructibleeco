@@ -126,7 +126,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/disaster-recovery-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:disaster-recovery-config:sha256-202d9968d858d7e3d67cfaee035bd39c76174e2b9b736d603828876a232f72b9
+    eco-base/urn: urn:eco-base:k8s:core:configmap:disaster-recovery-config:sha256-e8cc08643e08f70c35694404578cb14e595154ed55a3a82795b402e76007797a
   labels:
     app.kubernetes.io/name: disaster-recovery
     eco-base/governance: aligned

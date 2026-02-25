@@ -19,7 +19,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/jaeger-enhanced-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:jaeger-enhanced-config:sha256-22fd72476c3a6910987b5af177c9bd3212b5df7bc24291599e7c6508081e48eb
+    eco-base/urn: urn:eco-base:k8s:core:configmap:jaeger-enhanced-config:sha256-072fd0317dcf702125318046ec2b6a295d5685f498f1b82e2ff1d1c765a89f52
   labels: {}
   name: jaeger-enhanced-config
   namespace: istio-system
@@ -34,7 +34,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/tracing-context-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:tracing-context-config:sha256-1d1c9da10a523e6b17044aa9908913152b9c06a7b57d6882a37a622304a74bdd
+    eco-base/urn: urn:eco-base:k8s:core:configmap:tracing-context-config:sha256-f6dce45a4535567c0c455c69d67bcbc1c8604af3519e66ccfce8615c2dd0d58c
   labels: {}
   name: tracing-context-config
   namespace: istio-system
@@ -55,7 +55,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/trace-retention-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:trace-retention-config:sha256-002412e37fd6fe40bfa13f20f74234990d0d854b23ebd466991a481c495e4ac6
+    eco-base/urn: urn:eco-base:k8s:core:configmap:trace-retention-config:sha256-71e6cf6a29966b987bf463385b253ecf980b6f64d9747b85c9d4a5dbe56bcef8
   labels: {}
   name: trace-retention-config
   namespace: istio-system

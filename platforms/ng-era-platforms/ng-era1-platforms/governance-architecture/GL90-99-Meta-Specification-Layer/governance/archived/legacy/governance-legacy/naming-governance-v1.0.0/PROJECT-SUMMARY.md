@@ -184,7 +184,7 @@
 系統遵循以下標準：
 - ✅ ISO27001 信息安全管理
 - ✅ ISO27701 隱私信息管理
-- ✅ SemVer 語義化版本
+- ✅ SemVer Spec化版本
 - ✅ Kubernetes 最佳實踐
 - ✅ GitOps 運維模式
 

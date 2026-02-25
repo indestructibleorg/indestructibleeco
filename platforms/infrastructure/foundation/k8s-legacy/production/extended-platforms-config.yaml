@@ -191,7 +191,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/extended-platforms-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:extended-platforms-config:sha256-cbf23034a0cd6898b48c4055d2fd0516ed49028ee9c6d5ce50d6b254f8cad170
+    eco-base/urn: urn:eco-base:k8s:core:configmap:extended-platforms-config:sha256-a420e1516d3d80932b174bf10ec1baac48bc8f64d2233217e4f56c5cf10dbfa5
   labels: {}
   name: extended-platforms-config
   namespace: production

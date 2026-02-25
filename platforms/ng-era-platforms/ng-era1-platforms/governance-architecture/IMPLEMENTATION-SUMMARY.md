@@ -19,7 +19,7 @@ GL Platform Enterprise Architecture v1.0.0 has been successfully created as a co
 Components:
 - Semantic Taxonomy System (10 domains, 22 capabilities, 19 resources, 8 labels)
 - Semantic Mapping System (internal-to-ui, platform-to-api, component-to-functional mappings)
-- Semantic Validation System (conflict, duplicate, inconsistency, completeness detection)
+- Schema Validation System (conflict, duplicate, inconsistency, completeness detection)
 - Semantic Graph Integration (nodes, edges, schema)
 - Comment Naming Convention (tag, block, key formats)
 

@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/deployment/machine-native-ops
-    eco-base/urn: urn:eco-base:k8s:core:deployment:machine-native-ops:sha256-c228cfcc0fd06852e1a2c0033cf4454300c8361e5885576a1d75db86ef335e8e
+    eco-base/urn: urn:eco-base:k8s:core:deployment:machine-native-ops:sha256-a8b97a6049d53346aa7646f165a29ccc6e48e6f910dca130f79c1eb7fad96801
     sidecar.istio.io/interceptionMode: TPROXY
     sidecar.istio.io/proxyConfig: "proxyStatsMatcher:\n  inclusionRegexps:\n  - \"\
       .*_outbound.*\"\n  - \".*_inbound.*\"\n"

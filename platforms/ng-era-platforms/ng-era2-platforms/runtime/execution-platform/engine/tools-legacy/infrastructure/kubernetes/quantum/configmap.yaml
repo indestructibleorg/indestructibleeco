@@ -22,7 +22,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/quantumflow-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:quantumflow-config:sha256-67df9ae3315c66dff057703d428e127607be204ebfc7b34668415bf87a5cdf08
+    eco-base/urn: urn:eco-base:k8s:core:configmap:quantumflow-config:sha256-ce10da2f98678204846fa5fa09bfc4d0e55b299ed0e6b25bf04fe199714cc809
   labels:
     app.kubernetes.io/name: quantumflow
     eco-base/governance: aligned

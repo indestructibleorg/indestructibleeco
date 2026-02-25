@@ -130,7 +130,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/cross-platform-storage-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:cross-platform-storage-config:sha256-56e1cf8c863c6ab72bb6d4b13783631b39db64f3ccaac1c014030c82ec117235
+    eco-base/urn: urn:eco-base:k8s:core:configmap:cross-platform-storage-config:sha256-45cbf93354b9b345bed11d401025b74c43865526cdf6dd00fe69a00796d88669
   labels: {}
   name: cross-platform-storage-config
   namespace: production

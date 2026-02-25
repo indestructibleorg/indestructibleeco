@@ -38,7 +38,7 @@ def health_check():
     """Health check endpoint"""
     return jsonify({
         'status': 'healthy',
-        'service': 'GL Semantic Core Engine',
+        'service': 'GL Spec Core Engine',
         'version': '1.0.0'
     })
 
@@ -247,7 +247,7 @@ def export_graph():
 
 
 if __name__ == '__main__':
-    print("Starting GL Semantic Core Engine API Server...")
+    print("Starting GL Spec Core Engine API Server...")
     print("API Documentation: http://localhost:5000/")
     print("Health Check: http://localhost:5000/health")
     debug = os.environ.get("FLASK_DEBUG", "0") == "1"

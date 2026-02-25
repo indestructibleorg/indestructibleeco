@@ -575,7 +575,7 @@ parallelism_scope:
     description: 全域語意索引並行處理
     status: ACTIVE
     index_components:
-      - app.kubernetes.io/component: Layer Semantics
+      - app.kubernetes.io/component: Layer Spec
         parallel_status: ACTIVE
         count: 7
       - app.kubernetes.io/component: Boundary Definitions
@@ -604,7 +604,7 @@ parallelism_scope:
     constitution_chapters:
       - chapter: Chapter 1 - Supremacy
         parallel_status: ACTIVE
-      - chapter: Chapter 2 - Layer Semantics
+      - chapter: Chapter 2 - Layer Spec
         parallel_status: ACTIVE
       - chapter: Chapter 3 - Boundary Prohibitions
         parallel_status: ACTIVE

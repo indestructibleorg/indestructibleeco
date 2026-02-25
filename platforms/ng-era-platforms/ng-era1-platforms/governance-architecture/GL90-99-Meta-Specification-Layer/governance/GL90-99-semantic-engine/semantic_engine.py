@@ -8,7 +8,7 @@
 # GL Unified Naming Charter: gl-enterprise-architecture/governance/engine/governance/gl-artifacts/meta/naming-charter/gl-unified-naming-charter.yaml
 
 """
-Semantic Core Engine
+Spec Core Engine
 Main engine integrating folding, parameterization, indexing, and inference
 Phase 6: Semantic Engine Integration (語意引擎化)
 """
@@ -25,7 +25,7 @@ from typing import Dict, Any, List, Optional
 import yaml
 
 from .semantic_models import SemanticNode, SemanticGraph, SemanticNodeType
-from .semantic_folding import SemanticFoldingEngine
+from .spec_aggregation import SemanticFoldingEngine
 from .semantic_parameterization import SemanticParameterizationEngine
 from .semantic_indexing import SemanticIndexingEngine
 from .semantic_inference import SemanticInferenceEngine
@@ -33,7 +33,7 @@ from .semantic_inference import SemanticInferenceEngine
 
 class SemanticEngine:
     """
-    Main Semantic Core Engine
+    Main Spec Core Engine
     Integrates all semantic processing capabilities into a unified API
     """
     
@@ -275,7 +275,7 @@ class SemanticEngine:
             raise RuntimeError("Engine not initialized. Load specification first.")
         return self.inference.infer_labels_for_resource(resource_id)
     
-    # ==================== Semantic Validation API ====================
+    # ==================== Schema Validation API ====================
     
     def validate_conflict(self, node_a_id: str, node_b_id: str) -> Dict[str, Any]:
         """

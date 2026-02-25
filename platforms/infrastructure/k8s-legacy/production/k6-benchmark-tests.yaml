@@ -52,7 +52,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/k6-tests
-    eco-base/urn: urn:eco-base:k8s:core:configmap:k6-tests:sha256-89f745349433177ce5412038e8235f99eac3775771430c445cbf1a60fca02de1
+    eco-base/urn: urn:eco-base:k8s:core:configmap:k6-tests:sha256-e30245a6badba22c57d0d20eabea9ba862c3b702821e7e82951c6655c094099e
   labels:
     app.kubernetes.io/name: performance-benchmark
     eco-base/governance: aligned

@@ -538,7 +538,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/provenance-schema
-    eco-base/urn: urn:eco-base:k8s:core:configmap:provenance-schema:sha256-e271936210bc81556ac24a96bee70c7a0d593745d6bac498589bb2126ab0ed3c
+    eco-base/urn: urn:eco-base:k8s:core:configmap:provenance-schema:sha256-79cb1a5aa86a790046848b2360d747460ff4a9f24c87c18acf91bb09bbce6e97
   labels: {}
   name: provenance-schema
   namespace: machinenativenops-provenance

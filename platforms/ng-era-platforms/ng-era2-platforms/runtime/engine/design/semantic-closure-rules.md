@@ -445,7 +445,7 @@ def validate_structure(artifact):
     return status, issues
 ```
 
-### Step 2: Semantic Validation
+### Step 2: Schema Validation
 
 ```python
 def validate_semantics(artifact):
@@ -530,7 +530,7 @@ gates:
         - name: Structural Validation
           run: validate --level structural artifact.yaml
         
-        - name: Semantic Validation
+        - name: Schema Validation
           run: validate --level semantic artifact.yaml
         
         - name: Dependency Validation

@@ -25,7 +25,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/backup-encryption-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:backup-encryption-config:sha256-60f2127235e759355eef90c6290c0d89b7f3dec40944ff6f11b11eb2ee57391e
+    eco-base/urn: urn:eco-base:k8s:core:configmap:backup-encryption-config:sha256-4f70855c62c8ee1432bedee2c0054260aeaef424b78452ca28f4896d47f98a62
   labels: {}
   name: backup-encryption-config
   namespace: velero
@@ -35,7 +35,7 @@ kind: Secret
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/secret/velero-encryption-keys
-    eco-base/urn: urn:eco-base:k8s:core:secret:velero-encryption-keys:sha256-d322a572fb6485e39e8d38052f568e652680d41ca1713860ba9d81f0282f2590
+    eco-base/urn: urn:eco-base:k8s:core:secret:velero-encryption-keys:sha256-2e50155c29f59e9794f993e51b4bc76b3715c5caa82b2f473679e3b4db149852
   labels: {}
   name: velero-encryption-keys
   namespace: velero

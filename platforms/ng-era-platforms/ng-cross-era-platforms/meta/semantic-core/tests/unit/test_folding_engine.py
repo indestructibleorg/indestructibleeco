@@ -31,12 +31,12 @@ import sys
 # 添加 src 到路径
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
-from semantic_folding.engine import (
+from spec_aggregation.engine import (
     SemanticFoldingEngine,
     FoldingConfig,
     FoldingStrategy,
     SemanticNode,
-    FoldedSemantics
+    AggregatedSpec
 )
 
 
@@ -87,7 +87,7 @@ class TestSemanticFoldingEngine:
         """测试向量折叠策略"""
         folded = self.engine._fold_vector_strategy(self.test_nodes)
         
-        assert isinstance(folded, FoldedSemantics)
+        assert isinstance(folded, AggregatedSpec)
         assert folded.node_count == 2
         assert folded.vector_dimensions == 64
         assert folded.adjacency_matrix.shape == (2, 2)
@@ -100,7 +100,7 @@ class TestSemanticFoldingEngine:
         
         folded = graph_engine._fold_graph_strategy(self.test_nodes)
         
-        assert isinstance(folded, FoldedSemantics)
+        assert isinstance(folded, AggregatedSpec)
         assert folded.node_count == 2
         assert folded.metadata["folding_strategy"] == "graph"
     
@@ -111,7 +111,7 @@ class TestSemanticFoldingEngine:
         
         folded = hybrid_engine._fold_hybrid_strategy(self.test_nodes)
         
-        assert isinstance(folded, FoldedSemantics)
+        assert isinstance(folded, AggregatedSpec)
         assert folded.node_count == 2
         assert folded.vector_dimensions == 128  # 64 + 64
         assert folded.metadata["folding_strategy"] == "hybrid"
@@ -123,7 +123,7 @@ class TestSemanticFoldingEngine:
         
         folded = adaptive_engine._fold_adaptive_strategy(self.test_nodes)
         
-        assert isinstance(folded, FoldedSemantics)
+        assert isinstance(folded, AggregatedSpec)
         assert folded.node_count == 2
         assert folded.metadata["folding_strategy"] in ["vector", "graph", "hybrid"]
     
@@ -135,7 +135,7 @@ class TestSemanticFoldingEngine:
             [0.0, 1.0, 0.0],
         ])
         
-        folded = FoldedSemantics(
+        folded = AggregatedSpec(
             nodes=nodes,
             adjacency_matrix=np.zeros((2, 2)),
             vector_space=vector_space,
@@ -153,7 +153,7 @@ class TestSemanticFoldingEngine:
     def test_save_and_load_folded_semantics(self):
         """测试保存和加载折叠语义"""
         with tempfile.TemporaryDirectory() as tmpdir:
-            folded = FoldedSemantics(
+            folded = AggregatedSpec(
                 nodes=self.test_nodes,
                 adjacency_matrix=np.array([[0, 0.5], [0.5, 0]]),
                 vector_space=np.random.randn(2, 64),
@@ -220,7 +220,7 @@ class TestSemanticFoldingEngine:
         assert abs(similarity - 0.0) < 1e-6
 
 
-class TestFoldedSemantics:
+class TestAggregatedSpec:
     
     def setup_method(self):
         """测试设置"""
@@ -249,7 +249,7 @@ class TestFoldedSemantics:
             )
         ]
         
-        self.folded = FoldedSemantics(
+        self.folded = AggregatedSpec(
             nodes=self.nodes,
             adjacency_matrix=np.array([[0, 0.5], [0.5, 0]]),
             vector_space=np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]),

@@ -457,7 +457,7 @@ sealed_scope_17:
   source_file: ECO-CONSTITUTION.yaml
   sealed_chapters:
     - {chapter: 1, name: Supremacy, status: IMMUTABLE}
-    - {chapter: 2, name: Layer Semantics, status: IMMUTABLE}
+    - {chapter: 2, name: Layer Spec, status: IMMUTABLE}
     - {chapter: 3, name: Boundary Prohibitions, status: IMMUTABLE}
     - {chapter: 4, name: Lifecycle, status: IMMUTABLE}
     - {chapter: 5, name: Artifact Governance, status: IMMUTABLE}

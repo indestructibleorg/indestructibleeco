@@ -58,7 +58,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/multi-region-dr-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:multi-region-dr-config:sha256-0c7de5f2ea68dfb381b27bfdd670656e9ac7e8ea3fa3f2fa996ba3ede20f80ea
+    eco-base/urn: urn:eco-base:k8s:core:configmap:multi-region-dr-config:sha256-6f5295505ed8ace2496258dffd6ee053ca5108142568b307ae4c3a78be60bf6f
   labels: {}
   name: multi-region-dr-config
   namespace: production

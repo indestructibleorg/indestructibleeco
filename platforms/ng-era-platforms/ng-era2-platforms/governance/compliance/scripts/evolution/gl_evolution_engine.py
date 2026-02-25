@@ -297,7 +297,7 @@ class GLEvolutionEngine:
         if not record:
             raise ValueError(f"找不到執行記錄: {execution_id}")
         
-        # 執行語義分析
+        # 執行Spec分析
         analysis = self._perform_semantic_analysis(record)
         
         # 識別模式
@@ -629,7 +629,7 @@ class GLEvolutionEngine:
     # ========== 私有方法 ==========
     
     def _perform_semantic_analysis(self, record: ExecutionRecord) -> Dict:
-        """執行語義分析"""
+        """執行Spec分析"""
         analysis = {
             "intent_understood": True,
             "reasoning_steps": [],

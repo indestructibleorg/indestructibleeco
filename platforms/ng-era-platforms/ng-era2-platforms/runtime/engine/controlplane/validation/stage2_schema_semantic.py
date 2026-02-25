@@ -6,7 +6,7 @@
 #
 #!/usr/bin/env python3
 """
-Supply Chain Verification - Stage 2: Schema/Semantic Validation
+Supply Chain Verification - Stage 2: Schema/Schema Validation
 This module handles schema and semantic verification for Kubernetes resources.
 """
 # MNGA-002: Import organization needs review
@@ -20,7 +20,7 @@ from .supply_chain_types import VerificationEvidence
 # Configure logging
 logger = logging.getLogger(__name__)
 class Stage2SchemaSemanticVerifier:
-    """Verifier for Stage 2: Schema/Semantic Validation"""
+    """Verifier for Stage 2: Schema/Schema Validation"""
     def __init__(self, repo_path: Path, evidence_dir: Path, hash_manager: HashManager):
         """
         Initialize Stage 2 verifier

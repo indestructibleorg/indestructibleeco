@@ -47,7 +47,7 @@ kind: Service
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/service/machine-native-ops-lb
-    eco-base/urn: urn:eco-base:k8s:core:service:machine-native-ops-lb:sha256-e2d175abfcd6a26469f140be5dab53430907cb9776a1cff505ecc2f7f81c7f8d
+    eco-base/urn: urn:eco-base:k8s:core:service:machine-native-ops-lb:sha256-eafcd141e74bfcb1d9ff0946fc36d619f827287512ac748ad374593a39c49180
     service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
     service.beta.kubernetes.io/aws-load-balancer-type: nlb
   labels:

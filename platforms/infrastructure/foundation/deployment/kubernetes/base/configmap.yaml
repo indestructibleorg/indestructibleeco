@@ -13,7 +13,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/machine-native-ops-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:machine-native-ops-config:sha256-3708619c875a179daa49d831b1fc5598a2b221f8455a5814042db8f78629bb24
+    eco-base/urn: urn:eco-base:k8s:core:configmap:machine-native-ops-config:sha256-f705c436f1dd88d8e8ce7d6db06bfbce4f90ddec1551f581558751c5433e8441
   labels: {}
   name: machine-native-ops-config
   namespace: platform-03
@@ -29,7 +29,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/monitoring-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:monitoring-config:sha256-def269cda86b3b465fbe5c4d4e06a56e1ea2a24e194c486cd833abbabb064291
+    eco-base/urn: urn:eco-base:k8s:core:configmap:monitoring-config:sha256-4c31b416b781a29608fde4256604c38b9e0e61580d31a68f7957d71b9a2a7dfa
   labels: {}
   name: monitoring-config
   namespace: platform-03
@@ -44,7 +44,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/secrets-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:secrets-config:sha256-cc83843947f25f08abd151c579c50534763c8c2b0f301c5f5d4f9fa4bb147af9
+    eco-base/urn: urn:eco-base:k8s:core:configmap:secrets-config:sha256-574f0793b2066f654454bbbf602d501c95a451081db4da50819656d3c279f1c5
   labels: {}
   name: secrets-config
   namespace: platform-03

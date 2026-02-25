@@ -61,7 +61,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/jaeger-tracing-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:jaeger-tracing-config:sha256-8d49d14e1fda2b35f60ffa81e469eb6d7aefa19c9431d83bcf36dd2cf9e39045
+    eco-base/urn: urn:eco-base:k8s:core:configmap:jaeger-tracing-config:sha256-7983ce3c2f8bd4f0368ccd4e8292f03ec417e3f1d5b0cb5f95ec4668c7d53515
   labels: {}
   name: jaeger-tracing-config
   namespace: platform-03

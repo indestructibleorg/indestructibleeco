@@ -28,10 +28,10 @@ if [ ! -d "scripts/gl" ]; then
 fi
 
 # Run semantic validation
-echo "📋 Running GL Semantic Validation..."
+echo "📋 Running GL Schema Validation..."
 if [ -f "scripts/gl/validate-semantics.py" ]; then
     python3 scripts/gl/validate-semantics.py || {
-        echo "❌ GL Semantic Validation Failed!"
+        echo "❌ GL Schema Validation Failed!"
         echo ""
         echo "Please fix the following issues before committing:"
         echo "  1. Ensure all artifacts map to GL layers"

@@ -26,7 +26,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/istio-custom-metrics
-    eco-base/urn: urn:eco-base:k8s:core:configmap:istio-custom-metrics:sha256-6d9933ba9553751751a0957e692e8387eb9f75207c2a8d457e909db61d374f4f
+    eco-base/urn: urn:eco-base:k8s:core:configmap:istio-custom-metrics:sha256-c18d8479939ae69f46044e69a7bb89b40ff00be3a3f7a98bba6897f4e620943e
   labels: {}
   name: istio-custom-metrics
   namespace: istio-system
@@ -83,7 +83,7 @@ kind: ConfigMap
 metadata:
   annotations:
     eco-base/uri: eco-base://k8s/core/configmap/service-mesh-dashboard
-    eco-base/urn: urn:eco-base:k8s:core:configmap:service-mesh-dashboard:sha256-1edd1c0125244ea6b380c1e32483d2aa6883132e8d730c699740cd457e58e5a9
+    eco-base/urn: urn:eco-base:k8s:core:configmap:service-mesh-dashboard:sha256-6c1e11a9659767ded82fc6c3e8c7168dd1d575c051bbfb745693630da69e856f
   labels:
     eco-base/governance: aligned
     eco-base/part-of: eco-base

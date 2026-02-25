@@ -102,7 +102,7 @@ class SemanticNode:
 
 
 @dataclass
-class FoldedSemantics:
+class AggregatedSpec:
     """折叠后的语义表示"""
     nodes: List[SemanticNode]
     adjacency_matrix: np.ndarray
@@ -181,7 +181,7 @@ class SemanticFoldingEngine:
         print(f"创建图构建器: 压缩={self.config.compression_enabled}")
         return None  # 简化示例
     
-    def fold_specification(self, spec_data: Dict[str, Any]) -> FoldedSemantics:
+    def fold_specification(self, spec_data: Dict[str, Any]) -> AggregatedSpec:
         """
         折叠语义规范
         
@@ -189,7 +189,7 @@ class SemanticFoldingEngine:
             spec_data: 语义规范数据，来自 UnificationSpecification
             
         Returns:
-            FoldedSemantics: 折叠后的语义表示
+            AggregatedSpec: 折叠后的语义表示
         """
         # 1. 解析语义节点
         nodes = self._parse_semantic_nodes(spec_data)
@@ -258,7 +258,7 @@ class SemanticFoldingEngine:
         
         return nodes
     
-    def _fold_vector_strategy(self, nodes: List[SemanticNode]) -> FoldedSemantics:
+    def _fold_vector_strategy(self, nodes: List[SemanticNode]) -> AggregatedSpec:
         """向量折叠策略"""
         print(f"执行向量折叠策略: {len(nodes)} 个节点")
         
@@ -274,7 +274,7 @@ class SemanticFoldingEngine:
         # 构建邻接矩阵（基于语义相似度）
         adjacency_matrix = self._build_semantic_adjacency(vector_space_np)
         
-        return FoldedSemantics(
+        return AggregatedSpec(
             nodes=nodes,
             adjacency_matrix=adjacency_matrix,
             vector_space=vector_space_np,
@@ -286,7 +286,7 @@ class SemanticFoldingEngine:
             }
         )
     
-    def _fold_graph_strategy(self, nodes: List[SemanticNode]) -> FoldedSemantics:
+    def _fold_graph_strategy(self, nodes: List[SemanticNode]) -> AggregatedSpec:
         """图折叠策略"""
         print(f"执行图折叠策略: {len(nodes)} 个节点")
         
@@ -294,7 +294,7 @@ class SemanticFoldingEngine:
         vector_space = np.array([node.to_vector() for node in nodes], dtype=np.float32)
         adjacency_matrix = self._build_semantic_adjacency(vector_space)
         
-        return FoldedSemantics(
+        return AggregatedSpec(
             nodes=nodes,
             adjacency_matrix=adjacency_matrix,
             vector_space=vector_space,
@@ -305,7 +305,7 @@ class SemanticFoldingEngine:
             }
         )
     
-    def _fold_hybrid_strategy(self, nodes: List[SemanticNode]) -> FoldedSemantics:
+    def _fold_hybrid_strategy(self, nodes: List[SemanticNode]) -> AggregatedSpec:
         """混合折叠策略"""
         print(f"执行混合折叠策略: {len(nodes)} 个节点")
         
@@ -327,7 +327,7 @@ class SemanticFoldingEngine:
             graph_folded.adjacency_matrix
         )
         
-        return FoldedSemantics(
+        return AggregatedSpec(
             nodes=nodes,
             adjacency_matrix=fused_adjacency,
             vector_space=fused_vector_space,
@@ -339,7 +339,7 @@ class SemanticFoldingEngine:
             }
         )
     
-    def _fold_adaptive_strategy(self, nodes: List[SemanticNode]) -> FoldedSemantics:
+    def _fold_adaptive_strategy(self, nodes: List[SemanticNode]) -> AggregatedSpec:
         """自适应折叠策略"""
         print(f"执行自适应折叠策略: {len(nodes)} 个节点")
         
@@ -419,7 +419,7 @@ class SemanticFoldingEngine:
         
         return original_size / (compressed_size + 1e-8)
     
-    def save_folded_semantics(self, folded: FoldedSemantics, output_path: str):
+    def save_folded_semantics(self, folded: AggregatedSpec, output_path: str):
         """保存折叠后的语义表示"""
         # 序列化数据
         serializable_data = {
@@ -453,7 +453,7 @@ class SemanticFoldingEngine:
         
         print(f"已保存折叠语义到: {output_path}")
     
-    def load_folded_semantics(self, input_path: str) -> FoldedSemantics:
+    def load_folded_semantics(self, input_path: str) -> AggregatedSpec:
         """加载折叠后的语义表示"""
         # 加载元数据和节点
         with open(f"{input_path}.json", 'r', encoding='utf-8') as f:
@@ -479,7 +479,7 @@ class SemanticFoldingEngine:
             )
             nodes.append(node)
         
-        return FoldedSemantics(
+        return AggregatedSpec(
             nodes=nodes,
             adjacency_matrix=adjacency,
             vector_space=vectors,

@@ -1,4 +1,4 @@
-# GL Semantic Core Platform
+# GL Spec Core Platform
 
 ## 平台概述
 
@@ -35,7 +35,7 @@ GL 语义核心平台是 MachineNativeOps 平台宇宙的语义计算基础设�
 ```
 gl-platform-services/
 ├── src/                          # 源代码
-│   ├── semantic-folding/         # 语义折叠引擎
+│   ├── spec-aggregation/         # 语义折叠引擎
 │   ├── semantic-computation/     # 语义计算引擎
 │   ├── semantic-indexing/        # 语义索引引擎
 │   ├── semantic-inference/       # 语义推理引擎
@@ -74,10 +74,10 @@ kind: PlatformContract
 metadata:
   name: gl-runtime-dag-platform
 spec:
-  semantic_core:
+  spec_core:
     service_endpoint: "[EXTERNAL_URL_REMOVED]
     features:
-      - semantic-folding
+      - spec-aggregation
       - vector-search
       - semantic-inference
 ```
@@ -147,7 +147,7 @@ curl -X POST [EXTERNAL_URL_REMOVED] \
 pip install -r requirements.txt
 
 # 运行语义折叠引擎
-python -m src.semantic_folding.engine --config configs/folding-config.yaml
+python -m src.spec_aggregation.engine --config configs/folding-config.yaml
 
 # 运行测试
 pytest tests/
@@ -163,20 +163,20 @@ python tools/benchmark/run_benchmark.py
 kubectl apply -f deployments/kubernetes/
 
 # 检查状态
-kubectl get pods -n gl-platform-semantic-core
+kubectl get pods -n gl-platform-spec-core
 
 # 查看日志
-kubectl logs -f deployment/gl-semantic-core -n gl-platform-semantic-core
+kubectl logs -f deployment/gl-spec-core -n gl-platform-spec-core
 ```
 
 ### Docker 运行
 
 ```bash
 # 构建镜像
-docker build -t gl-platform/semantic-core:v1.0.0 -f deployments/docker/Dockerfile .
+docker build -t gl-platform/spec-core:v1.0.0 -f deployments/docker/Dockerfile .
 
 # 运行容器
-docker run -p 8080:8080 -p 9090:9090 gl-platform/semantic-core:v1.0.0
+docker run -p 8080:8080 -p 9090:9090 gl-platform/spec-core:v1.0.0
 ```
 
 ## API 文档
@@ -191,7 +191,7 @@ docker run -p 8080:8080 -p 9090:9090 gl-platform/semantic-core:v1.0.0
 
 详细的架构文档请查看 [docs/architecture/](docs/architecture/)
 
-- [语义折叠架构](docs/architecture/semantic-folding-architecture.md)
+- [语义折叠架构](docs/architecture/spec-aggregation-architecture.md)
 - [向量索引设计](docs/architecture/vector-indexing-design.md)
 - [图计算设计](docs/architecture/graph-computation-design.md)
 
@@ -200,7 +200,7 @@ docker run -p 8080:8080 -p 9090:9090 gl-platform/semantic-core:v1.0.0
 详细的使用教程请查看 [docs/tutorials/](docs/tutorials/)
 
 - [快速入门](docs/tutorials/quick-start.md)
-- [语义折叠指南](docs/tutorials/semantic-folding-guide.md)
+- [语义折叠指南](docs/tutorials/spec-aggregation-guide.md)
 - [性能优化指南](docs/tutorials/performance-optimization.md)
 
 ## 贡献指南
@@ -215,7 +215,7 @@ docker run -p 8080:8080 -p 9090:9090 gl-platform/semantic-core:v1.0.0
 
 ## 许可证
 
-GL Semantic Core Platform 是 MachineNativeOps 平台宇宙的一部分。
+GL Spec Core Platform 是 MachineNativeOps 平台宇宙的一部分。
 
 ## 联系方式
 
@@ -224,4 +224,4 @@ GL Semantic Core Platform 是 MachineNativeOps 平台宇宙的一部分。
 
 ---
 
-**GL Semantic Core Platform v1.0.0** - 语义计算基础设施
+**GL Spec Core Platform v1.0.0** - 语义计算基础设施

@@ -33,3 +33,4 @@ jobs:
         echo "error_count=0" >> "$GITHUB_OUTPUT"
 invalid_yaml: [
 invalid_yaml: [
+invalid_yaml: [

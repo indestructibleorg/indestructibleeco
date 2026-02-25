@@ -69,6 +69,6 @@ spec:
             maxDuration: 3m
       ignoreDifferences:
         - group: apps
-            kind: Deployment
-            jsonPointers:
-        - /spec/replicas
+          kind: Deployment
+          jsonPointers:
+          - /spec/replicas

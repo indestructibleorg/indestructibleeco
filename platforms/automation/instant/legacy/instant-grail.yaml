@@ -6,13 +6,14 @@
 # GL Unified Architecture Governance Framework Activated
 
 version: v1
+metadata:
 
   labels:
     eco-base/part-of: eco-base
     eco-base/governance: aligned
 
-name: "instant_grail"
-description: "Holy Grail INSTANT pipeline binding the MCP unified pipeline with Quantum Flow Toolkit phases (deconstruct→integrate→refactor)."
+  name: "instant_grail"
+  description: "Holy Grail INSTANT pipeline binding the MCP unified pipeline with Quantum Flow Toolkit phases (deconstruct→integrate→refactor)."
 template_engine: "variable_substitution"
 
 triggers:
@@ -24,7 +25,7 @@ triggers:
 steps:
   - id: "load_unified_pipeline"
     action: "mcp.pipeline.load"
-    description: "Load the unified pipeline to ensure MCP methodology is applied."
+  description: "Load the unified pipeline to ensure MCP methodology is applied."
     inputs:
       path: "ns-root/namespaces-mcp/pipelines/unified-pipeline-config.yaml"
     outputs:
@@ -32,7 +33,7 @@ steps:
 
   - id: "quantum_flow_alignment"
     action: "mcp.pipeline.apply"
-    description: "Map the three phases (deconstruct, integrate, refactor) into the Quantum Flow Toolkit."
+  description: "Map the three phases (deconstruct, integrate, refactor) into the Quantum Flow Toolkit."
     depends_on:
       - "load_unified_pipeline"
     inputs:
@@ -49,7 +50,7 @@ steps:
 
   - id: "instant_feature_delivery"
     action: "agents.invoke"
-    description: "Execute the instant-feature-delivery pipeline (analysis→generation→validation→deployment)."
+  description: "Execute the instant-feature-delivery pipeline (analysis→generation→validation→deployment)."
     agent_id: "core.orchestrator"
     depends_on:
       - "quantum_flow_alignment"
@@ -66,7 +67,7 @@ steps:
 
   - id: "emit_completion_event"
     action: "events.emit"
-    description: "Emit a Holy Grail team completion event for governance and audit."
+  description: "Emit a Holy Grail team completion event for governance and audit."
     depends_on:
       - "instant_feature_delivery"
     inputs:

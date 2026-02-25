@@ -16,6 +16,7 @@
 # ═══════════════════════════════════════════════════════════════════════════
 
 
+metadata:
   name: instant-execution-manifest
   version: 1.0.0
   status: PRODUCTION_READY

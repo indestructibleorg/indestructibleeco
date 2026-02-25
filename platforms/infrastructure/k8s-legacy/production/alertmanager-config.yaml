@@ -45,7 +45,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/alertmanager-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:alertmanager-config:sha256-147c076623bd857788526faac928a982cacf9f32e645d2614c35ac301007930d
+    eco-base/urn: urn:eco-base:k8s:core:configmap:alertmanager-config:sha256-851bc950a106ef0048c27c2784554a1d966f6293654226130e7ed99fce0e0a60
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance

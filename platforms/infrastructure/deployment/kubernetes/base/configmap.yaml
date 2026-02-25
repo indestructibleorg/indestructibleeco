@@ -15,7 +15,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/machine-native-ops-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:machine-native-ops-config:sha256-55bd6d73cee4b1257c1842ae70531ccb103f06cfa584d5a757c69bc355de24f3
+    eco-base/urn: urn:eco-base:k8s:core:configmap:machine-native-ops-config:sha256-769e54d7e09096c568d4e413a5598f475579e18c85f3051c4ee24771c388cac4
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -41,7 +41,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/monitoring-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:monitoring-config:sha256-55d8af17020b5830c578bcb05b22957ec0d74d85b8fed3081d0a238b486f7790
+    eco-base/urn: urn:eco-base:k8s:core:configmap:monitoring-config:sha256-6c7dc00929ebc7586586e6b32cf23c02ff703460d7aa68f739a17651c74a350c
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -66,7 +66,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/secrets-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:secrets-config:sha256-93c3d228babb2c93422a7c598d4490b056592b6093fd7646556bd78ee50855b0
+    eco-base/urn: urn:eco-base:k8s:core:configmap:secrets-config:sha256-4446e788a6305b7d5558906fb7f9ac8c5d3880c66c25316460826bf1acb6c845
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance

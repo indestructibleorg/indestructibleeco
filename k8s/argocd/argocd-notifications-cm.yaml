@@ -73,7 +73,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/argocd-notifications-cm
-    eco-base/urn: urn:eco-base:k8s:core:configmap:argocd-notifications-cm:sha256-440962938b25d1f138fa99a308165cf9c2298a1366152c699e2bc3330216106d
+    eco-base/urn: urn:eco-base:k8s:core:configmap:argocd-notifications-cm:sha256-f3bc52d99e4fd3ec01cfe937d9697220c92f3744c24d08dd1ba03260061bff1f
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance

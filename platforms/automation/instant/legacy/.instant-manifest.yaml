@@ -5,10 +5,11 @@
 # 
 # GL Unified Architecture Governance Framework Activated
 
-name: namespace-mcp
-version: "2.0.1"
-status: active
-description: "INSTANT manifest for namespace-mcp; enumerates expected artifacts referenced in project docs."
+metadata:
+  name: namespace-mcp
+  version: "2.0.1"
+  status: active
+  description: "INSTANT manifest for namespace-mcp; enumerates expected artifacts referenced in project docs."
 artifacts:
   - path: config/conversion.yaml
     type: config
@@ -31,4 +32,4 @@ artifacts:
   - path: reports/
     type: output
 
-  updated_at: "2025-01-09"
+updated_at: "2025-01-09"

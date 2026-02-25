@@ -132,7 +132,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/cross-platform-storage-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:cross-platform-storage-config:sha256-b35e15d2ee52d3903db1a8467c127211d7b2ad426473dd68d33e8b80cbf81446
+    eco-base/urn: urn:eco-base:k8s:core:configmap:cross-platform-storage-config:sha256-e767402666d9baba7ce10efa33a3e53075bb552907b7221ae96837ca5e3c9c21
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance

@@ -35,7 +35,6 @@ spec:
         - type: validate
           message: "Privileged containers are not allowed"
           pattern:
-            spec:
               containers:
                 - securityContext:
                     privileged: false
@@ -51,7 +50,6 @@ spec:
         - type: validate
           message: "Containers must have read-only root filesystem"
           pattern:
-            spec:
               containers:
                 - securityContext:
                     readOnlyRootFilesystem: true
@@ -67,7 +65,6 @@ spec:
         - type: validate
           message: "Containers must run as non-root user"
           pattern:
-            spec:
               containers:
                 - securityContext:
                     runAsNonRoot: true
@@ -83,7 +80,6 @@ spec:
         - type: validate
           message: "Containers must drop all capabilities"
           pattern:
-            spec:
               containers:
                 - securityContext:
                     capabilities:
@@ -101,7 +97,6 @@ spec:
         - type: validate
           message: "Containers must have resource limits"
           pattern:
-            spec:
               containers:
                 - resources:
                     limits:
@@ -122,7 +117,6 @@ spec:
         - type: validate
           message: "Containers must use runtime/default seccomp profile"
           pattern:
-            spec:
               securityContext:
                 seccompProfile:
                   type: RuntimeDefault
@@ -136,25 +130,25 @@ spec:
           message: "Namespaces must have network policies"
           pattern:
             metadata:
-  labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-    pod-security.kubernetes.io/enforce: restricted
-  annotations:
-    kubernetes.io/metadata.name: ".*"
-    exceptions:
-      - name: system-namespace-exception
-  namespaces:
-      - kube-system
-      - kube-public
-      - kube-node-lease
-  reason: "System namespaces require privileged access"
-  expires: "2025-12-31"
-    reporting:
+              labels:
+                eco-base/part-of: eco-base
+                eco-base/governance: aligned
+                pod-security.kubernetes.io/enforce: restricted
+            annotations:
+              kubernetes.io/metadata.name: ".*"
+              exceptions:
+                - name: system-namespace-exception
+            namespaces:
+            - kube-system
+            - kube-public
+            - kube-node-lease
+            reason: "System namespaces require privileged access"
+            expires: "2025-12-31"
+  reporting:
       enabled: true
   violations:
   severity: warning
   notify: true
-    compliance:
+  compliance:
   target: 95%
   window: 24h

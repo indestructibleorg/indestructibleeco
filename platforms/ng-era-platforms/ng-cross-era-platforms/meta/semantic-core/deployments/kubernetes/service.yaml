@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/gl-spec-core-service
-    eco-base/urn: urn:eco-base:k8s:core:service:gl-spec-core-service:sha256-0b4fc63681222cfd7a593a8f6c433ce2282ead78d9922191251043b397529d87
+    eco-base/urn: urn:eco-base:k8s:core:service:gl-spec-core-service:sha256-f5a565b7e43dbdaab5db375ceb92827443a6b18529af02b190e98c87b1250d70
     prometheus.io/port: '9091'
     prometheus.io/scrape: 'true'
   labels:
@@ -50,7 +50,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/gl-spec-core-external
-    eco-base/urn: urn:eco-base:k8s:core:service:gl-spec-core-external:sha256-8b1719c7a9f1e3126eda926eb1b7eeb245a6376960fed357e460bde7602018b5
+    eco-base/urn: urn:eco-base:k8s:core:service:gl-spec-core-external:sha256-b50cb9763d1cd10fc99f8012cf0dcc84cfeab8b1b9a178dbccae9f8b1cb927ba
     service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
     service.beta.kubernetes.io/aws-load-balancer-type: alb
   labels:

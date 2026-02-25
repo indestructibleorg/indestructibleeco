@@ -4,12 +4,13 @@ on:
   workflow_run:
     workflows:
       - "PR Blocked Response"
-    types: [completed]
+    types: [requested, completed]
 
 permissions:
   contents: read
   actions: write
   pull-requests: write
+  issues: write
 
 jobs:
   redispatch:
@@ -24,15 +25,17 @@ jobs:
         with:
           script: |
             const run = context.payload.workflow_run;
+            const status = (run.status || '').toLowerCase();
             const conclusion = (run.conclusion || '').toLowerCase();
             const jobs = await github.rest.actions.listJobsForWorkflowRun({
               owner: context.repo.owner,
               repo: context.repo.repo,
               run_id: run.id,
             });
+            const shouldApprove = status === 'requested' || status === 'waiting' || conclusion === 'action_required';
             const shouldRedispatch = conclusion === 'action_required' || jobs.data.total_count === 0;
-            if (!shouldRedispatch) {
-              core.info(`Skip redispatch for conclusion=${conclusion}, jobs=${jobs.data.total_count}`);
+            if (!shouldApprove && !shouldRedispatch) {
+              core.info(`Skip recovery for status=${status}, conclusion=${conclusion}, jobs=${jobs.data.total_count}`);
               return;
             }
             const prNumber = run.pull_requests?.[0]?.number;
@@ -45,14 +48,76 @@ jobs:
               core.info('No head branch associated with workflow run; skip redispatch.');
               return;
             }
-            await github.rest.actions.createWorkflowDispatch({
+            const marker = '<!-- autoecoops:recovery -->';
+            const headShaLine = `- Head SHA: \`${run.head_sha || 'unknown'}\``;
+            const comments = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              workflow_id: 'pr-blocked-response.yaml',
-              ref: headBranch,
-              inputs: {
-                pr_number: String(prNumber),
-                autofix_details: `Recovery dispatch from action_required run ${run.id}`,
-              },
+              issue_number: prNumber,
+              per_page: 100,
             });
-            core.info(`Dispatched pr-blocked-response.yaml for PR #${prNumber} on ${headBranch}`);
+            const existing = comments.data.find(c => c.body && c.body.includes(marker));
+            if (existing && existing.body.includes(headShaLine)) {
+              core.info(`Recovery already attempted for head SHA ${run.head_sha}; skip redispatch.`);
+              return;
+            }
+            let approveResult = "not-needed";
+            if (shouldApprove) {
+              try {
+                await github.request('POST /repos/{owner}/{repo}/actions/runs/{run_id}/approve', {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: run.id,
+                });
+                approveResult = "approved";
+                core.info(`Approved workflow run ${run.id}`);
+              } catch (e) {
+                approveResult = "approve-failed";
+                core.info(`Approve run skipped/failed for ${run.id}: ${e.message}`);
+              }
+            }
+            let dispatchResult = "dispatched";
+            try {
+              await github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'pr-blocked-response.yaml',
+                ref: headBranch,
+                inputs: {
+                  pr_number: String(prNumber),
+                  autofix_details: `Recovery dispatch from run ${run.id} (status=${status}, conclusion=${conclusion}, jobs=${jobs.data.total_count}, approve=${approveResult})`,
+                },
+              });
+            } catch (e) {
+              dispatchResult = "dispatch-failed";
+              core.info(`Dispatch failed for run ${run.id}: ${e.message}`);
+            }
+            const body = [
+              '## Auto Recovery Triggered',
+              '',
+              `- Run: \`${run.id}\``,
+              headShaLine,
+              `- Status: \`${status || 'unknown'}\``,
+              `- Conclusion: \`${conclusion || 'none'}\``,
+              `- Jobs detected: \`${jobs.data.total_count}\``,
+              `- Approve workflows to run: \`${approveResult}\``,
+              `- Redispatch: \`${dispatchResult}\` on \`${headBranch}\``,
+              '',
+              marker,
+            ].join('\n');
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
+            core.info(`Recovery flow completed for PR #${prNumber} on ${headBranch} with ${dispatchResult}`);

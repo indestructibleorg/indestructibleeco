@@ -236,11 +236,11 @@ jobs:
         )
 
         # Fail-Closed: if Prometheus unreachable, BLOCK promotion (do not assume healthy)
-        if availability_pct is None and prometheus_url:
+        if availability_pct is None and prometheus_url and not prometheus_url.startswith("{{"):
             print('ERROR: Prometheus configured but unreachable — cannot validate SLO.')
             print('Blocking promotion to prevent fail-open deployment.')
             sys.exit(2)  # Exit code 2 = infrastructure failure (distinct from SLO failure)
-        elif availability_pct is None:
+        elif availability_pct is None or not prometheus_url or prometheus_url.startswith("{{"):
             print('WARNING: PROMETHEUS_URL not set — SLO validation skipped (staging only).')
             print('Assuming healthy for non-production environment.')
             availability_pct = 99.99

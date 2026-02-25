@@ -70,8 +70,8 @@ env:
   # GCP / GKE
   GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID || 'my-project-ops-1991' }}
   GKE_REGION: ${{ vars.GKE_REGION || 'asia-east1' }}
-  GKE_CLUSTER_STAGING: ${{ vars.GKE_CLUSTER_STAGING || 'eco-base-staging' }}
-  GKE_CLUSTER_PRODUCTION: ${{ vars.GKE_CLUSTER_PRODUCTION || 'eco-production' }}
+  GKE_CLUSTER_STAGING: ${{ vars.GKE_CLUSTER_STAGING || "eco-production" }}
+  GKE_CLUSTER_PRODUCTION: ${{ vars.GKE_CLUSTER_PRODUCTION || "eco-production" }}
   K8S_NAMESPACE_STAGING: ${{ vars.K8S_NAMESPACE_STAGING || 'eco-staging' }}
   K8S_NAMESPACE_PRODUCTION: ${{ vars.K8S_NAMESPACE_PRODUCTION || 'eco-production' }}
   # Registry
@@ -445,7 +445,7 @@ jobs:
           fi
 
       - name: Setup Node.js
-        if: steps.check-web.outputs.has_web == 'true'
+        if: steps.check-web.outputs.has_web == "true" && secrets.CLOUDFLARE_API_TOKEN != ""
         uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e  # v4.3.0
         with:
           node-version: "20"
@@ -453,12 +453,12 @@ jobs:
           cache-dependency-path: "platforms/web/app/package-lock.json"
 
       - name: Install dependencies
-        if: steps.check-web.outputs.has_web == 'true'
+        if: steps.check-web.outputs.has_web == "true" && secrets.CLOUDFLARE_API_TOKEN != ""
         working-directory: platforms/web/app
         run: npm install
 
       - name: Build web app
-        if: steps.check-web.outputs.has_web == 'true'
+        if: steps.check-web.outputs.has_web == "true" && secrets.CLOUDFLARE_API_TOKEN != ""
         working-directory: platforms/web/app
         env:
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -471,7 +471,7 @@ jobs:
 
       - name: Deploy to Cloudflare Pages
         id: deploy
-        if: steps.check-web.outputs.has_web == 'true'
+        if: steps.check-web.outputs.has_web == "true" && secrets.CLOUDFLARE_API_TOKEN != ""
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -489,13 +489,13 @@ jobs:
           echo "✅ Cloudflare Pages deployed: $DEPLOY_URL"
 
       - name: Skip (no web app)
-        if: steps.check-web.outputs.has_web == 'false'
+        if: steps.check-web.outputs.has_web == "true" && secrets.CLOUDFLARE_API_TOKEN != ""
         run: |
           echo "status=skipped" >> "$GITHUB_OUTPUT"
           echo "deployment_url=https://eco-base.pages.dev" >> "$GITHUB_OUTPUT"
 
       - name: Verify Cloudflare deployment health
-        if: steps.check-web.outputs.has_web == 'true' && steps.deploy.outputs.status == 'success'
+        if: steps.check-web.outputs.has_web == "true" && secrets.CLOUDFLARE_API_TOKEN != ""
         run: |
           DEPLOY_URL="${{ steps.deploy.outputs.deployment_url }}"
           echo "Checking deployment health: $DEPLOY_URL"

@@ -179,6 +179,32 @@ jobs:
           rm -rf "$TMPDIR"
           supabase --version
 
+      - name: Link Supabase project
+        id: link
+        if: steps.check-functions.outputs.has_functions == 'true' && steps.validate-token.outputs.has_token == 'true'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          PROJECT_REF=$(echo "$SUPABASE_URL" | sed 's|https://||' | cut -d'.' -f1)
+          echo "project_ref=$PROJECT_REF" >> "$GITHUB_OUTPUT"
+          echo "Linking to project: $PROJECT_REF"
+          supabase link --project-ref "$PROJECT_REF" || echo "Link failed (non-fatal)"
+
+      - name: Push database migrations
+        if: steps.link.outcome == 'success'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          if [ -d "supabase/migrations" ] && [ "$(ls supabase/migrations/*.sql 2>/dev/null | wc -l)" -gt 0 ]; then
+            echo "Pushing migrations..."
+            supabase db push --linked || echo "⚠️ Migration push failed (non-fatal)"
+          else
+            echo "No migrations to push"
+          fi
+
       - name: Deploy Edge Functions
         id: deploy
         if: steps.check-functions.outputs.has_functions == 'true' && steps.validate-token.outputs.has_token == 'true'
@@ -186,7 +212,10 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         run: |
-          PROJECT_REF=$(echo "$SUPABASE_URL" | sed 's|https://||' | cut -d'.' -f1)
+          PROJECT_REF="${{ steps.link.outputs.project_ref }}"
+          if [ -z "$PROJECT_REF" ]; then
+            PROJECT_REF=$(echo "$SUPABASE_URL" | sed 's|https://||' | cut -d'.' -f1)
+          fi
           echo "Deploying to project: $PROJECT_REF"
 
           DEPLOY_ERRORS=0

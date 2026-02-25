@@ -52,13 +52,12 @@ __pycache__/
 .eco-audit/
 .eco-wal/
 
-# GCP Service Account Keys
+# GCP Service Account Keys (targeted patterns, not blanket *.json)
 .gcp/
-*.json
-# Allow essential config JSON files (not secrets)
-!**/package.json
-!**/tsconfig.json
-!**/tsconfig.*.json
+*-key.json
+*-credentials.json
+service-account*.json
+gcp-*.json
 
 # Cloudflare Certificates
 .cloudflare/

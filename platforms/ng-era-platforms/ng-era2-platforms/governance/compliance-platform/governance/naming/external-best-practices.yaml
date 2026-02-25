@@ -1,0 +1,10 @@
+external_best_practices:
+  version: "1.0"
+  sources:
+    - id: "offline-snapshot"
+      description: "Local snapshot placeholder for external best practices"
+      path_hint: "complements/"
+  enhancements:
+    prefix_rules: []
+    naming_conventions: []
+    mapping_notes: []

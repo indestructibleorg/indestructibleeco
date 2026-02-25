@@ -1,0 +1,87 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: DEFINITION
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLLayerDefinition
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:governance:gl-artifacts:strategic:DEFINITION.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/strategic/DEFINITION.yaml"
+  layer_id: GL00-09
+  name: Strategic Layer
+  version: "1.0.0"
+spec:
+  range: "00-09"
+  description: "Vision, architecture, decision, risk, compliance, security"
+  dimensions:
+    - id: "00-vision-strategy"
+      purpose: "Define organizational vision and strategic direction"
+      artifacts:
+        - "naming-adoption-phases.yaml"
+        - "naming-governance-summary.yaml"
+      functions:
+        - "generate_adoption_roadmap"
+        - "get_strategic_objectives"
+    - id: "01-architecture"
+      purpose: "Define governance architecture and organizational structure"
+      artifacts:
+        - "naming-governance-structure.yaml"
+        - "naming-escalation-matrix.yaml"
+      functions:
+        - "get_organizational_structure"
+        - "resolve_escalation"
+        - "get_role_permissions"
+    - id: "02-decision"
+      purpose: "Manage decision-making processes and stakeholder engagement"
+      artifacts:
+        - "stakeholder-matrix.yaml"
+        - "naming-exception-process.yaml"
+        - "naming-incentives.yaml"
+      functions:
+        - "get_stakeholder_map"
+        - "process_exception_request"
+        - "calculate_incentives"
+    - id: "03-change"
+      purpose: "Manage organizational change and transformation"
+      artifacts:
+        - "naming-rfc-workflow.yaml"
+        - "naming-change-request.yaml"
+        - "naming-collaboration-workflow.yaml"
+        - "naming-migration-plan.yaml"
+      functions:
+        - "create_change_request"
+        - "validate_rfc"
+        - "execute_migration_phase"
+    - id: "04-risk"
+      purpose: "Identify and manage strategic risks"
+    - id: "05-compliance"
+      purpose: "Ensure regulatory and policy compliance"
+    - id: "06-security"
+      purpose: "Define security policies and requirements"
+    - id: "08-process"
+      purpose: "Define strategic processes and workflows"
+    - id: "09-performance"
+      purpose: "Monitor and measure strategic performance"
+  interfaces:
+    input:
+      - "organizational_vision"
+      - "strategic_objectives"
+      - "risk_assessments"
+    output:
+      - "strategic_plans"
+      - "governance_policies"
+      - "decision_frameworks"
+  dependencies:
+    upstream: []
+    downstream:
+      - "GL10-29"
+      - "GL30-49"
+  validation:
+    semantic_boundary: "Strategic governance - vision, architecture, decisions, risk, compliance, security"
+    no_conflicts: true
+    no_duplicates: true
+    clear_boundaries: true

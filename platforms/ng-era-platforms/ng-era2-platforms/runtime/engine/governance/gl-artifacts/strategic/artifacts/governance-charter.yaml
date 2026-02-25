@@ -1,0 +1,378 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: governance-charter
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# =============================================================================
+# GL00-09 Strategic Layer - Governance Charter
+# MachineNativeOps Governance Artifact
+# =============================================================================
+apiVersion: governance.machinenativeops.io/v2
+kind: GovernanceCharter
+metadata:
+  name: machinenativeops-governance-charter
+  version: "1.0.0"
+  created_at: "2025-01-18T00:00:00Z"
+  updated_at: "2025-01-18T00:00:00Z"
+  owner: governance-committee
+  layer: "GL00-09"
+  tags:
+    - strategic
+    - charter
+    - governance
+    - core
+  annotations:
+    governance.machinenativeops.io/classification: "internal"
+    governance.machinenativeops.io/review-cycle: "annual"
+spec:
+  # Required fields for GL00-09 compliance
+  vision: "成為機器原生運維領域的領導者，實現組織運營的完全自主化與智能化"
+  mission: "透過GL架構提供完整的治理解決方案，使組織能夠以機器原生的方式運作"
+  values:
+    - name: "透明度"
+      description: "所有治理決策與流程完全透明"
+    - name: "自動化"
+      description: "優先採用自動化方案"
+    - name: "持續改進"
+      description: "透過回饋機制持續優化"
+  charter:
+    title: "MachineNativeOps 治理框架"
+    title_en: "MachineNativeOps Governance Charter"
+    effective_date: "2025-01-01"
+    version: "1.0.0"
+    preamble: |
+      本框架定義MachineNativeOps組織的治理架構、原則、角色與責任，
+      確保組織以透明、高效、可追溯的方式運作。本框架適用於所有
+      GL（Governance Layers）層級的治理活動。
+  governance_principles:
+    - principle: "透明度優先"
+      principle_en: "Transparency First"
+      description: |
+        所有治理決策、流程與結果必須透明可見，支援審計與追溯。
+        治理文件以機器可讀格式存儲於版本控制系統中。
+      implementation:
+        - "所有Artifact存儲於Git倉庫"
+        - "決策記錄包含完整上下文"
+        - "變更歷史完整保留"
+    - principle: "自動化驅動"
+      principle_en: "Automation Driven"
+      description: |
+        優先採用自動化方案執行治理流程，減少人工干預，
+        提高效率與一致性。
+      implementation:
+        - "CI/CD整合的治理工作流程"
+        - "自動化驗證與合規檢查"
+        - "自動化報告生成"
+    - principle: "層級分離"
+      principle_en: "Layer Separation"
+      description: |
+        嚴格遵循GL層級分離原則，各層級職責明確，
+        避免職責混淆與越權操作。
+      implementation:
+        - "明確的層級邊界定義"
+        - "層級間標準化介面"
+        - "跨層級操作需明確授權"
+    - principle: "持續改進"
+      principle_en: "Continuous Improvement"
+      description: |
+        透過回饋機制與數據分析持續優化治理體系，
+        擁抱變革與創新。
+      implementation:
+        - "定期回顧與檢討"
+        - "指標驅動的改進"
+        - "最佳實踐分享"
+    - principle: "安全內建"
+      principle_en: "Security Built-in"
+      description: |
+        安全性是所有治理決策的首要考量，
+        採用預設安全配置與最小權限原則。
+      implementation:
+        - "RBAC存取控制"
+        - "敏感資訊加密"
+        - "安全審計追蹤"
+  governance_structure:
+    layers:
+      - layer_id: "GL00-09"
+        name: "Strategic Layer"
+        name_zh: "戰略層"
+        responsibilities:
+          - "組織願景與使命定義"
+          - "戰略目標制定（OKR）"
+          - "治理框架維護"
+          - "重大決策審批"
+          - "資源分配決策"
+        decision_authority: "highest"
+        review_cycle: "annual"
+      - layer_id: "GL10-29"
+        name: "Operational Layer"
+        name_zh: "運營層"
+        responsibilities:
+          - "戰略目標分解與執行計劃"
+          - "資源調度與分配"
+          - "流程設計與優化"
+          - "團隊管理與協調"
+          - "風險監控與應對"
+        decision_authority: "high"
+        review_cycle: "quarterly"
+      - layer_id: "GL30-49"
+        name: "Execution Layer"
+        name_zh: "執行層"
+        responsibilities:
+          - "具體任務執行"
+          - "產品開發與交付"
+          - "技術實現"
+          - "品質保證"
+          - "問題解決"
+        decision_authority: "medium"
+        review_cycle: "monthly"
+      - layer_id: "GL50-59"
+        name: "Observability Layer"
+        name_zh: "觀測層"
+        responsibilities:
+          - "指標收集與監控"
+          - "異常偵測與告警"
+          - "審計追蹤"
+          - "合規監控"
+          - "報告生成"
+        decision_authority: "medium"
+        review_cycle: "continuous"
+      - layer_id: "GL60-80"
+        name: "Advanced/Feedback Layer"
+        name_zh: "進階/回饋層"
+        responsibilities:
+          - "數據分析與洞察"
+          - "優化建議"
+          - "回饋收集與處理"
+          - "實驗與測試"
+          - "模型訓練與優化"
+        decision_authority: "medium"
+        review_cycle: "monthly"
+      - layer_id: "GL81-83"
+        name: "Extended Layer"
+        name_zh: "擴展層"
+        responsibilities:
+          - "新興議題探索"
+          - "跨域協作"
+          - "外部合作管理"
+          - "社群治理"
+          - "創新孵化"
+        decision_authority: "low"
+        review_cycle: "quarterly"
+      - layer_id: "GL90-99"
+        name: "Meta-Specification Layer"
+        name_zh: "元規範層"
+        responsibilities:
+          - "治理標準制定"
+          - "規格管理"
+          - "模板維護"
+          - "驗證規則定義"
+          - "治理流程設計"
+        decision_authority: "highest"
+        review_cycle: "semi-annual"
+  roles_and_responsibilities:
+    governance_bodies:
+      - name: "Governance Committee"
+        name_zh: "治理委員會"
+        description: "最高治理決策機構"
+        responsibilities:
+          - "審批治理框架變更"
+          - "審批重大戰略決策"
+          - "監督治理執行情況"
+          - "解決跨層級爭議"
+        composition:
+          - role: "Chief Governance Officer"
+            count: 1
+          - role: "Layer Representatives"
+            count: 7
+          - role: "External Advisors"
+            count: 2
+        meeting_frequency: "monthly"
+        quorum: "60%"
+      - name: "Strategy Committee"
+        name_zh: "戰略委員會"
+        description: "戰略規劃與審批機構"
+        responsibilities:
+          - "制定年度戰略目標"
+          - "審批資源分配計劃"
+          - "監督戰略執行進度"
+          - "調整戰略方向"
+        composition:
+          - role: "CEO"
+            count: 1
+          - role: "Department Heads"
+            count: 5
+          - role: "Strategy Analysts"
+            count: 2
+        meeting_frequency: "quarterly"
+        quorum: "70%"
+      - name: "Technical Review Board"
+        name_zh: "技術審查委員會"
+        description: "技術決策與架構審查機構"
+        responsibilities:
+          - "審批重大技術決策"
+          - "架構設計審查"
+          - "技術標準制定"
+          - "技術風險評估"
+        composition:
+          - role: "CTO"
+            count: 1
+          - role: "Principal Engineers"
+            count: 4
+          - role: "Security Lead"
+            count: 1
+        meeting_frequency: "bi-weekly"
+        quorum: "50%"
+    individual_roles:
+      - role: "Chief Governance Officer (CGO)"
+        responsibilities:
+          - "治理體系整體負責"
+          - "治理委員會主席"
+          - "跨層級協調"
+          - "對外治理溝通"
+        authority_level: "executive"
+        reports_to: "CEO"
+      - role: "Layer Owner"
+        responsibilities:
+          - "特定GL層級負責"
+          - "層級Artifact維護"
+          - "層級合規確保"
+          - "層級報告提交"
+        authority_level: "senior"
+        reports_to: "CGO"
+      - role: "Artifact Owner"
+        responsibilities:
+          - "特定Artifact維護"
+          - "Artifact更新與版本管理"
+          - "Artifact合規確保"
+          - "變更請求處理"
+        authority_level: "standard"
+        reports_to: "Layer Owner"
+      - role: "Governance Auditor"
+        responsibilities:
+          - "治理合規審計"
+          - "審計報告編制"
+          - "改進建議提出"
+          - "追蹤改進執行"
+        authority_level: "senior"
+        reports_to: "CGO"
+  decision_making:
+    decision_types:
+      - type: "strategic"
+        description: "戰略層級決策"
+        authority: "Governance Committee"
+        approval_threshold: "70%"
+        escalation_path:
+          - "Strategy Committee"
+          - "Governance Committee"
+          - "Board of Directors"
+      - type: "operational"
+        description: "運營層級決策"
+        authority: "Department Head"
+        approval_threshold: "simple_majority"
+        escalation_path:
+          - "Layer Owner"
+          - "CGO"
+          - "Governance Committee"
+      - type: "technical"
+        description: "技術層級決策"
+        authority: "Technical Review Board"
+        approval_threshold: "simple_majority"
+        escalation_path:
+          - "Principal Engineer"
+          - "CTO"
+          - "Technical Review Board"
+      - type: "emergency"
+        description: "緊急決策"
+        authority: "CGO or CTO"
+        approval_threshold: "single_approval"
+        escalation_path:
+          - "On-call Lead"
+          - "CGO/CTO"
+          - "CEO"
+        post_action: "Governance Committee review within 48 hours"
+    decision_process:
+      steps:
+        - step: 1
+          name: "Proposal"
+          description: "提出決策提案"
+          artifacts:
+            - "Decision Proposal Document"
+            - "Impact Assessment"
+        - step: 2
+          name: "Review"
+          description: "相關方審查"
+          artifacts:
+            - "Review Comments"
+            - "Risk Assessment"
+        - step: 3
+          name: "Approval"
+          description: "決策審批"
+          artifacts:
+            - "Approval Record"
+            - "Voting Results"
+        - step: 4
+          name: "Implementation"
+          description: "決策執行"
+          artifacts:
+            - "Implementation Plan"
+            - "Progress Reports"
+        - step: 5
+          name: "Review"
+          description: "執行結果審查"
+          artifacts:
+            - "Outcome Report"
+            - "Lessons Learned"
+  compliance_and_audit:
+    compliance_requirements:
+      - requirement: "Internal Policy Compliance"
+        description: "符合內部治理政策"
+        verification: "automated"
+        frequency: "continuous"
+      - requirement: "Security Standards"
+        description: "符合安全標準要求"
+        verification: "automated + manual"
+        frequency: "quarterly"
+      - requirement: "Data Protection"
+        description: "符合數據保護要求"
+        verification: "manual"
+        frequency: "annual"
+    audit_schedule:
+      - audit_type: "Internal Audit"
+        frequency: "quarterly"
+        scope: "All GL layers"
+        auditor: "Internal Audit Team"
+      - audit_type: "Compliance Audit"
+        frequency: "semi-annual"
+        scope: "Compliance requirements"
+        auditor: "Compliance Team"
+      - audit_type: "External Audit"
+        frequency: "annual"
+        scope: "Full governance system"
+        auditor: "External Auditor"
+  amendment_process:
+    minor_changes:
+      description: "小幅修訂（格式、澄清）"
+      approval: "CGO"
+      notice_period: "7 days"
+    major_changes:
+      description: "重大修訂（原則、結構）"
+      approval: "Governance Committee (70%)"
+      notice_period: "30 days"
+    emergency_changes:
+      description: "緊急修訂"
+      approval: "CGO + CEO"
+      notice_period: "immediate"
+      post_action: "Governance Committee ratification within 14 days"
+status:
+  phase: "active"
+  approved_by: "governance-committee"
+  approved_at: "2025-01-01T00:00:00Z"
+  effective_date: "2025-01-01"
+  next_review: "2026-01-01"
+  change_history:
+    - version: "1.0.0"
+      date: "2025-01-01"
+      author: "governance-committee"
+      changes: "Initial charter creation"

@@ -1,0 +1,80 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLLayerDefinitions
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:GL-LAYER-DEFINITIONS.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-LAYER-DEFINITIONS.yaml"
+  name: gl-layer-definitions
+  version: "1.0.0"
+  created: "2026-01-21"
+layer_definitions:
+  - layer_id: "GL20-29"
+    name: "Data Science / Data Access Layer"
+    description: "Manages data ingestion, cataloging, metadata, and asset governance"
+    path: "workspace/src/data"
+    semantic_urn: "urn:machinenativeops:gl:data:layer:1.0.0"
+    parent_urn: "urn:machinenativeops:gl:root:semantic-anchor:1.0.0"
+    modules:
+      - id: "GL20"
+        name: "Data Ingestion"
+        path: "workspace/src/data/ingestion"
+        semantic_urn: "urn:machinenativeops:gl:data:ingestion:1.0.0"
+      - id: "GL21"
+        name: "Data Catalog"
+        path: "workspace/src/data/catalog"
+        semantic_urn: "urn:machinenativeops:gl:data:catalog:1.0.0"
+      - id: "GL22"
+        name: "Metadata"
+        path: "workspace/src/data/metadata"
+        semantic_urn: "urn:machinenativeops:gl:data:metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:GL-LAYER-DEFINITIONS.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-LAYER-DEFINITIONS.yaml"1.0.0"
+      - id: "GL23"
+        name: "Data Assets"
+        path: "workspace/src/data/assets"
+        semantic_urn: "urn:machinenativeops:gl:data:assets:1.0.0"
+  - layer_id: "GL40-49"
+    name: "Algorithm Layer"
+    description: "Manages models, pipelines, feature engineering, and ML operations"
+    path: "workspace/src/algorithms"
+    semantic_urn: "urn:machinenativeops:gl:algorithms:layer:1.0.0"
+    parent_urn: "urn:machinenativeops:gl:root:semantic-anchor:1.0.0"
+    modules:
+      - id: "GL40"
+        name: "Model Registry"
+        path: "workspace/src/algorithms/models"
+        semantic_urn: "urn:machinenativeops:gl:algorithms:models:1.0.0"
+      - id: "GL41"
+        name: "Pipelines"
+        path: "workspace/src/algorithms/pipelines"
+        semantic_urn: "urn:machinenativeops:gl:algorithms:pipelines:1.0.0"
+      - id: "GL42"
+        name: "Feature Engineering"
+        path: "workspace/src/algorithms/feature_engineering"
+        semantic_urn: "urn:machinenativeops:gl:algorithms:feature-engineering:1.0.0"
+  - layer_id: "GL50-59"
+    name: "CUDA / GPU Acceleration Layer"
+    description: "Manages CUDA kernels, GPU scheduling, and accelerator optimization"
+    path: "workspace/src/gpu"
+    semantic_urn: "urn:machinenativeops:gl:gpu:layer:1.0.0"
+    parent_urn: "urn:machinenativeops:gl:root:semantic-anchor:1.0.0"
+    modules:
+      - id: "GL50"
+        name: "CUDA Kernels"
+        path: "workspace/src/gpu/cuda_kernels"
+        semantic_urn: "urn:machinenativeops:gl:gpu:cuda-kernels:1.0.0"
+      - id: "GL51"
+        name: "GPU Scheduler"
+        path: "workspace/src/gpu/gpu_scheduler"
+        semantic_urn: "urn:machinenativeops:gl:gpu:scheduler:1.0.0"
+      - id: "GL52"
+        name: "Accelerators"
+        path: "workspace/src/gpu/accelerators"
+        semantic_urn: "urn:machinenativeops:gl:gpu:accelerators:1.0.0"
+activation_status: "GL Unified Architecture Governance Framework Activated"

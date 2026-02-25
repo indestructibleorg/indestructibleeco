@@ -1,0 +1,267 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: velero-config
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:velero-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/velero-config.yaml"
+  name: velero
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: velero
+    environment: production
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:velero-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/velero-config.yaml"
+  name: velero-s3-credentials
+  namespace: velero
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: velero
+    environment: production
+type: Opaque
+stringData:
+  cloud: |
+    [default]
+    aws_access_key_id = ${AWS_ACCESS_KEY_ID}
+    aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
+
+---
+apiVersion: velero.io/v1
+kind: BackupStorageLocation
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:velero-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/velero-config.yaml"
+  name: default
+  namespace: velero
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: velero
+    environment: production
+spec:
+  provider: aws
+  objectStorage:
+    bucket: machinenativeops-backups
+    prefix: velero
+  config:
+    region: us-east-1
+    s3Url: https://s3.amazonaws.com
+    s3ForcePathStyle: "true"
+  accessMode: ReadWrite
+
+---
+apiVersion: velero.io/v1
+kind: VolumeSnapshotLocation
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:velero-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/velero-config.yaml"
+  name: default
+  namespace: velero
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: velero
+    environment: production
+spec:
+  provider: aws
+  config:
+    region: us-east-1
+
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:velero-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/velero-config.yaml"
+  name: daily-cluster-backup
+  namespace: velero
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: velero
+    environment: production
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM UTC
+  template:
+    includedNamespaces:
+    - production
+    - istio-system
+    - monitoring
+    - velero
+    excludedResources:
+    - events
+    - pods
+    - endpoints
+    ttl: 720h  # 30 days
+    storageLocation: default
+    volumeSnapshotLocations:
+    - default
+    hooks:
+      resources:
+      - name: pre-backup-hook
+        includedNamespaces:
+        - production
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: machine-native-ops
+        pre:
+          - exec:
+              container: app
+              command:
+              - /bin/sh
+              - -c
+              - "echo 'Starting backup' && python -m pytest tests/backup_validation.py"
+              onError: Continue
+              timeout: 600s
+
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:velero-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/velero-config.yaml"
+  name: hourly-incremental-backup
+  namespace: velero
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: velero
+    environment: production
+spec:
+  schedule: "0 * * * *"  # Hourly
+  template:
+    includedNamespaces:
+    - production
+    excludedResources:
+    - events
+    - pods
+    - endpoints
+    ttl: 168h  # 7 days
+    storageLocation: default
+    volumeSnapshotLocations:
+    - default
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:velero-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/velero-config.yaml"
+  name: postgres-backup
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: postgres-backup
+    environment: production
+spec:
+  schedule: "0 */4 * * *"  # Every 4 hours
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: postgres-backup
+            image: postgres:15-alpine
+            command:
+            - /bin/sh
+            - -c
+            - |
+              PGPASSWORD="${POSTGRES_PASSWORD}" pg_dump \
+                -h "${POSTGRES_HOST}" \
+                -p "${POSTGRES_PORT}" \
+                -U "${POSTGRES_USER}" \
+                -d "${POSTGRES_DB}" \
+                --format=custom \
+                --compress=9 \
+                --file=/backup/postgres-$(date +%Y%m%d-%H%M%S).dump
+            env:
+            - name: POSTGRES_HOST
+              value: "postgresql.production.svc.cluster.local"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: machine-native-ops-secrets
+                  key: postgres-db
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: machine-native-ops-secrets
+                  key: postgres-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: machine-native-ops-secrets
+                  key: postgres-password
+            volumeMounts:
+            - name: backup
+              mountPath: /backup
+          volumes:
+          - name: backup
+            persistentVolumeClaim:
+              claimName: postgres-backup-pvc
+          restartPolicy: OnFailure
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:velero-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/velero-config.yaml"
+  name: redis-backup
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: redis-backup
+    environment: production
+spec:
+  schedule: "*/30 * * * *"  # Every 30 minutes
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: redis-backup
+            image: redis:7-alpine
+            command:
+            - /bin/sh
+            - -c
+            - |
+              redis-cli -h "${REDIS_HOST}" -p "${REDIS_PORT}" \
+                --rdb /backup/redis-$(date +%Y%m%d-%H%M%S).rdb
+            env:
+            - name: REDIS_HOST
+              value: "redis-master.production.svc.cluster.local"
+            - name: REDIS_PORT
+              value: "6379"
+            volumeMounts:
+            - name: backup
+              mountPath: /backup
+          volumes:
+          - name: backup
+            persistentVolumeClaim:
+              claimName: redis-backup-pvc
+          restartPolicy: OnFailure

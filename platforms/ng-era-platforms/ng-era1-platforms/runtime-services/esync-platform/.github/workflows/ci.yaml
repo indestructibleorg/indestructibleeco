@@ -1,0 +1,159 @@
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Charter Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: write
+  statuses: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491  # v5.0.0
+        with:
+          go-version: '1.21'
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:esync-platform:.github:workflows:ci.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/esync-platform/.github/workflows/ci.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+          cache: true
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@3a919529898de7743f057cfbf1a10b4cd6a0ca0c  # v3.7.0
+        with:
+          version: latest
+          args: --config .config/lint/golangci.yml
+
+      - name: Run Conftest
+        uses: instrumenta/conftest-action/2e8e23a40f857f1a5360888b18b32c6a61cbe9c1  # v0.28.1
+        with:
+          policy: .config/conftest/policies
+          files: deploy/kustomize/overlays/dev/*.yaml
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@095b03a7be4e08a43295c94838d386e08c99e229  # v2.3.2
+        with:
+          config-path: .gitleaks.toml
+
+      - name: Run Semgrep
+        uses: returntocorp/semgrep-action@49bd5d037b8660c706d1c93a90409f8c9f55e88f  # v1.0.0
+        with:
+          config: .config/sast/semgrep.yaml
+
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@67e36e48b7899213f19760e076db2b0d4db9c6d3  # v0.16.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy Results
+        uses: github/codeql-action/upload-sarif@ddccb676ed580d70f998aabde5c8827539458ef6  # v2.22.8
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+
+      - name: Set up Go
+        uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491  # v5.0.0
+        with:
+          go-version: '1.21'
+          cache: true
+
+      - name: Run Tests
+        run: |
+          go test -v -race -coverprofile=coverage.out ./...
+          go tool cover -html=coverage.out -o coverage.html
+
+      - name: Upload Coverage
+        uses: codecov/codecov-action@8b1eaf4b8648635e4aab52c9195b0ab09154d1a8  # v4.1.0
+        with:
+          files: ./coverage.out
+          flags: unittests
+
+  build:
+    name: Build Artifacts
+    runs-on: ubuntu-latest
+    needs: [lint, security-scan, test]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+
+      - name: Set up Go
+        uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491  # v5.0.0
+        with:
+          go-version: '1.21'
+          cache: true
+
+      - name: Build Binary
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o bin/syncd ./cmd/syncd
+
+      - name: Generate SBOM
+        uses: anchore/sbom-action/78fc75e86e62b48cde2ccba8125c2a61ce8c46b3  # v0.15.0
+        with:
+          image: ${{ github.repository }}:${{ github.sha }}
+          format: spdx-json
+          output-file: artifacts/sbom/spdx.json
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@1eb3cb2b3e0f296241caca2a7ab8ed34950fe83f  # v4.0.0
+        with:
+          name: syncd-binary
+          path: bin/syncd
+          retention-days: 7
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@1eb3cb2b3e0f296241caca2a7ab8ed34950fe83f  # v4.0.0
+        with:
+          name: sbom
+          path: artifacts/sbom/spdx.json
+          retention-days: 90

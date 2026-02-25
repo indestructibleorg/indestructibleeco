@@ -1,0 +1,274 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: servicemesh.machinenativeops.io/v1
+kind: ServiceMeshConfiguration
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:infrastructure:service-mesh:istio-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/infrastructure/service-mesh/istio-config.yaml"
+  name: gl-quantum-service-mesh
+  namespace: infrastructure
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-servicemesh
+spec:
+  enabled: true
+  
+  istio:
+    enabled: true
+    version: "1.19.0"
+    
+    namespace: istio-system
+    profile: default
+    
+    components:
+      pilot:
+        enabled: true
+        k8s:
+          replicas: 2
+          resources:
+            requests:
+              cpu: 500m
+              memory: 2048Mi
+            limits:
+              cpu: 1000m
+              memory: 4096Mi
+              
+      istiodRemote:
+        enabled: false
+        
+      globalProxy:
+        enabled: true
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+            
+  meshPolicy:
+    mode: STRICT
+    mtls:
+      enabled: true
+      type: STRICT
+      
+    trafficPolicy:
+      - name: gl-quantum-api-policy
+        target:
+          namespace: gl-quantum-prod
+          
+        tls:
+          mode: ISTIO_MUTUAL
+          
+        portLevelMtls:
+          - port:
+              number: 8080
+            mode: ISTIO_MUTUAL
+            
+  virtualServices:
+    - name: gl-quantum-api
+      namespace: gl-quantum-prod
+      
+      hosts:
+        - "api.gl-quantum.machinenativeops.com"
+        
+      gateways:
+        - gl-quantum-gateway
+        
+      http:
+        - match:
+            - uri:
+                prefix: /api/v1
+          route:
+            - destination:
+                host: gl-quantum-api
+                subset: v1
+              weight: 90
+            - destination:
+                host: gl-quantum-api
+                subset: v2
+              weight: 10
+              
+        - fault:
+            delay:
+              percentage:
+                value: 0.1
+              fixedDelay: 5s
+          match:
+            - headers:
+                x-fault-injection:
+                  exact: "true"
+          route:
+            - destination:
+                host: gl-quantum-api
+                
+    - name: gl-quantum-webhook
+      namespace: gl-quantum-prod
+      
+      hosts:
+        - "webhook.gl-quantum.machinenativeops.com"
+        
+      gateways:
+        - gl-quantum-gateway
+        
+      http:
+        - match:
+            - uri:
+                prefix: /webhooks
+          route:
+            - destination:
+                host: gl-quantum-webhook
+                subset: v1
+          timeout: 30s
+          
+  destinationRules:
+    - name: gl-quantum-api
+      namespace: gl-quantum-prod
+      
+      host: gl-quantum-api
+      
+      trafficPolicy:
+        loadBalancer:
+          simple: LEAST_CONN
+          
+        connectionPool:
+          tcp:
+            maxConnections: 100
+            connectTimeout: 30s
+            tcpKeepalive:
+              time: 7200s
+              interval: 75s
+              
+      subsets:
+        - name: v1
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            version: v1.0.0
+        - name: v2
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            version: v1.1.0
+            
+    - name: gl-quantum-worker
+      namespace: gl-quantum-prod
+      
+      host: gl-quantum-worker
+      
+      trafficPolicy:
+        loadBalancer:
+          simple: ROUND_ROBIN
+          
+  gateways:
+    - name: gl-quantum-gateway
+      namespace: istio-system
+      
+      selector:
+        istio: ingressgateway
+        
+      servers:
+        - port:
+            number: 80
+            name: http
+            protocol: HTTP
+          hosts:
+            - "gl-quantum.machinenativeops.com"
+            - "api.gl-quantum.machinenativeops.com"
+            - "webhook.gl-quantum.machinenativeops.com"
+          tls:
+            httpsRedirect: true
+            
+        - port:
+            number: 443
+            name: https
+            protocol: HTTPS
+          hosts:
+            - "gl-quantum.machinenativeops.com"
+            - "api.gl-quantum.machinenativeops.com"
+            - "webhook.gl-quantum.machinenativeops.com"
+          tls:
+            mode: SIMPLE
+            credentialName: gl-quantum-tls-cert
+            
+  authorizationPolicies:
+    - name: gl-quantum-api-allow
+      namespace: gl-quantum-prod
+      
+      action: ALLOW
+      
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: gl-quantum-api
+          
+      rules:
+        - from:
+            - source:
+                principals:
+                  - cluster.local/ns/istio-system/sa/istio-ingressgateway
+          to:
+            - operation:
+                methods: ["GET", "POST", "PUT", "DELETE"]
+                
+    - name: gl-quantum-deny-all
+      namespace: gl-quantum-prod
+      
+      action: DENY
+      
+      rules:
+        - {}
+        
+  requestAuthentications:
+    - name: gl-quantum-jwt-auth
+      namespace: gl-quantum-prod
+      
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: gl-quantum-api
+          
+      jwtRules:
+        - issuer: "https://auth.machinenativeops.com"
+          jwks: "https://auth.machinenativeops.com/.well-known/jwks.json"
+          outputPayloadToHeader: x-jwt-payload
+          
+  telemetry:
+    v2:
+      metadataExchange:
+        enabled: true
+        
+      prometheus:
+        enabled: true
+        
+      accessLogging:
+        - providers:
+            - name: envoy
+              envoyAccessLogService:
+                logName: accesslog
+                service:
+                  host: "otel-collector.observability.svc.cluster.local"
+                  port: 443
+                  
+      stackdriver:
+        enabled: false
+        logging: false
+        monitoring: false
+        
+      tracing:
+        - providers:
+            - name: otel
+              tracing:
+                port: 4317
+                host: otel-collector.observability.svc.cluster.local
+                sampling: 10.0

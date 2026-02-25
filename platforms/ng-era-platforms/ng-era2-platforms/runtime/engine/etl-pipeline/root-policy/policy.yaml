@@ -1,0 +1,23 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: policy
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Root Policy
+# ECO-Layer: GL06 (Root Policy)
+# Closure-Signal: policy
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:etl-pipeline:root-policy:policy.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/root-policy/policy.yaml"
+  name: root-policy
+  version: "1.0.0"
+  layer: "GL06"
+
+policy-rules:
+  - rule: "naming-convention-enforcement"
+    description: "All names must follow kebab-case or snake_case"
+    enforcement: "strict"

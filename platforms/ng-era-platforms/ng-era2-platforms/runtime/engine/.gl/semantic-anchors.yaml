@@ -1,0 +1,233 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: semantic-anchors
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# GL Semantic Anchors Registry - AEP Engine
+# @gl-layer ECO-90-META
+# @gl-semantic-anchor ECO-90-META-ANCHORS
+
+gl_version: "1.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:.gl:semantic-anchors.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/.gl/semantic-anchors.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+registry:
+  module: "aep-engine"
+  updated: "2026-01-24"
+
+anchors:
+  # Core Engine
+  ECO-30-EXEC-AEP-ENGINE:
+    layer: "ECO-30-EXECUTION"
+    type: "module-entry"
+    file: "engine/index.ts"
+    exports:
+      - "FsLoader"
+      - "GitLoader"
+      - "MergeIndex"
+      - "YamlParser"
+      - "JsonPassthrough"
+      - "AnchorResolver"
+      - "DefaultsApplier"
+      - "EnvMerger"
+      - "ModuleDefaults"
+      - "SchemaValidator"
+      - "ModuleValidator"
+      - "ErrorReporter"
+      - "GovernanceEngine"
+      - "RuleEvaluator"
+      - "EventsWriter"
+      - "TemplateEngine"
+      - "ModuleMapper"
+      - "ArtifactWriter"
+      - "LocalExecutor"
+      - "RemoteExecutor"
+      - "RollbackManager"
+      - "ArtifactManager"
+      - "EvidenceChain"
+      - "ManifestGenerator"
+
+  # Type Definitions
+  ECO-30-EXEC-TYPEDEF:
+    layer: "ECO-30-EXECUTION"
+    type: "type-definition"
+    files:
+      - "engine/interfaces.d.ts"
+      - "engine/interfaces-fix.d.ts"
+    interfaces:
+      - "EvidenceRecord"
+      - "ExecutionResult"
+      - "LoadResult"
+      - "ParseResult"
+      - "ValidationResult"
+      - "GLEvent"
+      - "MergeStrategy"
+
+  # Artifacts Subsystem
+  ECO-30-EXEC-ARTIFACTS:
+    layer: "ECO-30-EXECUTION"
+    type: "subsystem"
+    path: "engine/artifacts"
+    components:
+      artifact_manager:
+        file: "artifact_manager.ts"
+        class: "ArtifactManager"
+      evidence_chain:
+        file: "evidence_chain.ts"
+        class: "EvidenceChain"
+      manifest_generator:
+        file: "manifest_generator.ts"
+        class: "ManifestGenerator"
+
+  # Executor Subsystem
+  ECO-30-EXEC-EXECUTOR:
+    layer: "ECO-30-EXECUTION"
+    type: "subsystem"
+    path: "engine/executor"
+    components:
+      local_executor:
+        file: "local_executor.ts"
+        class: "LocalExecutor"
+      remote_executor:
+        file: "remote_executor.ts"
+        class: "RemoteExecutor"
+      rollback:
+        file: "rollback.ts"
+        class: "RollbackManager"
+
+  # Governance Subsystem
+  ECO-10-GOV-ENGINE:
+    layer: "ECO-10-OPERATIONAL"
+    type: "subsystem"
+    path: "engine/governance"
+    components:
+      anchor_resolver:
+        file: "anchor_resolver.ts"
+        class: "AnchorResolver"
+      events_writer:
+        file: "events_writer.ts"
+        class: "EventsWriter"
+      gl_engine:
+        file: "gl_engine.ts"
+        class: "GovernanceEngine"
+      rule_evaluator:
+        file: "rule_evaluator.ts"
+        class: "RuleEvaluator"
+
+  # Loader Subsystem
+  ECO-30-EXEC-LOADER:
+    layer: "ECO-30-EXECUTION"
+    type: "subsystem"
+    path: "engine/loader"
+    components:
+      fs_loader:
+        file: "fs_loader.ts"
+        class: "FsLoader"
+      git_loader:
+        file: "git_loader.ts"
+        class: "GitLoader"
+      merge_index:
+        file: "merge_index.ts"
+        class: "MergeIndex"
+
+  # Normalizer Subsystem
+  ECO-30-EXEC-NORMALIZER:
+    layer: "ECO-30-EXECUTION"
+    type: "subsystem"
+    path: "engine/normalizer"
+    components:
+      defaults_applier:
+        file: "defaults_applier.ts"
+        class: "DefaultsApplier"
+      env_merger:
+        file: "env_merger.ts"
+        class: "EnvMerger"
+      module_defaults:
+        file: "module_defaults.ts"
+        class: "ModuleDefaults"
+
+  # Parser Subsystem
+  ECO-30-EXEC-PARSER:
+    layer: "ECO-30-EXECUTION"
+    type: "subsystem"
+    path: "engine/parser"
+    components:
+      anchor_resolver:
+        file: "anchor_resolver.ts"
+        class: "AnchorResolver"
+      json_passthrough:
+        file: "json_passthrough.ts"
+        class: "JsonPassthrough"
+      yaml_parser:
+        file: "yaml_parser.ts"
+        class: "YamlParser"
+
+  # Renderer Subsystem
+  ECO-30-EXEC-RENDERER:
+    layer: "ECO-30-EXECUTION"
+    type: "subsystem"
+    path: "engine/renderer"
+    components:
+      artifact_writer:
+        file: "artifact_writer.ts"
+        class: "ArtifactWriter"
+      module_mapper:
+        file: "module_mapper.ts"
+        class: "ModuleMapper"
+      template_engine:
+        file: "template_engine.ts"
+        class: "TemplateEngine"
+
+  # Validator Subsystem
+  ECO-30-EXEC-VALIDATOR:
+    layer: "ECO-30-EXECUTION"
+    type: "subsystem"
+    path: "engine/validator"
+    components:
+      error_reporter:
+        file: "error_reporter.ts"
+        class: "ErrorReporter"
+      module_validator:
+        file: "module_validator.ts"
+        class: "ModuleValidator"
+      schema_validator:
+        file: "schema_validator.ts"
+        class: "SchemaValidator"
+
+  # Test Suite
+  ECO-50-TEST-ENGINE:
+    layer: "ECO-50-OBSERVABILITY"
+    type: "test-suite"
+    path: "engine/tests"
+    test_files:
+      - "artifacts/evidence_chain.test.ts"
+      - "governance/rule_evaluator.test.ts"
+      - "loader/fs_loader.test.ts"
+      - "loader/merge_index.test.ts"
+      - "normalizer/env_merger.test.ts"
+      - "validator/schema_validator.test.ts"
+
+  # Documentation
+  ECO-90-META-DOCS:
+    layer: "ECO-90-META"
+    type: "documentation"
+    files:
+      - "engine/README.md"
+      - "engine/SPEC.md"
+      - "engine/artifacts/README.md"
+      - "engine/executor/README.md"
+      - "engine/governance/README.md"
+      - "engine/loader/README.md"
+      - "engine/normalizer/README.md"
+      - "engine/parser/README.md"
+      - "engine/renderer/README.md"
+      - "engine/validator/README.md"

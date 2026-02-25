@@ -1,0 +1,118 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: security.machinenativeops.io/v1
+kind: CheckovConfig
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:infrastructure:scanners:checkov-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/infrastructure/scanners/checkov-config.yaml"
+  name: gl-quantum-checkov
+  namespace: infrastructure
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-scanners
+spec:
+  enabled: true
+  version: "latest"
+  
+  schedule:
+    cron: "0 */4 * * *"  # Every 4 hours
+    
+  scanTargets:
+    - path: "./infrastructure/kubernetes"
+      framework: kubernetes
+      
+    - path: "./infrastructure/terraform"
+      framework: terraform
+      
+    - path: "./infrastructure/cloudformation"
+      framework: cloudformation
+      
+    - path: "./infrastructure/ansible"
+      framework: ansible
+      
+  checks:
+    enabled:
+      - CKV_K8S_1  # Ensure default service accounts are not actively used
+      - CKV_K8S_3  # Minimize the admission of privileged containers
+      - CKV_K8S_4  # Minimize the admission of containers with capabilities assigned
+      - CKV_K8S_6  # Minimize the admission of containers with added capabilities
+      - CKV_K8S_7  # Minimize the admission of containers with capabilities assigned
+      - CKV_K8S_8  # Minimize the admission of containers with allowPrivilegeEscalation
+      - CKV_K8S_9  # Minimize the admission of root containers
+      - CKV_K8S_10 # Minimize the admission of containers with the root filesystem
+      - CKV_K8S_11 # Ensure image CVE scanning is enabled
+      - CKV_K8S_12 # Ensure image pull policy is set to Always
+      - CKV_K8S_13 # Ensure Pod Network Policies are set
+      - CKV_K8S_14 # Ensure the default namespace is not used
+      - CKV_K8S_15 # Ensure PodSecurityPolicy is enabled
+      
+    disabled:
+      - CKV_K8S_2  # Disable specific check
+      
+  namingChecks:
+    enabled: true
+    policy: "^(dev|staging|prod)-[a-z0-9-]+-(deploy|svc|ing|cm|secret)-v[0-9]+\\.[0-9]+\\.[0-9]+"
+    
+    resources:
+      - Deployment
+      - Service
+      - Ingress
+      - ConfigMap
+      - Secret
+      
+  severity:
+    critical:
+      failAction: block
+      
+    high:
+      failAction: warn
+      
+    medium:
+      failAction: info
+      
+  output:
+    formats:
+      - json
+      - sarif
+      - junit
+      
+    upload:
+      - type: elasticsearch
+        index: checkov-results
+        endpoint: ${{ secrets.ELASTICSEARCH_ENDPOINT }}
+        
+      - type: github-security
+        repo: MachineNativeOps/machine-native-ops
+        
+  remediation:
+    suggestions: true
+    autoFix: false
+    
+  integration:
+    github:
+      enabled: true
+      createPR: false
+      commentOnPR: true
+      statusCheck: true
+      
+    jira:
+      enabled: true
+      project: ECO-SEC
+      priority: High
+      
+  reporting:
+    enabled: true
+    trends: true
+    comparison: true

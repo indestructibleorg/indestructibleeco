@@ -1,0 +1,14 @@
+{"id":"gl-validation-1769561765915","type":"validation","timestamp":"2026-01-28T00:56:05.915Z","source":"governance/gl_engine.ts","data":{"success":true,"violationCount":2979,"criticalCount":0}}
+{"id":"gl-validation-1769561816904","type":"validation","timestamp":"2026-01-28T00:56:56.904Z","source":"governance/gl_engine.ts","data":{"success":true,"violationCount":2910,"criticalCount":0}}
+{"id":"gl-validation-1769561841864","type":"validation","timestamp":"2026-01-28T00:57:21.864Z","source":"governance/gl_engine.ts","data":{"success":true,"violationCount":72,"criticalCount":0}}
+{"id":"gl-validation-1769561858389","type":"validation","timestamp":"2026-01-28T00:57:38.389Z","source":"governance/gl_engine.ts","data":{"success":true,"violationCount":54,"criticalCount":0}}
+{"id":"gl-validation-1769561944164","type":"validation","timestamp":"2026-01-28T00:59:04.164Z","source":"governance/gl_engine.ts","data":{"success":true,"violationCount":0,"criticalCount":0}}
+{"id":"gl-validation-1769561949436","type":"validation","timestamp":"2026-01-28T00:59:09.436Z","source":"governance/gl_engine.ts","data":{"success":true,"violationCount":0,"criticalCount":0}}
+{"id":"gl-validation-1769562291660","type":"validation","timestamp":"2026-01-28T01:04:51.660Z","source":"governance/gl_engine.ts","data":{"success":true,"violationCount":0,"criticalCount":0}}
+{"id":"gl-validation-1769562346423","type":"validation","timestamp":"2026-01-28T01:05:46.423Z","source":"governance/gl_engine.ts","data":{"success":true,"violationCount":0,"criticalCount":0}}
+{"id":"gl-validation-1769562353070","type":"validation","timestamp":"2026-01-28T01:05:53.070Z","source":"governance/gl_engine.ts","data":{"success":true,"violationCount":0,"criticalCount":0}}
+{"id":"gl-validation-1769562357986","type":"validation","timestamp":"2026-01-28T01:05:57.986Z","source":"governance/gl_engine.ts","data":{"success":true,"violationCount":0,"criticalCount":0}}
+{"id":"gl-validation-1769562625834","type":"validation","timestamp":"2026-01-28T01:10:25.834Z","source":"governance/gl_engine.ts","data":{"success":true,"violationCount":0,"criticalCount":0}}
+{"id":"gl-validation-1769562646106","type":"validation","timestamp":"2026-01-28T01:10:46.106Z","source":"governance/gl_engine.ts","data":{"success":true,"violationCount":0,"criticalCount":0}}
+{"id":"gl-validation-1769562651358","type":"validation","timestamp":"2026-01-28T01:10:51.358Z","source":"governance/gl_engine.ts","data":{"success":true,"violationCount":0,"criticalCount":0}}
+{"id":"gl-validation-1769562656202","type":"validation","timestamp":"2026-01-28T01:10:56.202Z","source":"governance/gl_engine.ts","data":{"success":true,"violationCount":0,"criticalCount":0}}

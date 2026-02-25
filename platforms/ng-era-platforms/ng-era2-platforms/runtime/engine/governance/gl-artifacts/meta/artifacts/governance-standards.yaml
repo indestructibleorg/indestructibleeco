@@ -1,0 +1,420 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: governance-standards
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# =============================================================================
+# GL90-99 Meta-Specification Layer - Governance Standards
+# MachineNativeOps Governance Artifact
+# =============================================================================
+apiVersion: governance.machinenativeops.io/v2
+kind: GovernanceStandards
+metadata:
+  name: gl-governance-standards
+  version: "2.0.0"
+  created_at: "2025-01-18T00:00:00Z"
+  updated_at: "2025-01-18T00:00:00Z"
+  owner: standards-team
+  layer: "GL90-99"
+  tags:
+    - meta-spec
+    - standards
+    - governance
+  annotations:
+    governance.machinenativeops.io/authority: "governance-committee"
+    governance.machinenativeops.io/binding: "mandatory"
+spec:
+  # Required fields for GL90-99 compliance
+  specification:
+    name: "GL Governance Standards"
+    version: "2.0.0"
+    scope: "All GL layers"
+  governance:
+    authority: "governance-committee"
+    review_cycle: "semi-annual"
+    approval_process: "committee-vote"
+  standards:
+    name: "MachineNativeOps Governance Standards"
+    name_zh: "MachineNativeOps治理標準"
+    version: "2.0.0"
+    description: |
+      定義GL治理體系的核心標準，包含Artifact規範、
+      命名規則、版本控制、審批流程與合規要求。
+  # ===========================================================================
+  # Artifact標準
+  # ===========================================================================
+  artifact_standards:
+    naming_conventions:
+      - rule_id: "NAME-001"
+        name: "Artifact Name Format"
+        description: "Artifact名稱必須使用kebab-case格式"
+        pattern: "^[a-z][a-z0-9-]*[a-z0-9]$"
+        examples:
+          valid:
+            - "governance-charter"
+            - "strategic-objectives-2025"
+            - "gl-layer-validation"
+          invalid:
+            - "GovernanceCharter"
+            - "governance_charter"
+            - "governance-charter-"
+      - rule_id: "NAME-002"
+        name: "File Name Format"
+        description: "文件名必須與Artifact名稱一致，使用.yaml擴展名"
+        pattern: "^[a-z][a-z0-9-]*[a-z0-9]\\.yaml$"
+        examples:
+          valid:
+            - "governance-charter.yaml"
+            - "strategic-objectives.yaml"
+          invalid:
+            - "GovernanceCharter.yaml"
+            - "governance-charter.yml"
+      - rule_id: "NAME-003"
+        name: "Layer Prefix"
+        description: "跨層級引用時必須包含層級前綴"
+        pattern: "^GL[0-9]{2}-[0-9]{2}/"
+        examples:
+          valid:
+            - "GL00-09/governance-charter"
+            - "GL10-29/operational-plan"
+    structure_requirements:
+      - rule_id: "STRUCT-001"
+        name: "Required Top-Level Fields"
+        description: "所有Artifact必須包含以下頂層字段"
+        required_fields:
+          - field: "apiVersion"
+            type: "string"
+            description: "API版本"
+          - field: "kind"
+            type: "string"
+            description: "Artifact類型"
+          - field: "metadata"
+            type: "object"
+            description: "元數據"
+          - field: "spec"
+            type: "object"
+            description: "規格定義"
+      - rule_id: "STRUCT-002"
+        name: "Required Metadata Fields"
+        description: "metadata必須包含以下字段"
+        required_fields:
+          - field: "name"
+            type: "string"
+            description: "Artifact名稱"
+          - field: "version"
+            type: "string"
+            description: "版本號"
+            pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+          - field: "created_at"
+            type: "string"
+            description: "創建時間"
+            format: "ISO8601"
+          - field: "owner"
+            type: "string"
+            description: "擁有者"
+          - field: "layer"
+            type: "string"
+            description: "所屬GL層級"
+            pattern: "^GL[0-9]{2}-[0-9]{2}$"
+      - rule_id: "STRUCT-003"
+        name: "Optional Metadata Fields"
+        description: "建議包含的可選元數據字段"
+        optional_fields:
+          - field: "updated_at"
+            type: "string"
+            description: "最後更新時間"
+          - field: "tags"
+            type: "array"
+            description: "標籤列表"
+          - field: "annotations"
+            type: "object"
+            description: "註解"
+          - field: "labels"
+            type: "object"
+            description: "標籤"
+    version_control:
+      - rule_id: "VER-001"
+        name: "Semantic Versioning"
+        description: "版本號必須遵循語義化版本規範"
+        format: "MAJOR.MINOR.PATCH"
+        rules:
+          - "MAJOR: 不兼容的API變更"
+          - "MINOR: 向後兼容的功能新增"
+          - "PATCH: 向後兼容的問題修復"
+      - rule_id: "VER-002"
+        name: "Version Increment Rules"
+        description: "版本遞增規則"
+        rules:
+          - condition: "Breaking changes"
+            action: "Increment MAJOR, reset MINOR and PATCH"
+          - condition: "New features"
+            action: "Increment MINOR, reset PATCH"
+          - condition: "Bug fixes"
+            action: "Increment PATCH"
+      - rule_id: "VER-003"
+        name: "Change History"
+        description: "所有版本變更必須記錄在change_history中"
+        required_fields:
+          - "version"
+          - "date"
+          - "author"
+          - "changes"
+  # ===========================================================================
+  # 層級標準
+  # ===========================================================================
+  layer_standards:
+    layer_definitions:
+      - layer_id: "GL00-09"
+        name: "Strategic Layer"
+        artifact_types:
+          - "VisionStatement"
+          - "StrategicObjectives"
+          - "GovernanceCharter"
+          - "RiskRegister"
+          - "ResourceAllocationPolicy"
+        review_cycle: "annual"
+        approval_authority: "governance-committee"
+      - layer_id: "GL10-29"
+        name: "Operational Layer"
+        artifact_types:
+          - "OperationalPlan"
+          - "ResourceAllocation"
+          - "StandardOperatingProcedure"
+          - "ProcessDefinition"
+          - "TeamStructure"
+        review_cycle: "quarterly"
+        approval_authority: "operations-director"
+      - layer_id: "GL30-49"
+        name: "Execution Layer"
+        artifact_types:
+          - "ProjectPlan"
+          - "DeploymentRecord"
+          - "TestReport"
+          - "ReleaseNotes"
+          - "IncidentReport"
+        review_cycle: "monthly"
+        approval_authority: "team-lead"
+      - layer_id: "GL50-59"
+        name: "Observability Layer"
+        artifact_types:
+          - "MetricsDefinition"
+          - "AlertRules"
+          - "SLODefinition"
+          - "AuditPolicy"
+          - "ComplianceReport"
+        review_cycle: "quarterly"
+        approval_authority: "observability-lead"
+      - layer_id: "GL60-80"
+        name: "Advanced/Feedback Layer"
+        artifact_types:
+          - "FeedbackMechanism"
+          - "AnalyticsReport"
+          - "OptimizationProposal"
+          - "ExperimentDefinition"
+          - "MLModelRegistry"
+        review_cycle: "monthly"
+        approval_authority: "feedback-lead"
+      - layer_id: "GL81-83"
+        name: "Extended Layer"
+        artifact_types:
+          - "InnovationRegistry"
+          - "ResearchProject"
+          - "ExternalCollaboration"
+          - "CommunityGuidelines"
+          - "PartnershipAgreement"
+        review_cycle: "quarterly"
+        approval_authority: "innovation-lead"
+      - layer_id: "GL90-99"
+        name: "Meta-Specification Layer"
+        artifact_types:
+          - "GovernanceStandards"
+          - "ArtifactTemplate"
+          - "ValidationRules"
+          - "LayerDefinition"
+          - "DependencyGraph"
+        review_cycle: "semi-annual"
+        approval_authority: "governance-committee"
+    cross_layer_rules:
+      - rule_id: "CROSS-001"
+        name: "Dependency Direction"
+        description: "依賴方向必須從高層級指向低層級"
+        allowed_directions:
+          - from: "GL00-09"
+            to: ["GL10-29", "GL90-99"]
+          - from: "GL10-29"
+            to: ["GL30-49", "GL50-59"]
+          - from: "GL30-49"
+            to: ["GL50-59"]
+          - from: "GL50-59"
+            to: ["GL60-80"]
+          - from: "GL60-80"
+            to: ["GL00-09", "GL10-29"]
+          - from: "GL90-99"
+            to: ["all"]
+      - rule_id: "CROSS-002"
+        name: "Reference Format"
+        description: "跨層級引用必須使用完整路徑"
+        format: "{{ layer_id }}/{{ artifact_name }}"
+        example: "GL00-09/governance-charter"
+  # ===========================================================================
+  # 審批標準
+  # ===========================================================================
+  approval_standards:
+    approval_workflows:
+      - workflow_id: "APPROVAL-001"
+        name: "Standard Approval"
+        description: "標準審批流程"
+        applicable_to: ["GL10-29", "GL30-49", "GL50-59", "GL60-80", "GL81-83"]
+        steps:
+          - step: 1
+            name: "Author Submission"
+            actor: "artifact_owner"
+            action: "submit_for_review"
+          - step: 2
+            name: "Peer Review"
+            actor: "peer_reviewer"
+            action: "review_and_comment"
+            min_reviewers: 1
+          - step: 3
+            name: "Lead Approval"
+            actor: "team_lead"
+            action: "approve_or_reject"
+          - step: 4
+            name: "Merge"
+            actor: "artifact_owner"
+            action: "merge_changes"
+      - workflow_id: "APPROVAL-002"
+        name: "Strategic Approval"
+        description: "戰略層級審批流程"
+        applicable_to: ["GL00-09", "GL90-99"]
+        steps:
+          - step: 1
+            name: "Author Submission"
+            actor: "artifact_owner"
+            action: "submit_for_review"
+          - step: 2
+            name: "Expert Review"
+            actor: "domain_expert"
+            action: "review_and_comment"
+            min_reviewers: 2
+          - step: 3
+            name: "Committee Review"
+            actor: "governance_committee"
+            action: "review_in_meeting"
+          - step: 4
+            name: "Committee Approval"
+            actor: "governance_committee"
+            action: "vote"
+            approval_threshold: "70%"
+          - step: 5
+            name: "Final Merge"
+            actor: "governance_admin"
+            action: "merge_changes"
+    approval_criteria:
+      - criterion_id: "CRIT-001"
+        name: "Completeness"
+        description: "Artifact必須包含所有必要字段"
+        weight: 0.25
+      - criterion_id: "CRIT-002"
+        name: "Accuracy"
+        description: "內容必須準確無誤"
+        weight: 0.25
+      - criterion_id: "CRIT-003"
+        name: "Consistency"
+        description: "與現有Artifact保持一致"
+        weight: 0.20
+      - criterion_id: "CRIT-004"
+        name: "Clarity"
+        description: "內容清晰易懂"
+        weight: 0.15
+      - criterion_id: "CRIT-005"
+        name: "Compliance"
+        description: "符合治理標準"
+        weight: 0.15
+  # ===========================================================================
+  # 合規標準
+  # ===========================================================================
+  compliance_standards:
+    mandatory_checks:
+      - check_id: "COMP-001"
+        name: "Schema Validation"
+        description: "驗證Artifact符合Schema定義"
+        severity: "error"
+        automated: true
+      - check_id: "COMP-002"
+        name: "Required Fields"
+        description: "驗證所有必要字段存在"
+        severity: "error"
+        automated: true
+      - check_id: "COMP-003"
+        name: "Naming Convention"
+        description: "驗證命名符合規範"
+        severity: "error"
+        automated: true
+      - check_id: "COMP-004"
+        name: "Version Format"
+        description: "驗證版本號格式正確"
+        severity: "error"
+        automated: true
+      - check_id: "COMP-005"
+        name: "Layer Assignment"
+        description: "驗證Artifact分配到正確層級"
+        severity: "error"
+        automated: true
+    recommended_checks:
+      - check_id: "REC-001"
+        name: "Documentation Quality"
+        description: "檢查文件品質"
+        severity: "warning"
+        automated: false
+      - check_id: "REC-002"
+        name: "Cross-Reference Validity"
+        description: "驗證跨引用有效性"
+        severity: "warning"
+        automated: true
+      - check_id: "REC-003"
+        name: "Freshness"
+        description: "檢查Artifact是否過期"
+        severity: "warning"
+        automated: true
+        threshold_days: 180
+  # ===========================================================================
+  # 文件標準
+  # ===========================================================================
+  documentation_standards:
+    required_documentation:
+      - doc_type: "README"
+        description: "每個層級目錄必須包含README"
+        format: "markdown"
+      - doc_type: "CHANGELOG"
+        description: "記錄所有變更歷史"
+        format: "markdown"
+      - doc_type: "API Documentation"
+        description: "所有API必須有文件"
+        format: "openapi/markdown"
+    documentation_quality:
+      - criterion: "Completeness"
+        description: "文件必須涵蓋所有功能"
+      - criterion: "Accuracy"
+        description: "文件必須與實際實現一致"
+      - criterion: "Examples"
+        description: "必須提供使用範例"
+      - criterion: "Maintenance"
+        description: "文件必須定期更新"
+status:
+  phase: "active"
+  approved_by: "governance-committee"
+  approved_at: "2025-01-18T00:00:00Z"
+  last_review: "2025-01-18T00:00:00Z"
+  next_review: "2025-07-18T00:00:00Z"
+  change_history:
+    - version: "2.0.0"
+      date: "2025-01-18"
+      author: "standards-team"
+      changes: "Major update with comprehensive standards"
+    - version: "1.0.0"
+      date: "2024-06-01"
+      author: "standards-team"
+      changes: "Initial governance standards"

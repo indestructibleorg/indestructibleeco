@@ -1,0 +1,2 @@
+{"event_id":"gl-integration-001","timestamp":"2026-01-28T00:35:00Z","event_type":"INTEGRATION","source":"governance","target":"gl","action":"consolidation","status":"completed"}
+{"event_id":"gl-integration-002","timestamp":"2026-01-28T00:35:00Z","event_type":"MIGRATION","source":"gl","target":"governance","action":"file_consolidation","status":"completed","details":{"files_migrated":100,"artifacts_integrated":true}}

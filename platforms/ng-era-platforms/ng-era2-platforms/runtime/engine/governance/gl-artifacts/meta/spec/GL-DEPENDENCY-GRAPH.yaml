@@ -1,0 +1,791 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: ECO-DEPENDENCY-GRAPH
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# =============================================================================
+# GL (Governance Layers) 層級間依賴關係圖
+# MachineNativeOps Governance Layer Dependency Graph
+# Version: 2.0.0
+# =============================================================================
+apiVersion: governance.machinenativeops.io/v2
+kind: GovernanceDependencyGraph
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:governance:gl-artifacts:meta:spec:GL-DEPENDENCY-GRAPH.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/spec/GL-DEPENDENCY-GRAPH.yaml"
+  name: gl-dependency-graph
+  version: "2.0.0"
+  created_at: "{{CREATED_AT_YEAR}}-01-18T00:00:00Z"
+  owner: governance-team
+  description: |
+    定義GL00-99各層級之間的依賴關係、數據流向、互動模式與整合點
+# =============================================================================
+# 層級依賴矩陣
+# =============================================================================
+dependency_matrix:
+  # 行：來源層級，列：目標層級
+  # 值：依賴類型 (provides/receives/bidirectional/none)
+  GL00-09:
+    GL00-09: "internal"
+    GL10-29: "provides_direction"
+    GL30-49: "indirect"
+    GL50-59: "receives_reports"
+    GL60-80: "receives_recommendations"
+    GL81-83: "receives_innovations"
+    GL90-99: "bidirectional"
+  GL10-29:
+    GL00-09: "receives_direction"
+    GL10-29: "internal"
+    GL30-49: "provides_guidance"
+    GL50-59: "receives_metrics"
+    GL60-80: "receives_insights"
+    GL81-83: "receives_knowledge"
+    GL90-99: "receives_standards"
+  GL30-49:
+    GL00-09: "indirect"
+    GL10-29: "receives_guidance"
+    GL30-49: "internal"
+    GL50-59: "provides_data"
+    GL60-80: "provides_feedback"
+    GL81-83: "collaborates"
+    GL90-99: "receives_standards"
+  GL50-59:
+    GL00-09: "provides_reports"
+    GL10-29: "provides_metrics"
+    GL30-49: "collects_data"
+    GL50-59: "internal"
+    GL60-80: "provides_data"
+    GL81-83: "monitors"
+    GL90-99: "receives_standards"
+  GL60-80:
+    GL00-09: "provides_recommendations"
+    GL10-29: "provides_insights"
+    GL30-49: "receives_feedback"
+    GL50-59: "receives_data"
+    GL60-80: "internal"
+    GL81-83: "collaborates"
+    GL90-99: "receives_standards"
+  GL81-83:
+    GL00-09: "provides_innovations"
+    GL10-29: "transfers_knowledge"
+    GL30-49: "collaborates"
+    GL50-59: "monitored_by"
+    GL60-80: "collaborates"
+    GL81-83: "internal"
+    GL90-99: "receives_standards"
+  GL90-99:
+    GL00-09: "bidirectional"
+    GL10-29: "provides_standards"
+    GL30-49: "provides_standards"
+    GL50-59: "provides_standards"
+    GL60-80: "provides_standards"
+    GL81-83: "provides_standards"
+    GL90-99: "internal"
+# =============================================================================
+# 數據流向定義
+# =============================================================================
+data_flows:
+  # 戰略層數據流
+  strategic_flows:
+    - flow_id: "SF-001"
+      name: "Strategic Direction Flow"
+      name_zh: "戰略方向流"
+      source: "GL00-09"
+      target: "GL10-29"
+      data_types:
+        - "governance_charter"
+        - "strategic_objectives"
+        - "risk_appetite"
+        - "resource_allocation_decisions"
+      frequency: "quarterly"
+      protocol: "artifact_publication"
+      validation: "committee_approval"
+    - flow_id: "SF-002"
+      name: "Strategic Feedback Flow"
+      name_zh: "戰略回饋流"
+      source: "GL10-29"
+      target: "GL00-09"
+      data_types:
+        - "operational_reports"
+        - "risk_status"
+        - "resource_utilization"
+        - "compliance_status"
+      frequency: "monthly"
+      protocol: "report_submission"
+      validation: "data_verification"
+  # 運營層數據流
+  operational_flows:
+    - flow_id: "OF-001"
+      name: "Operational Guidance Flow"
+      name_zh: "運營指導流"
+      source: "GL10-29"
+      target: "GL30-49"
+      data_types:
+        - "operational_plan"
+        - "sop_documents"
+        - "resource_allocation"
+        - "quality_standards"
+      frequency: "weekly"
+      protocol: "task_assignment"
+      validation: "manager_approval"
+    - flow_id: "OF-002"
+      name: "Execution Feedback Flow"
+      name_zh: "執行回饋流"
+      source: "GL30-49"
+      target: "GL10-29"
+      data_types:
+        - "progress_reports"
+        - "issue_logs"
+        - "delivery_status"
+        - "resource_requests"
+      frequency: "daily"
+      protocol: "status_update"
+      validation: "automated_check"
+  # 執行層數據流
+  execution_flows:
+    - flow_id: "EF-001"
+      name: "Execution Data Flow"
+      name_zh: "執行數據流"
+      source: "GL30-49"
+      target: "GL50-59"
+      data_types:
+        - "application_logs"
+        - "system_metrics"
+        - "trace_data"
+        - "deployment_events"
+      frequency: "continuous"
+      protocol: "streaming"
+      validation: "schema_validation"
+    - flow_id: "EF-002"
+      name: "Alert Flow"
+      name_zh: "告警流"
+      source: "GL50-59"
+      target: "GL30-49"
+      data_types:
+        - "alerts"
+        - "anomaly_notifications"
+        - "threshold_breaches"
+      frequency: "real_time"
+      protocol: "push_notification"
+      validation: "alert_rules"
+  # 觀測層數據流
+  observability_flows:
+    - flow_id: "OBF-001"
+      name: "Analytics Data Flow"
+      name_zh: "分析數據流"
+      source: "GL50-59"
+      target: "GL60-80"
+      data_types:
+        - "aggregated_metrics"
+        - "trend_data"
+        - "anomaly_patterns"
+        - "correlation_data"
+      frequency: "hourly"
+      protocol: "batch_transfer"
+      validation: "data_quality_check"
+    - flow_id: "OBF-002"
+      name: "Compliance Report Flow"
+      name_zh: "合規報告流"
+      source: "GL50-59"
+      target: "GL00-09"
+      data_types:
+        - "audit_reports"
+        - "compliance_status"
+        - "security_incidents"
+      frequency: "monthly"
+      protocol: "report_generation"
+      validation: "auditor_review"
+  # 回饋層數據流
+  feedback_flows:
+    - flow_id: "FF-001"
+      name: "Optimization Recommendation Flow"
+      name_zh: "優化建議流"
+      source: "GL60-80"
+      target: "GL10-29"
+      data_types:
+        - "optimization_recommendations"
+        - "ab_test_results"
+        - "model_performance"
+      frequency: "weekly"
+      protocol: "recommendation_submission"
+      validation: "impact_assessment"
+    - flow_id: "FF-002"
+      name: "Strategic Insight Flow"
+      name_zh: "戰略洞察流"
+      source: "GL60-80"
+      target: "GL00-09"
+      data_types:
+        - "strategic_insights"
+        - "trend_analysis"
+        - "predictive_models"
+      frequency: "quarterly"
+      protocol: "insight_presentation"
+      validation: "committee_review"
+  # 擴展層數據流
+  extended_flows:
+    - flow_id: "XF-001"
+      name: "Innovation Transfer Flow"
+      name_zh: "創新轉移流"
+      source: "GL81-83"
+      target: "GL10-29"
+      data_types:
+        - "innovation_results"
+        - "lessons_learned"
+        - "best_practices"
+      frequency: "on_completion"
+      protocol: "knowledge_transfer"
+      validation: "adoption_review"
+    - flow_id: "XF-002"
+      name: "External Collaboration Flow"
+      name_zh: "外部協作流"
+      source: "GL81-83"
+      target: "external"
+      data_types:
+        - "partnership_agreements"
+        - "collaboration_outputs"
+        - "community_contributions"
+      frequency: "as_needed"
+      protocol: "external_api"
+      validation: "legal_review"
+  # 元規範層數據流
+  meta_flows:
+    - flow_id: "MF-001"
+      name: "Standards Distribution Flow"
+      name_zh: "標準分發流"
+      source: "GL90-99"
+      target: "all_layers"
+      data_types:
+        - "specifications"
+        - "standards"
+        - "templates"
+        - "validation_rules"
+      frequency: "on_release"
+      protocol: "version_release"
+      validation: "compatibility_check"
+    - flow_id: "MF-002"
+      name: "Requirements Collection Flow"
+      name_zh: "需求收集流"
+      source: "all_layers"
+      target: "GL90-99"
+      data_types:
+        - "spec_requests"
+        - "improvement_suggestions"
+        - "compatibility_issues"
+      frequency: "continuous"
+      protocol: "issue_tracking"
+      validation: "triage_review"
+# =============================================================================
+# 互動模式定義
+# =============================================================================
+interaction_patterns:
+  # 同步互動模式
+  synchronous_patterns:
+    - pattern_id: "SP-001"
+      name: "Governance Meeting"
+      name_zh: "治理會議"
+      type: "meeting"
+      participants:
+        primary: ["GL00-09"]
+        secondary: ["GL10-29", "GL50-59"]
+      frequency: "quarterly"
+      duration: "2-4 hours"
+      outputs:
+        - "meeting_minutes"
+        - "action_items"
+        - "decisions"
+      escalation_path: "board_of_directors"
+    - pattern_id: "SP-002"
+      name: "Operational Sync"
+      name_zh: "運營同步會"
+      type: "meeting"
+      participants:
+        primary: ["GL10-29"]
+        secondary: ["GL30-49"]
+      frequency: "weekly"
+      duration: "1 hour"
+      outputs:
+        - "status_update"
+        - "blockers"
+        - "priorities"
+      escalation_path: "operations_director"
+    - pattern_id: "SP-003"
+      name: "Daily Standup"
+      name_zh: "每日站會"
+      type: "meeting"
+      participants:
+        primary: ["GL30-49"]
+        secondary: []
+      frequency: "daily"
+      duration: "15 minutes"
+      outputs:
+        - "progress_update"
+        - "blockers"
+      escalation_path: "tech_lead"
+    - pattern_id: "SP-004"
+      name: "Incident Response"
+      name_zh: "事件響應"
+      type: "war_room"
+      participants:
+        primary: ["GL30-49", "GL50-59"]
+        secondary: ["GL10-29"]
+      frequency: "on_incident"
+      duration: "until_resolution"
+      outputs:
+        - "incident_report"
+        - "root_cause_analysis"
+        - "remediation_plan"
+      escalation_path: "on_call_manager"
+  # 異步互動模式
+  asynchronous_patterns:
+    - pattern_id: "AP-001"
+      name: "Artifact Review"
+      name_zh: "Artifact審查"
+      type: "review"
+      participants:
+        reviewer: ["GL90-99"]
+        submitter: ["all_layers"]
+      trigger: "artifact_submission"
+      sla: "48 hours"
+      outputs:
+        - "review_comments"
+        - "approval_status"
+      escalation_path: "standards_committee"
+    - pattern_id: "AP-002"
+      name: "Change Request"
+      name_zh: "變更請求"
+      type: "workflow"
+      participants:
+        requester: ["GL30-49"]
+        approver: ["GL10-29"]
+      trigger: "change_submission"
+      sla: "24 hours"
+      outputs:
+        - "approval_decision"
+        - "implementation_plan"
+      escalation_path: "change_advisory_board"
+    - pattern_id: "AP-003"
+      name: "Feedback Submission"
+      name_zh: "回饋提交"
+      type: "feedback"
+      participants:
+        submitter: ["GL60-80"]
+        receiver: ["GL10-29", "GL00-09"]
+      trigger: "analysis_completion"
+      sla: "1 week"
+      outputs:
+        - "recommendations"
+        - "action_plan"
+      escalation_path: "strategy_committee"
+  # 自動化互動模式
+  automated_patterns:
+    - pattern_id: "AUP-001"
+      name: "CI/CD Pipeline"
+      name_zh: "CI/CD流水線"
+      type: "automation"
+      trigger: "code_commit"
+      layers_involved: ["GL30-49", "GL50-59"]
+      actions:
+        - "build"
+        - "test"
+        - "security_scan"
+        - "deploy"
+        - "metrics_collection"
+      outputs:
+        - "build_artifacts"
+        - "test_results"
+        - "deployment_status"
+      escalation_path: "devops_team"
+    - pattern_id: "AUP-002"
+      name: "Monitoring Alert"
+      name_zh: "監控告警"
+      type: "automation"
+      trigger: "threshold_breach"
+      layers_involved: ["GL50-59", "GL30-49"]
+      actions:
+        - "alert_generation"
+        - "notification"
+        - "auto_remediation"
+      outputs:
+        - "alert_record"
+        - "remediation_log"
+      escalation_path: "on_call_engineer"
+    - pattern_id: "AUP-003"
+      name: "Compliance Scan"
+      name_zh: "合規掃描"
+      type: "automation"
+      trigger: "scheduled"
+      frequency: "daily"
+      layers_involved: ["GL50-59", "GL10-29"]
+      actions:
+        - "policy_check"
+        - "vulnerability_scan"
+        - "configuration_audit"
+      outputs:
+        - "compliance_report"
+        - "violation_list"
+      escalation_path: "compliance_officer"
+    - pattern_id: "AUP-004"
+      name: "Artifact Validation"
+      name_zh: "Artifact驗證"
+      type: "automation"
+      trigger: "artifact_creation"
+      layers_involved: ["GL90-99", "all_layers"]
+      actions:
+        - "schema_validation"
+        - "consistency_check"
+        - "dependency_verification"
+      outputs:
+        - "validation_result"
+        - "error_report"
+      escalation_path: "spec_engineer"
+# =============================================================================
+# 整合點定義
+# =============================================================================
+integration_points:
+  # API整合點
+  api_integrations:
+    - integration_id: "API-001"
+      name: "Governance API"
+      name_zh: "治理API"
+      type: "rest_api"
+      provider: "GL90-99"
+      consumers: ["all_layers"]
+      endpoints:
+        - path: "/api/v2/artifacts"
+          methods: ["GET", "POST", "PUT", "DELETE"]
+          description: "Artifact CRUD operations"
+        - path: "/api/v2/validation"
+          methods: ["POST"]
+          description: "Artifact validation"
+        - path: "/api/v2/dependencies"
+          methods: ["GET"]
+          description: "Dependency graph queries"
+      authentication: "oauth2"
+      rate_limit: "1000/hour"
+    - integration_id: "API-002"
+      name: "Metrics API"
+      name_zh: "指標API"
+      type: "rest_api"
+      provider: "GL50-59"
+      consumers: ["GL00-09", "GL10-29", "GL60-80"]
+      endpoints:
+        - path: "/api/v2/metrics"
+          methods: ["GET"]
+          description: "Metrics queries"
+        - path: "/api/v2/alerts"
+          methods: ["GET", "POST"]
+          description: "Alert management"
+        - path: "/api/v2/dashboards"
+          methods: ["GET"]
+          description: "Dashboard data"
+      authentication: "api_key"
+      rate_limit: "5000/hour"
+    - integration_id: "API-003"
+      name: "Execution API"
+      name_zh: "執行API"
+      type: "rest_api"
+      provider: "GL30-49"
+      consumers: ["GL10-29", "GL50-59"]
+      endpoints:
+        - path: "/api/v2/deployments"
+          methods: ["GET", "POST"]
+          description: "Deployment management"
+        - path: "/api/v2/tasks"
+          methods: ["GET", "POST", "PUT"]
+          description: "Task management"
+        - path: "/api/v2/releases"
+          methods: ["GET", "POST"]
+          description: "Release management"
+      authentication: "oauth2"
+      rate_limit: "2000/hour"
+  # 事件整合點
+  event_integrations:
+    - integration_id: "EVT-001"
+      name: "Governance Events"
+      name_zh: "治理事件"
+      type: "event_bus"
+      provider: "GL90-99"
+      consumers: ["all_layers"]
+      events:
+        - event: "artifact.created"
+          description: "New artifact created"
+        - event: "artifact.updated"
+          description: "Artifact updated"
+        - event: "spec.released"
+          description: "New specification released"
+        - event: "validation.failed"
+          description: "Validation failure"
+      protocol: "kafka"
+      retention: "7 days"
+    - integration_id: "EVT-002"
+      name: "Operational Events"
+      name_zh: "運營事件"
+      type: "event_bus"
+      provider: "GL10-29"
+      consumers: ["GL30-49", "GL50-59"]
+      events:
+        - event: "plan.approved"
+          description: "Operational plan approved"
+        - event: "resource.allocated"
+          description: "Resource allocation changed"
+        - event: "policy.updated"
+          description: "Policy updated"
+      protocol: "kafka"
+      retention: "30 days"
+    - integration_id: "EVT-003"
+      name: "Execution Events"
+      name_zh: "執行事件"
+      type: "event_bus"
+      provider: "GL30-49"
+      consumers: ["GL10-29", "GL50-59", "GL60-80"]
+      events:
+        - event: "deployment.started"
+          description: "Deployment started"
+        - event: "deployment.completed"
+          description: "Deployment completed"
+        - event: "deployment.failed"
+          description: "Deployment failed"
+        - event: "test.completed"
+          description: "Test suite completed"
+      protocol: "kafka"
+      retention: "90 days"
+    - integration_id: "EVT-004"
+      name: "Observability Events"
+      name_zh: "觀測事件"
+      type: "event_bus"
+      provider: "GL50-59"
+      consumers: ["GL10-29", "GL30-49", "GL60-80"]
+      events:
+        - event: "alert.triggered"
+          description: "Alert triggered"
+        - event: "alert.resolved"
+          description: "Alert resolved"
+        - event: "slo.breached"
+          description: "SLO breached"
+        - event: "anomaly.detected"
+          description: "Anomaly detected"
+      protocol: "kafka"
+      retention: "30 days"
+  # 文件整合點
+  file_integrations:
+    - integration_id: "FILE-001"
+      name: "Artifact Repository"
+      name_zh: "Artifact倉庫"
+      type: "git"
+      provider: "GL90-99"
+      consumers: ["all_layers"]
+      repository: "governance/artifacts"
+      branches:
+        main: "production artifacts"
+        develop: "development artifacts"
+        feature: "feature branches"
+      hooks:
+        - "pre-commit: validation"
+        - "post-merge: notification"
+    - integration_id: "FILE-002"
+      name: "Documentation Repository"
+      name_zh: "文檔倉庫"
+      type: "git"
+      provider: "GL10-29"
+      consumers: ["all_layers"]
+      repository: "docs"
+      branches:
+        main: "published documentation"
+        draft: "draft documentation"
+      hooks:
+        - "pre-commit: lint"
+        - "post-merge: publish"
+    - integration_id: "FILE-003"
+      name: "Report Storage"
+      name_zh: "報告存儲"
+      type: "object_storage"
+      provider: "GL50-59"
+      consumers: ["GL00-09", "GL10-29"]
+      bucket: "governance-reports"
+      retention:
+        audit_reports: "7 years"
+        operational_reports: "3 years"
+        metrics_exports: "1 year"
+# =============================================================================
+# 依賴關係視覺化
+# =============================================================================
+visualization:
+  # Mermaid圖表定義
+  mermaid_diagram: |
+    graph TB
+      subgraph Strategic["GL00-09: Strategic Layer"]
+        S1[Vision & Strategy]
+        S2[Governance Charter]
+        S3[Risk Appetite]
+      end
+      subgraph Operational["GL10-29: Operational Layer"]
+        O1[Operational Plan]
+        O2[SOP]
+        O3[Resource Allocation]
+      end
+      subgraph Execution["GL30-49: Execution Layer"]
+        E1[Project Execution]
+        E2[Development]
+        E3[Deployment]
+      end
+      subgraph Observability["GL50-59: Observability Layer"]
+        OB1[Metrics]
+        OB2[Logs]
+        OB3[Traces]
+      end
+      subgraph Feedback["GL60-80: Feedback Layer"]
+        F1[Analytics]
+        F2[A/B Testing]
+        F3[Optimization]
+      end
+      subgraph Extended["GL81-83: Extended Layer"]
+        X1[Innovation]
+        X2[Collaboration]
+        X3[Community]
+      end
+      subgraph Meta["GL90-99: Meta-Specification Layer"]
+        M1[Standards]
+        M2[Templates]
+        M3[Validation]
+      end
+      %% Strategic to Operational
+      S1 -->|direction| O1
+      S2 -->|policies| O2
+      S3 -->|constraints| O3
+      %% Operational to Execution
+      O1 -->|tasks| E1
+      O2 -->|procedures| E2
+      O3 -->|resources| E3
+      %% Execution to Observability
+      E1 -->|events| OB1
+      E2 -->|logs| OB2
+      E3 -->|traces| OB3
+      %% Observability to Feedback
+      OB1 -->|data| F1
+      OB2 -->|patterns| F2
+      OB3 -->|insights| F3
+      %% Feedback loops
+      F1 -->|recommendations| O1
+      F3 -->|insights| S1
+      %% Extended interactions
+      X1 -->|innovations| O1
+      X2 -->|knowledge| E1
+      %% Meta-spec to all
+      M1 -.->|standards| S1
+      M1 -.->|standards| O1
+      M1 -.->|standards| E1
+      M1 -.->|standards| OB1
+      M1 -.->|standards| F1
+      M1 -.->|standards| X1
+      %% Feedback to Strategic
+      O1 -->|reports| S1
+      OB1 -->|compliance| S1
+  # ASCII圖表
+  ascii_diagram: |
+    ┌─────────────────────────────────────────────────────────────────────────┐
+    │                    GL GOVERNANCE LAYERS DEPENDENCY                       │
+    ├─────────────────────────────────────────────────────────────────────────┤
+    │                                                                          │
+    │  ┌──────────────────┐                                                   │
+    │  │   GL00-09        │◄────────────────────────────────────────┐        │
+    │  │   Strategic      │                                          │        │
+    │  │   Layer          │──────────────────────┐                   │        │
+    │  └────────┬─────────┘                      │                   │        │
+    │           │ direction                      │ reports           │        │
+    │           ▼                                │                   │        │
+    │  ┌──────────────────┐                      │                   │        │
+    │  │   GL10-29        │◄─────────────────────┼───────────────┐   │        │
+    │  │   Operational    │                      │               │   │        │
+    │  │   Layer          │──────────────────┐   │               │   │        │
+    │  └────────┬─────────┘                  │   │               │   │        │
+    │           │ guidance                   │   │               │   │        │
+    │           ▼                            │   │               │   │        │
+    │  ┌──────────────────┐                  │   │               │   │        │
+    │  │   GL30-49        │                  │   │               │   │        │
+    │  │   Execution      │──────────────────┼───┼───────────┐   │   │        │
+    │  │   Layer          │                  │   │           │   │   │        │
+    │  └────────┬─────────┘                  │   │           │   │   │        │
+    │           │ data                       │   │           │   │   │        │
+    │           ▼                            │   │           │   │   │        │
+    │  ┌──────────────────┐                  │   │           │   │   │        │
+    │  │   GL50-59        │──────────────────┘   │           │   │   │        │
+    │  │   Observability  │─────────────────────►│           │   │   │        │
+    │  │   Layer          │──────────────────────┼───────────┼───┘   │        │
+    │  └────────┬─────────┘                      │           │       │        │
+    │           │ analytics                      │           │       │        │
+    │           ▼                                │           │       │        │
+    │  ┌──────────────────┐                      │           │       │        │
+    │  │   GL60-80        │──────────────────────┼───────────┘       │        │
+    │  │   Feedback       │──────────────────────┘                   │        │
+    │  │   Layer          │──────────────────────────────────────────┘        │
+    │  └──────────────────┘                                                   │
+    │                                                                          │
+    │  ┌──────────────────┐     ┌──────────────────┐                          │
+    │  │   GL81-83        │     │   GL90-99        │                          │
+    │  │   Extended       │◄────│   Meta-Spec      │────────────────────►     │
+    │  │   Layer          │     │   Layer          │  (to all layers)         │
+    │  └──────────────────┘     └──────────────────┘                          │
+    │                                                                          │
+    └─────────────────────────────────────────────────────────────────────────┘
+# =============================================================================
+# 依賴關係驗證規則
+# =============================================================================
+validation_rules:
+  # 循環依賴檢查
+  circular_dependency_check:
+    enabled: true
+    allowed_exceptions:
+      - "GL00-09 <-> GL90-99"  # 戰略層與元規範層的雙向依賴是允許的
+    action_on_violation: "error"
+  # 跨層級直接依賴檢查
+  cross_layer_direct_dependency:
+    enabled: true
+    max_skip_layers: 1  # 最多跳過1層
+    exceptions:
+      - source: "GL50-59"
+        target: "GL00-09"
+        reason: "合規報告需直接提交至戰略層"
+      - source: "GL60-80"
+        target: "GL00-09"
+        reason: "戰略洞察需直接提交至戰略層"
+    action_on_violation: "warning"
+  # 必要依賴檢查
+  required_dependencies:
+    rules:
+      - layer: "GL10-29"
+        must_depend_on: ["GL00-09"]
+        reason: "運營層必須依賴戰略層的方向"
+      - layer: "GL30-49"
+        must_depend_on: ["GL10-29"]
+        reason: "執行層必須依賴運營層的指導"
+      - layer: "GL50-59"
+        must_depend_on: ["GL30-49"]
+        reason: "觀測層必須收集執行層的數據"
+    action_on_violation: "error"
+  # 數據流完整性檢查
+  data_flow_integrity:
+    enabled: true
+    checks:
+      - "所有數據流必須有明確的來源和目標"
+      - "所有數據流必須有驗證機制"
+      - "敏感數據流必須有加密"
+    action_on_violation: "error"
+# =============================================================================
+# 版本與演進
+# =============================================================================
+versioning:
+  current_version: "2.0.0"
+  release_date: "{{RELEASE_DATE}}"
+  changelog:
+    - version: "2.0.0"
+      date: "2025-01-18"
+      changes:
+        - "完整定義所有層級間依賴關係"
+        - "新增數據流向定義"
+        - "新增互動模式定義"
+        - "新增整合點定義"
+        - "新增視覺化圖表"
+        - "新增驗證規則"

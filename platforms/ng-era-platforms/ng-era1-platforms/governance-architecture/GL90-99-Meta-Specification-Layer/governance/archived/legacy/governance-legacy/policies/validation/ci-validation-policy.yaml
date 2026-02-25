@@ -1,0 +1,259 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# CI/CD 验证策略
+# 定义 CI/PR 流程中的命名验证规则和工具配置
+
+apiVersion: governance.machinenativeops.io/v1alpha1
+kind: ValidationPolicy
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:policies:validation:ci-validation-policy.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/validation/ci-validation-policy.yaml"
+  name: naming-pr-validation
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    category: validation
+    module: naming-governance
+    enforcement: strict
+
+spec:
+  # 验证范围
+  scope:
+    paths:
+      - "manifests/"
+      - "terraform/"
+      - "helm/"
+      - "k8s/"
+      - ".github/workflows/"
+      - ".gitlab-ci.yml"
+
+    filePatterns:
+      - "**/*.yaml"
+      - "**/*.yml"
+      - "**/*.tf"
+      - "**/*.json"
+
+    resourceTypes:
+      - "Deployment"
+      - "StatefulSet"
+      - "DaemonSet"
+      - "Service"
+      - "Ingress"
+      - "ConfigMap"
+      - "Secret"
+      - "ServiceAccount"
+      - "PersistentVolumeClaim"
+      - "HorizontalPodAutoscaler"
+
+    environments:
+      - "production"
+      - "staging"
+      - "dev"
+
+  # 验证工具配置
+  tools:
+    # Conftest (OPA Rego) 配置
+    conftest:
+      enabled: true
+      policyPath: "policies/conftest/"
+      namespace: "main"
+      data:
+        - "schemas/resource-name.schema.yaml"
+      failOn: ["critical", "high"]
+      outputFormat: "json"
+
+    # Checkov IaC 扫描
+    checkov:
+      enabled: true
+      framework:
+        - "kubernetes"
+        - "terraform"
+        - "helm"
+      skipChecks:
+        - "CKV_K8S_1"  # 示例：跳过特定检查
+      softFail: false
+      compactOutput: false
+
+    # Kube-bench CIS 基准测试
+    kubeBench:
+      enabled: true
+      configDir: "./cis-config"
+      targets:
+        - "master"
+        - "node"
+        - "etcd"
+      skipTests:
+        - "1.1.1"  # 示例：跳过特定测试
+
+    # Kubeaudit 安全审计
+    kubeaudit:
+      enabled: true
+      auditAll: true
+      checks:
+        - "apparmor"
+        - "capabilities"
+        - "hostns"
+        - "image"
+        - "limits"
+        - "mountds"
+        - "netpols"
+        - "nonroot"
+        - "privesc"
+        - "privileged"
+        - "rootfs"
+        - "seccomp"
+
+    # Kubescape 安全扫描
+    kubescape:
+      enabled: true
+      frameworks:
+        - "nsa"
+        - "mitre"
+        - "cis"
+      severityThreshold: "medium"
+      failOn: "critical"
+
+    # 自定义验证工具
+    custom:
+      - name: "Naming Pattern Validator"
+        command: "python"
+        args:
+          - "tools/governance/python/validate_naming.py"
+          - "--strict"
+          - "--format=json"
+
+      - name: "Label Completeness Check"
+        command: "bash"
+        args:
+          - "tools/governance/bash/check_required_labels.sh"
+
+  # 执行策略
+  enforcement:
+    mode: "enforce"  # advisory | warn | enforce
+    description: |
+      enforce: 严格执行，违规则阻止 PR 合并
+      warn: 警告但允许继续
+      advisory: 仅记录，不阻止
+
+    failOn:
+      - "critical"
+      - "high"
+
+    warnOn:
+      - "medium"
+
+    exemptions:
+      - resource: "legacy-app-*"
+        reason: "历史遗留系统，已有迁移计划"
+        expiresAt: "2025-12-31T23:59:59Z"
+        approvedBy: "governance-board"
+
+      - resource: "*/kube-system/*"
+        reason: "系统命名空间，特殊命名约定"
+        expiresAt: "永久"
+        approvedBy: "platform-team"
+
+  # CI/CD 集成
+  cicd:
+    # GitHub Actions 配置
+    githubActions:
+      enabled: true
+      workflow: ".github/workflows/naming-validation.yml"
+      triggerOn:
+        - "pull_request"
+        - "push"
+      branches:
+        - "main"
+        - "develop"
+        - "release/*"
+      paths:
+        - "manifests/**"
+        - "terraform/**"
+
+    # GitLab CI 配置
+    gitlabCI:
+      enabled: false
+      stage: "validate"
+      only:
+        - "merge_requests"
+        - "main"
+      script:
+        - "conftest test manifests/"
+        - "checkov -d terraform/"
+
+    # Jenkins 配置
+    jenkins:
+      enabled: false
+      pipeline: "Jenkinsfile.validation"
+      stages:
+        - "lint"
+        - "validate"
+        - "security-scan"
+
+  # 报告配置
+  reporting:
+    format:
+      - "json"
+      - "sarif"
+      - "junit"
+      - "html"
+
+    destination:
+      # Slack 通知
+      slack:
+        enabled: true
+        channel: "#pr-validation"
+        webhook: "${SLACK_WEBHOOK_URL}"
+        notifyOn:
+          - "failure"
+          - "critical-issues"
+        messageTemplate: |
+          :x: Naming Validation Failed
+          PR: {{ .pr_url }}
+          Violations: {{ .violation_count }}
+          Severity: {{ .highest_severity }}
+
+      # Email 通知
+      email:
+        enabled: true
+        recipients:
+          - "governance-team@example.com"
+        notifyOn:
+          - "critical-issues"
+        subject: "Naming Validation Alert: {{ .pr_title }}"
+
+      # 存储到对象存储
+      storage:
+        type: "s3"
+        bucket: "governance-validation-reports"
+        path: "naming-validation/{{ .date }}/{{ .pr_number }}"
+        retention: "90d"
+
+      # GitHub PR Comments
+      github:
+        enabled: true
+        commentOn:
+          - "failure"
+        collapseSuccessful: true
+
+  # 性能和并发控制
+  performance:
+    timeout: "10m"
+    maxConcurrent: 5
+    cache:
+      enabled: true
+      ttl: "24h"
+
+  # 审计和日志
+  audit:
+    enabled: true
+    logLevel: "info"
+    includeSuccessful: false
+    storage:
+      type: "elasticsearch"
+      index: "governance-validation-logs"
+      retention: "90d"

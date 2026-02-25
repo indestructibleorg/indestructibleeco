@@ -1,0 +1,90 @@
+# @ECO-governed
+# @ECO-layer: data
+# @ECO-semantic: instant_grail
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+version: v1
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:automation:instant:legacy:instant-grail.yaml"
+    eco-base/uri: "eco-base://platform/resource/automation/instant/legacy/instant-grail.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+name: "instant_grail"
+description: "Holy Grail INSTANT pipeline binding the MCP unified pipeline with Quantum Flow Toolkit phases (deconstruct→integrate→refactor)."
+template_engine: "variable_substitution"
+
+triggers:
+  - on_startup: true
+  - event: "RUN_CREATED"
+  - event: "CODE_CHANGE_DETECTED"
+  - event: "CHAT_MESSAGE_CREATED"
+
+steps:
+  - id: "load_unified_pipeline"
+    action: "mcp.pipeline.load"
+    description: "Load the unified pipeline to ensure MCP methodology is applied."
+    inputs:
+      path: "ns-root/namespaces-mcp/pipelines/unified-pipeline-config.yaml"
+    outputs:
+      - pipeline_spec
+
+  - id: "quantum_flow_alignment"
+    action: "mcp.pipeline.apply"
+    description: "Map the three phases (deconstruct, integrate, refactor) into the Quantum Flow Toolkit."
+    depends_on:
+      - "load_unified_pipeline"
+    inputs:
+      phases: ["deconstruct", "integrate", "refactor"]
+      latency_targets: "${team.methodology.latency_targets}"
+      parallelism: "${team.methodology.parallelism}"
+      closed_loop: "${team.methodology.governance.closed_loop}"
+      human_intervention: "${team.methodology.governance.human_intervention}"
+    outputs:
+      - quantum_binding
+    artifacts:
+      - name: "quantum_flow_binding"
+        type: "markdown"
+
+  - id: "instant_feature_delivery"
+    action: "agents.invoke"
+    description: "Execute the instant-feature-delivery pipeline (analysis→generation→validation→deployment)."
+    agent_id: "core.orchestrator"
+    depends_on:
+      - "quantum_flow_alignment"
+    inputs:
+      pipeline: "${pipeline_spec}"
+      target_pipeline: "instant-feature-delivery"
+      latency_guard: "${team.methodology.latency_targets}"
+      human_intervention: "${team.methodology.governance.human_intervention}"
+    outputs:
+      - delivery_report
+    artifacts:
+      - name: "instant_delivery_report"
+        type: "markdown"
+
+  - id: "emit_completion_event"
+    action: "events.emit"
+    description: "Emit a Holy Grail team completion event for governance and audit."
+    depends_on:
+      - "instant_feature_delivery"
+    inputs:
+      event_type: "HOLY_GRAIL_TEAM_COMPLETED"
+      payload:
+        team_id: "holy-grail"
+        pipeline: "ns-root/namespaces-mcp/pipelines/unified-pipeline-config.yaml"
+        latency: "${delivery_report.latency}"
+
+audit:
+  enabled: true
+  events:
+    - "PLAYBOOK_STARTED"
+    - "STEP_COMPLETED"
+    - "PLAYBOOK_COMPLETED"
+    - "ERROR"

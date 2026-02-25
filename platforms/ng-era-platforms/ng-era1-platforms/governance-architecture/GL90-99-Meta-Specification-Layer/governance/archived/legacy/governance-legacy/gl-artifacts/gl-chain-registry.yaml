@@ -1,0 +1,362 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLChainRegistry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-chain-registry.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-chain-registry.yaml"
+  name: gl-chain-registry
+  version: "1.0.0"
+  status: ACTIVE
+  created_at: "2025-01-19T00:00:00Z"
+  owner: governance-committee
+chain_declaration:
+  purpose: "建立 GL 治理架構所有文件之間的完整鏈鍵關係"
+  authority: "ECO-CONSTITUTION.yaml"
+  integrity: VERIFIED
+core_governance_chain:
+  chain_id: "CHAIN-CORE"
+  name: "Core Governance Chain"
+  name_zh: "核心治理鏈"
+  nodes:
+    - node_id: "NODE-01"
+      file: "ECO-CONSTITUTION.yaml"
+      type: "constitution"
+      role: "最高治理規範"
+      status: ENACTED
+      authority: SUPREME
+      depends_on: []
+      provides_to:
+        - "ECO-SEMANTIC-SEAL.yaml"
+        - "ECO-SEMANTIC-BOUNDARIES.yaml"
+        - "ECO-GOVERNANCE-LOOP.yaml"
+        - "ECO-TASK-LIFECYCLE.yaml"
+        - "ECO-EXECUTION-MODE.yaml"
+        - "ECO-AUTOMATION-ENGINE.yaml"
+        - "ECO-ARTIFACT-ENGINE.yaml"
+        - "ECO-SKILLS-MATRIX.yaml"
+        - "ECO-ARTIFACTS-MATRIX.yaml"
+        - "ECO-FILESYSTEM-MAPPING.yaml"
+        - "ECO-DAG.yaml"
+    - node_id: "NODE-02"
+      file: "ECO-SEMANTIC-SEAL.yaml"
+      type: "semantic-specification"
+      role: "語意封存規範"
+      status: SEALED
+      authority: HIGH
+      depends_on:
+        - "ECO-CONSTITUTION.yaml"
+      provides_to:
+        - "ECO-SEMANTIC-BOUNDARIES.yaml"
+        - "ECO-ARTIFACT-ENGINE.yaml"
+    - node_id: "NODE-03"
+      file: "ECO-SEMANTIC-BOUNDARIES.yaml"
+      type: "semantic-specification"
+      role: "語意邊界定義"
+      status: SEALED
+      authority: HIGH
+      depends_on:
+        - "ECO-CONSTITUTION.yaml"
+        - "ECO-SEMANTIC-SEAL.yaml"
+      provides_to:
+        - "ECO-SKILLS-MATRIX.yaml"
+        - "ECO-ARTIFACTS-MATRIX.yaml"
+        - "ECO-FILESYSTEM-MAPPING.yaml"
+        - "ECO-ARTIFACT-ENGINE.yaml"
+execution_governance_chain:
+  chain_id: "CHAIN-EXEC"
+  name: "Execution Governance Chain"
+  name_zh: "執行治理鏈"
+  nodes:
+    - node_id: "NODE-04"
+      file: "ECO-GOVERNANCE-LOOP.yaml"
+      type: "governance-process"
+      role: "治理循環"
+      status: SEALED
+      authority: HIGH
+      depends_on:
+        - "ECO-CONSTITUTION.yaml"
+      provides_to:
+        - "ECO-TASK-LIFECYCLE.yaml"
+        - "ECO-AUTOMATION-ENGINE.yaml"
+        - "ECO-ARTIFACT-ENGINE.yaml"
+    - node_id: "NODE-05"
+      file: "ECO-TASK-LIFECYCLE.yaml"
+      type: "governance-process"
+      role: "任務生命週期"
+      status: SEALED
+      authority: HIGH
+      depends_on:
+        - "ECO-CONSTITUTION.yaml"
+        - "ECO-GOVERNANCE-LOOP.yaml"
+      provides_to:
+        - "ECO-AUTOMATION-ENGINE.yaml"
+        - "ECO-ARTIFACT-ENGINE.yaml"
+    - node_id: "NODE-06"
+      file: "ECO-EXECUTION-MODE.yaml"
+      type: "execution-specification"
+      role: "執行模式"
+      status: SEALED
+      authority: HIGH
+      depends_on:
+        - "ECO-CONSTITUTION.yaml"
+      provides_to:
+        - "ECO-AUTOMATION-ENGINE.yaml"
+        - "ECO-ARTIFACT-ENGINE.yaml"
+automation_engine_chain:
+  chain_id: "CHAIN-AUTO"
+  name: "Automation Engine Chain"
+  name_zh: "自動化引擎鏈"
+  nodes:
+    - node_id: "NODE-07"
+      file: "ECO-AUTOMATION-ENGINE.yaml"
+      type: "automation-engine"
+      role: "自動化引擎"
+      status: SEALED
+      authority: HIGH
+      depends_on:
+        - "ECO-CONSTITUTION.yaml"
+        - "ECO-GOVERNANCE-LOOP.yaml"
+        - "ECO-TASK-LIFECYCLE.yaml"
+        - "ECO-EXECUTION-MODE.yaml"
+      provides_to:
+        - "ECO-ARTIFACT-ENGINE.yaml"
+    - node_id: "NODE-08"
+      file: "ECO-ARTIFACT-ENGINE.yaml"
+      type: "artifact-engine"
+      role: "產物生成引擎"
+      status: ACTIVE
+      authority: HIGH
+      depends_on:
+        - "ECO-CONSTITUTION.yaml"
+        - "ECO-SEMANTIC-SEAL.yaml"
+        - "ECO-SEMANTIC-BOUNDARIES.yaml"
+        - "ECO-GOVERNANCE-LOOP.yaml"
+        - "ECO-TASK-LIFECYCLE.yaml"
+        - "ECO-EXECUTION-MODE.yaml"
+        - "ECO-AUTOMATION-ENGINE.yaml"
+        - "ECO-SKILLS-MATRIX.yaml"
+        - "ECO-ARTIFACTS-MATRIX.yaml"
+        - "ECO-FILESYSTEM-MAPPING.yaml"
+      provides_to: []
+matrix_definition_chain:
+  chain_id: "CHAIN-MATRIX"
+  name: "Matrix Definition Chain"
+  name_zh: "矩陣定義鏈"
+  nodes:
+    - node_id: "NODE-09"
+      file: "ECO-SKILLS-MATRIX.yaml"
+      type: "matrix-definition"
+      role: "技能能力責任矩陣"
+      status: SEALED
+      authority: HIGH
+      depends_on:
+        - "ECO-CONSTITUTION.yaml"
+        - "ECO-SEMANTIC-BOUNDARIES.yaml"
+      provides_to:
+        - "ECO-ARTIFACTS-MATRIX.yaml"
+        - "ECO-ARTIFACT-ENGINE.yaml"
+    - node_id: "NODE-10"
+      file: "ECO-ARTIFACTS-MATRIX.yaml"
+      type: "matrix-definition"
+      role: "產物矩陣"
+      status: SEALED
+      authority: HIGH
+      depends_on:
+        - "ECO-CONSTITUTION.yaml"
+        - "ECO-SEMANTIC-BOUNDARIES.yaml"
+        - "ECO-SKILLS-MATRIX.yaml"
+      provides_to:
+        - "ECO-FILESYSTEM-MAPPING.yaml"
+        - "ECO-ARTIFACT-ENGINE.yaml"
+    - node_id: "NODE-11"
+      file: "ECO-FILESYSTEM-MAPPING.yaml"
+      type: "filesystem-mapping"
+      role: "檔案系統映射"
+      status: SEALED
+      authority: HIGH
+      depends_on:
+        - "ECO-CONSTITUTION.yaml"
+        - "ECO-SEMANTIC-BOUNDARIES.yaml"
+        - "ECO-ARTIFACTS-MATRIX.yaml"
+      provides_to:
+        - "ECO-ARTIFACT-ENGINE.yaml"
+structure_definition_chain:
+  chain_id: "CHAIN-STRUCT"
+  name: "Structure Definition Chain"
+  name_zh: "結構定義鏈"
+  nodes:
+    - node_id: "NODE-12"
+      file: "ECO-DAG.yaml"
+      type: "structure-definition"
+      role: "有向無環圖"
+      status: SEALED
+      authority: HIGH
+      depends_on:
+        - "ECO-CONSTITUTION.yaml"
+      provides_to:
+        - "ECO-GOVERNANCE-LOOP.yaml"
+    - node_id: "NODE-13"
+      file: "ECO-DAG.md"
+      type: "documentation"
+      role: "DAG 文檔"
+      status: SEALED
+      authority: MEDIUM
+      depends_on:
+        - "ECO-DAG.yaml"
+      provides_to: []
+complete_chain_graph:
+  graph_id: "GRAPH-COMPLETE"
+  name: "Complete GL Chain Graph"
+  name_zh: "完整 GL 鏈鍵圖"
+  topology: |
+    ┌─────────────────────────────────────────────────────────────────────────┐
+    │                        ECO-CONSTITUTION.yaml                              │
+    │                         (SUPREME AUTHORITY)                              │
+    └─────────────────────────────────────────────────────────────────────────┘
+                                      │
+          ┌───────────────────────────┼───────────────────────────┐
+          │                           │                           │
+          ▼                           ▼                           ▼
+    ┌─────────────┐           ┌─────────────┐           ┌─────────────┐
+    │ECO-SEMANTIC- │           │ECO-GOVERNANCE│           │  ECO-DAG     │
+    │SEAL.yaml    │           │-LOOP.yaml   │           │  .yaml      │
+    └─────────────┘           └─────────────┘           └─────────────┘
+          │                           │                           │
+          ▼                           ▼                           ▼
+    ┌─────────────┐           ┌─────────────┐           ┌─────────────┐
+    │ECO-SEMANTIC- │           │ECO-TASK-     │           │  ECO-DAG     │
+    │BOUNDARIES   │           │LIFECYCLE    │           │  .md        │
+    │.yaml        │           │.yaml        │           └─────────────┘
+    └─────────────┘           └─────────────┘
+          │                           │
+          │                           ▼
+          │                   ┌─────────────┐
+          │                   │ECO-EXECUTION-│
+          │                   │MODE.yaml    │
+          │                   └─────────────┘
+          │                           │
+          ▼                           ▼
+    ┌─────────────┐           ┌─────────────┐
+    │ECO-SKILLS-   │           │ECO-AUTOMATION│
+    │MATRIX.yaml  │           │-ENGINE.yaml │
+    └─────────────┘           └─────────────┘
+          │                           │
+          ▼                           │
+    ┌─────────────┐                   │
+    │ECO-ARTIFACTS-│                   │
+    │MATRIX.yaml  │                   │
+    └─────────────┘                   │
+          │                           │
+          ▼                           │
+    ┌─────────────┐                   │
+    │ECO-FILESYSTEM│                   │
+    │-MAPPING.yaml│                   │
+    └─────────────┘                   │
+          │                           │
+          └───────────────────────────┘
+                        │
+                        ▼
+              ┌─────────────────┐
+              │ECO-ARTIFACT-     │
+              │ENGINE.yaml      │
+              │(ACTIVE ENGINE)  │
+              └─────────────────┘
+chain_statistics:
+  total_nodes: 13
+  total_chains: 5
+  chains:
+    - chain_id: "CHAIN-CORE"
+      nodes: 3
+    - chain_id: "CHAIN-EXEC"
+      nodes: 3
+    - chain_id: "CHAIN-AUTO"
+      nodes: 2
+    - chain_id: "CHAIN-MATRIX"
+      nodes: 3
+    - chain_id: "CHAIN-STRUCT"
+      nodes: 2
+  node_status:
+    ENACTED: 1
+    SEALED: 11
+    ACTIVE: 1
+  authority_levels:
+    SUPREME: 1
+    HIGH: 11
+    MEDIUM: 1
+dependency_matrix:
+  matrix_id: "DEP-MATRIX-001"
+  dependencies:
+    ECO-CONSTITUTION.yaml:
+      depends_on: []
+      depended_by: 12
+    ECO-SEMANTIC-SEAL.yaml:
+      depends_on: 1
+      depended_by: 2
+    ECO-SEMANTIC-BOUNDARIES.yaml:
+      depends_on: 2
+      depended_by: 4
+    ECO-GOVERNANCE-LOOP.yaml:
+      depends_on: 1
+      depended_by: 3
+    ECO-TASK-LIFECYCLE.yaml:
+      depends_on: 2
+      depended_by: 2
+    ECO-EXECUTION-MODE.yaml:
+      depends_on: 1
+      depended_by: 2
+    ECO-AUTOMATION-ENGINE.yaml:
+      depends_on: 4
+      depended_by: 1
+    ECO-ARTIFACT-ENGINE.yaml:
+      depends_on: 10
+      depended_by: 0
+    ECO-SKILLS-MATRIX.yaml:
+      depends_on: 2
+      depended_by: 2
+    ECO-ARTIFACTS-MATRIX.yaml:
+      depends_on: 3
+      depended_by: 2
+    ECO-FILESYSTEM-MAPPING.yaml:
+      depends_on: 3
+      depended_by: 1
+    ECO-DAG.yaml:
+      depends_on: 1
+      depended_by: 2
+    ECO-DAG.md:
+      depends_on: 1
+      depended_by: 0
+chain_validation:
+  rules:
+    - rule_id: "CHAIN-VAL-01"
+      name: "依賴完整性"
+      description: "所有依賴必須存在且有效"
+      enforcement: STRICT
+    - rule_id: "CHAIN-VAL-02"
+      name: "循環依賴禁止"
+      description: "不得存在循環依賴"
+      enforcement: STRICT
+    - rule_id: "CHAIN-VAL-03"
+      name: "權限層級遵守"
+      description: "低權限不得覆蓋高權限"
+      enforcement: STRICT
+    - rule_id: "CHAIN-VAL-04"
+      name: "狀態一致性"
+      description: "依賴的文件狀態必須一致"
+      enforcement: STRICT
+    - rule_id: "CHAIN-VAL-05"
+      name: "鏈鍵完整性"
+      description: "所有鏈鍵必須完整連接"
+      enforcement: STRICT
+chain_signature:
+  registry_id: "ECO-CHAIN-REGISTRY-001"
+  version: "1.0.0"
+  status: ACTIVE
+  created_at: "2025-01-19T00:00:00Z"
+  integrity_hash: "sha256:gl-chain-registry-v1"
+  total_files: 13
+  total_chains: 5

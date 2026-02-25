@@ -1,0 +1,115 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: circuit-breaking
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+---
+# Circuit Breaking Configuration
+# Automatically removes unhealthy instances from load balancing
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:istio:destination-rules:circuit-breaking.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/istio/destination-rules/circuit-breaking.yaml"
+  name: machine-native-ops-circuit-breaker
+  namespace: platform-03
+spec:
+  host: machine-native-ops
+  trafficPolicy:
+    # Connection pool settings
+    connectionPool:
+      tcp:
+        maxConnections: 100  # Maximum connections to upstream
+        connectTimeout: 10s
+        tcpKeepalive:
+          time: 7200s
+          interval: 75s
+      http:
+        http1MaxPendingRequests: 50  # Max pending HTTP/1.1 requests
+        http2MaxRequests: 1000  # Max concurrent HTTP/2 requests
+        maxRequestsPerConnection: 3  # Max requests per connection
+        idleTimeout: 300s  # Close idle connections after 5 minutes
+        h2UpgradePolicy: UPGRADE
+        maxRetries: 3
+    # Outlier detection for circuit breaking
+    outlierDetection:
+      consecutive5xxErrors: 5  # Eject after 5 consecutive 5xx errors
+      interval: 30s  # Analysis interval
+      baseEjectionTime: 30s  # Minimum ejection time
+      maxEjectionPercent: 50  # Max 50% of hosts can be ejected
+      minHealthPercent: 40  # Minimum healthy percentage (lower = more aggressive)
+    # Load balancing strategy
+    loadBalancer:
+      simple: ROUND_ROBIN
+      localityLbSetting:
+        enabled: true
+        failover:
+        - from: region1
+          to: region2
+        - from: region2
+          to: region3
+        - from: region3
+          to: region1
+    # TLS settings
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+  - name: stable
+    labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+      version: stable
+  - name: canary
+    labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+      version: canary
+---
+# Aggressive Circuit Breaking for Critical Services
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:istio:destination-rules:circuit-breaking.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/istio/destination-rules/circuit-breaking.yaml"
+  name: machine-native-ops-circuit-breaker-aggressive
+  namespace: platform-03
+spec:
+  host: machine-native-ops-critical
+  trafficPolicy:
+    connectionPool:
+      http:
+        http1MaxPendingRequests: 10
+        maxRequestsPerConnection: 1
+    outlierDetection:
+      consecutive5xxErrors: 3  # Faster ejection
+      interval: 10s
+      baseEjectionTime: 60s  # Longer ejection
+      maxEjectionPercent: 30
+      minHealthPercent: 60  # Require more healthy hosts
+---
+# Conservative Circuit Breaking for Background Services
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:istio:destination-rules:circuit-breaking.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/istio/destination-rules/circuit-breaking.yaml"
+  name: machine-native-ops-circuit-breaker-conservative
+  namespace: platform-03
+spec:
+  host: machine-native-ops-background
+  trafficPolicy:
+    connectionPool:
+      http:
+        http1MaxPendingRequests: 100
+        maxRequestsPerConnection: 10
+    outlierDetection:
+      consecutive5xxErrors: 10  # Slower ejection
+      interval: 60s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 70
+      minHealthPercent: 20

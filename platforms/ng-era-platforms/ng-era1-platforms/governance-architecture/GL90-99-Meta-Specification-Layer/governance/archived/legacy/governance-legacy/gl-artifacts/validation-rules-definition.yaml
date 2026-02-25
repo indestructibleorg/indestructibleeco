@@ -1,0 +1,67 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLValidationRulesDefinition
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:validation-rules-definition.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/validation-rules-definition.yaml"
+  name: validation-rules-definition
+  version: "1.0.0"
+  created: "2026-01-21"
+  layer: "GL50-59"
+validation_system:
+  name: "Validation Rules Definition"
+  description: "9 validation rules across 5 systems"
+validation_systems:
+  - system_id: "SEMANTIC"
+    name: "Semantic Validation System"
+    rules:
+      - rule_id: "SEM-001"
+        name: "Semantic Consistency Check"
+        enforcement: "BLOCKING"
+      - rule_id: "SEM-002"
+        name: "Semantic Boundary Check"
+        enforcement: "BLOCKING"
+  - system_id: "STRUCTURAL"
+    name: "Structural Validation System"
+    rules:
+      - rule_id: "STR-001"
+        name: "Layer Correspondence Check"
+        enforcement: "BLOCKING"
+      - rule_id: "STR-002"
+        name: "Actionable Output Check"
+        enforcement: "BLOCKING"
+  - system_id: "GOVERNANCE"
+    name: "Governance Validation System"
+    rules:
+      - rule_id: "GOV-001"
+        name: "Cross-Layer Detection"
+        enforcement: "BLOCKING"
+      - rule_id: "GOV-002"
+        name: "Artifacts Classification Check"
+        enforcement: "BLOCKING"
+  - system_id: "SECURITY"
+    name: "Security Validation System"
+    rules:
+      - rule_id: "SEC-001"
+        name: "Integrity Verification"
+        enforcement: "BLOCKING"
+  - system_id: "PROOF"
+    name: "Proof Validation System"
+    rules:
+      - rule_id: "PRF-001"
+        name: "Evidence Chain Completeness"
+        enforcement: "BLOCKING"
+      - rule_id: "PRF-002"
+        name: "Decision Provability"
+        enforcement: "BLOCKING"
+      - rule_id: "PRF-003"
+        name: "Audit Trail Integrity"
+        enforcement: "BLOCKING"
+total_rules: 9
+total_systems: 5
+activation_status: "ACTIVE"

@@ -1,0 +1,698 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: database-architecture-specification
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# =============================================================================
+# GL20-29 Data Layer - Database Architecture Specification
+# MachineNativeOps Governance Artifact
+# =============================================================================
+apiVersion: governance.machinenativeops.io/v2
+kind: DatabaseArchitecture
+metadata:
+  name: database-architecture-specification
+  version: "1.0.0"
+  created_at: "2026-01-27T00:00:00Z"
+  updated_at: "2026-01-27T00:00:00Z"
+  owner: data-team
+  layer: "GL20-29"
+  tags:
+    - database
+    - architecture
+    - data-model
+    - schema
+    - persistence
+  annotations:
+    governance.machinenativeops.io/initiative: "INIT-2026-Q1-001"
+    governance.machinenativeops.io/priority: "P0"
+    governance.machinenativeops.io/scope: "data-layer"
+spec:
+  # Required fields for GL20-29 compliance
+  title: "資料庫架構規範"
+  title_en: "Database Architecture Specification"
+  
+  description: |
+    本規範定義了MachineNativeOps項目的數據庫架構設計、數據模型、
+    訪問模式與治理策略，確保數據的一致性、完整性與高可用性。
+  
+  description_en: |
+    This specification defines the database architecture design, data models, 
+    access patterns, and governance strategies for the MachineNativeOps project, 
+    ensuring data consistency, integrity, and high availability.
+  
+  # Database Strategy
+  database_strategy:
+    approach: "混合數據庫策略 (Polyglot Persistence)"
+    
+    principles:
+      - id: "DB-PRIN-001"
+        title: "合適的工具處理合適的任務"
+        description: "根據數據特性選擇最適合的數據庫類型"
+        rationale: "不同數據有不同的訪問模式與一致性需求"
+      
+      - id: "DB-PRIN-002"
+        title: "數據一致性優先"
+        description: "確保數據的ACID特性與參照完整性"
+        exceptions: "緩存層與分析數據庫可接受最終一致性"
+      
+      - id: "DB-PRIN-003"
+        title: "讀寫分離"
+        description: "主庫負責寫入，從庫負責讀取查詢"
+        benefits: "提升讀取性能與系統可用性"
+      
+      - id: "DB-PRIN-004"
+        title: "數據安全與隱私"
+        description: "加密敏感數據，實施訪問控制"
+        requirements: "符合GDPR、CCPA等數據保護法規"
+      
+      - id: "DB-PRIN-005"
+        title: "可擴展性設計"
+        description: "支持水平擴展與垂直擴展"
+        approaches: "分片、分區、讀寫分離"
+  
+  # Database Types and Use Cases
+  database_types:
+    - type: "關聯式數據庫 (Relational Database)"
+      technology: "PostgreSQL"
+      version: "15+"
+      
+      use_cases:
+        - "核心業務數據 (用戶、訂單、產品)"
+        - "需要ACID保證的交易數據"
+        - "複雜查詢與關聯"
+        - "數據完整性約束"
+      
+      features:
+        - "ACID事務支持"
+        - "JSON/JSONB支持"
+        - "全文搜索 (Full-Text Search)"
+        - "分區與分表"
+        - "物化視圖"
+      
+      configuration:
+        max_connections: 200
+        shared_buffers: "4GB"
+        effective_cache_size: "12GB"
+        work_mem: "64MB"
+        maintenance_work_mem: "512MB"
+      
+      replication:
+        strategy: "Streaming Replication"
+        topology: "1 Primary + 2 Replicas (Read Replicas)"
+        sync_mode: "Asynchronous"
+    
+    - type: "文檔數據庫 (Document Database)"
+      technology: "MongoDB"
+      version: "7.0+"
+      
+      use_cases:
+        - "非結構化或半結構化數據"
+        - "內容管理系統"
+        - "日誌與事件數據"
+        - "靈活的Schema演化"
+      
+      features:
+        - "靈活的文檔模型"
+        - "水平擴展 (Sharding)"
+        - "豐富的查詢語言"
+        - "聚合管道"
+      
+      replication:
+        strategy: "Replica Set"
+        topology: "3-node Replica Set"
+        read_preference: "secondaryPreferred"
+    
+    - type: "鍵值存儲 (Key-Value Store)"
+      technology: "Redis"
+      version: "7.0+"
+      
+      use_cases:
+        - "會話存儲 (Session Storage)"
+        - "緩存層 (Cache Layer)"
+        - "實時計數器與排行榜"
+        - "消息隊列 (Pub/Sub)"
+        - "分佈式鎖"
+      
+      features:
+        - "內存存儲，極快性能"
+        - "多種數據結構 (String, Hash, List, Set, Sorted Set)"
+        - "持久化支持 (RDB + AOF)"
+        - "Lua腳本支持"
+      
+      configuration:
+        maxmemory: "2GB"
+        maxmemory_policy: "allkeys-lru"
+        persistence: "RDB + AOF"
+      
+      high_availability:
+        strategy: "Redis Sentinel"
+        topology: "1 Master + 2 Replicas + 3 Sentinels"
+    
+    - type: "搜索引擎 (Search Engine)"
+      technology: "Elasticsearch"
+      version: "8.0+"
+      
+      use_cases:
+        - "全文搜索"
+        - "日誌分析 (ELK Stack)"
+        - "實時數據分析"
+        - "複雜的聚合查詢"
+      
+      features:
+        - "分佈式全文搜索"
+        - "即時索引"
+        - "豐富的聚合功能"
+        - "RESTful API"
+      
+      configuration:
+        cluster_name: "machinenativeops-search"
+        node_count: 3
+        heap_size: "4GB"
+  
+  # Data Models
+  data_models:
+    core_entities:
+      - entity: "User"
+        description: "用戶實體"
+        database: "PostgreSQL"
+        table_name: "users"
+        
+        schema:
+          id:
+            type: "UUID"
+            primary_key: true
+            default: "gen_random_uuid()"
+          
+          email:
+            type: "VARCHAR(255)"
+            nullable: false
+            unique: true
+            index: true
+          
+          name:
+            type: "VARCHAR(255)"
+            nullable: false
+          
+          password_hash:
+            type: "VARCHAR(255)"
+            nullable: false
+            description: "使用bcrypt加密"
+          
+          role:
+            type: "VARCHAR(50)"
+            nullable: false
+            default: "user"
+            check: "role IN ('admin', 'user', 'readonly')"
+          
+          status:
+            type: "VARCHAR(50)"
+            nullable: false
+            default: "active"
+            check: "status IN ('active', 'inactive', 'suspended')"
+          
+          email_verified:
+            type: "BOOLEAN"
+            nullable: false
+            default: false
+          
+          last_login_at:
+            type: "TIMESTAMP WITH TIME ZONE"
+            nullable: true
+          
+          created_at:
+            type: "TIMESTAMP WITH TIME ZONE"
+            nullable: false
+            default: "CURRENT_TIMESTAMP"
+          
+          updated_at:
+            type: "TIMESTAMP WITH TIME ZONE"
+            nullable: false
+            default: "CURRENT_TIMESTAMP"
+        
+        indexes:
+          - name: "idx_users_email"
+            columns: ["email"]
+            unique: true
+          - name: "idx_users_role"
+            columns: ["role"]
+          - name: "idx_users_status"
+            columns: ["status"]
+          - name: "idx_users_created_at"
+            columns: ["created_at"]
+        
+        constraints:
+          - name: "chk_email_format"
+            type: "CHECK"
+            condition: "email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}$'"
+      
+      - entity: "Session"
+        description: "用戶會話 (存儲於Redis)"
+        database: "Redis"
+        key_pattern: "session:{user_id}:{session_id}"
+        
+        fields:
+          user_id: "用戶ID"
+          session_id: "會話ID"
+          access_token: "訪問令牌"
+          refresh_token: "刷新令牌"
+          expires_at: "過期時間"
+          ip_address: "IP地址"
+          user_agent: "用戶代理"
+        
+        ttl: 604800  # 7 days in seconds
+  
+  # Data Access Patterns
+  access_patterns:
+    - pattern: "CQRS (Command Query Responsibility Segregation)"
+      description: "讀寫分離模式"
+      
+      write_operations:
+        target: "Primary Database"
+        operations:
+          - "INSERT"
+          - "UPDATE"
+          - "DELETE"
+        consistency: "強一致性 (ACID)"
+      
+      read_operations:
+        target: "Read Replicas / Cache"
+        operations:
+          - "SELECT (Simple)"
+          - "SELECT (Complex with JOINs)"
+        consistency: "最終一致性 (可接受延遲 < 1秒)"
+      
+      benefits:
+        - "提升讀取性能"
+        - "降低主庫負載"
+        - "支持獨立擴展"
+    
+    - pattern: "緩存策略 (Caching Strategy)"
+      description: "多層緩存提升性能"
+      
+      layers:
+        - layer: "L1: Application Cache"
+          technology: "In-Memory (LRU Cache)"
+          ttl: "60 seconds"
+          use_case: "頻繁訪問的靜態數據"
+        
+        - layer: "L2: Redis Cache"
+          technology: "Redis"
+          ttl: "300-3600 seconds"
+          use_case: "用戶會話、熱點數據"
+          strategies:
+            - "Cache-Aside (Lazy Loading)"
+            - "Write-Through"
+            - "Write-Behind"
+        
+        - layer: "L3: Database Query Cache"
+          technology: "PostgreSQL Materialized Views"
+          refresh: "Hourly / On-Demand"
+          use_case: "複雜聚合查詢結果"
+      
+      cache_invalidation:
+        strategies:
+          - "TTL-based expiration"
+          - "Event-driven invalidation"
+          - "Manual invalidation (API endpoint)"
+    
+    - pattern: "數據分片 (Sharding)"
+      description: "水平擴展策略"
+      
+      sharding_strategy: "Hash-based Sharding"
+      shard_key: "user_id"
+      shard_count: 4
+      
+      routing:
+        algorithm: "Consistent Hashing"
+        library: "Python: hash_ring"
+      
+      considerations:
+        - "跨分片查詢複雜度增加"
+        - "需要應用層路由邏輯"
+        - "分片再平衡需謹慎規劃"
+  
+  # Schema Management
+  schema_management:
+    migration_strategy: "版本化遷移 (Versioned Migrations)"
+    
+    tools:
+      - tool: "Alembic (Python)"
+        database: "PostgreSQL"
+        framework: "SQLAlchemy"
+      
+      - tool: "TypeORM Migrations (Node.js)"
+        database: "PostgreSQL"
+        framework: "TypeORM"
+    
+    workflow:
+      - step: 1
+        action: "開發環境創建遷移腳本"
+        command: "alembic revision -m 'description'"
+      
+      - step: 2
+        action: "測試遷移 (Up & Down)"
+        commands:
+          - "alembic upgrade head"
+          - "alembic downgrade -1"
+      
+      - step: 3
+        action: "代碼審查遷移腳本"
+        checks:
+          - "檢查破壞性變更"
+          - "驗證索引創建"
+          - "確認數據完整性"
+      
+      - step: 4
+        action: "部署前測試 (Staging)"
+        validations:
+          - "遷移性能測試"
+          - "數據驗證"
+      
+      - step: 5
+        action: "生產環境部署"
+        procedure:
+          - "備份數據庫"
+          - "維護窗口通知"
+          - "執行遷移"
+          - "驗證結果"
+          - "監控性能"
+    
+    best_practices:
+      - "遷移腳本必須是冪等的"
+      - "避免在遷移中執行重型數據操作"
+      - "大型表的結構變更使用線上遷移工具"
+      - "始終提供回滾腳本"
+      - "在非高峰時段執行遷移"
+  
+  # Data Governance
+  data_governance:
+    data_classification:
+      - level: "Public"
+        description: "公開數據"
+        examples: ["產品目錄", "公開文檔"]
+        encryption: "不需要"
+        access: "無限制"
+      
+      - level: "Internal"
+        description: "內部數據"
+        examples: ["內部報告", "系統日誌"]
+        encryption: "傳輸加密"
+        access: "認證用戶"
+      
+      - level: "Confidential"
+        description: "機密數據"
+        examples: ["用戶資料", "業務數據"]
+        encryption: "傳輸 + 存儲加密"
+        access: "RBAC控制"
+      
+      - level: "Restricted"
+        description: "高度機密數據"
+        examples: ["密碼", "支付信息", "個人身份信息"]
+        encryption: "強加密 (AES-256)"
+        access: "最小權限原則"
+        logging: "所有訪問必須審計"
+    
+    data_retention:
+      policies:
+        - data_type: "用戶會話數據"
+          retention_period: "7 days"
+          deletion_method: "自動過期 (TTL)"
+        
+        - data_type: "應用日誌"
+          retention_period: "90 days"
+          deletion_method: "定期清理作業"
+        
+        - data_type: "用戶數據"
+          retention_period: "3 years after account deletion"
+          deletion_method: "軟刪除 + 歸檔"
+        
+        - data_type: "財務記錄"
+          retention_period: "7 years"
+          deletion_method: "歸檔至冷存儲"
+    
+    data_privacy:
+      compliance:
+        - "GDPR (General Data Protection Regulation)"
+        - "CCPA (California Consumer Privacy Act)"
+      
+      user_rights:
+        - right: "數據訪問權 (Right to Access)"
+          implementation: "API端點提供用戶數據導出"
+        
+        - right: "數據刪除權 (Right to Deletion)"
+          implementation: "軟刪除機制 + 定期清理"
+        
+        - right: "數據可攜權 (Right to Portability)"
+          implementation: "JSON/CSV格式數據導出"
+      
+      pii_handling:
+        - "最小化PII收集"
+        - "PII欄位加密存儲"
+        - "訪問日誌記錄"
+        - "數據遮蔽 (Data Masking) 用於非生產環境"
+  
+  # Backup and Disaster Recovery
+  backup_recovery:
+    backup_strategy:
+      full_backup:
+        frequency: "每日"
+        time: "02:00 UTC"
+        retention: "30 days"
+      
+      incremental_backup:
+        frequency: "每小時"
+        retention: "7 days"
+      
+      transaction_log_backup:
+        frequency: "每15分鐘"
+        retention: "3 days"
+    
+    backup_storage:
+      primary: "AWS S3 (Same Region)"
+      secondary: "AWS S3 (Different Region)"
+      encryption: "AES-256"
+    
+    recovery_objectives:
+      rpo: "< 15 minutes (Recovery Point Objective)"
+      rto: "< 1 hour (Recovery Time Objective)"
+    
+    disaster_recovery:
+      strategy: "Multi-Region Active-Passive"
+      
+      failover_procedure:
+        - step: 1
+          action: "檢測主區域故障"
+          monitoring: "自動健康檢查"
+        
+        - step: 2
+          action: "啟動DR區域數據庫"
+          automation: "Terraform + Ansible"
+        
+        - step: 3
+          action: "更新DNS指向DR區域"
+          tool: "Route 53"
+        
+        - step: 4
+          action: "驗證系統功能"
+          tests: "冒煙測試 + 健康檢查"
+        
+        - step: 5
+          action: "通知團隊"
+          channels: "PagerDuty + Slack"
+      
+      testing:
+        frequency: "每季度"
+        procedure: "完整DR演練"
+  
+  # Performance Optimization
+  performance:
+    indexing_strategy:
+      guidelines:
+        - "為WHERE子句常用欄位創建索引"
+        - "為JOIN欄位創建索引"
+        - "為ORDER BY欄位創建索引"
+        - "複合索引考慮欄位順序"
+        - "避免過度索引 (影響寫入性能)"
+      
+      monitoring:
+        - "識別缺失索引 (pg_stat_user_tables)"
+        - "識別未使用索引 (pg_stat_user_indexes)"
+        - "分析慢查詢日誌"
+    
+    query_optimization:
+      best_practices:
+        - "使用EXPLAIN ANALYZE分析查詢計劃"
+        - "避免SELECT *，明確指定欄位"
+        - "合理使用JOIN，避免笛卡爾積"
+        - "使用EXISTS代替IN (對於子查詢)"
+        - "批量操作使用BULK INSERT"
+        - "分頁查詢使用遊標或LIMIT/OFFSET優化"
+      
+      slow_query_threshold: "1000ms"
+      logging: "啟用慢查詢日誌"
+    
+    connection_pooling:
+      strategy: "應用層連接池"
+      
+      configuration:
+        pool_size: 20
+        max_overflow: 10
+        pool_timeout: 30
+        pool_recycle: 3600
+      
+      tools:
+        - "SQLAlchemy Connection Pool (Python)"
+        - "PgBouncer (Connection Pooler)"
+  
+  # Monitoring and Alerting
+  monitoring:
+    metrics:
+      database_health:
+        - "連接數 (Active Connections)"
+        - "CPU使用率"
+        - "記憶體使用率"
+        - "磁盤使用率"
+        - "磁盤I/O"
+      
+      query_performance:
+        - "查詢延遲 (p50, p95, p99)"
+        - "慢查詢數量"
+        - "每秒查詢數 (QPS)"
+        - "鎖等待時間"
+      
+      replication:
+        - "複製延遲"
+        - "複製狀態"
+        - "從庫落後程度"
+    
+    alerting:
+      critical_alerts:
+        - alert: "數據庫宕機"
+          threshold: "連接失敗"
+          response_time: "立即"
+        
+        - alert: "磁盤使用率 > 90%"
+          threshold: "90%"
+          response_time: "< 15 minutes"
+        
+        - alert: "複製延遲 > 10秒"
+          threshold: "10 seconds"
+          response_time: "< 30 minutes"
+      
+      warning_alerts:
+        - alert: "慢查詢增加"
+          threshold: "> 100 slow queries/hour"
+          response_time: "< 1 hour"
+        
+        - alert: "連接數 > 80%"
+          threshold: "80% of max_connections"
+          response_time: "< 1 hour"
+    
+    tools:
+      - "Prometheus + Grafana"
+      - "pgAdmin (PostgreSQL)"
+      - "MongoDB Compass"
+      - "Redis Insight"
+  
+  # Security
+  security:
+    authentication:
+      - method: "Database User Accounts"
+        strength: "Strong passwords (min 16 characters)"
+        rotation: "每90天"
+      
+      - method: "IAM Database Authentication (AWS RDS)"
+        description: "使用IAM角色認證"
+        benefits: "無需管理密碼"
+    
+    authorization:
+      - principle: "最小權限原則 (Principle of Least Privilege)"
+        implementation: "每個應用使用獨立數據庫用戶，僅授予必要權限"
+      
+      - roles:
+          - role: "app_readonly"
+            permissions: ["SELECT"]
+          
+          - role: "app_readwrite"
+            permissions: ["SELECT", "INSERT", "UPDATE", "DELETE"]
+          
+          - role: "app_admin"
+            permissions: ["ALL PRIVILEGES"]
+    
+    encryption:
+      at_rest:
+        method: "Transparent Data Encryption (TDE)"
+        algorithm: "AES-256"
+        key_management: "AWS KMS"
+      
+      in_transit:
+        method: "SSL/TLS"
+        version: "TLS 1.2+"
+        certificate: "Let's Encrypt / AWS Certificate Manager"
+      
+      application_level:
+        - "密碼使用bcrypt加密 (cost factor: 12)"
+        - "敏感PII欄位使用應用層加密"
+    
+    audit_logging:
+      enabled: true
+      log_events:
+        - "DDL操作 (CREATE, ALTER, DROP)"
+        - "權限變更 (GRANT, REVOKE)"
+        - "失敗的登入嘗試"
+        - "敏感數據訪問"
+      
+      retention: "1 year"
+      storage: "Elasticsearch (ELK Stack)"
+  
+  # Development Best Practices
+  development:
+    orm_usage:
+      recommended:
+        - "SQLAlchemy (Python)"
+        - "TypeORM (TypeScript/Node.js)"
+      
+      guidelines:
+        - "使用ORM進行CRUD操作"
+        - "複雜查詢使用原生SQL"
+        - "避免N+1查詢問題"
+        - "使用eager loading減少查詢次數"
+    
+    code_organization:
+      pattern: "Repository Pattern"
+      structure: |
+        /database
+          /models          # ORM模型
+          /repositories    # 數據訪問層
+          /migrations      # 遷移腳本
+          /seeds           # 種子數據
+    
+    testing:
+      unit_testing:
+        - "使用In-Memory Database (SQLite)"
+        - "Mock數據庫連接"
+        - "測試Repository層邏輯"
+      
+      integration_testing:
+        - "使用Docker容器運行測試數據庫"
+        - "測試數據庫遷移"
+        - "測試數據完整性約束"
+      
+      performance_testing:
+        - "大數據量測試"
+        - "並發訪問測試"
+        - "查詢性能基準測試"
+
+status:
+  phase: "active"
+  approved_by: "data-team"
+  approved_at: "2026-01-27T00:00:00Z"
+  last_review: "2026-01-27T00:00:00Z"
+  next_review: "2026-07-27T00:00:00Z"
+  change_history:
+    - version: "1.0.0"
+      date: "2026-01-27"
+      author: "data-team"
+      changes: "Initial database architecture specification"

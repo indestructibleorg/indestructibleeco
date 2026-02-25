@@ -1,0 +1,55 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: kubernetes-kustomization-production
+# @ECO-audit-trail: ../../../engine/governance/GL_SEMANTIC_ANCHOR.json
+#
+# GL Unified Architecture Governance Framework Activated
+# Kubernetes Production Overlay Kustomization
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: platform-03
+
+namePrefix: prod-
+
+commonLabels:
+  env: production
+  governance.machinenativeops.io/environment: production
+
+images:
+  - name: machinenativeops/aep-engine
+    newName: machinenativeops/aep-engine
+    newTag: v2.0.0
+  - name: machinenativeops/file-organizer-system
+    newName: machinenativeops/file-organizer-system
+    newTag: v2.0.0
+  - name: machinenativeops/instant-system
+    newName: machinenativeops/instant-system
+    newTag: v2.0.0
+  - name: machinenativeops/elasticsearch-search-system
+    newName: machinenativeops/elasticsearch-search-system
+    newTag: v2.0.0
+  - name: machinenativeops/esync-platform
+    newName: machinenativeops/esync-platform
+    newTag: v2.0.0
+
+resources:
+  - ../../base
+  - ../../systems/engine
+  - ../../systems/file-organizer-system
+  - ../../systems/instant
+  - ../../systems/elasticsearch-search-system
+  - ../../systems/esync-platform
+
+replicas:
+  - name: aep-engine
+    count: 5
+  - name: file-organizer-system
+    count: 3
+  - name: instant-system
+    count: 5
+  - name: elasticsearch-search-system
+    count: 3
+  - name: esync-platform
+    count: 3

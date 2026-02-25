@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "platform-shared"
+version = "1.0.0"
+description = "Shared kernel — sandbox/container/environment framework and cross-cutting protocols for decentralized platforms."
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3", "pytest-asyncio>=0.24"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/platform_shared"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

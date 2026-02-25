@@ -1,0 +1,249 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: config-artifact
+# @ECO-audit-trail: ../../engine/governance/gl-artifacts/meta/semantic/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-platform-ecosystem/governance/engine/governance/gl-artifacts/meta/semantic/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-platform-ecosystem/governance/engine/governance/gl-artifacts/meta/naming-charter/gl-unified-naming-charter.yaml
+
+# GL Governance Audit Trail Schema
+# Version: 1.0.0
+
+apiVersion: audit.gl.io/v1
+kind: AuditTrailSchema
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:.governance:audit:audit-schema.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/.governance/audit/audit-schema.yaml"
+  name: gl-governance-audit
+  version: "1.0.0"
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl.governance.level: "3"
+    gl.charter.version: "5.0"
+
+spec:
+  # Audit Event Structure
+  eventSchema:
+    type: object
+    required:
+      - eventId
+      - timestamp
+      - actor
+      - action
+      - resource
+    properties:
+      eventId:
+        type: string
+        format: uuid
+        description: "Unique event identifier"
+      
+      timestamp:
+        type: string
+        format: date-time
+        description: "ISO8601 timestamp"
+      
+      actor:
+        type: object
+        properties:
+          type:
+            type: string
+            enum: [user, system, agent, workflow]
+          id:
+            type: string
+          name:
+            type: string
+          email:
+            type: string
+            format: email
+      
+      action:
+        type: object
+        properties:
+          type:
+            type: string
+            enum: [create, update, delete, approve, reject, migrate, rollback, fix]
+          category:
+            type: string
+            enum: [naming, security, compliance, deployment]
+          result:
+            type: string
+            enum: [success, failure, partial]
+      
+      resource:
+        type: object
+        properties:
+          kind:
+            type: string
+          name:
+            type: string
+          namespace:
+            type: string
+          previousState:
+            type: object
+          newState:
+            type: object
+      
+      context:
+        type: object
+        properties:
+          runId:
+            type: string
+          workflowName:
+            type: string
+          pullRequestId:
+            type: integer
+          commitSha:
+            type: string
+          branch:
+            type: string
+      
+      governance:
+        type: object
+        properties:
+          level:
+            type: integer
+            minimum: 1
+            maximum: 3
+          charterVersion:
+            type: string
+          policyViolations:
+            type: array
+            items:
+              type: string
+          approvals:
+            type: array
+            items:
+              type: object
+              properties:
+                approver:
+                  type: string
+                timestamp:
+                  type: string
+                  format: date-time
+                decision:
+                  type: string
+                  enum: [approved, rejected]
+      
+      signature:
+        type: object
+        properties:
+          algorithm:
+            type: string
+            enum: [sha256, sha512]
+          value:
+            type: string
+          publicKey:
+            type: string
+
+  # Retention Policy
+  retention:
+    default: 365d
+    compliance: 7y
+    security: 3y
+    
+  # Storage Configuration
+  storage:
+    primary:
+      type: elasticsearch
+      index: gl-audit-logs
+      shards: 5
+      replicas: 1
+    backup:
+      type: s3
+      bucket: gl-audit-backup
+      encryption: AES-256
+
+  # Export Formats
+  exportFormats:
+    - json
+    - csv
+    - parquet
+    
+  # Compliance Mapping
+  complianceMapping:
+    SOC2:
+      - CC6.1
+      - CC6.2
+      - CC7.1
+    ISO27001:
+      - A.12.4.1
+      - A.12.4.2
+      - A.12.4.3
+    GDPR:
+      - Article30
+      - Article33
+
+---
+# Sample Audit Events
+
+apiVersion: audit.gl.io/v1
+kind: AuditEvent
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:.governance:audit:audit-schema.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/.governance/audit/audit-schema.yaml"
+  name: sample-naming-fix
+spec:
+  eventId: "550e8400-e29b-41d4-a716-446655440000"
+  timestamp: "2026-01-30T08:00:00Z"
+  actor:
+    type: workflow
+    id: "gl-workflow-auto-healer"
+    name: "GL Auto Healer"
+  action:
+    type: fix
+    category: naming
+    result: success
+  resource:
+    kind: Deployment
+    name: "app-backend"
+    namespace: "production"
+    previousState:
+      name: "app-backend"
+    newState:
+      name: "prod-app-backend-deploy-v1.0.0"
+  governance:
+    level: 3
+    charterVersion: "5.0"
+    policyViolations: []
+  signature:
+    algorithm: sha256
+    value: "abc123..."
+
+---
+# Audit Query Examples
+
+apiVersion: audit.gl.io/v1
+kind: AuditQuery
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:.governance:audit:audit-schema.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/.governance/audit/audit-schema.yaml"
+  name: daily-compliance-report
+spec:
+  query: |
+    {
+      "query": {
+        "bool": {
+          "must": [
+            {"range": {"timestamp": {"gte": "now-24h"}}},
+            {"term": {"action.category": "naming"}}
+          ]
+        }
+      },
+      "aggs": {
+        "by_result": {
+          "terms": {"field": "action.result"}
+        },
+        "by_actor_type": {
+          "terms": {"field": "actor.type"}
+        }
+      }
+    }
+  schedule: "0 0 * * *"
+  output:
+    - email: governance-team@example.com
+    - slack: "#gl-governance"

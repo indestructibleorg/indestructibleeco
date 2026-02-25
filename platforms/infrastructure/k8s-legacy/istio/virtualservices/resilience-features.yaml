@@ -1,0 +1,131 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: resilience-features
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+---
+# Circuit Breaking and Timeout Configuration
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:istio:virtualservices:resilience-features.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/istio/virtualservices/resilience-features.yaml"
+  name: machine-native-ops-resilience
+  namespace: platform-03
+spec:
+  hosts:
+  - machine-native-ops
+  http:
+  # API calls with retry and timeout
+  - match:
+    - uri:
+        prefix: /api/v1/
+    route:
+    - destination:
+        host: machine-native-ops
+        port:
+          number: 8080
+        subset: stable
+    timeout: 30s
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+      retryOn: 5xx,connect-failure,refused-stream,gateway-error,reset,stream-cancellation
+      retryRemoteLocalities: true
+    fault:
+      delay:
+        percentage:
+          value: 0.1  # 0.1% delay injection for testing
+        fixedDelay: 100ms
+      abort:
+        percentage:
+          value: 0.05  # 0.05% abort injection for testing
+        httpStatus: 503
+  # Read operations with longer timeout
+  - match:
+    - method:
+        exact: GET
+      uri:
+        regex: ^/api/v1/(memory|cache|search)
+    route:
+    - destination:
+        host: machine-native-ops
+        subset: stable
+    timeout: 60s
+    retries:
+      attempts: 2
+      perTryTimeout: 30s
+      retryOn: 5xx,gateway-error,connect-failure
+  # Write operations with short timeout
+  - match:
+    - method:
+        regex: (POST|PUT|DELETE)
+      uri:
+        prefix: /api/v1/
+    route:
+    - destination:
+        host: machine-native-ops
+        subset: stable
+    timeout: 20s
+    retries:
+      attempts: 1
+      perTryTimeout: 20s
+      retryOn: connect-failure,refused-stream
+---
+# Rate Limiting Configuration
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:istio:virtualservices:resilience-features.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/istio/virtualservices/resilience-features.yaml"
+  name: machine-native-ops-rate-limit
+  namespace: platform-03
+spec:
+  hosts:
+  - machine-native-ops
+  http:
+  # Rate limit API endpoints
+  - match:
+    - uri:
+        prefix: /api/
+    route:
+    - destination:
+        host: machine-native-ops
+        subset: stable
+    fault:
+      # Use EnvoyRateLimit filter for rate limiting
+      abort:
+        percentage:
+          value: 0
+---
+# Request Hedging for Improved Latency
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:istio:virtualservices:resilience-features.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/istio/virtualservices/resilience-features.yaml"
+  name: machine-native-ops-hedging
+  namespace: platform-03
+spec:
+  hosts:
+  - machine-native-ops
+  http:
+  # Critical read operations with hedging
+  - match:
+    - uri:
+        regex: ^/api/v1/critical/(read|get|query)
+    route:
+    - destination:
+        host: machine-native-ops
+        subset: stable
+    timeout: 50ms
+    retries:
+      attempts: 3
+      perTryTimeout: 50ms
+      retryOn: connect-failure,refused-stream,reset
+      retryRemoteLocalities: true

@@ -1,0 +1,295 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1alpha1
+kind: GovernancePolicy
+metadata:
+  name: information-security-policy-reference
+  description: "信息安全策略索引和治理集成点"
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    category: "security"
+    domain: "compliance"
+  annotations:
+    version: "v1.0.0"
+    lastReviewed: "2025-12-17"
+
+spec:
+  description: |
+    本文件作为治理框架与信息安全策略的集成点。
+    完整的安全策略由安全团队维护，本文件提供：
+    1. 与命名治理相关的安全要求
+    2. 安全策略索引和引用
+    3. 治理流程中的安全检查点
+
+  # 与命名治理相关的安全要求
+  namingSecurityRequirements:
+    secretsNaming:
+      description: "敏感信息和密钥的命名要求"
+      requirements:
+        - "密钥名称不得包含敏感信息"
+        - "使用统一前缀标识敏感资源"
+        - "遵循最小权限原则进行命名"
+      examples:
+        valid:
+          - "SECRET_DATABASE_PASSWORD"
+          - "SECRET_API_KEY_STRIPE"
+        invalid:
+          - "PROD_DB_PASSWORD_abc123xyz"  # 包含密码片段
+          - "STRIPE_KEY_sk_live_xxx"      # 包含实际密钥
+
+    resourceTagging:
+      description: "资源标签的安全要求"
+      requiredTags:
+        - name: "data-classification"
+          values: ["public", "internal", "confidential", "restricted"]
+        - name: "compliance-scope"
+          values: ["pci-dss", "hipaa", "gdpr", "sox", "none"]
+        - name: "owner"
+          description: "资源责任人"
+        - name: "cost-center"
+          description: "成本中心"
+
+    environmentSeparation:
+      description: "环境隔离命名要求"
+      requirements:
+        - "生产和非生产资源必须明确区分"
+        - "使用环境前缀避免混淆"
+        - "禁止在命名中共享敏感标识符"
+
+  # 安全策略索引
+  securityPolicyReferences:
+    - policy: "Data Classification Policy"
+      id: "SEC-001"
+      owner: "CISO Office"
+      relevantTo:
+        - "naming-governance"
+        - "exception-handling"
+      checkpoints:
+        - "资源命名必须反映数据分类"
+        - "例外申请需考虑数据敏感度"
+
+    - policy: "Access Control Policy"
+      id: "SEC-002"
+      owner: "Security Team"
+      relevantTo:
+        - "change-management"
+        - "exception-handling"
+      checkpoints:
+        - "变更审批需验证访问权限"
+        - "例外不得绕过访问控制"
+
+    - policy: "Secrets Management Policy"
+      id: "SEC-003"
+      owner: "Security Team"
+      relevantTo:
+        - "naming-governance"
+        - "observability-validation"
+      checkpoints:
+        - "密钥命名不得泄露敏感信息"
+        - "监控告警不得记录明文密钥"
+
+    - policy: "Incident Response Policy"
+      id: "SEC-004"
+      owner: "Security Operations"
+      relevantTo:
+        - "change-management"
+      checkpoints:
+        - "紧急变更可能触发安全审查"
+        - "事故相关变更需记录在案"
+
+    - policy: "Vulnerability Management Policy"
+      id: "SEC-005"
+      owner: "Security Team"
+      relevantTo:
+        - "change-management"
+        - "metrics-and-audit"
+      checkpoints:
+        - "安全补丁变更优先级"
+        - "漏洞修复时间纳入 KPI"
+
+  # 治理流程中的安全检查点
+  securityCheckpoints:
+    naming:
+      preValidation:
+        - check: "密钥名称不包含敏感信息"
+          severity: "Critical"
+          automation: "Regex scan"
+        - check: "资源包含必需的安全标签"
+          severity: "High"
+          automation: "Label validation"
+
+    changeManagement:
+      preApproval:
+        - check: "高风险变更需安全团队审查"
+          severity: "High"
+          trigger:
+            - "涉及认证/授权"
+            - "涉及数据库 schema"
+            - "涉及网络边界"
+        - check: "生产变更需安全扫描"
+          severity: "High"
+          automation: "SAST/DAST scan"
+
+      postImplementation:
+        - check: "验证安全配置未降级"
+          severity: "Critical"
+          automation: "Security posture check"
+
+    exception:
+      preApproval:
+        - check: "安全策略例外需 CISO 批准"
+          severity: "Critical"
+          requiredApprover: "CISO"
+        - check: "评估安全风险和补偿控制"
+          severity: "High"
+
+  # 安全事件上报
+  incidentReporting:
+    triggers:
+      - event: "未授权的命名规范变更"
+        severity: "Medium"
+        action: "通知安全运营团队"
+
+      - event: "生产环境发现未标记敏感资源"
+        severity: "High"
+        action: "创建安全事件单"
+
+      - event: "密钥泄露在资源名称中"
+        severity: "Critical"
+        action: "触发事故响应流程"
+
+    contacts:
+      primary: "security-ops@example.com"
+      escalation: "ciso@example.com"
+      oncall: "pagerduty:security-team"
+
+  # 合规性映射
+  complianceMapping:
+    SOC2:
+      controls:
+        - id: "CC6.1"
+          description: "逻辑和物理访问控制"
+          governanceAlignment:
+            - "命名规范支持访问审计"
+            - "环境隔离通过命名强化"
+
+        - id: "CC7.2"
+          description: "系统监控"
+          governanceAlignment:
+            - "可观测性规范支持安全监控"
+            - "告警命名标准化"
+
+    ISO27001:
+      controls:
+        - id: "A.8.2.1"
+          description: "信息分类"
+          governanceAlignment:
+            - "资源标签包含数据分类"
+            - "命名反映敏感度级别"
+
+        - id: "A.9.4.1"
+          description: "信息访问限制"
+          governanceAlignment:
+            - "变更管理验证访问权限"
+            - "例外处理不绕过控制"
+
+    GDPR:
+      requirements:
+        - article: "Article 32"
+          description: "处理安全"
+          governanceAlignment:
+            - "个人数据资源明确标记"
+            - "安全变更流程保护数据"
+
+  # 安全培训整合
+  trainingIntegration:
+    topics:
+      - name: "安全命名实践"
+        duration: "30 min"
+        audience: ["All engineers"]
+        frequency: "Onboarding + Annual"
+
+      - name: "密钥管理"
+        duration: "45 min"
+        audience: ["Backend engineers", "DevOps"]
+        frequency: "Onboarding + Annual"
+
+      - name: "安全变更管理"
+        duration: "60 min"
+        audience: ["Team leads", "Managers"]
+        frequency: "Annual"
+
+  # 自动化工具整合
+  toolIntegration:
+    secretScanning:
+      tools:
+        - "GitGuardian"
+        - "TruffleHog"
+      integration: "Pre-commit hooks + CI/CD"
+      action: "Block commit if secrets detected"
+
+    securityScanning:
+      tools:
+        - "Snyk"
+        - "SonarQube"
+      integration: "CI/CD pipeline"
+      thresholds:
+        critical: 0
+        high: 5
+        medium: 20
+
+    complianceChecking:
+      tools:
+        - "Open Policy Agent"
+        - "CloudCustodian"
+      integration: "Pre-deployment + Runtime"
+
+  # 审计要求
+  audit:
+    frequency: "Quarterly"
+    scope:
+      - "Security tag compliance"
+      - "Secret naming compliance"
+      - "Security checkpoint effectiveness"
+    reports:
+      - "Security governance dashboard"
+      - "Compliance posture report"
+
+  enforcement:
+    level: "error"
+    violations:
+      secretInName:
+        severity: "Critical"
+        action: "Immediate revocation + incident"
+
+      missingSecurityTags:
+        severity: "High"
+        action: "Block deployment + notification"
+
+      unauthorizedException:
+        severity: "Critical"
+        action: "Automatic rejection + escalation"
+
+  metadata:
+    version: "v1.0.0"
+    owner: "security-team"
+    contributors:
+      - "governance-board"
+      - "platform-team"
+    approvers:
+      - "ciso@example.com"
+      - "cto@example.com"
+    reviewDate: "2025-12-17"
+    nextReviewDate: "2026-03-17"  # Quarterly review
+
+  references:
+    - title: "OWASP Secure Coding Practices"
+      url: "https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/"
+    - title: "NIST Cybersecurity Framework"
+      url: "https://www.nist.gov/cyberframework"
+    - title: "CIS Controls"
+      url: "https://www.cisecurity.org/controls"

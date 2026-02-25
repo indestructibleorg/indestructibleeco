@@ -1,0 +1,199 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: kubernetes-manifests-index
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+#
+# GL Unified Architecture Governance Framework Activated
+# Kubernetes Manifests Index
+
+apiVersion: machinenativeops.io/v1
+kind: ManifestIndex
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:kubernetes:manifests:INDEX.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/kubernetes/manifests/INDEX.yaml"
+  name: kubernetes-manifests-index
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: kubernetes-manifests
+    app.kubernetes.io/app.kubernetes.io/component: index
+    governance.machinenativeops.io/charter-version: "2.0.0"
+spec:
+  version: "2.0.0"
+  description: "Complete Kubernetes Manifests Index for MachineNativeOps Infrastructure"
+  lastUpdated: "2026-01-28T05:00:00Z"
+  
+  systems:
+    - name: aep-engine
+      path: systems/engine
+      components:
+        - type: Deployment
+          file: deployment.yaml
+          description: "AEP Engine Core Governance System"
+        - type: Service
+          file: service.yaml
+          description: "AEP Engine API Service"
+      governance:
+        layer: "governance"
+        charterVersion: "2.0.0"
+        validationRequired: true
+        
+    - name: file-organizer-system
+      path: systems/file-organizer-system
+      components:
+        - type: Deployment
+          file: deployment.yaml
+          description: "File Organization and Management System"
+        - type: Service
+          file: service.yaml
+          description: "File Organizer API Service"
+      governance:
+        layer: "application"
+        charterVersion: "2.0.0"
+        validationRequired: true
+        
+    - name: instant-system
+      path: systems/instant
+      components:
+        - type: Deployment
+          file: deployment.yaml
+          description: "Real-time Data Synchronization System"
+        - type: Service
+          file: service.yaml
+          description: "Instant Data Sync API Service"
+      governance:
+        layer: "data"
+        charterVersion: "2.0.0"
+        validationRequired: true
+        
+    - name: elasticsearch-search-system
+      path: systems/elasticsearch-search-system
+      components:
+        - type: Deployment
+          file: deployment.yaml
+          description: "Elasticsearch-based Search System"
+        - type: Service
+          file: service.yaml
+          description: "Search API Service"
+      governance:
+        layer: "search"
+        charterVersion: "2.0.0"
+        validationRequired: true
+        
+    - name: esync-platform
+      path: systems/esync-platform
+      components:
+        - type: Deployment
+          file: deployment.yaml
+          description: "Enterprise Multi-Source Synchronization Platform"
+        - type: Service
+          file: service.yaml
+          description: "ESync Platform API Service"
+      governance:
+        layer: "platform"
+        charterVersion: "2.0.0"
+        validationRequired: true
+        
+  baseResources:
+    - name: namespace
+      file: base/namespace.yaml
+      description: "MachineNativeOps Namespace"
+    - name: configmap
+      file: base/configmap.yaml
+      description: "Application Configuration"
+    - name: secret
+      file: base/secret.yaml
+      description: "Secret Management Placeholder"
+    - name: serviceaccount
+      file: base/serviceaccount.yaml
+      description: "Service Account"
+    - name: networkpolicy
+      file: base/networkpolicy.yaml
+      description: "Network Security Policy"
+    - name: limitrange
+      file: base/limitrange.yaml
+      description: "Resource Limits"
+    - name: resourcequota
+      file: base/resourcequota.yaml
+      description: "Namespace Resource Quota"
+    - name: ingress
+      file: base/ingress.yaml
+      description: "Ingress Configuration"
+    - name: hpa
+      file: base/hpa.yaml
+      description: "Horizontal Pod Autoscaler"
+    - name: poddisruptionbudget
+      file: base/poddisruptionbudget.yaml
+      description: "Pod Disruption Budget"
+      
+  environments:
+    - name: dev
+      path: overlays/dev
+      namespace: platform-03-dev
+      replicas:
+        aep-engine: 1
+        file-organizer-system: 1
+        instant-system: 1
+        elasticsearch-search-system: 1
+        esync-platform: 1
+        
+    - name: staging
+      path: overlays/staging
+      namespace: platform-03-staging
+      replicas:
+        aep-engine: 2
+        file-organizer-system: 1
+        instant-system: 2
+        elasticsearch-search-system: 1
+        esync-platform: 1
+        
+    - name: production
+      path: overlays/production
+      namespace: platform-03
+      replicas:
+        aep-engine: 5
+        file-organizer-system: 3
+        instant-system: 5
+        elasticsearch-search-system: 3
+        esync-platform: 3
+        
+  bestPractices:
+    glGovernance:
+      enabled: true
+      version: "2.0.0"
+      markersRequired: true
+      auditTrailRequired: true
+    resourceManagement:
+      limitsEnforced: true
+      quotasEnforced: true
+      autoscalingEnabled: true
+    security:
+      networkPolicies: true
+      serviceAccounts: true
+      secretsManaged: true
+    observability:
+      probesEnabled: true
+      metricsEnabled: true
+      labelsConsistent: true
+    configuration:
+      kustomizeEnabled: true
+      environmentOverlays: true
+      versionControl: true
+      
+  deploymentCommands:
+    dev: |
+      kubectl apply -k infrastructure/kubernetes/manifests/overlays/dev
+    staging: |
+      kubectl apply -k infrastructure/kubernetes/manifests/overlays/staging
+    production: |
+      kubectl apply -k infrastructure/kubernetes/manifests/overlays/production
+      
+  verificationCommands:
+    status: |
+      kubectl get pods -n machine-native-ops
+      kubectl get services -n machine-native-ops
+    governance: |
+      kubectl get pods -n machine-native-ops -L governance.machinenativeops.io/layer
+      kubectl get pods -n machine-native-ops -L governance.machinenativeops.io/charter-version

@@ -1,0 +1,169 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLGovernanceEventFlow
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:GL-GOVERNANCE-EVENT-FLOW.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-GOVERNANCE-EVENT-FLOW.yaml"
+  name: gl-governance-event-flow
+  version: "1.0.0"
+  created: "2026-01-21"
+event_flows:
+  - event_id: "ARTIFACT_CREATED"
+    name: "Artifact Created Event"
+    trigger_conditions:
+      - "new_file_added"
+      - "artifact_modified"
+    actions:
+      - action_id: "VALIDATE_SEMANTIC_MAPPING"
+        handler: "gl-semantics-validator"
+        blocking: true
+        failure_action: "BLOCK_AND_NOTIFY"
+        parameters:
+          - "semantic_urn_validation"
+          - "parent_urn_validation"
+          - "layer_mapping_validation"
+      - action_id: "GENERATE_EVIDENCE_CHAIN"
+        handler: "gl-evidence-generator"
+        blocking: true
+        failure_action: "BLOCK_AND_NOTIFY"
+        parameters:
+          - "capture_metadata"
+          - "generate_hash"
+          - "store_evidence"
+      - action_id: "UPDATE_SEMANTIC_INDEX"
+        handler: "gl-index-updater"
+        blocking: false
+        failure_action: "LOG_AND_RETRY"
+        parameters:
+          - "vectorize_content"
+          - "update_tags"
+          - "sync_index"
+  - event_id: "LAYER_MODIFIED"
+    name: "Layer Modified Event"
+    trigger_conditions:
+      - "layer_config_changed"
+      - "module_registered"
+      - "module_unregistered"
+    actions:
+      - action_id: "VALIDATE_LAYER_INTEGRITY"
+        handler: "gl-layer-validator"
+        blocking: true
+        failure_action: "BLOCK_AND_ROLLBACK"
+        parameters:
+          - "check_dependencies"
+          - "validate_semantics"
+          - "verify_consistency"
+      - action_id: "TRIGGER_LAYER_CI"
+        handler: "gl-ci-trigger"
+        blocking: true
+        failure_action: "BLOCK_AND_NOTIFY"
+        parameters:
+          - "run_layer_specific_tests"
+          - "execute_quantum_validation"
+          - "generate_audit_report"
+  - event_id: "VALIDATION_FAILED"
+    name: "Validation Failed Event"
+    trigger_conditions:
+      - "semantic_validation_failed"
+      - "consistency_check_failed"
+      - "quantum_validation_failed"
+    actions:
+      - action_id: "BLOCK_AND_NOTIFY"
+        handler: "gl-governance-enforcer"
+        blocking: true
+        failure_action: "TERMINATE_WORKFLOW"
+        parameters:
+          - "notify_stakeholders"
+          - "generate_failure_report"
+          - "prevent_deployment"
+      - action_id: "GENERATE_FAILURE_EVIDENCE"
+        handler: "gl-evidence-generator"
+        blocking: true
+        failure_action: "BLOCK_AND_NOTIFY"
+        parameters:
+          - "capture_failure_state"
+          - "log_validation_errors"
+          - "store_failure_evidence"
+  - event_id: "QUANTUM_VALIDATION_REQUIRED"
+    name: "Quantum Validation Required Event"
+    trigger_conditions:
+      - "artifact_promoted"
+      - "deployment_initiated"
+      - "critical_change_made"
+    actions:
+      - action_id: "EXECUTE_QUANTUM_VALIDATION"
+        handler: "gl-quantum-validator"
+        blocking: true
+        failure_action: "BLOCK_AND_NOTIFY"
+        parameters:
+          - "consistency_check"
+          - "reversibility_check"
+          - "reproducibility_check"
+          - "provability_check"
+      - action_id: "GENERATE_VALIDATION_REPORT"
+        handler: "gl-report-generator"
+        blocking: true
+        failure_action: "BLOCK_AND_NOTIFY"
+        parameters:
+          - "include_validation_results"
+          - "generate_metrics"
+          - "store_report"
+  - event_id: "DEPLOYMENT_INITIATED"
+    name: "Deployment Initiated Event"
+    trigger_conditions:
+      - "pr_merged"
+      - "release_created"
+      - "deployment_triggered"
+    actions:
+      - action_id: "VALIDATE_DEPLOYMENT_READINESS"
+        handler: "gl-deployment-validator"
+        blocking: true
+        failure_action: "BLOCK_DEPLOYMENT"
+        parameters:
+          - "check_all_validations_passed"
+          - "verify_evidence_chain_complete"
+          - "confirm_audit_clear"
+      - action_id: "GENERATE_DEPLOYMENT_EVIDENCE"
+        handler: "gl-evidence-generator"
+        blocking: true
+        failure_action: "BLOCK_DEPLOYMENT"
+        parameters:
+          - "capture_deployment_metadata"
+          - "generate_deployment_hash"
+          - "store_deployment_evidence"
+      - action_id: "UPDATE_SEMANTIC_INDEX"
+        handler: "gl-index-updater"
+        blocking: false
+        failure_action: "LOG_AND_CONTINUE"
+        parameters:
+          - "update_deployment_index"
+          - "sync_semantic_state"
+closed_loop_mechanisms:
+  - mechanism_id: "AUTOMATIC_ROLLBACK"
+    trigger: "VALIDATION_FAILED"
+    action: "ROLLBACK_TO_LAST_VALID_STATE"
+    conditions:
+      - "all_validations_failed"
+      - "critical_violation_detected"
+    blocking: true
+  - mechanism_id: "AUTOMATIC_RETRY"
+    trigger: "TRANSIENT_VALIDATION_FAILURE"
+    action: "RETRY_VALIDATION"
+    conditions:
+      - "network_timeout"
+      - "temporary_unavailability"
+    max_retries: 3
+    blocking: true
+  - mechanism_id: "MANUAL_INTERVENTION"
+    trigger: "UNRESOLVED_VALIDATION_FAILURE"
+    action: "ESCALATE_TO_HUMAN"
+    conditions:
+      - "max_retries_exceeded"
+      - "ambiguous_validation_result"
+    blocking: true
+activation_status: "GL Unified Architecture Governance Framework Activated"

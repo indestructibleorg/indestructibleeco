@@ -1,0 +1,432 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: FileX-standard-template-v1
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# FileX Standard Template v1
+# Bi-Directional Governance Loop Artifact Template
+# Version: 1.0.0
+# Purpose: Ensures bi-directional governance closure for all artifacts
+#
+# NOTE: This file contains TWO YAML documents:
+#   1. The FileX template specification (main document)
+#   2. The validation schema definition (supporting document)
+# Multi-document YAML is intentional for keeping template and schema together.
+# Use YAML parsers that support multi-document streams (yaml.safe_load_all in Python).
+
+apiVersion: machinenativeops.io/v1
+kind: FileXArtifact
+metadata:
+  name: ${ARTIFACT_NAME}
+  version: ${ARTIFACT_VERSION}
+  namespace: ${NAMESPACE}
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    machinenativeops.io/tier: "artifact"
+    machinenativeops.io/version: "${ARTIFACT_VERSION}"
+    machinenativeops.io/component: "${ARTIFACT_NAME}"
+    machinenativeops.io/governance-closure: "required"
+  annotations:
+    machinenativeops.io/description: "${ARTIFACT_DESCRIPTION}"
+    machinenativeops.io/semantic-root: "${SEMANTIC_ROOT_VERSION}"
+    machinenativeops.io/created-by: "${AUTHOR}"
+    machinenativeops.io/last-modified: "${TIMESTAMP}"
+    machinenativeops.io/governance-status: "pending-validation"
+
+spec:
+  # === ARTIFACT IDENTIFICATION ===
+  artifact:
+    # Artifact identification
+    name: ${ARTIFACT_NAME}
+    version: ${ARTIFACT_VERSION}
+    semantic_root: ${SEMANTIC_ROOT_VERSION}
+    
+    # Artifact metadata
+    created: ${CREATION_TIMESTAMP}
+    updated: ${UPDATE_TIMESTAMP}
+    author: ${AUTHOR}
+    description: ${ARTIFACT_DESCRIPTION}
+    
+    # Artifact type
+    type: ${ARTIFACT_TYPE}  # config | module | schema | document | policy | service
+    
+    # Dependencies
+    dependencies:
+      - name: ${DEPENDENCY_NAME}
+        version: ${DEPENDENCY_VERSION}
+        type: required  # required | optional
+        purpose: ${DEPENDENCY_PURPOSE}
+    
+    # Compatibility matrix
+    compatibility:
+      semantic_root: "${SEMANTIC_ROOT_VERSION}"
+      min_version: "${MIN_COMPATIBLE_VERSION}"
+      max_version: "${MAX_COMPATIBLE_VERSION}"
+
+  # === GENERATION CONFIGURATION ===
+  generation:
+    # Forward expansion
+    forward:
+      # Main artifact content
+      content:
+        type: ${CONTENT_TYPE}
+        format: ${CONTENT_FORMAT}  # yaml | json | xml | markdown | text
+        encoding: ${CONTENT_ENCODING}  # utf-8 | ascii
+        data: ${CONTENT_DATA}
+      
+      # New concepts introduced
+      concepts:
+        - name: ${CONCEPT_NAME}
+          definition: ${CONCEPT_DEFINITION}
+          extends: ${PARENT_CONCEPT}  # Optional: Parent concept
+          fields:
+            - name: ${FIELD_NAME}
+              type: ${FIELD_TYPE}
+              required: ${FIELD_REQUIRED}
+              description: ${FIELD_DESCRIPTION}
+          examples:
+            - ${EXAMPLE_1}
+            - ${EXAMPLE_2}
+      
+      # New dependencies introduced
+      new_dependencies:
+        - name: ${DEPENDENCY_NAME}
+          version: ${DEPENDENCY_VERSION}
+          reason: ${DEPENDENCY_REASON}
+      
+      # Breaking changes
+      breaking_changes:
+        - type: ${BREAKING_CHANGE_TYPE}  # api | schema | contract | behavior
+          description: ${BREAKING_CHANGE_DESCRIPTION}
+          impact: ${BREAKING_CHANGE_IMPACT}
+          migration_guide: ${MIGRATION_GUIDE_PATH}
+    
+    # Backward reconciliation (CRITICAL)
+    backward:
+      # Reconciliation requirements
+      reconciliation:
+        - artifact: ${DEPENDENT_ARTIFACT_NAME}
+          version: ${DEPENDENT_ARTIFACT_VERSION}
+          impact: ${IMPACT_LEVEL}  # breaking | non-breaking
+          priority: ${PRIORITY}  # critical | high | medium | low
+          
+          # Specific changes required
+          changes:
+            - type: ${CHANGE_TYPE}  # add | update | delete | extend
+              target: ${TARGET_ELEMENT}
+              description: ${CHANGE_DESCRIPTION}
+              reason: ${CHANGE_REASON}
+              
+              # Generated patch content
+              patch:
+                operation: ${PATCH_OPERATION}  # add | replace | remove | move | copy
+                path: ${JSON_POINTER_PATH}
+                value: ${PATCH_VALUE}
+                old_value: ${OLD_VALUE}
+          
+          # Auto-apply configuration
+          auto_apply: ${AUTO_APPLY}  # true | false
+          requires_approval: ${REQUIRES_APPROVAL}
+          approval_workflow: ${APPROVAL_WORKFLOW}
+          
+          # Migration support
+          migration_required: ${MIGRATION_REQUIRED}
+          migration_script: ${MIGRATION_SCRIPT_PATH}
+          migration_instructions: ${MIGRATION_INSTRUCTIONS}
+
+  # === VALIDATION CONFIGURATION ===
+  validation:
+    # Level 1: Structural validation
+    structural:
+      enabled: true
+      schema: ${SCHEMA_REFERENCE}
+      required_fields: ${REQUIRED_FIELDS_LIST}
+      
+    # Level 2: Semantic validation
+    semantic:
+      enabled: true
+      concept_consistency: true
+      definition_completeness: true
+      extension_compatibility: true
+      
+    # Level 3: Dependency validation
+    dependency:
+      enabled: true
+      dag_check: true
+      circular_dependency_check: true
+      version_compatibility: true
+      dependency_health: true
+      
+    # Level 4: Governance validation
+    governance:
+      enabled: true
+      naming_conventions: true
+      documentation_completeness: true
+      attestation_bundle: true
+      audit_trail: true
+      
+    # Level 5: Closure validation
+    closure:
+      enabled: true
+      dependency_closure: true
+      semantic_closure: true
+      version_closure: true
+      governance_closure: true
+    
+    # Validation results
+    results:
+      structural:
+        status: ${VALIDATION_STATUS}  # pass | fail | warning
+        issues: []
+      
+      semantic:
+        status: ${VALIDATION_STATUS}
+        issues: []
+      
+      dependency:
+        status: ${VALIDATION_STATUS}
+        issues: []
+      
+      governance:
+        status: ${VALIDATION_STATUS}
+        issues: []
+      
+      closure:
+        status: ${VALIDATION_STATUS}
+        issues: []
+      
+      # Overall validation
+      overall: ${VALIDATION_STATUS}
+      attestation_bundle: ${ATTESTATION_BUNDLE_PATH}
+
+  # === DOCUMENTATION ===
+  documentation:
+    # Overview
+    overview: |
+      ${ARTIFACT_OVERVIEW}
+      This artifact follows the FileX Standard Template v1 and implements
+      bi-directional governance closure mechanisms.
+    
+    # Usage examples
+    usage_examples:
+      - title: ${EXAMPLE_TITLE}
+        description: ${EXAMPLE_DESCRIPTION}
+        code: |
+          ${EXAMPLE_CODE}
+        output: |
+          ${EXAMPLE_OUTPUT}
+    
+    # API reference
+    api_reference: ${API_REFERENCE_PATH}
+    
+    # Migration guide
+    migration_guide: |
+      ${MIGRATION_GUIDE_CONTENT}
+    
+    # Breaking changes documentation
+    breaking_changes:
+      - version: ${VERSION}
+        date: ${DATE}
+        changes:
+          - ${BREAKING_CHANGE_1}
+          - ${BREAKING_CHANGE_2}
+        migration: ${MIGRATION_INSTRUCTIONS}
+    
+    # Changelog
+    changelog:
+      - version: ${VERSION}
+        date: ${DATE}
+        author: ${AUTHOR}
+        changes:
+          - ${CHANGE_1}
+          - ${CHANGE_2}
+          - ${CHANGE_3}
+    
+    # References
+    references:
+      - name: ${REFERENCE_NAME}
+        url: ${REFERENCE_URL}
+        type: ${REFERENCE_TYPE}  # specification | documentation | example
+
+  # === ATTESTATION ===
+  attestation:
+    # Attestation bundle generation
+    bundle:
+      path: ${ATTESTATION_BUNDLE_PATH}
+      format: ${ATTESTATION_FORMAT}  # json | yaml | protobuf
+      
+    # Attestation content
+    content:
+      # Artifact identification
+      artifact:
+        name: ${ARTIFACT_NAME}
+        version: ${ARTIFACT_VERSION}
+        hash: ${ARTIFACT_HASH}
+        signature: ${ARTIFACT_SIGNATURE}
+      
+      # Validation results
+      validation:
+        structural: ${VALIDATION_STATUS}
+        semantic: ${VALIDATION_STATUS}
+        dependency: ${VALIDATION_STATUS}
+        governance: ${VALIDATION_STATUS}
+        closure: ${VALIDATION_STATUS}
+        overall: ${VALIDATION_STATUS}
+      
+      # Governance compliance
+      governance:
+        policies_satisfied: ${POLICIES_COUNT}
+        policies_violated: 0
+        attestation_level: ${ATTESTATION_LEVEL}  # L1 | L2 | L3
+      
+      # Provenance
+      provenance:
+        created_by: ${AUTHOR}
+        created_at: ${TIMESTAMP}
+        tools: ${TOOLS_USED}
+        environment: ${ENVIRONMENT}
+      
+      # Trust chain
+      trust:
+        certificate_chain: ${CERTIFICATE_CHAIN}
+        signature: ${SIGNATURE}
+        timestamp: ${TIMESTAMP}
+
+# === STATUS ===
+status:
+  phase: ${ARTIFACT_PHASE}  # created | validated | approved | deployed
+  conditions:
+    - type: "StructuralValidation"
+      status: "${VALIDATION_STATUS}"
+      lastTransitionTime: "${TIMESTAMP}"
+      reason: "${VALIDATION_REASON}"
+      message: "${VALIDATION_MESSAGE}"
+    
+    - type: "SemanticValidation"
+      status: "${VALIDATION_STATUS}"
+      lastTransitionTime: "${TIMESTAMP}"
+      reason: "${VALIDATION_REASON}"
+      message: "${VALIDATION_MESSAGE}"
+    
+    - type: "DependencyValidation"
+      status: "${VALIDATION_STATUS}"
+      lastTransitionTime: "${TIMESTAMP}"
+      reason: "${VALIDATION_REASON}"
+      message: "${VALIDATION_MESSAGE}"
+    
+    - type: "GovernanceValidation"
+      status: "${VALIDATION_STATUS}"
+      lastTransitionTime: "${TIMESTAMP}"
+      reason: "${VALIDATION_REASON}"
+      message: "${VALIDATION_MESSAGE}"
+    
+    - type: "ClosureValidation"
+      status: "${VALIDATION_STATUS}"
+      lastTransitionTime: "${TIMESTAMP}"
+      reason: "${VALIDATION_REASON}"
+      message: "${VALIDATION_MESSAGE}"
+    
+    - type: "GovernanceClosure"
+      status: "${VALIDATION_STATUS}"
+      lastTransitionTime: "${TIMESTAMP}"
+      reason: "${VALIDATION_REASON}"
+      message: "Bi-directional governance loop complete and validated"
+
+---
+# Schema Definition for Validation
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filex-template-schema
+  namespace: machinenativeops-artifacts
+data:
+  schema.yaml: |
+    # FileX Standard Template v1 Schema
+    type: object
+    required:
+      - metadata
+      - spec
+      - status
+    properties:
+      metadata:
+        type: object
+        required:
+          - name
+          - version
+          - namespace
+        properties:
+          name:
+            type: string
+            pattern: "^[a-z][a-z0-9-]*$"
+          version:
+            type: string
+            pattern: "^\\d+\\.\\d+\\.\\d+$"
+          namespace:
+            type: string
+            pattern: "^[a-z][a-z0-9-]*$"
+      
+      spec:
+        type: object
+        required:
+          - artifact
+          - generation
+          - validation
+          - documentation
+        properties:
+          artifact:
+            type: object
+            required:
+              - name
+              - version
+              - semantic_root
+            properties:
+              name:
+                type: string
+              version:
+                type: string
+              semantic_root:
+                type: string
+              dependencies:
+                type: array
+                items:
+                  type: object
+          
+          generation:
+            type: object
+            required:
+              - forward
+              - backward
+            properties:
+              forward:
+                type: object
+                required:
+                  - content
+                  - concepts
+              backward:
+                type: object
+                required:
+                  - reconciliation
+          
+          validation:
+            type: object
+            required:
+              - structural
+              - semantic
+              - dependency
+              - governance
+              - closure
+          
+          documentation:
+            type: object
+            required:
+              - overview
+              - changelog
+      
+      status:
+        type: object
+        required:
+          - phase
+          - conditions

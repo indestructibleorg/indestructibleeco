@@ -1,0 +1,39 @@
+ngnamespacegovernance:
+  version: "3.0"
+  era_coverage:
+    era1: NG100-299
+    era2: NG300-599
+    era3: NG600-899
+    cross_era: NG900-999
+  core_principles:
+    - "uniqueness: all namespaces must be unique"
+    - "hierarchy: namespaces must support layered structure"
+    - "consistency: cross-era consistency is required"
+    - "traceability: full change traceability is required"
+    - "closure: governance closure is required"
+  lifecycle_stages:
+    creation:
+      standard: NG00201
+      validation:
+        - NG00301
+        - NG00401
+    active:
+      monitoring: NG00701
+      optimization: NG90501
+    deprecation:
+      migration: NG00901
+      compatibility: NG90301
+    archival:
+      archive: NG90901
+      destruction: NG91001
+  meta_codes:
+    - NG00000: Namespace Governance Charter
+    - NG00100: Namespace Identifier Standard
+    - NG00200: Namespace Lifecycle
+    - NG00300: Namespace Inheritance Hierarchy
+    - NG00400: Cross-Namespace Reference
+    - NG00500: Namespace Versioning
+    - NG00600: Namespace Permission Model
+    - NG00700: Namespace Audit Trail
+    - NG00800: Namespace Conflict Resolution
+    - NG00900: Namespace Migration

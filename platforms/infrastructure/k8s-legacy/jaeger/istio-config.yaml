@@ -1,0 +1,222 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: istio-config
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+---
+# Istio configuration for Jaeger distributed tracing
+
+# Enable tracing in Istio mesh
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:jaeger:istio-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/jaeger/istio-config.yaml"
+  name: istio-tracing-config
+  namespace: istio-system
+spec:
+  meshConfig:
+    # Enable distributed tracing
+    enableTracing: true
+    # Default tracing configuration
+    defaultConfig:
+      tracing:
+        # Sampling percentage (1.0 = 100%, 0.1 = 10%)
+        sampling: 10.0
+        # Custom tags for all traces
+        custom_tags:
+          environment:
+            environment:
+              value: production
+          version:
+            environment:
+              value: "v1.0.0"
+          cluster:
+            environment:
+              value: us-east-1
+          # Istio automatically adds these tags
+          # - istio_mesh_id
+          # - istio_revision
+          # - source_namespace
+          # - source_pod
+          # - source_app
+      # Max span duration (in seconds)
+      maxSpanDuration: 10s
+      # Zipkin configuration (deprecated, use OTLP)
+      zipkin:
+        address: zipkin.istio-system:9411
+      # OTLP configuration (recommended)
+      otlpConfig:
+        # OTLP exporter for traces
+        trace_exporters:
+        - otlp
+        otlp:
+          address: jaeger-collector.jaeger.svc:4317
+          # TLS configuration
+          tls:
+            insecure: true
+          # Headers for authentication
+          # headers:
+          #   X-Auth-Token: "your-token"
+          # Resource attributes
+          resource:
+            service.name: machine-native-ops
+            deployment.environment: production
+            telemetry.sdk.language: python
+            telemetry.sdk.name: opentelemetry
+            telemetry.sdk.version: "1.20.0"
+          # Propagation settings
+          propagators:
+          - tracecontext
+          - baggage
+          - b3
+---
+# Service configuration for enhanced tracing
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:jaeger:istio-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/jaeger/istio-config.yaml"
+  name: jaeger-tracing-config
+  namespace: platform-03
+data:
+  # Tracing configuration for applications
+  tracing.yaml: |
+    tracing:
+      enabled: true
+      exporter: jaeger
+      jaeger:
+        agent_host: jaeger-agent.jaeger.svc
+        agent_port: 6831
+        collector_host: jaeger-collector.jaeger.svc
+        collector_port: 14250
+        endpoint: http://jaeger-collector.jaeger.svc:14268/api/traces
+        # Sampling configuration
+        sampler:
+          type: probabilistic
+          param: 0.1  # 10% sampling
+        # Tags to include in all spans
+        tags:
+          app.kubernetes.io/name: machine-native-ops
+          environment: production
+          version: "1.0.0"
+        # Span options
+        span:
+          max_queue_size: 2048
+          schedule_delay_millis: 5000
+          export_timeout_millis: 30000
+          max_export_batch_size: 512
+        # Logging integration
+        logging:
+          enabled: true
+          level: info
+          log_spans: true
+          log_payloads: false
+---
+# Istio Telemetry configuration for trace collection
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:jaeger:istio-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/jaeger/istio-config.yaml"
+  name: mesh-tracing
+  namespace: istio-system
+spec:
+  # Apply to all namespaces
+  selector:
+    matchLabels:
+      istio-injection: enabled
+  tracing:
+  - providers:
+    - name: jaeger
+    randomSamplingPercentage: 10.0  # 10% sampling
+    customTags:
+      # Add service name tag
+      "service.name":
+        environment:
+          name: SERVICE_NAME
+      # Add request ID tag
+      "request.id":
+        environment:
+          name: X-Request-ID
+      # Add user ID tag
+      "user.id":
+        environment:
+          name: X-User-ID
+      # Add tenant ID tag
+      "tenant.id":
+        environment:
+          name: X-Tenant-ID
+---
+# Service-specific tracing configuration
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:jaeger:istio-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/jaeger/istio-config.yaml"
+  name: machine-native-ops-tracing
+  namespace: platform-03
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: machine-native-ops
+  tracing:
+  - providers:
+    - name: jaeger
+    # Higher sampling for critical services
+    randomSamplingPercentage: 100.0  # 100% sampling
+    customTags:
+      "service.type":
+        literal:
+          value: "critical"
+      "sla.target":
+        literal:
+          value: "p95:100ms,p99:500ms"
+---
+# Telemetry configuration for background services
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:jaeger:istio-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/jaeger/istio-config.yaml"
+  name: background-services-tracing
+  namespace: platform-03
+spec:
+  selector:
+    matchLabels:
+      type: background
+  tracing:
+  - providers:
+    - name: jaeger
+    # Lower sampling for background services
+    randomSamplingPercentage: 1.0  # 1% sampling
+    customTags:
+      "service.type":
+        literal:
+          value: "background"
+---
+# Enable access logging for trace correlation
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:jaeger:istio-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/jaeger/istio-config.yaml"
+  name: access-logging
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      istio-injection: enabled
+  accessLogging:
+  - providers:
+    - name: envoy
+    filter:
+      expression: request.url_path != "/health" &amp;&amp; request.url_path != "/metrics"

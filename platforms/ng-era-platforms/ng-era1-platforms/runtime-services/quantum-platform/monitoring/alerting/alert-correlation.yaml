@@ -1,0 +1,296 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: alerting.machinenativeops.io/v1
+kind: AlertCorrelation
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:monitoring:alerting:alert-correlation.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/monitoring/alerting/alert-correlation.yaml"
+  name: gl-quantum-alert-correlation
+  namespace: monitoring
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-observability
+spec:
+  enabled: true
+  
+  correlationRules:
+    - name: service_degradation_correlation
+      description: "Correlate alerts indicating service degradation"
+      conditions:
+        - alert: HighErrorRate
+          severity: critical
+          
+        - alert: HighLatency
+          severity: warning
+          
+        - alert: LowCacheHitRate
+          severity: info
+          
+      action:
+        aggregate: true
+        suppressIndividual: true
+        createSuperAlert: true
+        superAlert:
+          name: ServiceDegradation
+          severity: critical
+          message: "Service {{ $labels.service }} is experiencing degradation"
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            affected_service: "{{ $labels.service }}"
+            degradation_type: "combined_error_latency_cache"
+            
+    - name: deployment_failure_correlation
+      description: "Correlate deployment-related alerts"
+      conditions:
+        - alert: DeploymentFailed
+          severity: critical
+          
+        - alert: PodCrashLoopBackOff
+          severity: critical
+          
+        - alert: PodNotReady
+          severity: warning
+          
+      action:
+        aggregate: true
+        suppressIndividual: true
+        createSuperAlert: true
+        superAlert:
+          name: DeploymentFailure
+          severity: critical
+          message: "Deployment {{ $labels.deployment }} in namespace {{ $labels.namespace }} failed"
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            deployment_name: "{{ $labels.deployment }}"
+            namespace: "{{ $labels.namespace }}"
+            failure_type: "combined_deployment_pod_failure"
+            
+    - name: security_incident_correlation
+      description: "Correlate security-related alerts"
+      conditions:
+        - alert: CriticalVulnerabilityFound
+          severity: critical
+          
+        - alert: UnauthorizedAccessAttempt
+          severity: critical
+          
+        - alert: SecurityPolicyViolation
+          severity: high
+          
+      action:
+        aggregate: true
+        suppressIndividual: false
+        createSuperAlert: true
+        superAlert:
+          name: SecurityIncident
+          severity: critical
+          message: "Multiple security events detected requiring immediate attention"
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            incident_type: "combined_vulnerability_access_violation"
+            requires_immediate_action: true
+            
+    - name: resource_exhaustion_correlation
+      description: "Correlate resource exhaustion alerts"
+      conditions:
+        - alert: HighCPUUsage
+          severity: warning
+          
+        - alert: HighMemoryUsage
+          severity: warning
+          
+        - alert: HighDiskUsage
+          severity: critical
+          
+      action:
+        aggregate: true
+        suppressIndividual: false
+        createSuperAlert: true
+        superAlert:
+          name: ResourceExhaustion
+          severity: critical
+          message: "Node {{ $labels.node }} is experiencing resource exhaustion"
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            node_name: "{{ $labels.node }}"
+            exhaustion_type: "combined_cpu_memory_disk"
+            requires_immediate_action: true
+            
+  suppressionRules:
+    - name: suppress_info_during_maintenance
+      description: "Suppress info alerts during maintenance windows"
+      condition: |
+        alertseverity == "info" &&
+        maintenance_window_active == true
+      duration: 1h
+      reason: "Info alerts suppressed during maintenance"
+      
+    - name: suppress_known_issues
+      description: "Suppress alerts for known issues under investigation"
+      condition: |
+        alertname in ["KnownIssue1", "KnownIssue2"] &&
+        issue_investigation_active == true
+      duration: 24h
+      reason: "Alert suppressed - issue under investigation"
+      
+  deduplication:
+    enabled: true
+    
+    rules:
+      - name: duplicate_alert_dedup
+        window: 5m
+        matchLabels:
+          - alertname
+          - namespace
+          - service
+        action: suppress
+        comment: "Suppress duplicate alerts within 5-minute window"
+        
+      - name: similar_alert_dedup
+        window: 10m
+        matchLabels:
+          - alertname
+          - severity
+        threshold: 3
+        action: aggregate
+        comment: "Aggregate similar alerts if 3 or more within 10-minute window"
+        
+  enrichment:
+    enabled: true
+    
+    sources:
+      - name: kubernetes_metadata
+        type: kubernetes
+        enrichWith:
+          - pod_labels
+          - pod_annotations
+          - node_labels
+          - namespace_labels
+          
+      - name: runbook_links
+        type: static
+        data:
+          HighErrorRate: "https://docs.gl-quantum.machinenativeops.com/runbooks/high-error-rate"
+          HighLatency: "https://docs.gl-quantum.machinenativeops.com/runbooks/high-latency"
+          DeploymentFailed: "https://docs.gl-quantum.machinenativeops.com/runbooks/deployment-failure"
+          
+      - name: team_ownership
+        type: static
+        data:
+          gl-quantum-api: platform-team
+          gl-quantum-worker: platform-team
+          gl-quantum-webhook: security-team
+          
+      - name: severity_mapping
+        type: transform
+        transform: |
+          if severity == "critical" then urgency = "immediate"
+          else if severity == "high" then urgency = "high"
+          else if severity == "warning" then urgency = "medium"
+          else urgency = "low"
+          
+  routing:
+    enabled: true
+    
+    routes:
+      - name: critical_alerts
+        match:
+          severity: critical
+        receivers:
+          - type: pagerduty
+            service: gl-quantum-critical
+            
+          - type: slack
+            channel: "#gl-quantum-critical"
+            
+          - type: email
+            recipients: ["platform-team@machinenativeops.com"]
+            
+      - name: high_alerts
+        match:
+          severity: high
+        receivers:
+          - type: slack
+            channel: "#gl-quantum-alerts"
+            
+          - type: email
+            recipients: ["platform-team@machinenativeops.com"]
+            
+      - name: warning_alerts
+        match:
+          severity: warning
+        receivers:
+          - type: slack
+            channel: "#gl-quantum-warnings"
+            
+      - name: info_alerts
+        match:
+          severity: info
+        receivers:
+          - type: slack
+            channel: "#gl-quantum-info"
+            
+  incidentManagement:
+    enabled: true
+    
+    autoCreateIncident:
+      enabled: true
+      conditions:
+        - severity: critical
+        - correlated: true
+        
+      incidentTemplate:
+        title: "{{ .SuperAlertName }} - {{ .Labels.affected_service | default .Labels.node_name }}"
+        severity: "{{ .Severity }}"
+        priority: "{{ .Priority }}"
+        assignee: "{{ .Enrichment.team_ownership | default 'platform-team' }}"
+        description: |
+          # Incident Details
+          
+          ## Alerts
+          {{ range .CorrelatedAlerts }}
+          - {{ .AlertName }}: {{ .Message }}
+          {{ end }}
+          
+          ## Affected Resources
+          - Service: {{ .Labels.affected_service | default "N/A" }}
+          - Namespace: {{ .Labels.namespace | default "N/A" }}
+          - Node: {{ .Labels.node_name | default "N/A" }}
+          
+          ## Recommended Actions
+          {{ .Enrichment.runbook_links | default "See runbooks for details" }}
+          
+          ## Related Links
+          - Dashboard: https://grafana.gl-quantum.machinenativeops.com/d/{{ .DashboardID }}
+          - Logs: https://loki.gl-quantum.machinenativeops.com
+          
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          auto-created: "true"
+          correlation-enabled: "true"
+          
+    autoResolveIncident:
+      enabled: true
+      conditions:
+        - no_correlated_alerts_for: 15m
+        
+      action:
+        add_comment: "Incident automatically resolved - no correlated alerts for 15 minutes"
+        close_incident: true

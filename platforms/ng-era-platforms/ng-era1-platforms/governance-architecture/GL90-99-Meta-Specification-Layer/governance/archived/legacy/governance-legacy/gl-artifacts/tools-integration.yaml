@@ -1,0 +1,20 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLIntegration
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:tools-integration.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/tools-integration.yaml"
+  name: tools-gl-integration
+  version: "1.0.0"
+spec:
+  target: tools
+  gl_architecture_ref: "governance/gl-architecture/GL_LAYERS.yaml"
+  layer_mappings:
+    GL30-49:
+      source: "tools/python/governance_agent.py"
+      extends: "workspace/governance/gl-architecture/gl-extended/GL30-49-execution"

@@ -1,0 +1,83 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: DEFINITION
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLLayerDefinition
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:governance:gl-artifacts:execution:DEFINITION.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/execution/DEFINITION.yaml"
+  layer_id: GL30-49
+  name: Execution Layer
+  version: "1.0.0"
+spec:
+  range: "30-49"
+  description: "Schemas, templates, contracts, automation, tools"
+  dimensions:
+    - id: "26-tools"
+      purpose: "Execution tools and utilities"
+    - id: "27-templates"
+      purpose: "Execution templates and examples"
+      artifacts:
+        - "naming-templates.yaml"
+        - "naming-examples-library.yaml"
+      functions:
+        - "generate_template"
+        - "get_examples"
+    - id: "30-agents"
+      purpose: "Autonomous execution agents"
+    - id: "31-schemas"
+      purpose: "Schema definitions for validation"
+    - id: "32-rules"
+      purpose: "Execution rules and constraints"
+    - id: "33-common"
+      purpose: "Common execution components"
+    - id: "34-config"
+      purpose: "Configuration management"
+    - id: "35-scripts"
+      purpose: "Automation scripts"
+      artifacts:
+        - "naming-generator.sh"
+        - "naming-validator.sh"
+        - "naming-cli-tool.sh"
+        - "naming-patterns.yaml"
+      functions:
+        - "generate_name"
+        - "validate_name"
+        - "check_compliance"
+        - "batch_validate"
+    - id: "36-modules"
+      purpose: "Reusable execution modules"
+    - id: "37-behavior-contracts"
+      purpose: "Behavioral contracts and agreements"
+    - id: "38-sbom"
+      purpose: "Software Bill of Materials management"
+    - id: "39-automation"
+      purpose: "Automation orchestration"
+    - id: "40-self-healing"
+      purpose: "Self-healing mechanisms"
+  interfaces:
+    input:
+      - "operational_procedures"
+      - "templates"
+      - "schemas"
+    output:
+      - "validated_artifacts"
+      - "execution_reports"
+      - "automation_logs"
+  dependencies:
+    upstream:
+      - "GL00-09"
+      - "GL10-29"
+    downstream:
+      - "GL50-59"
+      - "GL60-80"
+  validation:
+    semantic_boundary: "Execution artifacts - tools, templates, schemas, contracts, automation"
+    no_conflicts: true
+    no_duplicates: true
+    clear_boundaries: true

@@ -1,0 +1,126 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: REGISTRY
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Module Registry for MachineNativeOps
+# This file serves as the central registry for all modules in the system
+registry_version: "1.0.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:controlplane:baseline:modules:REGISTRY.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/REGISTRY.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+last_updated: "2025-01-18"
+
+modules:
+  - module_id: "01-core"
+    manifest_path: "01-core/module-manifest.yaml"
+    namespace: "mno-core"
+    autonomy_level: "L1-L2"
+    status: "active"
+    semantic_health_score: 100
+    dependencies: []
+    
+  - module_id: "02-intelligence"
+    manifest_path: "02-intelligence/module-manifest.yaml"
+    namespace: "mno-intelligence"
+    autonomy_level: "L2-L3"
+    status: "active"
+    semantic_health_score: 100
+    dependencies:
+      - "01-core"
+      
+  - module_id: "03-governance"
+    manifest_path: "03-governance/module-manifest.yaml"
+    namespace: "mno-governance"
+    autonomy_level: "L3-L4"
+    status: "active"
+    semantic_health_score: 100
+    dependencies:
+      - "01-core"
+      - "02-intelligence"
+      
+  - module_id: "04-autonomous"
+    manifest_path: "04-autonomous/module-manifest.yaml"
+    namespace: "mno-autonomous"
+    autonomy_level: "L4-L5"
+    status: "in-development"
+    semantic_health_score: 85
+    dependencies:
+      - "01-core"
+      - "02-intelligence"
+      - "03-governance"
+      
+  - module_id: "05-observability"
+    manifest_path: "05-observability/module-manifest.yaml"
+    namespace: "mno-observability"
+    autonomy_level: "L4-L5"
+    status: "active"
+    semantic_health_score: 100
+    dependencies:
+      - "01-core"
+      - "02-intelligence"
+      - "03-governance"
+      
+  - module_id: "06-security"
+    manifest_path: "06-security/module-manifest.yaml"
+    namespace: "mno-security"
+    autonomy_level: "Global Layer"
+    status: "active"
+    semantic_health_score: 100
+    dependencies:
+      - "01-core"
+      - "03-governance"
+      - "05-observability"
+    veto_authority: true
+
+# Global semantic namespace mappings
+semantic_namespace_mappings:
+  - concept: "Core Infrastructure"
+    namespace: "mno-core"
+    module_id: "01-core"
+  - concept: "Intelligence & AI"
+    namespace: "mno-intelligence"
+    module_id: "02-intelligence"
+  - concept: "Governance & Policy"
+    namespace: "mno-governance"
+    module_id: "03-governance"
+  - concept: "Autonomous Operations"
+    namespace: "mno-autonomous"
+    module_id: "04-autonomous"
+  - concept: "Observability & Monitoring"
+    namespace: "mno-observability"
+    module_id: "05-observability"
+  - concept: "Security & Supply Chain"
+    namespace: "mno-security"
+    module_id: "06-security"
+
+# Dependency graph for visualization
+dependency_graph:
+  "01-core": []
+  "02-intelligence": ["01-core"]
+  "03-governance": ["01-core", "02-intelligence"]
+  "04-autonomous": ["01-core", "02-intelligence", "03-governance"]
+  "05-observability": ["01-core", "02-intelligence", "03-governance"]
+  "06-security": ["01-core", "03-governance", "05-observability"]
+
+# Module statistics
+statistics:
+  total_modules: 6
+  active_modules: 5
+  in_development_modules: 1
+  deprecated_modules: 0
+  average_autonomy_level: "L3.5"
+  global_average_semantic_health: 97.5
+  modules_with_veto_authority: 1
+  total_dependencies: 9
+  most_dependent_module: "04-autonomous"
+  least_dependent_module: "01-core"

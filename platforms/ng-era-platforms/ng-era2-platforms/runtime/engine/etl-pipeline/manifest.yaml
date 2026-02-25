@@ -1,0 +1,89 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# ETL Pipeline Manifest
+# ECO-Layer: GL30-49 (Execution)
+# Closure-Signal: manifest
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:etl-pipeline:manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/manifest.yaml"
+  name: etl-pipeline
+  version: "1.0.0"
+  description: "Comprehensive ETL pipeline with data synchronization service"
+  layer: "GL30-49"
+  last-updated: "2024-01-01T00:00:00Z"
+  responsible: "data-engineering-team"
+  
+governance:
+  gl-layers:
+    - "GL00-09"
+    - "GL10-29"
+    - "GL30-49"
+    - "GL50-59"
+    - "GL90-99"
+  
+  compliance:
+    - "gdpr"
+    - "soc2"
+    - "hipaa"
+  
+  closure-signals:
+    - "policy"
+    - "audit"
+    - "evidence"
+    - "artifact"
+    - "manifest"
+
+components:
+  extractors:
+    - name: base-extractor
+      type: abstract
+      file: workspace/projects/etl-pipeline/src/extractors/base_extractor.py
+      gl-layer: "GL30-49"
+  
+  transformers:
+    - name: base-transformer
+      type: abstract
+      file: workspace/projects/etl-pipeline/src/transformers/data_transformer.py
+      gl-layer: "GL30-49"
+  
+  loaders:
+    - name: base-loader
+      type: abstract
+      file: workspace/projects/etl-pipeline/src/loaders/base_loader.py
+      gl-layer: "GL30-49"
+  
+  sync:
+    - name: base-sync-service
+      type: abstract
+      file: workspace/projects/etl-pipeline/src/sync/base_sync.py
+      gl-layer: "GL30-49"
+  
+  monitoring:
+    - name: monitoring-service
+      type: service
+      file: workspace/projects/etl-pipeline/src/monitoring/monitoring_service.py
+      gl-layer: "GL50-59"
+
+tools:
+  - name: pipeline-validator
+    type: validation
+    file: tools/etl/pipeline_validator.py
+    gl-layer: "GL90-99"
+  - name: root-file-runner
+    type: execution
+    file: tools/etl/run_root_files.py
+    gl-layer: "GL30-49"
+
+evidence:
+  location: root-evidence
+  retention-days: 2555
+
+version:
+  current: "1.0.0"

@@ -1,0 +1,220 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: gateway
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+---
+# Istio Gateway for external access
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:istio:gateway.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/istio/gateway.yaml"
+  name: machine-native-ops-gateway
+  namespace: platform-03
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "machine-native-ops.example.com"
+    - "*.machine-native-ops.example.com"
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      serverCertificate: /etc/certs/tls.crt
+      privateKey: /etc/certs/tls.key
+    hosts:
+    - "machine-native-ops.example.com"
+    - "*.machine-native-ops.example.com"
+---
+# Virtual Service for HTTP/HTTPS traffic routing
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:istio:gateway.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/istio/gateway.yaml"
+  name: machine-native-ops-vs
+  namespace: platform-03
+spec:
+  hosts:
+  - "machine-native-ops.example.com"
+  - "*.machine-native-ops.example.com"
+  gateways:
+  - machine-native-ops-gateway
+  http:
+  # Health check endpoint
+  - match:
+    - uri:
+        prefix: /health
+    route:
+    - destination:
+        host: machine-native-ops
+        port:
+          number: 8080
+    timeout: 5s
+    retries:
+      attempts: 3
+      perTryTimeout: 2s
+  # Metrics endpoint
+  - match:
+    - uri:
+        prefix: /metrics
+    route:
+    - destination:
+        host: machine-native-ops
+        port:
+          number: 8080
+    timeout: 10s
+  # API endpoints
+  - match:
+    - uri:
+        prefix: /api/
+    route:
+    - destination:
+        host: machine-native-ops
+        port:
+          number: 8080
+    timeout: 30s
+    retries:
+      attempts: 2
+      perTryTimeout: 15s
+      retryOn: 5xx,connect-failure,refused-stream
+    fault:
+      delay:
+        percentage:
+          value: 0
+        fixedDelay: 0s
+      abort:
+        percentage:
+          value: 0
+        httpStatus: 500
+  # Admin UI
+  - match:
+    - uri:
+        prefix: /admin
+    route:
+    - destination:
+        host: machine-native-ops-admin
+        port:
+          number: 8080
+    timeout: 30s
+    corsPolicy:
+      allowOrigin:
+      - https://machine-native-ops.example.com
+      allowMethods:
+      - POST
+      - GET
+      - OPTIONS
+      - PUT
+      - DELETE
+      allowHeaders:
+      - authorization
+      - content-type
+      - x-requested-with
+      maxAge: 24h
+      allowCredentials: true
+      exposeHeaders:
+      - x-custom-header
+  # WebSocket connections
+  - match:
+    - uri:
+        prefix: /ws
+    route:
+    - destination:
+        host: machine-native-ops
+        port:
+          number: 8080
+  # Default route
+  - route:
+    - destination:
+        host: machine-native-ops
+        port:
+          number: 8080
+    timeout: 30s
+---
+# Destination Rule for load balancing and connection pooling
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:istio:gateway.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/istio/gateway.yaml"
+  name: machine-native-ops-dr
+  namespace: platform-03
+spec:
+  host: machine-native-ops
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+      localityLbSetting:
+        enabled: true
+        failover:
+        - from: region1
+          to: region2
+    connectionPool:
+      tcp:
+        maxConnections: 100
+        connectTimeout: 10s
+        tcpKeepalive:
+          time: 7200s
+          interval: 75s
+      http:
+        http1MaxPendingRequests: 50
+        http2MaxRequests: 1000
+        maxRequestsPerConnection: 3
+        idleTimeout: 300s
+        h2UpgradePolicy: UPGRADE
+    outlierDetection:
+      consecutive5xxErrors: 3
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+      minHealthPercent: 50
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+  - name: v1
+    labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+      version: v1
+  - name: v2
+    labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+      version: v2
+---
+# Destination Rule for Admin service
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:istio:gateway.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/istio/gateway.yaml"
+  name: machine-native-ops-admin-dr
+  namespace: platform-03
+spec:
+  host: machine-native-ops-admin
+  trafficPolicy:
+    loadBalancer:
+      simple: LEAST_CONN
+    connectionPool:
+      http:
+        http1MaxPendingRequests: 20
+        maxRequestsPerConnection: 2
+    outlierDetection:
+      consecutive5xxErrors: 5
+      interval: 60s
+      baseEjectionTime: 60s

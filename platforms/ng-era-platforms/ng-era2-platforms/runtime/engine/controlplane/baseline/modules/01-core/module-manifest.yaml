@@ -1,0 +1,86 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: module-manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+module_id: "01-core"
+module_name: "Core Engine & Infrastructure"
+module_description: |
+  The Core Engine module provides the foundational infrastructure and cognitive processing capabilities
+  for the MachineNativeOps platform. It handles system initialization, service registration, basic
+  automation primitives, and the cognitive processor that enables AI-native operations. This module
+  operates at L1-L2 autonomy levels, providing the essential building blocks upon which all other
+  modules depend.
+autonomy_level: "L1-L2"
+namespace: "mno-core"
+dependencies: []
+interfaces:
+  - name: "ServiceRegistry"
+    type: "service"
+    description: "Central service registration and discovery interface"
+    endpoints:
+      - "POST /services/register"
+      - "GET /services/{service_id}"
+      - "DELETE /services/{service_id}"
+  - name: "CognitiveProcessor"
+    type: "api"
+    description: "AI-native intent understanding and task execution interface"
+    endpoints:
+      - "POST /cognitive/intent"
+      - "POST /cognitive/execute"
+      - "GET /cognitive/status"
+  - name: "FileSystemAbstraction"
+    type: "data"
+    description: "FHS-compliant filesystem abstraction layer"
+    endpoints:
+      - "GET /fs/*"
+      - "PUT /fs/*"
+      - "DELETE /fs/*"
+status: "active"
+version: "1.0.0"
+components:
+  - name: "ServiceRegistry"
+    type: "service"
+    description: "Central service registry for component discovery and registration"
+    location: "lib/mno-core/service-registry/"
+  - name: "CognitiveProcessor"
+    type: "service"
+    description: "LLM-based intent understanding and task orchestration engine"
+    location: "lib/mno-core/cognitive-processor/"
+  - name: "FHSManager"
+    type: "library"
+    description: "Filesystem Hierarchy Standard compliance manager"
+    location: "lib/mno-core/fhs-manager/"
+  - name: "AutomationEngine"
+    type: "tool"
+    description: "Basic automation primitives and task execution engine"
+    location: "bin/mno-automation/"
+semantic_mappings:
+  - concept: "Service Discovery"
+    mapping: "mno-core.service-registry"
+    description: "Map service discovery concepts to the service registry"
+  - concept: "Intent Processing"
+    mapping: "mno-core.cognitive-processor"
+    description: "Map intent understanding to cognitive processor"
+  - concept: "Filesystem Operations"
+    mapping: "mno-core.fhs-manager"
+    description: "Map filesystem operations to FHS manager"
+  - concept: "Task Automation"
+    mapping: "mno-core.automation-engine"
+    description: "Map task automation to automation engine"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:controlplane:baseline:modules:01-core:module-manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/01-core/module-manifest.yaml"
+  created_date: "2025-01-18"
+  last_modified: "2025-01-18"
+  maintainers:
+    - "MachineNativeOps Team"
+  tags:
+    - "core"
+    - "infrastructure"
+    - "cognitive"
+    - "automation"
+    - "foundational"

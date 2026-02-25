@@ -1,0 +1,149 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: module-manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+module_id: "06-security"
+module_name: "Security & Supply Chain Governance"
+module_description: |
+  The Security & Supply Chain Governance module provides comprehensive security capabilities,
+  supply chain integrity, and compliance enforcement. It operates at Global Layer (GL) with
+  VETO authority across all system operations. This module implements SLSA provenance,
+  SBOM management, artifact signing with Cosign, and comprehensive security auditing.
+  It ensures end-to-end security from development to deployment and maintains compliance
+  with industry standards.
+autonomy_level: "Global Layer"
+namespace: "mno-security"
+dependencies:
+  - "01-core"
+  - "03-governance"
+  - "05-observability"
+interfaces:
+  - name: "ProvenanceManager"
+    type: "service"
+    description: "SLSA provenance generation and verification"
+    endpoints:
+      - "POST /provenance/generate"
+      - "POST /provenance/verify"
+      - "GET /provenance/{artifact_id}"
+  - name: "SBOMManager"
+    type: "service"
+    description: "Software Bill of Materials generation and management"
+    endpoints:
+      - "POST /sbom/generate"
+      - "GET /sbom/{artifact_id}"
+      - "POST /sbom/analyze"
+  - name: "ArtifactSigner"
+    type: "service"
+    description: "Cosign-based artifact signing and verification"
+    endpoints:
+      - "POST /sign/sign"
+      - "POST /sign/verify"
+      - "GET /sign/{signature_id}"
+  - name: "SecurityScanner"
+    type: "service"
+    description: "Vulnerability scanning and security auditing"
+    endpoints:
+      - "POST /security/scan"
+      - "GET /security/report/{scan_id}"
+      - "POST /security/audit"
+  - name: "SecretManager"
+    type: "service"
+    description: "Secret management and rotation"
+    endpoints:
+      - "POST /secrets/store"
+      - "GET /secrets/{secret_id}"
+      - "POST /secrets/rotate"
+  - name: "ComplianceMonitor"
+    type: "service"
+    description: "Compliance monitoring and reporting"
+    endpoints:
+      - "GET /compliance/status"
+      - "POST /compliance/evaluate"
+      - "GET /compliance/report"
+  - name: "PolicyGateSecurity"
+    type: "workflow"
+    description: "Security policy gate for CI/CD pipelines"
+    endpoints:
+      - "POST /security-gates/evaluate"
+      - "GET /security-gates/status"
+status: "active"
+version: "1.0.0"
+components:
+  - name: "ProvenanceManager"
+    type: "service"
+    description: "SLSA provenance generation and verification"
+    location: "lib/mno-security/provenance-manager/"
+  - name: "SBOMManager"
+    type: "service"
+    description: "SBOM generation with syft/trivy integration"
+    location: "lib/mno-security/sbom-manager/"
+  - name: "ArtifactSigner"
+    type: "service"
+    description: "Cosign-based artifact signing"
+    location: "lib/mno-security/artifact-signer/"
+  - name: "SecurityScanner"
+    type: "service"
+    description: "Comprehensive vulnerability scanning"
+    location: "lib/mno-security/security-scanner/"
+  - name: "SecretManager"
+    type: "service"
+    description: "Secure secret management and rotation"
+    location: "lib/mno-security/secret-manager/"
+  - name: "ComplianceMonitor"
+    type: "service"
+    description: "Compliance monitoring and reporting"
+    location: "lib/mno-security/compliance-monitor/"
+  - name: "RekorIntegration"
+    type: "library"
+    description: "Rekor transparency log integration"
+    location: "lib/mno-security/rekor-integration/"
+  - name: "TektonChainsIntegration"
+    type: "library"
+    description: "Tekton Chains provenance integration"
+    location: "lib/mno-security/tekton-chains/"
+semantic_mappings:
+  - concept: "Provenance"
+    mapping: "mno-security.provenance-manager"
+    description: "Map SLSA provenance to provenance manager"
+  - concept: "SBOM"
+    mapping: "mno-security.sbom-manager"
+    description: "Map Software Bill of Materials to SBOM manager"
+  - concept: "Artifact Signing"
+    mapping: "mno-security.artifact-signer"
+    description: "Map signing concepts to artifact signer"
+  - concept: "Security Scanning"
+    mapping: "mno-security.security-scanner"
+    description: "Map security scanning to security scanner"
+  - concept: "Secret Management"
+    mapping: "mno-security.secret-manager"
+    description: "Map secret management to secret manager"
+  - concept: "Compliance"
+    mapping: "mno-security.compliance-monitor"
+    description: "Map compliance concepts to compliance monitor"
+  - concept: "Transparency Log"
+    mapping: "mno-security.rekor-integration"
+    description: "Map transparency log to Rekor integration"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:controlplane:baseline:modules:06-security:module-manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/06-security/module-manifest.yaml"
+  created_date: "2025-01-18"
+  last_modified: "2025-01-18"
+  maintainers:
+    - "MachineNativeOps Team"
+  tags:
+    - "security"
+    - "supply-chain"
+    - "slsa"
+    - "sbom"
+    - "cosign"
+    - "provenance"
+    - "vulnerability-scanning"
+    - "compliance"
+    - "secret-management"
+    - "rekor"
+    - "global-layer"
+    - "veto"

@@ -1,0 +1,33 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLIntegration
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:workspace-integration.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/workspace-integration.yaml"
+  name: workspace-gl-integration
+  version: "1.0.0"
+spec:
+  target: workspace
+  gl_architecture_ref: "governance/gl-architecture/GL_LAYERS.yaml"
+  layer_mappings:
+    GL00-09:
+      source: "workspace/src/governance/00-vision-strategy"
+      extends: "workspace/governance/gl-architecture/gl-extended/GL00-09-strategic"
+    GL10-29:
+      source: "workspace/src/governance/10-policy"
+      extends: "workspace/governance/gl-architecture/gl-extended/GL10-29-operational"
+    GL30-49:
+      source: "workspace/src/governance/35-scripts"
+      extends: "workspace/governance/gl-architecture/gl-extended/GL30-49-execution"
+    GL60-80:
+      source: "workspace/src/governance/07-audit"
+      extends: "workspace/governance/gl-architecture/gl-extended/GL60-80-advanced"
+    GL81-83:
+      extends: "workspace/governance/gl-architecture/gl-extended/GL81-83-extended"
+    GL90-99:
+      extends: "workspace/governance/gl-architecture/gl-extended/GL90-99-meta"

@@ -1,0 +1,277 @@
+# 🔌 Root 裝置檔案對應表
+# MachineNativeOps Root Layer Device Mapping
+# Version: 1.0.0
+# Last Modified: 2025-12-20T22:00:00Z
+
+# =============================================================================
+# MachineNativeOps Device Mapping Configuration
+# =============================================================================
+# This file defines the mapping between logical device names and their physical
+# device file paths. It ensures consistent device access across different
+# system configurations and provides abstraction for hardware management.
+# =============================================================================
+
+# === 設備對應格式說明 ===
+# 格式: logical_name:physical_path:device_type:permissions:owner:description
+# logical_name: 邏輯設備名稱
+# physical_path: 實體設備檔案路徑
+# device_type: 設備類型 (block, character, network, virtual)
+# permissions: 設備權限
+# owner: 設備擁有者
+# description: 設備描述
+
+# === 區塊設備 (Block Devices) ===
+
+# 主要儲存設備
+system_root:/dev/sda:block:brw-rw----:root:disk:System root disk
+system_data:/dev/sdb:block:brw-rw----:root:disk:System data disk
+system_backup:/dev/sdc:block:brw-rw----:root:disk:System backup disk
+system_swap:/dev/sda1:block:brw-rw----:root:disk:System swap partition
+
+# 資料庫儲存
+database_data:/dev/md0:block:brw-rw----:postgres:disk:Database data RAID array
+database_logs:/dev/md1:block:brw-rw----:postgres:disk:Database logs RAID array
+database_wal:/dev/md2:block:brw-rw----:postgres:disk:Database WAL RAID array
+
+# 快取儲存
+cache_ssd:/dev/nvme0n1:block:brw-rw----:root:disk:High-speed cache SSD
+cache_temp:/dev/nvme0n1p1:block:brw-rw----:root:disk:Temporary cache partition
+
+# LVM 設備
+lvm_system:/dev/mapper/system-root:block:brw-rw----:root:disk:LVM system root
+lvm_data:/dev/mapper/system-data:block:brw-rw----:root:disk:LVM data volume
+lvm_logs:/dev/mapper/system-logs:block:brw-rw----:root:disk:LVM logs volume
+
+# === 字元設備 (Character Devices) ===
+
+# 終端設備
+console_primary:/dev/console:c:crw-------:root:tty:System console
+console_serial:/dev/ttyS0:c:crw-------:root:tty:Serial console
+console_virtual:/dev/tty0:c:crw-rw----:root:tty:Virtual console
+
+# 隨機數數生成器
+rng_hardware:/dev/hwrng:c:crw-rw----:root:root:Hardware random number generator
+rng_software:/dev/urandom:c:crw-rw-rw-:root:root:Software random number generator
+rng_entropy:/dev/random:c:crw-rw-rw-:root:root:Entropy random number generator
+
+# 記憶體設備
+mem_kmsg:/dev/kmsg:c:crw-rw----:root:root:Kernel message buffer
+mem_null:/dev/null:c:crw-rw-rw-:root:root:Null device
+mem_zero:/dev/zero:c:crw-rw-rw-:root:root:Zero device
+mem_full:/dev/full:c:crw-rw-rw-:root:root:Full device
+
+# 時間設備
+rtc_hardware:/dev/rtc0:c:crw-rw----:root:root:Hardware real-time clock
+rtc_system:/dev/rtc:c:crw-rw----:root:root:System real-time clock
+
+# HSM 設備
+hsm_primary:/dev/hsm0:c:crw-------:root:hsm:Primary hardware security module
+hsm_backup:/dev/hsm1:c:crw-------:root:hsm:Backup hardware security module
+hsm_virtual:/dev/vhsm:c:crw-------:root:hsm:Virtual hardware security module
+
+# === 網路設備 (Network Devices) ===
+
+# 主要網路介面
+net_primary:eth0:network:-root:root:Primary network interface
+net_secondary:eth1:network:-root:root:Secondary network interface
+net_management:eth2:network:-root:root:Management network interface
+net_backup:eth3:network:-root:root:Backup network interface
+
+# 虛擬網路設備
+net_loopback:lo:network:-root:root:Loopback interface
+net_bridge:br0:network:-root:root:Network bridge
+net_bond:bond0:network:-root:root:Bonded interface
+net_vlan:vlan100:network:-root:root:VLAN interface
+
+# 容器網路
+net_docker:docker0:network:-root:root:Docker bridge interface
+net_podman:podman0:network:-root:root:Podman bridge interface
+net_k8s:cni0:network:-root:root:Kubernetes CNI interface
+
+# === 虛擬設備 (Virtual Devices) ===
+
+# 虛擬化設備
+virt_kvm:/dev/kvm:c:crw-rw----:root:kvm:Kernel virtualization module
+virt_tun:/dev/net/tun:c:crw-rw----:root:root:TUN/TAP device
+virt_vhost:/dev/vhost-net:c:crw-rw----:root:root:vhost-net device
+
+# GPU 設備
+gpu_primary:/dev/dri/card0:c:crw-rw----:root:video:Primary GPU device
+gpu_render:/dev/dri/renderD128:c:crw-rw----:root:render:GPU render device
+gpu_nvidia:/dev/nvidia0:c:crw-rw----:root:root:NVIDIA GPU device
+
+# 音頻設備
+audio_primary:/dev/snd/controlC0:c:crw-rw----:root:audio:Primary audio control
+audio_mixer:/dev/mixer:c:crw-rw----:root:audio:Audio mixer device
+audio_pcm:/dev/snd/pcmC0D0c:c:crw-rw----:root:audio:Audio PCM device
+
+# USB 設備
+usb_primary:/dev/bus/usb/001/001:c:crw-rw----:root:root:Primary USB controller
+usb_storage:/dev/sg0:c:crw-rw----:root:disk:USB storage device
+usb_serial:/dev/ttyUSB0:c:crw-rw----:root:dialout:USB serial device
+
+# === 監控設備 (Monitoring Devices) ===
+
+# 溫度感測器
+temp_cpu:/sys/class/hwmon/hwmon0/temp1_input:monitor:r--r--r--:root:root:CPU temperature sensor
+temp motherboard:/sys/class/hwmon/hwmon1/temp1_input:monitor:r--r--r--:root:root:Motherboard temperature sensor
+temp_gpu:/sys/class/hwmon/hwmon2/temp1_input:monitor:r--r--r--:root:root:GPU temperature sensor
+
+# 電源感測器
+power_battery:/sys/class/power_supply/BAT0/capacity:monitor:r--r--r--:root:root:Battery capacity sensor
+power_ac:/sys/class/power_supply/AC/online:monitor:r--r--r--:root:root:AC power status
+
+# 系統監控
+sys_loadavg:/proc/loadavg:monitor:r--r--r--:root:root:System load average
+sys_meminfo:/proc/meminfo:monitor:r--r--r--:root:root:System memory information
+sys_stat:/proc/stat:monitor:r--r--r--:root:root:System statistics
+
+# === 安全設備 (Security Devices) ===
+
+# TPM 設備
+tpm_primary:/dev/tpm0:c:crw-------:root:tss:Primary TPM device
+tpm_secondary:/dev/tpm1:c:crw-------:root:tss:Secondary TPM device
+tpm_rm:/dev/tpmrm0:c:crw-rw----:root:tss:TPM resource manager
+
+# 智慧卡設備
+smartcard:/dev/smartcard0:c:crw-------:root:root:Smart card reader
+crypto_token:/dev/crypto_token0:c:crw-------:root:root:Cryptographic token
+
+# 生物辨識設備
+fingerprint:/dev/input/event0:c:crw-rw----:root:input:Fingerprint reader
+face_recognition:/dev/video0:c:crw-rw----:root:video:Face recognition camera
+
+# === 備份與歸檔設備 ===
+
+# 磁帶設備
+tape_primary:/dev/st0:c:crw-rw----:root:tape:Primary tape drive
+tape_secondary:/dev/nst0:c:crw-rw----:root:tape:Secondary tape drive
+tape_autoloader:/dev/sg1:c:crw-rw----:root:tape:Tape autoloader
+
+# 光碟設備
+cdrom_primary:/dev/sr0:c:crw-rw----:root:cdrom:Primary CD/DVD drive
+cdrom_secondary:/dev/sr1:c:crw-rw----:root:cdrom:Secondary CD/DVD drive
+
+# === 通用別名 (Generic Aliases) ===
+
+# 常用別名
+default_storage:/dev/sda:block:brw-rw----:root:disk:Default storage device
+default_swap:/dev/sda1:block:brw-rw----:root:disk:Default swap device
+default_cdrom:/dev/cdrom:c:crw-rw----:root:cdrom:Default CD/DVD device
+default_usb:/dev/sda:block:brw-rw----:root:disk:Default USB storage
+
+# 應用程式特定別名
+mysql_data:/dev/md10:block:brw-rw----:mysql:disk:MySQL data storage
+postgres_data:/dev/md20:block:brw-rw----:postgres:disk:PostgreSQL data storage
+redis_data:/dev/md30:block:brw-rw----:redis:disk:Redis data storage
+elasticsearch_data:/dev/md40:block:brw-rw----:elasticsearch:disk:Elasticsearch data storage
+
+# === 動態設備對應 (Dynamic Device Mappings) ===
+
+# USB 動態設備 (由 udev 規則動態創建)
+usb_storage_dynamic:/dev/disk/by-id/usb-*:block:brw-rw----:root:disk:Dynamic USB storage
+usb_serial_dynamic:/dev/ttyUSB*:c:crw-rw----:root:dialout:Dynamic USB serial
+
+# 網路動態設備
+net_dynamic_eth:/sys/class/net/eth*:network:-root:root:Dynamic Ethernet interfaces
+net_dynamic_wlan:/sys/class/net/wlan*:network:-root:root:Dynamic wireless interfaces
+
+# === 設備群組定義 (Device Group Definitions) ===
+
+# 系統關鍵設備群組
+[critical_devices]
+members=system_root,system_data,console_primary,rng_hardware,rtc_hardware
+description=Critical system devices required for basic operation
+
+# 儲存設備群組
+[storage_devices]
+members=system_data,database_data,cache_ssd,lvm_data,backup_primary
+description=Storage devices for data persistence
+
+# 安全設備群組
+[security_devices]
+members=hsm_primary,tpm_primary,smartcard,crypto_token
+description=Security-related devices for cryptography and authentication
+
+# 網路設備群組
+[network_devices]
+members=net_primary,net_secondary,net_management,net_bridge
+description=Network interface devices
+
+# 監控設備群組
+[monitoring_devices]
+members=temp_cpu,temp_motherboard,power_battery,sys_loadavg,sys_meminfo
+description=Monitoring and sensor devices
+
+# === 設備權限映射 (Device Permission Mappings) ===
+
+# 管理員權限
+[admin_permissions]
+devices=hsm_primary,backup_primary,system_root
+permissions=rw
+users=root
+description=Devices requiring administrator access
+
+# 服務帳號權限
+[service_permissions]
+devices=database_data,cache_ssd,net_primary
+permissions=rw
+users=postgres,redis,nginx
+description=Devices accessible to service accounts
+
+# 唯讀權限
+[readonly_permissions]
+devices=temp_cpu,power_battery,sys_loadavg,sys_meminfo
+permissions=r
+users=everyone
+description=Devices with read-only access for all users
+
+# === 設備監控配置 (Device Monitoring Configuration) ===
+
+# 監控規則
+[monitoring_rules]
+rule1=monitor device system_root for errors every 60s
+rule2=monitor device database_data for performance every 30s
+rule3=monitor device temp_cpu for threshold breaches every 10s
+rule4=monitor device hsm_primary for availability every 5s
+
+# 告警閾值
+[alert_thresholds]
+temp_cpu_warning=70
+temp_cpu_critical=85
+disk_usage_warning=80
+disk_usage_critical=95
+memory_usage_warning=80
+memory_usage_critical=95
+
+# === 設備故障轉移 (Device Failover Configuration) ===
+
+# 主要/備用設備對
+[failover_pairs]
+primary_storage=system_data,backup_storage=system_backup
+primary_network=net_primary,backup_network=net_secondary
+primary_hsm=hsm_primary,backup_hsm=hsm_secondary
+primary_rtc=rtc_hardware,backup_rtc=rtc_system
+
+# 轉移觸發條件
+[failover_triggers]
+device_error_count=3
+response_timeout=30s
+health_check_failure=true
+manual_trigger=true
+
+# === 設備維護窗口 (Device Maintenance Windows) ===
+
+# 維護排程
+[maintenance_schedule]
+daily_maintenance=02:00-04:00
+weekly_maintenance=Sunday 01:00-05:00
+monthly_maintenance=First Sunday 00:00-06:00
+emergency_maintenance=as_needed
+
+# 維護期間設備狀態
+[maintenance_behavior]
+devices_in_maintenance=readonly_mode
+backup_devices=active_mode
+critical_devices=no_maintenance
+notifications=enabled

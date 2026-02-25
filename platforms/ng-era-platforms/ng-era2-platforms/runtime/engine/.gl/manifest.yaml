@@ -1,0 +1,135 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# GL Semantic Manifest - AEP Engine
+# @gl-layer ECO-30-EXECUTION
+# @gl-semantic-anchor ECO-30-EXEC-ENGINE
+
+gl_version: "1.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:.gl:manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/.gl/manifest.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+module:
+  id: "aep-engine"
+  name: "Architecture Execution Pipeline Engine"
+  version: "1.0.0"
+  layer: "ECO-30-EXECUTION"
+  
+semantic_anchors:
+  - id: "ECO-30-EXEC-AEP-ENGINE"
+    type: "execution"
+    description: "Main AEP Engine entry point"
+    path: "engine/index.ts"
+    
+  - id: "ECO-30-EXEC-TYPEDEF"
+    type: "execution"
+    description: "Type definitions for AEP Engine"
+    paths:
+      - "engine/interfaces.d.ts"
+      - "engine/interfaces-fix.d.ts"
+
+  - id: "ECO-30-EXEC-ARTIFACTS"
+    type: "execution"
+    description: "Artifact management subsystem"
+    paths:
+      - "engine/artifacts/artifact_manager.ts"
+      - "engine/artifacts/evidence_chain.ts"
+      - "engine/artifacts/manifest_generator.ts"
+
+  - id: "ECO-30-EXEC-EXECUTOR"
+    type: "execution"
+    description: "Execution subsystem"
+    paths:
+      - "engine/executor/local_executor.ts"
+      - "engine/executor/remote_executor.ts"
+      - "engine/executor/rollback.ts"
+
+  - id: "ECO-10-GOV-ENGINE"
+    type: "governance"
+    description: "Governance enforcement subsystem"
+    paths:
+      - "engine/governance/anchor_resolver.ts"
+      - "engine/governance/events_writer.ts"
+      - "engine/governance/gl_engine.ts"
+      - "engine/governance/rule_evaluator.ts"
+
+  - id: "ECO-30-EXEC-LOADER"
+    type: "execution"
+    description: "Configuration loader subsystem"
+    paths:
+      - "engine/loader/fs_loader.ts"
+      - "engine/loader/git_loader.ts"
+      - "engine/loader/merge_index.ts"
+
+  - id: "ECO-30-EXEC-NORMALIZER"
+    type: "execution"
+    description: "Data normalization subsystem"
+    paths:
+      - "engine/normalizer/defaults_applier.ts"
+      - "engine/normalizer/env_merger.ts"
+      - "engine/normalizer/module_defaults.ts"
+
+  - id: "ECO-30-EXEC-PARSER"
+    type: "execution"
+    description: "Configuration parser subsystem"
+    paths:
+      - "engine/parser/anchor_resolver.ts"
+      - "engine/parser/json_passthrough.ts"
+      - "engine/parser/yaml_parser.ts"
+
+  - id: "ECO-30-EXEC-RENDERER"
+    type: "execution"
+    description: "Artifact renderer subsystem"
+    paths:
+      - "engine/renderer/artifact_writer.ts"
+      - "engine/renderer/module_mapper.ts"
+      - "engine/renderer/template_engine.ts"
+
+  - id: "ECO-30-EXEC-VALIDATOR"
+    type: "execution"
+    description: "Validation subsystem"
+    paths:
+      - "engine/validator/error_reporter.ts"
+      - "engine/validator/module_validator.ts"
+      - "engine/validator/schema_validator.ts"
+
+  - id: "ECO-50-TEST-ENGINE"
+    type: "observability"
+    description: "Test suite for AEP Engine"
+    paths:
+      - "engine/tests/artifacts/evidence_chain.test.ts"
+      - "engine/tests/governance/rule_evaluator.test.ts"
+      - "engine/tests/loader/fs_loader.test.ts"
+      - "engine/tests/loader/merge_index.test.ts"
+      - "engine/tests/normalizer/env_merger.test.ts"
+      - "engine/tests/validator/schema_validator.test.ts"
+
+dependencies:
+  internal:
+    - "ECO-10-CONFIG"
+    - "ECO-50-OBSERVABILITY"
+  external:
+    - "js-yaml"
+    - "ajv"
+    - "nunjucks"
+
+evidence:
+  required: true
+  chain_path: "engine/.gl/evidence-chain.json"
+
+governance:
+  policies:
+    - "no-continue-on-error"
+    - "mandatory-evidence"
+    - "semantic-anchor-required"

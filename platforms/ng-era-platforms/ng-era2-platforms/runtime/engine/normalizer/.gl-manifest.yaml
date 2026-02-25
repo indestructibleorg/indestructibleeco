@@ -1,0 +1,65 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: .gl-manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# GL Semantic Manifest - Normalizer Subsystem
+# @gl-layer ECO-30-EXECUTION
+# @gl-semantic-anchor ECO-30-EXEC-NORMALIZER
+# GL Unified Architecture Governance Framework Activated
+
+gl_version: "1.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:normalizer:.gl-manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/normalizer/.gl-manifest.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+manifest:
+  subsystem: "normalizer"
+  module: "aep-engine"
+  layer: "ECO-30-EXECUTION"
+  semantic_anchor: "ECO-30-EXEC-NORMALIZER"
+  updated: "2026-01-26"
+
+components:
+  defaults_applier:
+    file: "defaults_applier.ts"
+    class: "DefaultsApplier"
+    description: "Default value application to configuration"
+    version: "1.0.0"
+    exports:
+      - "DefaultsApplier"
+    dependencies:
+      - "../interfaces.d"
+
+  env_merger:
+    file: "env_merger.ts"
+    class: "EnvMerger"
+    description: "Environment-specific configuration merging"
+    version: "1.0.0"
+    exports:
+      - "EnvMerger"
+    dependencies:
+      - "../interfaces.d"
+
+  module_defaults:
+    file: "module_defaults.ts"
+    class: "ModuleDefaults"
+    description: "Module-level default configuration"
+    version: "1.0.0"
+    exports:
+      - "ModuleDefaults"
+    dependencies:
+      - "../interfaces.d"
+
+governance:
+  charter_activated: true
+  evidence_required: true
+  audit_compliant: true

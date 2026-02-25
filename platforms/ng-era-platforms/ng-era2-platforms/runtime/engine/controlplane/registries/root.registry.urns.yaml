@@ -1,0 +1,336 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: root.registry.urns
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# 🔗 Root Layer URN Registry (SSOT)
+# Version: 1.0.0
+# Purpose: Single Source of Truth for all URNs
+# Enforcement: Strict - All URN references must exist here
+
+apiVersion: machinenativeops.io/v1
+kind: RootURNRegistry
+metadata:
+  name: urn-registry
+  namespace: machinenativenops-registry
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    machinenativeops.io/tier: "registry"
+    machinenativeops.io/version: "v1.0.0"
+    machinenativeops.io/component: "urn-registry"
+  annotations:
+    machinenativeops.io/description: "Authoritative registry for all MachineNativeOps URNs"
+    machinenativeops.io/enforcement: "strict"
+    machinenativeops.io/last-modified: "2025-12-21T02:00:00Z"
+    machinenativeops.io/ssot: "true"
+
+spec:
+  version: 1
+  registry_type: "urns"
+  
+  # === 註冊表元數據 ===
+  registry_metadata:
+    total_urns: 21
+    last_updated: "2025-12-21T02:00:00Z"
+    schema_version: "1.0.0"
+    validation_status: "validated"
+  
+  # === URN 格式定義 ===
+  urn_format:
+    pattern: "^urn:machinenativeops:(module|service|config|policy|certificate|audit):[a-z0-9-]+(:v\\d+)?$"
+    components:
+      scheme: "urn"
+      namespace: "machinenativeops"
+      type: "module|service|config|policy|certificate|audit"
+      identifier: "[a-z0-9-]+"
+      version: "v\\d+ (optional)"
+  
+  # === 模組 URN 註冊 ===
+  module_urns:
+    - urn: "urn:machinenativeops:module:config-manager:v1"
+      type: "module"
+      identifier: "config-manager"
+      version: "v1"
+      target_registry: "root.registry.modules.yaml"
+      target_path: "spec.modules[id=config-manager]"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+      
+    - urn: "urn:machinenativeops:module:logging-service:v1"
+      type: "module"
+      identifier: "logging-service"
+      version: "v1"
+      target_registry: "root.registry.modules.yaml"
+      target_path: "spec.modules[id=logging-service]"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+      
+    - urn: "urn:machinenativeops:module:governance-engine:v1"
+      type: "module"
+      identifier: "governance-engine"
+      version: "v1"
+      target_registry: "root.registry.modules.yaml"
+      target_path: "spec.modules[id=governance-engine]"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+      
+    - urn: "urn:machinenativeops:module:trust-manager:v1"
+      type: "module"
+      identifier: "trust-manager"
+      version: "v1"
+      target_registry: "root.registry.modules.yaml"
+      target_path: "spec.modules[id=trust-manager]"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+      
+    - urn: "urn:machinenativeops:module:provenance-tracker:v1"
+      type: "module"
+      identifier: "provenance-tracker"
+      version: "v1"
+      target_registry: "root.registry.modules.yaml"
+      target_path: "spec.modules[id=provenance-tracker]"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+      
+    - urn: "urn:machinenativeops:module:integrity-validator:v1"
+      type: "module"
+      identifier: "integrity-validator"
+      version: "v1"
+      target_registry: "root.registry.modules.yaml"
+      target_path: "spec.modules[id=integrity-validator]"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+      
+    - urn: "urn:machinenativeops:module:super-execution-engine:v1"
+      type: "module"
+      identifier: "super-execution-engine"
+      version: "v1"
+      target_registry: "root.registry.modules.yaml"
+      target_path: "spec.modules[id=super-execution-engine]"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+      
+    - urn: "urn:machinenativeops:module:monitoring-service:v1"
+      type: "module"
+      identifier: "monitoring-service"
+      version: "v1"
+      target_registry: "root.registry.modules.yaml"
+      target_path: "spec.modules[id=monitoring-service]"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+  
+  # === 配置 URN 註冊 ===
+  config_urns:
+    - urn: "urn:machinenativeops:config:root-config:v1"
+      type: "config"
+      identifier: "root-config"
+      version: "v1"
+      target_registry: "root.config.yaml"
+      target_path: "metadata.name"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+      
+    - urn: "urn:machinenativeops:config:root-governance:v1"
+      type: "config"
+      identifier: "root-governance"
+      version: "v1"
+      target_registry: "root.governance.yaml"
+      target_path: "metadata.name"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+      
+    - urn: "urn:machinenativeops:config:root-modules:v1"
+      type: "config"
+      identifier: "root-modules"
+      version: "v1"
+      target_registry: "root.modules.yaml"
+      target_path: "metadata.name"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+      
+    - urn: "urn:machinenativeops:config:root-trust:v1"
+      type: "config"
+      identifier: "root-trust"
+      version: "v1"
+      target_registry: "root.trust.yaml"
+      target_path: "metadata.name"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+      
+    - urn: "urn:machinenativeops:config:root-provenance:v1"
+      type: "config"
+      identifier: "root-provenance"
+      version: "v1"
+      target_registry: "root.provenance.yaml"
+      target_path: "metadata.name"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+      
+    - urn: "urn:machinenativeops:config:root-integrity:v1"
+      type: "config"
+      identifier: "root-integrity"
+      version: "v1"
+      target_registry: "root.integrity.yaml"
+      target_path: "metadata.name"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+      
+    - urn: "urn:machinenativeops:config:root-bootstrap:v1"
+      type: "config"
+      identifier: "root-bootstrap"
+      version: "v1"
+      target_registry: "root.bootstrap.yaml"
+      target_path: "metadata.name"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+  
+  # === 策略 URN 註冊 ===
+  policy_urns:
+    - urn: "urn:machinenativeops:policy:rbac-policy:v1"
+      type: "policy"
+      identifier: "rbac-policy"
+      version: "v1"
+      target_registry: "root.governance.yaml"
+      target_path: "spec.rbac"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+      
+    - urn: "urn:machinenativeops:policy:audit-policy:v1"
+      type: "policy"
+      identifier: "audit-policy"
+      version: "v1"
+      target_registry: "root.governance.yaml"
+      target_path: "spec.audit"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+      
+    - urn: "urn:machinenativeops:policy:security-policy:v1"
+      type: "policy"
+      identifier: "security-policy"
+      version: "v1"
+      target_registry: "root.governance.yaml"
+      target_path: "spec.security"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+  
+  # === 證書 URN 註冊 ===
+  certificate_urns:
+    - urn: "urn:machinenativeops:certificate:root-ca:v1"
+      type: "certificate"
+      identifier: "root-ca"
+      version: "v1"
+      target_registry: "root.trust.yaml"
+      target_path: "spec.certificates.root_ca"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+      
+    - urn: "urn:machinenativeops:certificate:intermediate-ca:v1"
+      type: "certificate"
+      identifier: "intermediate-ca"
+      version: "v1"
+      target_registry: "root.trust.yaml"
+      target_path: "spec.certificates.intermediate_ca"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+  
+  # === 審計 URN 註冊 ===
+  audit_urns:
+    - urn: "urn:machinenativeops:audit:governance-audit:v1"
+      type: "audit"
+      identifier: "governance-audit"
+      version: "v1"
+      target_registry: "root.provenance.yaml"
+      target_path: "spec.audit_trails.governance"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+      
+    - urn: "urn:machinenativeops:audit:security-audit:v1"
+      type: "audit"
+      identifier: "security-audit"
+      version: "v1"
+      target_registry: "root.provenance.yaml"
+      target_path: "spec.audit_trails.security"
+      status: "active"
+      created: "2025-12-21T02:00:00Z"
+
+  # === URN 解析規則 ===
+  resolution_rules:
+    - type: "module"
+      lookup_order:
+        - "root.registry.modules.yaml"
+        - "root.modules.yaml"
+      cache_enabled: true
+      cache_ttl: "300s"
+      
+    - type: "config"
+      lookup_order:
+        - "root.*.yaml"
+      cache_enabled: true
+      cache_ttl: "600s"
+      
+    - type: "policy"
+      lookup_order:
+        - "root.governance.yaml"
+      cache_enabled: true
+      cache_ttl: "300s"
+      
+    - type: "certificate"
+      lookup_order:
+        - "root.trust.yaml"
+      cache_enabled: false
+      
+    - type: "audit"
+      lookup_order:
+        - "root.provenance.yaml"
+      cache_enabled: true
+      cache_ttl: "60s"
+
+  # === URN 驗證規則 ===
+  validation:
+    enabled: true
+    rules:
+      - "所有 URN 必須唯一"
+      - "所有 URN 必須符合格式規範"
+      - "所有 URN 的目標必須存在"
+      - "版本號必須有效"
+      - "類型必須匹配目標資源"
+    
+    checks:
+      uniqueness:
+        enabled: true
+        scope: "global"
+        
+      format:
+        enabled: true
+        pattern: "^urn:machinenativeops:(module|service|config|policy|certificate|audit):[a-z0-9-]+(:v\\d+)?$"
+        
+      target_existence:
+        enabled: true
+        verify_on_commit: true
+        
+      type_matching:
+        enabled: true
+        strict: true
+
+# === 狀態 ===
+status:
+  phase: "Active"
+  conditions:
+    - type: "Validated"
+      status: "True"
+      lastTransitionTime: "2025-12-21T02:00:00Z"
+      reason: "RegistryComplete"
+      message: "URN registry is complete and validated"
+  
+  statistics:
+    total_urns: 21
+    module_urns: 8
+    config_urns: 7
+    policy_urns: 3
+    certificate_urns: 2
+    audit_urns: 2
+    active_urns: 21
+    deprecated_urns: 0

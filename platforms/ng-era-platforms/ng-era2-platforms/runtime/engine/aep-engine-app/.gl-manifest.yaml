@@ -1,0 +1,123 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: .gl-manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# GL Semantic Manifest - AEP Engine App
+# @gl-layer ECO-70-PRESENTATION
+# @gl-semantic-anchor ECO-70-PRESENTATION-APP
+# GL Unified Architecture Governance Framework Activated
+
+gl_version: "1.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:aep-engine-app:.gl-manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/aep-engine-app/.gl-manifest.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+manifest:
+  subsystem: "aep-engine-app"
+  module: "machine-native-ops"
+  layer: "ECO-70-PRESENTATION"
+  semantic_anchor: "ECO-70-PRESENTATION-APP"
+  updated: "2026-01-26"
+
+description: |
+  AEP Engine Governance & Audit Mobile Application
+  React Native/Expo application for governance auditing and monitoring
+
+components:
+  app_layout:
+    file: "app/_layout.tsx"
+    type: "layout"
+    description: "Root application layout with navigation"
+    version: "1.0.0"
+
+  tabs_layout:
+    file: "app/(tabs)/_layout.tsx"
+    type: "layout"
+    description: "Tab navigation layout"
+    version: "1.0.0"
+
+  home_screen:
+    file: "app/(tabs)/index.tsx"
+    type: "screen"
+    description: "Dashboard home screen with statistics"
+    version: "1.0.0"
+
+  audit_screen:
+    file: "app/(tabs)/audit.tsx"
+    type: "screen"
+    description: "Audit execution and monitoring screen"
+    version: "1.0.0"
+
+  results_screen:
+    file: "app/(tabs)/results.tsx"
+    type: "screen"
+    description: "Detection results display screen"
+    version: "1.0.0"
+
+  report_screen:
+    file: "app/(tabs)/report.tsx"
+    type: "screen"
+    description: "Global governance reports screen"
+    version: "1.0.0"
+
+  settings_screen:
+    file: "app/(tabs)/settings.tsx"
+    type: "screen"
+    description: "Application settings screen"
+    version: "1.0.0"
+
+ui_components:
+  statistic_card:
+    file: "components/ui/statistic-card.tsx"
+    description: "Statistics display card component"
+
+  event_card:
+    file: "components/ui/event-card.tsx"
+    description: "Governance event display card"
+
+  problem_card:
+    file: "components/ui/problem-card.tsx"
+    description: "Issue/problem display card"
+
+  collapsible:
+    file: "components/ui/collapsible.tsx"
+    description: "Collapsible content component"
+
+hooks:
+  use_auth:
+    file: "hooks/use-auth.ts"
+    description: "Authentication hook"
+
+  use_color_scheme:
+    file: "hooks/use-color-scheme.ts"
+    description: "Color scheme detection hook"
+
+  use_colors:
+    file: "hooks/use-colors.ts"
+    description: "Theme colors hook"
+
+dependencies:
+  runtime:
+    - "expo"
+    - "react-native"
+    - "expo-router"
+    - "@react-navigation/native"
+  
+  integration:
+    - "../engine"
+    - "../etl-pipeline"
+    - "../elasticsearch-search-system"
+
+governance:
+  charter_activated: true
+  evidence_required: true
+  audit_compliant: true

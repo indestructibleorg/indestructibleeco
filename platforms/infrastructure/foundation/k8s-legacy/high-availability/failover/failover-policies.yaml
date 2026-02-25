@@ -1,0 +1,475 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: failover-policies
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+---
+# Failover Policies
+# Enterprise-grade automatic failover configuration
+
+---
+# Pod Disruption Budget for High Availability
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:high-availability:failover:failover-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/high-availability/failover/failover-policies.yaml"
+  name: machine-native-ops-ha-pdb
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/component: failover
+    type: pdb
+spec:
+  minAvailable: 66%  # Ensure 2/3 of pods remain available
+  maxUnavailable: 33%
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: machine-native-ops
+---
+# PriorityClass for Critical Workloads
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:high-availability:failover:failover-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/high-availability/failover/failover-policies.yaml"
+  name: critical-priority
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/component: failover
+    type: priority
+value: 1000000
+globalDefault: false
+description: "High priority class for critical workloads during failover"
+---
+# PriorityClass for High Priority Workloads
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:high-availability:failover:failover-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/high-availability/failover/failover-policies.yaml"
+  name: high-priority
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/component: failover
+    type: priority
+value: 500000
+globalDefault: false
+description: "High priority class for important workloads"
+---
+# PriorityClass for Normal Workloads
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:high-availability:failover:failover-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/high-availability/failover/failover-policies.yaml"
+  name: normal-priority
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/component: failover
+    type: priority
+value: 0
+globalDefault: true
+description: "Normal priority class for standard workloads"
+---
+# HorizontalPodAutoscaler for Main Application
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:high-availability:failover:failover-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/high-availability/failover/failover-policies.yaml"
+  name: machine-native-ops-hpa
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: machine-native-ops
+    app.kubernetes.io/component: scaling
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: machine-native-ops
+  minReplicas: 9  # Minimum 3 per zone
+  maxReplicas: 30  # Maximum 10 per zone
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Pods
+    pods:
+      metric:
+        name: http_requests_per_second
+      target:
+        type: AverageValue
+        averageValue: 1000
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+      - type: Pods
+        value: 4
+        periodSeconds: 15
+      selectPolicy: Max
+---
+# HorizontalPodAutoscaler for API Service
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:high-availability:failover:failover-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/high-availability/failover/failover-policies.yaml"
+  name: machine-native-ops-api-hpa
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: machine-native-ops-api
+    app.kubernetes.io/component: scaling
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: machine-native-ops-api
+  minReplicas: 6  # Minimum 2 per zone
+  maxReplicas: 18  # Maximum 6 per zone
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 60
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 70
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 600
+      policies:
+      - type: Percent
+        value: 30
+        periodSeconds: 90
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 30
+---
+# VerticalPodAutoscaler for Automatic Resource Adjustment
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:high-availability:failover:failover-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/high-availability/failover/failover-policies.yaml"
+  name: machine-native-ops-vpa
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: machine-native-ops
+    app.kubernetes.io/component: scaling
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: machine-native-ops
+  updatePolicy:
+    updateMode: "Auto"
+    minReplicas: 9
+  resourcePolicy:
+    containerPolicies:
+    - containerName: machine-native-ops
+      mode: Auto
+      minAllowed:
+        cpu: 500m
+        memory: 512Mi
+      maxAllowed:
+        cpu: 4000m
+        memory: 4Gi
+      controlledResources: ["cpu", "memory"]
+    - containerName: istio-proxy
+      mode: Auto
+      minAllowed:
+        cpu: 100m
+        memory: 128Mi
+      maxAllowed:
+        cpu: 500m
+        memory: 512Mi
+      controlledResources: ["cpu", "memory"]
+---
+# Zone Failure Detection ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:high-availability:failover:failover-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/high-availability/failover/failover-policies.yaml"
+  name: zone-failure-config
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/component: failover
+    type: config
+data:
+  config.yaml: |
+    zones:
+      us-east-1a:
+        enabled: true
+        health_check_interval: 30s
+        failure_threshold: 3
+        recovery_threshold: 2
+        nodes_expected: 5
+        pods_expected: 3
+      us-east-1b:
+        enabled: true
+        health_check_interval: 30s
+        failure_threshold: 3
+        recovery_threshold: 2
+        nodes_expected: 5
+        pods_expected: 3
+      us-east-1c:
+        enabled: true
+        health_check_interval: 30s
+        failure_threshold: 3
+        recovery_threshold: 2
+        nodes_expected: 5
+        pods_expected: 3
+    failover:
+      mode: automatic
+      cooldown_period: 300s
+      max_failover_attempts: 3
+      notification_enabled: true
+      notification_channels:
+      - slack
+      - email
+      - pagerduty
+    recovery:
+      mode: automatic
+      cooldown_period: 600s
+      health_check_enabled: true
+---
+# Zone Failover Controller Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:high-availability:failover:failover-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/high-availability/failover/failover-policies.yaml"
+  name: zone-failover-controller
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: zone-failover-controller
+    app.kubernetes.io/component: failover
+    type: controller
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zone-failover-controller
+  template:
+    metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:high-availability:failover:failover-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/high-availability/failover/failover-policies.yaml"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        app.kubernetes.io/name: zone-failover-controller
+        app.kubernetes.io/component: failover
+        type: controller
+        version: v1.0.0
+    spec:
+      serviceAccountName: zone-failover-controller
+      priorityClassName: critical-priority
+      containers:
+      - name: controller
+        image: machinenativeops/zone-failover-controller:v1.0.0
+        imagePullPolicy: IfNotPresent
+        command:
+        - /bin/sh
+        - -c
+        - |
+          # Zone failover controller logic
+          while true; do
+            # Check zone health
+            for zone in us-east-1a us-east-1b us-east-1c; do
+              NODE_COUNT=$(kubectl get nodes -l topology.kubernetes.io/zone=$zone --no-headers 2>/dev/null | wc -l)
+              POD_COUNT=$(kubectl get pods -n machine-native-ops -l topology.kubernetes.io/zone=$zone --no-headers 2>/dev/null | grep Running | wc -l)
+              
+              echo "Zone $zone: Nodes=$NODE_COUNT, Pods=$POD_COUNT"
+              
+              # Check if zone is healthy
+              if [ "$NODE_COUNT" -lt 3 ] || [ "$POD_COUNT" -lt 2 ]; then
+                echo "WARNING: Zone $zone may be unhealthy"
+                # Trigger failover logic
+                # Send notification
+                # Update routing
+              fi
+            done
+            sleep 30
+          done
+        env:
+        - name: NAMESPACE
+          value: "machine-native-ops"
+        - name: CHECK_INTERVAL
+          value: "30"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "pgrep -f 'zone-failover' || exit 1"
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        volumeMounts:
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        - name: logs
+          mountPath: /var/log/failover
+      volumes:
+      - name: config
+        configMap:
+          name: zone-failure-config
+      - name: logs
+        emptyDir: {}
+---
+# Zone Failover Controller ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:high-availability:failover:failover-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/high-availability/failover/failover-policies.yaml"
+  name: zone-failover-controller
+  namespace: platform-03
+---
+# Zone Failover Controller Role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:high-availability:failover:failover-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/high-availability/failover/failover-policies.yaml"
+  name: zone-failover-controller
+  namespace: platform-03
+rules:
+- apiGroups: [""]
+  resources: ["pods", "nodes"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "statefulsets"]
+  verbs: ["get", "list", "watch", "update"]
+- apiGroups: ["networking.istio.io"]
+  resources: ["virtualservices", "destinationrules"]
+  verbs: ["get", "list", "watch", "update", "patch"]
+- apiGroups: [""]
+  resources: ["configmaps", "events"]
+  verbs: ["get", "list", "watch", "create", "update"]
+---
+# Zone Failover Controller RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:high-availability:failover:failover-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/high-availability/failover/failover-policies.yaml"
+  name: zone-failover-controller
+  namespace: platform-03
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: zone-failover-controller
+subjects:
+- kind: ServiceAccount
+  name: zone-failover-controller
+  namespace: platform-03
+---
+# Circuit Breaker Configuration for Failover
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:high-availability:failover:failover-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/high-availability/failover/failover-policies.yaml"
+  name: circuit-breaker-failover
+  namespace: platform-03
+spec:
+  host: machine-native-ops
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+      localityLbSetting:
+        enabled: true
+        failover:
+        - from: us-east-1a/us-east-1a/*
+          to: us-east-1b/us-east-1b/*
+        - from: us-east-1b/us-east-1b/*
+          to: us-east-1c/us-east-1c/*
+        - from: us-east-1c/us-east-1c/*
+          to: us-east-1a/us-east-1a/*
+    outlierDetection:
+      consecutive5xxErrors: 5  # Eject after 5 consecutive errors
+      interval: 30s
+      baseEjectionTime: 300s  # 5 minutes ejection
+      maxEjectionPercent: 100  # Allow full zone ejection
+      minHealthPercent: 0  # Allow complete failover
+    connectionPool:
+      tcp:
+        maxConnections: 100
+        connectTimeout: 10s
+      http:
+        http1MaxPendingRequests: 50
+        maxRequestsPerConnection: 3
+        idleTimeout: 300s
+        retryOn: 5xx,connect-failure,refused-stream

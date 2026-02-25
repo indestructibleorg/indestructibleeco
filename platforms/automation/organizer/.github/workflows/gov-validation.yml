@@ -1,0 +1,57 @@
+# @GL-governed
+# @GL-layer: GL90-99
+# @GL-semantic: governed-configuration
+# @GL-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+name: File Organizer GL Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'file-organizer-system/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'file-organizer-system/**'
+  workflow_dispatch:
+
+jobs:
+  gl-governance-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./file-organizer-system
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+metadata:
+  name: ""
+  description: ""
+  labels: {}
+
+      
+      - name: Install GL Engine Dependencies
+        run: |
+          cd ../engine
+          npm ci
+          
+      - name: Run GL Semantic Validation
+        run: |
+          npx ts-node ../engine/governance/gl_engine.ts validate --strict
+          
+      - name: Generate Governance Event Stream
+        if: failure()
+        run: |
+          npx ts-node ../engine/governance/events_writer.ts --event-type=validation_failure
+          
+      - name: Block on GL Violations
+        run: |
+          echo "GL Unified Charter Activated - Validation Failed"
+          exit 1
+        if: failure()

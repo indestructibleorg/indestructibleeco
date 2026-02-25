@@ -1,0 +1,163 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: policy.machinenativeops.io/v1
+kind: SecurityPolicies
+metadata:
+  name: gl-quantum-security-policies
+  namespace: infrastructure
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-policies
+spec:
+  enabled: true
+  enforcementMode: enforce
+  
+  policies:
+    - name: deny-privileged-containers
+      severity: critical
+      resources:
+        - Pod
+        - Deployment
+        - StatefulSet
+        - DaemonSet
+      rules:
+        - type: validate
+          message: "Privileged containers are not allowed"
+          pattern:
+            spec:
+              containers:
+                - securityContext:
+                    privileged: false
+                    
+    - name: require-read-only-root-filesystem
+      severity: high
+      resources:
+        - Pod
+        - Deployment
+        - StatefulSet
+        - DaemonSet
+      rules:
+        - type: validate
+          message: "Containers must have read-only root filesystem"
+          pattern:
+            spec:
+              containers:
+                - securityContext:
+                    readOnlyRootFilesystem: true
+                    
+    - name: require-non-root-user
+      severity: high
+      resources:
+        - Pod
+        - Deployment
+        - StatefulSet
+        - DaemonSet
+      rules:
+        - type: validate
+          message: "Containers must run as non-root user"
+          pattern:
+            spec:
+              containers:
+                - securityContext:
+                    runAsNonRoot: true
+                    
+    - name: limit-container-capabilities
+      severity: high
+      resources:
+        - Pod
+        - Deployment
+        - StatefulSet
+        - DaemonSet
+      rules:
+        - type: validate
+          message: "Containers must drop all capabilities"
+          pattern:
+            spec:
+              containers:
+                - securityContext:
+                    capabilities:
+                      drop:
+                        - ALL
+                        
+    - name: enforce-resource-limits
+      severity: medium
+      resources:
+        - Pod
+        - Deployment
+        - StatefulSet
+        - DaemonSet
+      rules:
+        - type: validate
+          message: "Containers must have resource limits"
+          pattern:
+            spec:
+              containers:
+                - resources:
+                    limits:
+                      memory: ".*"
+                      cpu: ".*"
+                    requests:
+                      memory: ".*"
+                      cpu: ".*"
+                      
+    - name: restrict-seccomp-profile
+      severity: high
+      resources:
+        - Pod
+        - Deployment
+        - StatefulSet
+        - DaemonSet
+      rules:
+        - type: validate
+          message: "Containers must use runtime/default seccomp profile"
+          pattern:
+            spec:
+              securityContext:
+                seccompProfile:
+                  type: RuntimeDefault
+                  
+    - name: enforce-network-policies
+      severity: medium
+      resources:
+        - Namespace
+      rules:
+        - type: validate
+          message: "Namespaces must have network policies"
+          pattern:
+            metadata:
+              labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+                pod-security.kubernetes.io/enforce: restricted
+              annotations:
+                kubernetes.io/metadata.name: ".*"
+                
+  exceptions:
+    - name: system-namespace-exception
+      namespaces:
+        - kube-system
+        - kube-public
+        - kube-node-lease
+      reason: "System namespaces require privileged access"
+      expires: "2025-12-31"
+      
+  reporting:
+    enabled: true
+    violations:
+      severity: warning
+      notify: true
+      
+    compliance:
+      target: 95%
+      window: 24h

@@ -23,61 +23,54 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           RUN_ID: ${{ github.event.workflow_run.id }}
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
         run: |
-          PR_NUMBER="${{ github.event.workflow_run.pull_requests[0].number }}"
-          if [ -z "$PR_NUMBER" ] || [ "$PR_NUMBER" = "null" ]; then
-            PR_NUMBER="N/A"
-          fi
-
-          FAILED_JOBS=$(gh api "/repos/$REPO/actions/runs/$RUN_ID/jobs" --jq '.jobs[] | select(.conclusion=="failure") | {name: .name, id: .id}' 2>/dev/null || echo "")
-
+          FAILED_JOBS=$(gh api /repos/$REPO/actions/runs/$RUN_ID/jobs --jq '.jobs[] | select(.conclusion=="failure") | {name: .name, id: .id}')
+          
           if [ -z "$FAILED_JOBS" ]; then
-            echo "No failed jobs found in metadata"
+            echo "No failed jobs found in metadata, checking steps..."
             exit 0
           fi
 
           echo "$FAILED_JOBS" | jq -c '.' | while read -r job; do
             JOB_NAME=$(echo "$job" | jq -r '.name')
             JOB_ID=$(echo "$job" | jq -r '.id')
-
-            LOGS=$(gh api "/repos/$REPO/actions/jobs/$JOB_ID/logs" 2>/dev/null | tail -n 50 || echo "Logs unavailable")
-
-            ISSUE_TITLE="CI Gate [$JOB_NAME] Failed"
-
-            # 48h dedup: check open AND recently closed issues
-            DEDUP_CUTOFF=$(date -u -d '48 hours ago' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v-48H +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo "2020-01-01T00:00:00Z")
-
-            EXISTING_OPEN=$(gh issue list --repo "$REPO" --search "\"$ISSUE_TITLE\" in:title" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
-            EXISTING_CLOSED=$(gh issue list --repo "$REPO" --search "\"$ISSUE_TITLE\" in:title" --state closed --json number,closedAt --jq ".[] | select(.closedAt > \"$DEDUP_CUTOFF\") | .number" 2>/dev/null | head -1 || echo "")
-
-            if [ -n "$EXISTING_OPEN" ]; then
-              echo "Issue already open for '$ISSUE_TITLE': #$EXISTING_OPEN"
-              gh issue comment "$EXISTING_OPEN" --repo "$REPO" --body "Recurring failure detected in run [$RUN_ID](https://github.com/$REPO/actions/runs/$RUN_ID)." 2>/dev/null || true
+            
+            LOGS=$(gh api /repos/$REPO/actions/jobs/$JOB_ID/logs | tail -n 100)
+            LOG_HASH=$(echo "$LOGS" | sha256sum | cut -d' ' -f1)
+            
+            ISSUE_TITLE="CI Gate [$JOB_NAME] Failed in PR #$PR_NUMBER"
+            
+            EXISTING_ISSUE=$(gh issue list --repo $REPO --search "$LOG_HASH" --state open --json number --jq '.[0].number')
+            
+            if [ -n "$EXISTING_ISSUE" ]; then
+              echo "Issue already exists for this failure: #$EXISTING_ISSUE"
+              gh issue comment $EXISTING_ISSUE --repo $REPO --body "Detected recurring failure in PR #$PR_NUMBER. Logs hash: $LOG_HASH"
               continue
             fi
 
-            if [ -n "$EXISTING_CLOSED" ]; then
-              echo "Issue recently closed within 48h for '$ISSUE_TITLE': #$EXISTING_CLOSED — skipping"
-              continue
-            fi
+            ISSUE_BODY=$(cat <<EOT
+    ## CI Failure Detected
+    - **Gate**: $JOB_NAME
+    - **PR**: #$PR_NUMBER
+    - **Run**: [View Workflow Run](https://github.com/$REPO/actions/runs/$RUN_ID)
+    - **Logs Hash**: $LOG_HASH
 
-            BODY="## CI Failure Detected
-          - **Gate**: $JOB_NAME
-          - **PR**: #$PR_NUMBER
-          - **Run**: [View Workflow Run](https://github.com/$REPO/actions/runs/$RUN_ID)
+    ### Failed Logs (Tail)
+    \`\`\`
+    $LOGS
+    \`\`\`
 
-          ### Failed Logs (Tail)
-          \`\`\`
-          $LOGS
-          \`\`\`
-
-          ### Automation Context
-          - **Status**: Awaiting Auto-Repair
-          - **Policy**: ci-issue-governance.rego
-          - **Timestamp**: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-
-            gh issue create --repo "$REPO" \
+    ### Automation Context
+    - **Status**: Awaiting Auto-Repair
+    - **Policy**: ci-issue-governance.rego
+    - **Timestamp**: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+EOT
+    )
+            
+            gh issue create --repo $REPO \
               --title "$ISSUE_TITLE" \
-              --body "$BODY" \
-              --label "ci-failure,auto-repair" 2>/dev/null || echo "Failed to create issue for $JOB_NAME"
+              --body "$ISSUE_BODY" \
+              --label "ci-failure,gate-$JOB_NAME,auto-repair" \
+              --assignee "AutoEcoOps-Bot"
           done

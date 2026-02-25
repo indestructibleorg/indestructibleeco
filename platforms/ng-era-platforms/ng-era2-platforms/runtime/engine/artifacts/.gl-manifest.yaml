@@ -1,0 +1,73 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: .gl-manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# GL Semantic Manifest - Artifacts Subsystem
+# @gl-layer ECO-30-EXECUTION
+# @gl-semantic-anchor ECO-30-EXEC-ARTIFACTS
+# GL Unified Architecture Governance Framework Activated
+
+gl_version: "1.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:artifacts:.gl-manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/artifacts/.gl-manifest.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+manifest:
+  subsystem: "artifacts"
+  module: "aep-engine"
+  layer: "ECO-30-EXECUTION"
+  semantic_anchor: "ECO-30-EXEC-ARTIFACTS"
+  updated: "2026-01-26"
+
+components:
+  artifact_manager:
+    file: "artifact_manager.ts"
+    class: "ArtifactManager"
+    description: "Artifact lifecycle management"
+    version: "1.0.0"
+    exports:
+      - "ArtifactManager"
+    dependencies:
+      - "fs"
+      - "path"
+      - "../interfaces.d"
+
+  evidence_chain:
+    file: "evidence_chain.ts"
+    class: "EvidenceChain"
+    description: "Evidence chain generation and management"
+    version: "1.0.0"
+    exports:
+      - "EvidenceChain"
+    dependencies:
+      - "fs"
+      - "path"
+      - "crypto"
+      - "../interfaces.d"
+
+  manifest_generator:
+    file: "manifest_generator.ts"
+    class: "ManifestGenerator"
+    description: "Deployment manifest generation"
+    version: "1.0.0"
+    exports:
+      - "ManifestGenerator"
+    dependencies:
+      - "fs"
+      - "path"
+      - "crypto"
+      - "../interfaces.d"
+
+governance:
+  charter_activated: true
+  evidence_required: true
+  audit_compliant: true

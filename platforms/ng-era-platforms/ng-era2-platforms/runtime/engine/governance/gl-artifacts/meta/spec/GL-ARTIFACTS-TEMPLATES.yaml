@@ -1,0 +1,1369 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: ECO-ARTIFACTS-TEMPLATES
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# =============================================================================
+# GL (Governance Layers) Artifacts 標準模板
+# MachineNativeOps Governance Artifacts Templates
+# Version: 2.0.0
+# =============================================================================
+apiVersion: governance.machinenativeops.io/v2
+kind: GovernanceArtifactsTemplates
+metadata:
+  name: gl-artifacts-templates
+  version: "2.0.0"
+  created_at: "{{CREATED_AT_YEAR}}-01-18T00:00:00Z"
+  owner: governance-team
+  description: |
+    定義GL00-99各層級Artifacts的標準模板，確保治理文件的一致性與可組合性
+# =============================================================================
+# 通用Artifact基礎模板
+# =============================================================================
+base_template:
+  required_fields:
+    - field: "apiVersion"
+      type: "string"
+      description: "API版本"
+      pattern: "^governance\\.machinenativeops\\.io/v[0-9]+$"
+      example: "governance.machinenativeops.io/v2"
+    - field: "kind"
+      type: "string"
+      description: "Artifact類型"
+      pattern: "^[A-Z][a-zA-Z]+$"
+      example: "GovernanceCharter"
+    - field: "metadata"
+      type: "object"
+      description: "元數據"
+      required_subfields:
+        - "name"
+        - "version"
+        - "created_at"
+        - "owner"
+        - "layer"
+    - field: "spec"
+      type: "object"
+      description: "規格定義"
+  optional_fields:
+    - field: "status"
+      type: "object"
+      description: "狀態信息"
+    - field: "annotations"
+      type: "object"
+      description: "註解"
+    - field: "labels"
+      type: "object"
+      description: "標籤"
+# =============================================================================
+# GL00-09: Strategic Layer Artifacts Templates
+# =============================================================================
+GL00-09_templates:
+  # 願景聲明模板
+  vision_statement:
+    kind: "VisionStatement"
+    description: "組織願景聲明"
+    description_zh: "願景聲明"
+    layer: "GL00-09"
+    template: |
+      apiVersion: governance.machinenativeops.io/v2
+      kind: VisionStatement
+      metadata:
+        name: {{ name }}
+        version: "{{ version }}"
+        created_at: "{{ created_at }}"
+        updated_at: "{{ updated_at }}"
+        owner: {{ owner }}
+        layer: "GL00-09"
+        tags:
+          - strategic
+          - vision
+      spec:
+        vision:
+          statement: "{{ vision_statement }}"
+          horizon: "{{ vision_horizon }}"  # e.g., "5 years", "10 years"
+        mission:
+          statement: "{{ mission_statement }}"
+          purpose: "{{ mission_purpose }}"
+        values:
+          {{#each values}}
+          - name: "{{ this.name }}"
+            description: "{{ this.description }}"
+            behaviors:
+              {{#each this.behaviors}}
+              - "{{ this }}"
+              {{/each}}
+          {{/each}}
+        strategic_pillars:
+          {{#each strategic_pillars}}
+          - pillar: "{{ this.name }}"
+            description: "{{ this.description }}"
+            objectives:
+              {{#each this.objectives}}
+              - "{{ this }}"
+              {{/each}}
+          {{/each}}
+      status:
+        phase: "{{ status_phase }}"  # draft, review, approved, active
+        approved_by: "{{ approved_by }}"
+        approved_at: "{{ approved_at }}"
+        next_review: "{{ next_review_date }}"
+    validation_rules:
+      - rule: "vision.statement must not be empty"
+        severity: "error"
+      - rule: "mission.statement must not be empty"
+        severity: "error"
+      - rule: "values must have at least 3 items"
+        severity: "warning"
+      - rule: "strategic_pillars must have at least 2 items"
+        severity: "warning"
+  # 戰略目標（OKR）模板
+  strategic_objectives:
+    kind: "StrategicObjectives"
+    description: "戰略目標與關鍵結果"
+    description_zh: "戰略目標（OKR）"
+    layer: "GL00-09"
+    template: |
+      apiVersion: governance.machinenativeops.io/v2
+      kind: StrategicObjectives
+      metadata:
+        name: {{ name }}
+        version: "{{ version }}"
+        created_at: "{{ created_at }}"
+        owner: {{ owner }}
+        layer: "GL00-09"
+        fiscal_year: "{{ fiscal_year }}"
+        quarter: "{{ quarter }}"  # optional, for quarterly OKRs
+      spec:
+        objectives:
+          {{#each objectives}}
+          - id: "{{ this.id }}"
+            title: "{{ this.title }}"
+            description: "{{ this.description }}"
+            owner: "{{ this.owner }}"
+            priority: {{ this.priority }}  # 1-5, 1 being highest
+            alignment:
+              vision_pillar: "{{ this.alignment.vision_pillar }}"
+              parent_objective: "{{ this.alignment.parent_objective }}"
+            key_results:
+              {{#each this.key_results}}
+              - id: "{{ this.id }}"
+                description: "{{ this.description }}"
+                metric: "{{ this.metric }}"
+                baseline: {{ this.baseline }}
+                target: {{ this.target }}
+                current: {{ this.current }}
+                unit: "{{ this.unit }}"
+                tracking_frequency: "{{ this.tracking_frequency }}"
+              {{/each}}
+            timeline:
+              start_date: "{{ this.timeline.start_date }}"
+              end_date: "{{ this.timeline.end_date }}"
+              milestones:
+                {{#each this.timeline.milestones}}
+                - date: "{{ this.date }}"
+                  description: "{{ this.description }}"
+                {{/each}}
+          {{/each}}
+        dependencies:
+          {{#each dependencies}}
+          - from_objective: "{{ this.from }}"
+            to_objective: "{{ this.to }}"
+            type: "{{ this.type }}"  # blocks, enables, supports
+          {{/each}}
+        resources:
+          budget: {{ budget }}
+          headcount: {{ headcount }}
+          tools:
+            {{#each tools}}
+            - "{{ this }}"
+            {{/each}}
+      status:
+        overall_progress: {{ overall_progress }}
+        health: "{{ health }}"  # on_track, at_risk, off_track
+        last_updated: "{{ last_updated }}"
+    validation_rules:
+      - rule: "objectives must have at least 1 item"
+        severity: "error"
+      - rule: "each objective must have at least 2 key_results"
+        severity: "warning"
+      - rule: "key_result.target must be greater than key_result.baseline"
+        severity: "error"
+  # 治理框架模板
+  governance_charter:
+    kind: "GovernanceCharter"
+    description: "治理框架"
+    description_zh: "治理框架"
+    layer: "GL00-09"
+    template: |
+      apiVersion: governance.machinenativeops.io/v2
+      kind: GovernanceCharter
+      metadata:
+        name: {{ name }}
+        version: "{{ version }}"
+        created_at: "{{ created_at }}"
+        owner: {{ owner }}
+        layer: "GL00-09"
+        effective_date: "{{ effective_date }}"
+      spec:
+        preamble:
+          purpose: "{{ preamble_purpose }}"
+          scope: "{{ preamble_scope }}"
+          authority: "{{ preamble_authority }}"
+        governance_structure:
+          board_of_directors:
+            composition: "{{ board_composition }}"
+            responsibilities:
+              {{#each board_responsibilities}}
+              - "{{ this }}"
+              {{/each}}
+            meeting_frequency: "{{ board_meeting_frequency }}"
+          committees:
+            {{#each committees}}
+            - name: "{{ this.name }}"
+              chair: "{{ this.chair }}"
+              members: {{ this.member_count }}
+              responsibilities:
+                {{#each this.responsibilities}}
+                - "{{ this }}"
+                {{/each}}
+              meeting_frequency: "{{ this.meeting_frequency }}"
+            {{/each}}
+          executive_team:
+            {{#each executives}}
+            - role: "{{ this.role }}"
+              responsibilities:
+                {{#each this.responsibilities}}
+                - "{{ this }}"
+                {{/each}}
+            {{/each}}
+        decision_framework:
+          decision_types:
+            {{#each decision_types}}
+            - type: "{{ this.type }}"
+              authority: "{{ this.authority }}"
+              approval_process: "{{ this.approval_process }}"
+              escalation_path: "{{ this.escalation_path }}"
+            {{/each}}
+          voting_rules:
+            quorum: "{{ quorum }}"
+            majority_type: "{{ majority_type }}"
+            tie_breaker: "{{ tie_breaker }}"
+        accountability:
+          reporting_requirements:
+            {{#each reporting_requirements}}
+            - report: "{{ this.report }}"
+              frequency: "{{ this.frequency }}"
+              audience: "{{ this.audience }}"
+            {{/each}}
+          audit_requirements:
+            internal_audit: "{{ internal_audit_frequency }}"
+            external_audit: "{{ external_audit_frequency }}"
+        amendments:
+          process: "{{ amendment_process }}"
+          approval_threshold: "{{ amendment_approval_threshold }}"
+      status:
+        phase: "{{ status_phase }}"
+        ratified_by: "{{ ratified_by }}"
+        ratified_at: "{{ ratified_at }}"
+  # 風險登錄表模板
+  risk_register:
+    kind: "RiskRegister"
+    description: "風險登錄表"
+    description_zh: "風險登錄表"
+    layer: "GL00-09"
+    template: |
+      apiVersion: governance.machinenativeops.io/v2
+      kind: RiskRegister
+      metadata:
+        name: {{ name }}
+        version: "{{ version }}"
+        created_at: "{{ created_at }}"
+        owner: {{ owner }}
+        layer: "GL00-09"
+      spec:
+        risk_appetite:
+          overall_appetite: "{{ overall_appetite }}"  # conservative, moderate, aggressive
+          category_appetites:
+            {{#each category_appetites}}
+            - category: "{{ this.category }}"
+              appetite: "{{ this.appetite }}"
+              threshold: {{ this.threshold }}
+            {{/each}}
+        risks:
+          {{#each risks}}
+          - id: "{{ this.id }}"
+            title: "{{ this.title }}"
+            description: "{{ this.description }}"
+            category: "{{ this.category }}"
+            owner: "{{ this.owner }}"
+            assessment:
+              likelihood: {{ this.likelihood }}  # 1-5
+              impact: {{ this.impact }}  # 1-5
+              risk_score: {{ this.risk_score }}  # likelihood * impact
+              risk_level: "{{ this.risk_level }}"  # low, medium, high, critical
+            treatment:
+              strategy: "{{ this.treatment.strategy }}"  # accept, mitigate, transfer, avoid
+              controls:
+                {{#each this.treatment.controls}}
+                - "{{ this }}"
+                {{/each}}
+              residual_risk: {{ this.treatment.residual_risk }}
+            monitoring:
+              indicators:
+                {{#each this.monitoring.indicators}}
+                - "{{ this }}"
+                {{/each}}
+              review_frequency: "{{ this.monitoring.review_frequency }}"
+              last_review: "{{ this.monitoring.last_review }}"
+            status: "{{ this.status }}"  # identified, assessed, treated, monitoring, closed
+          {{/each}}
+        risk_matrix:
+          dimensions:
+            likelihood:
+              - level: 1
+                label: "Rare"
+              - level: 2
+                label: "Unlikely"
+              - level: 3
+                label: "Possible"
+              - level: 4
+                label: "Likely"
+              - level: 5
+                label: "Almost Certain"
+            impact:
+              - level: 1
+                label: "Insignificant"
+              - level: 2
+                label: "Minor"
+              - level: 3
+                label: "Moderate"
+              - level: 4
+                label: "Major"
+              - level: 5
+                label: "Catastrophic"
+      status:
+        total_risks: {{ total_risks }}
+        critical_risks: {{ critical_risks }}
+        high_risks: {{ high_risks }}
+        last_updated: "{{ last_updated }}"
+# =============================================================================
+# GL10-29: Operational Layer Artifacts Templates
+# =============================================================================
+GL10-29_templates:
+  # 運營計畫模板
+  operational_plan:
+    kind: "OperationalPlan"
+    description: "運營計畫"
+    description_zh: "運營計畫"
+    layer: "GL10-29"
+    template: |
+      apiVersion: governance.machinenativeops.io/v2
+      kind: OperationalPlan
+      metadata:
+        name: {{ name }}
+        version: "{{ version }}"
+        created_at: "{{ created_at }}"
+        owner: {{ owner }}
+        layer: "GL10-29"
+        period: "{{ period }}"  # e.g., "2025-Q1", "2025"
+      spec:
+        alignment:
+          strategic_objectives:
+            {{#each strategic_objectives}}
+            - objective_id: "{{ this.id }}"
+              contribution: "{{ this.contribution }}"
+            {{/each}}
+        initiatives:
+          {{#each initiatives}}
+          - id: "{{ this.id }}"
+            name: "{{ this.name }}"
+            description: "{{ this.description }}"
+            owner: "{{ this.owner }}"
+            department: "{{ this.department }}"
+            priority: {{ this.priority }}
+            deliverables:
+              {{#each this.deliverables}}
+              - name: "{{ this.name }}"
+                due_date: "{{ this.due_date }}"
+                acceptance_criteria: "{{ this.acceptance_criteria }}"
+              {{/each}}
+            resources:
+              budget: {{ this.resources.budget }}
+              headcount: {{ this.resources.headcount }}
+              tools:
+                {{#each this.resources.tools}}
+                - "{{ this }}"
+                {{/each}}
+            timeline:
+              start_date: "{{ this.timeline.start_date }}"
+              end_date: "{{ this.timeline.end_date }}"
+              phases:
+                {{#each this.timeline.phases}}
+                - name: "{{ this.name }}"
+                  start: "{{ this.start }}"
+                  end: "{{ this.end }}"
+                {{/each}}
+            kpis:
+              {{#each this.kpis}}
+              - metric: "{{ this.metric }}"
+                target: {{ this.target }}
+                current: {{ this.current }}
+              {{/each}}
+            risks:
+              {{#each this.risks}}
+              - risk: "{{ this.risk }}"
+                mitigation: "{{ this.mitigation }}"
+              {{/each}}
+            dependencies:
+              {{#each this.dependencies}}
+              - initiative_id: "{{ this.id }}"
+                type: "{{ this.type }}"
+              {{/each}}
+          {{/each}}
+        resource_allocation:
+          total_budget: {{ total_budget }}
+          by_department:
+            {{#each department_budgets}}
+            - department: "{{ this.department }}"
+              budget: {{ this.budget }}
+              headcount: {{ this.headcount }}
+            {{/each}}
+        governance:
+          review_cadence: "{{ review_cadence }}"
+          escalation_criteria:
+            {{#each escalation_criteria}}
+            - condition: "{{ this.condition }}"
+              action: "{{ this.action }}"
+            {{/each}}
+      status:
+        phase: "{{ status_phase }}"
+        overall_progress: {{ overall_progress }}
+        budget_utilization: {{ budget_utilization }}
+  # 標準作業流程模板
+  sop:
+    kind: "StandardOperatingProcedure"
+    description: "標準作業流程"
+    description_zh: "標準作業流程（SOP）"
+    layer: "GL10-29"
+    template: |
+      apiVersion: governance.machinenativeops.io/v2
+      kind: StandardOperatingProcedure
+      metadata:
+        name: {{ name }}
+        version: "{{ version }}"
+        created_at: "{{ created_at }}"
+        owner: {{ owner }}
+        layer: "GL10-29"
+        category: "{{ category }}"
+        effective_date: "{{ effective_date }}"
+      spec:
+        overview:
+          purpose: "{{ purpose }}"
+          scope: "{{ scope }}"
+          applicability: "{{ applicability }}"
+        definitions:
+          {{#each definitions}}
+          - term: "{{ this.term }}"
+            definition: "{{ this.definition }}"
+          {{/each}}
+        roles_responsibilities:
+          {{#each roles}}
+          - role: "{{ this.role }}"
+            responsibilities:
+              {{#each this.responsibilities}}
+              - "{{ this }}"
+              {{/each}}
+          {{/each}}
+        procedure:
+          prerequisites:
+            {{#each prerequisites}}
+            - "{{ this }}"
+            {{/each}}
+          steps:
+            {{#each steps}}
+            - step_number: {{ this.number }}
+              action: "{{ this.action }}"
+              responsible: "{{ this.responsible }}"
+              details: "{{ this.details }}"
+              expected_outcome: "{{ this.expected_outcome }}"
+              time_estimate: "{{ this.time_estimate }}"
+              {{#if this.decision_point}}
+              decision_point:
+                question: "{{ this.decision_point.question }}"
+                options:
+                  {{#each this.decision_point.options}}
+                  - option: "{{ this.option }}"
+                    next_step: {{ this.next_step }}
+                  {{/each}}
+              {{/if}}
+            {{/each}}
+          exception_handling:
+            {{#each exceptions}}
+            - exception: "{{ this.exception }}"
+              handling: "{{ this.handling }}"
+              escalation: "{{ this.escalation }}"
+            {{/each}}
+        quality_control:
+          checkpoints:
+            {{#each checkpoints}}
+            - checkpoint: "{{ this.checkpoint }}"
+              criteria: "{{ this.criteria }}"
+              verification_method: "{{ this.verification_method }}"
+            {{/each}}
+        references:
+          {{#each references}}
+          - document: "{{ this.document }}"
+            location: "{{ this.location }}"
+          {{/each}}
+        revision_history:
+          {{#each revisions}}
+          - version: "{{ this.version }}"
+            date: "{{ this.date }}"
+            author: "{{ this.author }}"
+            changes: "{{ this.changes }}"
+          {{/each}}
+      status:
+        phase: "{{ status_phase }}"
+        approved_by: "{{ approved_by }}"
+        next_review: "{{ next_review }}"
+  # 資源分配表模板
+  resource_allocation:
+    kind: "ResourceAllocation"
+    description: "資源分配表"
+    description_zh: "資源分配表"
+    layer: "GL10-29"
+    template: |
+      apiVersion: governance.machinenativeops.io/v2
+      kind: ResourceAllocation
+      metadata:
+        name: {{ name }}
+        version: "{{ version }}"
+        created_at: "{{ created_at }}"
+        owner: {{ owner }}
+        layer: "GL10-29"
+        period: "{{ period }}"
+      spec:
+        budget:
+          total: {{ total_budget }}
+          currency: "{{ currency }}"
+          allocation:
+            {{#each budget_allocation}}
+            - category: "{{ this.category }}"
+              amount: {{ this.amount }}
+              percentage: {{ this.percentage }}
+              justification: "{{ this.justification }}"
+            {{/each}}
+        headcount:
+          total: {{ total_headcount }}
+          allocation:
+            {{#each headcount_allocation}}
+            - department: "{{ this.department }}"
+              count: {{ this.count }}
+              roles:
+                {{#each this.roles}}
+                - role: "{{ this.role }}"
+                  count: {{ this.count }}
+                {{/each}}
+            {{/each}}
+        infrastructure:
+          {{#each infrastructure}}
+          - resource: "{{ this.resource }}"
+            type: "{{ this.type }}"
+            capacity: "{{ this.capacity }}"
+            cost: {{ this.cost }}
+            owner: "{{ this.owner }}"
+          {{/each}}
+        tools_licenses:
+          {{#each tools}}
+          - tool: "{{ this.tool }}"
+            license_type: "{{ this.license_type }}"
+            seats: {{ this.seats }}
+            annual_cost: {{ this.annual_cost }}
+            renewal_date: "{{ this.renewal_date }}"
+          {{/each}}
+      status:
+        budget_utilized: {{ budget_utilized }}
+        headcount_filled: {{ headcount_filled }}
+        last_updated: "{{ last_updated }}"
+# =============================================================================
+# GL30-49: Execution Layer Artifacts Templates
+# =============================================================================
+GL30-49_templates:
+  # 專案執行計畫模板
+  project_plan:
+    kind: "ProjectPlan"
+    description: "專案執行計畫"
+    description_zh: "專案執行計畫"
+    layer: "GL30-49"
+    template: |
+      apiVersion: governance.machinenativeops.io/v2
+      kind: ProjectPlan
+      metadata:
+        name: {{ name }}
+        version: "{{ version }}"
+        created_at: "{{ created_at }}"
+        owner: {{ owner }}
+        layer: "GL30-49"
+        project_code: "{{ project_code }}"
+      spec:
+        overview:
+          title: "{{ project_title }}"
+          description: "{{ project_description }}"
+          objectives:
+            {{#each objectives}}
+            - "{{ this }}"
+            {{/each}}
+          success_criteria:
+            {{#each success_criteria}}
+            - "{{ this }}"
+            {{/each}}
+        team:
+          project_manager: "{{ project_manager }}"
+          tech_lead: "{{ tech_lead }}"
+          members:
+            {{#each team_members}}
+            - name: "{{ this.name }}"
+              role: "{{ this.role }}"
+              allocation: {{ this.allocation }}
+            {{/each}}
+        timeline:
+          start_date: "{{ start_date }}"
+          end_date: "{{ end_date }}"
+          phases:
+            {{#each phases}}
+            - name: "{{ this.name }}"
+              start: "{{ this.start }}"
+              end: "{{ this.end }}"
+              deliverables:
+                {{#each this.deliverables}}
+                - "{{ this }}"
+                {{/each}}
+            {{/each}}
+        work_breakdown:
+          {{#each work_items}}
+          - id: "{{ this.id }}"
+            title: "{{ this.title }}"
+            description: "{{ this.description }}"
+            assignee: "{{ this.assignee }}"
+            estimated_hours: {{ this.estimated_hours }}
+            actual_hours: {{ this.actual_hours }}
+            status: "{{ this.status }}"
+            dependencies:
+              {{#each this.dependencies}}
+              - "{{ this }}"
+              {{/each}}
+          {{/each}}
+        risks:
+          {{#each risks}}
+          - risk: "{{ this.risk }}"
+            probability: "{{ this.probability }}"
+            impact: "{{ this.impact }}"
+            mitigation: "{{ this.mitigation }}"
+            owner: "{{ this.owner }}"
+          {{/each}}
+        communication:
+          stakeholders:
+            {{#each stakeholders}}
+            - name: "{{ this.name }}"
+              role: "{{ this.role }}"
+              communication_frequency: "{{ this.frequency }}"
+            {{/each}}
+          meetings:
+            {{#each meetings}}
+            - type: "{{ this.type }}"
+              frequency: "{{ this.frequency }}"
+              participants:
+                {{#each this.participants}}
+                - "{{ this }}"
+                {{/each}}
+            {{/each}}
+      status:
+        phase: "{{ current_phase }}"
+        progress: {{ progress }}
+        health: "{{ health }}"
+        blockers:
+          {{#each blockers}}
+          - "{{ this }}"
+          {{/each}}
+  # 測試報告模板
+  test_report:
+    kind: "TestReport"
+    description: "測試報告"
+    description_zh: "測試報告"
+    layer: "GL30-49"
+    template: |
+      apiVersion: governance.machinenativeops.io/v2
+      kind: TestReport
+      metadata:
+        name: {{ name }}
+        version: "{{ version }}"
+        created_at: "{{ created_at }}"
+        owner: {{ owner }}
+        layer: "GL30-49"
+        project: "{{ project }}"
+        build: "{{ build_number }}"
+      spec:
+        summary:
+          total_tests: {{ total_tests }}
+          passed: {{ passed }}
+          failed: {{ failed }}
+          skipped: {{ skipped }}
+          pass_rate: {{ pass_rate }}
+          execution_time: "{{ execution_time }}"
+        coverage:
+          line_coverage: {{ line_coverage }}
+          branch_coverage: {{ branch_coverage }}
+          function_coverage: {{ function_coverage }}
+        test_suites:
+          {{#each test_suites}}
+          - name: "{{ this.name }}"
+            tests: {{ this.tests }}
+            passed: {{ this.passed }}
+            failed: {{ this.failed }}
+            duration: "{{ this.duration }}"
+            failures:
+              {{#each this.failures}}
+              - test: "{{ this.test }}"
+                error: "{{ this.error }}"
+                stack_trace: "{{ this.stack_trace }}"
+              {{/each}}
+          {{/each}}
+        quality_gates:
+          {{#each quality_gates}}
+          - gate: "{{ this.gate }}"
+            threshold: {{ this.threshold }}
+            actual: {{ this.actual }}
+            status: "{{ this.status }}"
+          {{/each}}
+        recommendations:
+          {{#each recommendations}}
+          - "{{ this }}"
+          {{/each}}
+      status:
+        overall_status: "{{ overall_status }}"
+        quality_gate_passed: {{ quality_gate_passed }}
+  # 部署紀錄模板
+  deployment_record:
+    kind: "DeploymentRecord"
+    description: "部署紀錄"
+    description_zh: "部署紀錄"
+    layer: "GL30-49"
+    template: |
+      apiVersion: governance.machinenativeops.io/v2
+      kind: DeploymentRecord
+      metadata:
+        name: {{ name }}
+        version: "{{ version }}"
+        created_at: "{{ created_at }}"
+        owner: {{ owner }}
+        layer: "GL30-49"
+        deployment_id: "{{ deployment_id }}"
+      spec:
+        release:
+          version: "{{ release_version }}"
+          changelog:
+            {{#each changelog}}
+            - "{{ this }}"
+            {{/each}}
+          artifacts:
+            {{#each artifacts}}
+            - name: "{{ this.name }}"
+              type: "{{ this.type }}"
+              checksum: "{{ this.checksum }}"
+            {{/each}}
+        environment:
+          name: "{{ environment }}"
+          type: "{{ environment_type }}"
+          infrastructure:
+            {{#each infrastructure}}
+            - component: "{{ this.component }}"
+              version: "{{ this.version }}"
+            {{/each}}
+        deployment:
+          strategy: "{{ deployment_strategy }}"
+          started_at: "{{ started_at }}"
+          completed_at: "{{ completed_at }}"
+          duration: "{{ duration }}"
+          deployed_by: "{{ deployed_by }}"
+          steps:
+            {{#each steps}}
+            - step: "{{ this.step }}"
+              status: "{{ this.status }}"
+              started_at: "{{ this.started_at }}"
+              completed_at: "{{ this.completed_at }}"
+              logs: "{{ this.logs }}"
+            {{/each}}
+        verification:
+          health_checks:
+            {{#each health_checks}}
+            - check: "{{ this.check }}"
+              status: "{{ this.status }}"
+              response_time: {{ this.response_time }}
+            {{/each}}
+          smoke_tests:
+            passed: {{ smoke_tests_passed }}
+            failed: {{ smoke_tests_failed }}
+        rollback:
+          available: {{ rollback_available }}
+          previous_version: "{{ previous_version }}"
+          rollback_procedure: "{{ rollback_procedure }}"
+      status:
+        deployment_status: "{{ deployment_status }}"
+        health: "{{ health }}"
+# =============================================================================
+# GL50-59: Observability Layer Artifacts Templates
+# =============================================================================
+GL50-59_templates:
+  # 監控指標定義模板
+  metrics_definition:
+    kind: "MetricsDefinition"
+    description: "監控指標定義"
+    description_zh: "監控指標定義"
+    layer: "GL50-59"
+    template: |
+      apiVersion: governance.machinenativeops.io/v2
+      kind: MetricsDefinition
+      metadata:
+        name: {{ name }}
+        version: "{{ version }}"
+        created_at: "{{ created_at }}"
+        owner: {{ owner }}
+        layer: "GL50-59"
+      spec:
+        metrics:
+          {{#each metrics}}
+          - name: "{{ this.name }}"
+            type: "{{ this.type }}"  # counter, gauge, histogram, summary
+            description: "{{ this.description }}"
+            unit: "{{ this.unit }}"
+            labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+              {{#each this.labels}}
+              - "{{ this }}"
+              {{/each}}
+            collection:
+              source: "{{ this.collection.source }}"
+              interval: "{{ this.collection.interval }}"
+              aggregation: "{{ this.collection.aggregation }}"
+            thresholds:
+              warning: {{ this.thresholds.warning }}
+              critical: {{ this.thresholds.critical }}
+            slo:
+              target: {{ this.slo.target }}
+              window: "{{ this.slo.window }}"
+          {{/each}}
+        dashboards:
+          {{#each dashboards}}
+          - name: "{{ this.name }}"
+            description: "{{ this.description }}"
+            panels:
+              {{#each this.panels}}
+              - title: "{{ this.title }}"
+                type: "{{ this.type }}"
+                metrics:
+                  {{#each this.metrics}}
+                  - "{{ this }}"
+                  {{/each}}
+              {{/each}}
+          {{/each}}
+  # 告警規則模板
+  alert_rules:
+    kind: "AlertRules"
+    description: "告警規則"
+    description_zh: "異常預警規則"
+    layer: "GL50-59"
+    template: |
+      apiVersion: governance.machinenativeops.io/v2
+      kind: AlertRules
+      metadata:
+        name: {{ name }}
+        version: "{{ version }}"
+        created_at: "{{ created_at }}"
+        owner: {{ owner }}
+        layer: "GL50-59"
+      spec:
+        rules:
+          {{#each rules}}
+          - name: "{{ this.name }}"
+            description: "{{ this.description }}"
+            severity: "{{ this.severity }}"  # info, warning, critical
+            condition:
+              metric: "{{ this.condition.metric }}"
+              operator: "{{ this.condition.operator }}"
+              threshold: {{ this.condition.threshold }}
+              duration: "{{ this.condition.duration }}"
+            labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+              {{#each this.labels}}
+              {{ @key }}: "{{ this }}"
+              {{/each}}
+            annotations:
+              summary: "{{ this.annotations.summary }}"
+              description: "{{ this.annotations.description }}"
+              runbook: "{{ this.annotations.runbook }}"
+            notification:
+              channels:
+                {{#each this.notification.channels}}
+                - "{{ this }}"
+                {{/each}}
+              escalation:
+                {{#each this.notification.escalation}}
+                - level: {{ this.level }}
+                  after: "{{ this.after }}"
+                  notify:
+                    {{#each this.notify}}
+                    - "{{ this }}"
+                    {{/each}}
+                {{/each}}
+          {{/each}}
+  # SLO報告模板
+  slo_report:
+    kind: "SLOReport"
+    description: "SLO報告"
+    description_zh: "SLA/SLO/SLI報告"
+    layer: "GL50-59"
+    template: |
+      apiVersion: governance.machinenativeops.io/v2
+      kind: SLOReport
+      metadata:
+        name: {{ name }}
+        version: "{{ version }}"
+        created_at: "{{ created_at }}"
+        owner: {{ owner }}
+        layer: "GL50-59"
+        period: "{{ period }}"
+      spec:
+        slos:
+          {{#each slos}}
+          - name: "{{ this.name }}"
+            description: "{{ this.description }}"
+            sli:
+              metric: "{{ this.sli.metric }}"
+              good_events: "{{ this.sli.good_events }}"
+              total_events: "{{ this.sli.total_events }}"
+            target:
+              percentage: {{ this.target.percentage }}
+              window: "{{ this.target.window }}"
+            performance:
+              current: {{ this.performance.current }}
+              trend: "{{ this.performance.trend }}"
+              error_budget:
+                total: {{ this.performance.error_budget.total }}
+                consumed: {{ this.performance.error_budget.consumed }}
+                remaining: {{ this.performance.error_budget.remaining }}
+            incidents:
+              {{#each this.incidents}}
+              - date: "{{ this.date }}"
+                duration: "{{ this.duration }}"
+                impact: {{ this.impact }}
+                root_cause: "{{ this.root_cause }}"
+              {{/each}}
+          {{/each}}
+        summary:
+          total_slos: {{ total_slos }}
+          meeting_target: {{ meeting_target }}
+          at_risk: {{ at_risk }}
+          breached: {{ breached }}
+# =============================================================================
+# GL60-80: Feedback Layer Artifacts Templates
+# =============================================================================
+GL60-80_templates:
+  # A/B測試設計模板
+  ab_test_design:
+    kind: "ABTestDesign"
+    description: "A/B測試設計"
+    description_zh: "A/B測試設計文件"
+    layer: "GL60-80"
+    template: |
+      apiVersion: governance.machinenativeops.io/v2
+      kind: ABTestDesign
+      metadata:
+        name: {{ name }}
+        version: "{{ version }}"
+        created_at: "{{ created_at }}"
+        owner: {{ owner }}
+        layer: "GL60-80"
+        experiment_id: "{{ experiment_id }}"
+      spec:
+        hypothesis:
+          statement: "{{ hypothesis_statement }}"
+          null_hypothesis: "{{ null_hypothesis }}"
+          alternative_hypothesis: "{{ alternative_hypothesis }}"
+        design:
+          type: "{{ experiment_type }}"  # A/B, A/B/n, multivariate
+          variants:
+            {{#each variants}}
+            - name: "{{ this.name }}"
+              description: "{{ this.description }}"
+              allocation: {{ this.allocation }}
+              changes:
+                {{#each this.changes}}
+                - "{{ this }}"
+                {{/each}}
+            {{/each}}
+          targeting:
+            population: "{{ population }}"
+            sample_size: {{ sample_size }}
+            criteria:
+              {{#each targeting_criteria}}
+              - "{{ this }}"
+              {{/each}}
+          duration:
+            minimum: "{{ minimum_duration }}"
+            maximum: "{{ maximum_duration }}"
+        metrics:
+          primary:
+            {{#each primary_metrics}}
+            - metric: "{{ this.metric }}"
+              minimum_detectable_effect: {{ this.mde }}
+              baseline: {{ this.baseline }}
+            {{/each}}
+          secondary:
+            {{#each secondary_metrics}}
+            - metric: "{{ this.metric }}"
+            {{/each}}
+          guardrail:
+            {{#each guardrail_metrics}}
+            - metric: "{{ this.metric }}"
+              threshold: {{ this.threshold }}
+            {{/each}}
+        statistical_analysis:
+          significance_level: {{ significance_level }}
+          power: {{ power }}
+          correction_method: "{{ correction_method }}"
+        risks:
+          {{#each risks}}
+          - risk: "{{ this.risk }}"
+            mitigation: "{{ this.mitigation }}"
+          {{/each}}
+      status:
+        phase: "{{ phase }}"
+        start_date: "{{ start_date }}"
+        end_date: "{{ end_date }}"
+  # 模型再訓練紀錄模板
+  model_retraining_log:
+    kind: "ModelRetrainingLog"
+    description: "模型再訓練紀錄"
+    description_zh: "模型再訓練紀錄"
+    layer: "GL60-80"
+    template: |
+      apiVersion: governance.machinenativeops.io/v2
+      kind: ModelRetrainingLog
+      metadata:
+        name: {{ name }}
+        version: "{{ version }}"
+        created_at: "{{ created_at }}"
+        owner: {{ owner }}
+        layer: "GL60-80"
+        model_id: "{{ model_id }}"
+      spec:
+        model:
+          name: "{{ model_name }}"
+          type: "{{ model_type }}"
+          previous_version: "{{ previous_version }}"
+          new_version: "{{ new_version }}"
+        trigger:
+          type: "{{ trigger_type }}"  # scheduled, performance_degradation, data_drift
+          details: "{{ trigger_details }}"
+        training:
+          dataset:
+            name: "{{ dataset_name }}"
+            size: {{ dataset_size }}
+            date_range: "{{ date_range }}"
+            features:
+              {{#each features}}
+              - "{{ this }}"
+              {{/each}}
+          hyperparameters:
+            {{#each hyperparameters}}
+            {{ @key }}: {{ this }}
+            {{/each}}
+          training_time: "{{ training_time }}"
+          resources_used:
+            compute: "{{ compute }}"
+            memory: "{{ memory }}"
+        evaluation:
+          metrics:
+            {{#each evaluation_metrics}}
+            - metric: "{{ this.metric }}"
+              previous: {{ this.previous }}
+              new: {{ this.new }}
+              improvement: {{ this.improvement }}
+            {{/each}}
+          validation:
+            method: "{{ validation_method }}"
+            results: "{{ validation_results }}"
+        deployment:
+          strategy: "{{ deployment_strategy }}"
+          rollout_percentage: {{ rollout_percentage }}
+          monitoring_period: "{{ monitoring_period }}"
+      status:
+        phase: "{{ phase }}"
+        deployed: {{ deployed }}
+        performance_verified: {{ performance_verified }}
+# =============================================================================
+# GL81-83: Extended Layer Artifacts Templates
+# =============================================================================
+GL81-83_templates:
+  # 創新實驗報告模板
+  innovation_experiment:
+    kind: "InnovationExperiment"
+    description: "創新實驗報告"
+    description_zh: "創新實驗報告"
+    layer: "GL81-83"
+    template: |
+      apiVersion: governance.machinenativeops.io/v2
+      kind: InnovationExperiment
+      metadata:
+        name: {{ name }}
+        version: "{{ version }}"
+        created_at: "{{ created_at }}"
+        owner: {{ owner }}
+        layer: "GL81-83"
+        experiment_id: "{{ experiment_id }}"
+      spec:
+        overview:
+          title: "{{ title }}"
+          description: "{{ description }}"
+          innovation_type: "{{ innovation_type }}"  # technology, process, business_model
+        hypothesis:
+          statement: "{{ hypothesis }}"
+          assumptions:
+            {{#each assumptions}}
+            - "{{ this }}"
+            {{/each}}
+        experiment_design:
+          approach: "{{ approach }}"
+          scope: "{{ scope }}"
+          duration: "{{ duration }}"
+          resources:
+            team:
+              {{#each team}}
+              - name: "{{ this.name }}"
+                role: "{{ this.role }}"
+              {{/each}}
+            budget: {{ budget }}
+            tools:
+              {{#each tools}}
+              - "{{ this }}"
+              {{/each}}
+          success_criteria:
+            {{#each success_criteria}}
+            - criterion: "{{ this.criterion }}"
+              target: "{{ this.target }}"
+            {{/each}}
+        results:
+          findings:
+            {{#each findings}}
+            - finding: "{{ this.finding }}"
+              evidence: "{{ this.evidence }}"
+              significance: "{{ this.significance }}"
+            {{/each}}
+          metrics:
+            {{#each metrics}}
+            - metric: "{{ this.metric }}"
+              result: {{ this.result }}
+              target: {{ this.target }}
+            {{/each}}
+          lessons_learned:
+            {{#each lessons}}
+            - "{{ this }}"
+            {{/each}}
+        recommendations:
+          decision: "{{ decision }}"  # proceed, pivot, abandon
+          next_steps:
+            {{#each next_steps}}
+            - "{{ this }}"
+            {{/each}}
+          transfer_plan:
+            target_layer: "{{ target_layer }}"
+            artifacts:
+              {{#each transfer_artifacts}}
+              - "{{ this }}"
+              {{/each}}
+      status:
+        phase: "{{ phase }}"
+        outcome: "{{ outcome }}"
+# =============================================================================
+# GL90-99: Meta-Specification Layer Artifacts Templates
+# =============================================================================
+GL90-99_templates:
+  # 元規範設計文件模板
+  meta_specification:
+    kind: "MetaSpecification"
+    description: "元規範設計文件"
+    description_zh: "元規範設計文件"
+    layer: "GL90-99"
+    template: |
+      apiVersion: governance.machinenativeops.io/v2
+      kind: MetaSpecification
+      metadata:
+        name: {{ name }}
+        version: "{{ version }}"
+        created_at: "{{ created_at }}"
+        owner: {{ owner }}
+        layer: "GL90-99"
+      spec:
+        overview:
+          purpose: "{{ purpose }}"
+          scope: "{{ scope }}"
+          principles:
+            {{#each principles}}
+            - "{{ this }}"
+            {{/each}}
+        specification:
+          schema:
+            version: "{{ schema_version }}"
+            format: "{{ schema_format }}"
+          components:
+            {{#each components}}
+            - name: "{{ this.name }}"
+              type: "{{ this.type }}"
+              required: {{ this.required }}
+              description: "{{ this.description }}"
+              validation:
+                {{#each this.validation}}
+                - rule: "{{ this.rule }}"
+                  message: "{{ this.message }}"
+                {{/each}}
+            {{/each}}
+          composition:
+            composable: {{ composable }}
+            extension_points:
+              {{#each extension_points}}
+              - point: "{{ this.point }}"
+                type: "{{ this.type }}"
+              {{/each}}
+        governance:
+          review_process:
+            stages:
+              {{#each review_stages}}
+              - stage: "{{ this.stage }}"
+                approvers:
+                  {{#each this.approvers}}
+                  - "{{ this }}"
+                  {{/each}}
+              {{/each}}
+          versioning:
+            strategy: "{{ versioning_strategy }}"
+            compatibility: "{{ compatibility_policy }}"
+            deprecation: "{{ deprecation_policy }}"
+        implementation:
+          reference_implementations:
+            {{#each reference_implementations}}
+            - name: "{{ this.name }}"
+              location: "{{ this.location }}"
+            {{/each}}
+          tooling:
+            {{#each tooling}}
+            - tool: "{{ this.tool }}"
+              purpose: "{{ this.purpose }}"
+            {{/each}}
+      status:
+        phase: "{{ phase }}"
+        adoption: {{ adoption_count }}
+  # 規範驗證報告模板
+  validation_report:
+    kind: "ValidationReport"
+    description: "規範驗證報告"
+    description_zh: "規範驗證報告"
+    layer: "GL90-99"
+    template: |
+      apiVersion: governance.machinenativeops.io/v2
+      kind: ValidationReport
+      metadata:
+        name: {{ name }}
+        version: "{{ version }}"
+        created_at: "{{ created_at }}"
+        owner: {{ owner }}
+        layer: "GL90-99"
+        validation_run_id: "{{ validation_run_id }}"
+      spec:
+        scope:
+          artifacts_validated: {{ artifacts_validated }}
+          layers_covered:
+            {{#each layers_covered}}
+            - "{{ this }}"
+            {{/each}}
+        results:
+          summary:
+            total_checks: {{ total_checks }}
+            passed: {{ passed }}
+            failed: {{ failed }}
+            warnings: {{ warnings }}
+          by_layer:
+            {{#each layer_results}}
+            - layer: "{{ this.layer }}"
+              artifacts: {{ this.artifacts }}
+              passed: {{ this.passed }}
+              failed: {{ this.failed }}
+            {{/each}}
+          violations:
+            {{#each violations}}
+            - artifact: "{{ this.artifact }}"
+              rule: "{{ this.rule }}"
+              severity: "{{ this.severity }}"
+              message: "{{ this.message }}"
+              location: "{{ this.location }}"
+              suggestion: "{{ this.suggestion }}"
+            {{/each}}
+        recommendations:
+          {{#each recommendations}}
+          - priority: {{ this.priority }}
+            recommendation: "{{ this.recommendation }}"
+            affected_artifacts:
+              {{#each this.affected}}
+              - "{{ this }}"
+              {{/each}}
+          {{/each}}
+      status:
+        overall_compliance: {{ overall_compliance }}
+        next_validation: "{{ next_validation }}"
+# =============================================================================
+# 模板使用指南
+# =============================================================================
+usage_guide:
+  template_selection:
+    description: "根據層級和artifact類型選擇適當的模板"
+    steps:
+      - "確定artifact所屬的GL層級"
+      - "選擇對應層級的artifact模板"
+      - "填充模板中的變量"
+      - "執行驗證規則"
+      - "提交審核"
+  variable_substitution:
+    description: "模板變量替換規則"
+    syntax:
+      simple: "{{ variable_name }}"
+      conditional: "{{#if condition}}...{{/if}}"
+      iteration: "{{#each array}}...{{/each}}"
+  validation:
+    description: "artifact驗證流程"
+    steps:
+      - "Schema驗證"
+      - "必填字段檢查"
+      - "業務規則驗證"
+      - "跨artifact一致性檢查"
+  best_practices:
+    - "始終使用最新版本的模板"
+    - "填充所有必填字段"
+    - "提供有意義的描述和註解"
+    - "遵循命名規範"
+    - "定期審查和更新artifact"
+# =============================================================================
+# 版本與演進
+# =============================================================================
+versioning:
+  current_version: "2.0.0"
+  release_date: "{{RELEASE_DATE}}"
+  changelog:
+    - version: "2.0.0"
+      date: "2025-01-18"
+      changes:
+        - "完整定義所有GL層級的artifact模板"
+        - "新增模板變量和驗證規則"
+        - "新增使用指南"

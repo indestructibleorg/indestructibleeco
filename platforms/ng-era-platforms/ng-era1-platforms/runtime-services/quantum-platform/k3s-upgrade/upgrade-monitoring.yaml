@@ -1,0 +1,135 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: k3s-upgrade-monitoring
+  namespace: monitoring
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-upgrade
+spec:
+  groups:
+    - name: k3s.upgrade.status
+      interval: 30s
+      rules:
+        - alert: K3sUpgradeInProgress
+          expr: |
+            system_upgrade_plan_status{status="running"} > 0
+          for: 1m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: info
+            category: k3s-upgrade
+          annotations:
+            summary: "K3s upgrade in progress for plan {{ $labels.plan_name }}"
+            description: "Upgrade to version {{ $labels.version }} is running on {{ $labels.node_count }} nodes"
+            
+        - alert: K3sUpgradeFailed
+          expr: |
+            system_upgrade_plan_status{status="failed"} > 0
+          for: 1m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: critical
+            category: k3s-upgrade
+          annotations:
+            summary: "K3s upgrade failed for plan {{ $labels.plan_name }}"
+            description: "Upgrade to version {{ $labels.version }} failed on node {{ $labels.node_name }}"
+            
+        - alert: K3sUpgradeCompleted
+          expr: |
+            system_upgrade_plan_status{status="completed"} > 0
+          for: 1m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: info
+            category: k3s-upgrade
+          annotations:
+            summary: "K3s upgrade completed for plan {{ $labels.plan_name }}"
+            description: "Upgrade to version {{ $labels.version }} completed successfully"
+            
+    - name: k3s.cluster.health
+      interval: 30s
+      rules:
+        - alert: K3sNodeNotReady
+          expr: |
+            kube_node_status_condition{condition="Ready",status="true"} == 0
+          for: 5m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            category: k3s-health
+          annotations:
+            summary: "K3s node {{ $labels.node }} is not ready"
+            description: "Node {{ $labels.node }} has been in NotReady state for more than 5 minutes"
+            
+        - alert: K3sPodNotRunning
+          expr: |
+            kube_pod_status_phase{phase!="Running",phase!="Succeeded"} > 0
+          for: 10m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            category: k3s-health
+          annotations:
+            summary: "K3s pods not running"
+            description: "{{ $value }} pods are not in Running state in namespace {{ $labels.namespace }}"
+            
+    - name: k3s.rollback.status
+      interval: 30s
+      rules:
+        - alert: K3sRollbackInProgress
+          expr: |
+            k3s_rollback_status{status="in_progress"} > 0
+          for: 1m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            category: k3s-rollback
+          annotations:
+            summary: "K3s rollback in progress"
+            description: "Rolling back from version {{ $labels.from_version }} to {{ $labels.to_version }}"
+            
+        - alert: K3sRollbackFailed
+          expr: |
+            k3s_rollback_status{status="failed"} > 0
+          for: 1m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: critical
+            category: k3s-rollback
+          annotations:
+            summary: "K3s rollback failed"
+            description: "Rollback from version {{ $labels.from_version }} to {{ $labels.to_version }} failed"
+            
+        - alert: K3sRollbackCompleted
+          expr: |
+            k3s_rollback_status{status="completed"} > 0
+          for: 1m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: info
+            category: k3s-rollback
+          annotations:
+            summary: "K3s rollback completed"
+            description: "Successfully rolled back to version {{ $labels.to_version }}"

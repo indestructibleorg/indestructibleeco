@@ -1,0 +1,527 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# =============================================================================
+# GL00-09 Strategic Layer - Frontend-Backend Separation Architecture
+# MachineNativeOps Governance Artifact
+# =============================================================================
+apiVersion: governance.machinenativeops.io/v2
+kind: ArchitectureSpecification
+metadata:
+  name: frontend-backend-separation-architecture
+  version: "1.0.0"
+  created_at: "2026-01-27T00:00:00Z"
+  updated_at: "2026-01-27T00:00:00Z"
+  owner: architecture-team
+  layer: "GL00-09"
+  tags:
+    - architecture
+    - frontend
+    - backend
+    - api-first
+    - separation-of-concerns
+  annotations:
+    governance.machinenativeops.io/initiative: "INIT-2026-Q1-001"
+    governance.machinenativeops.io/priority: "P0"
+    governance.machinenativeops.io/scope: "system-wide"
+spec:
+  # Required fields for GL00-09 compliance
+  title: "前後端分離架構規範"
+  title_en: "Frontend-Backend Separation Architecture Specification"
+  
+  description: |
+    本專案採用前後端分離架構，以 API 規格為核心，前端與後端同步開發，
+    最後進行整合測試。此架構確保系統的可擴展性、可維護性與團隊協作效率。
+  
+  description_en: |
+    This project adopts a frontend-backend separation architecture, 
+    with API specifications as the core. The frontend and backend are 
+    developed simultaneously, followed by integration testing. This architecture 
+    ensures system scalability, maintainability, and team collaboration efficiency.
+  
+  # Architecture Principles
+  principles:
+    - id: "PRIN-001"
+      title: "關注點分離 (Separation of Concerns)"
+      description: "前端專注於用戶介面與用戶體驗，後端專注於業務邏輯與數據處理"
+      rationale: "提高代碼的可維護性與可測試性"
+      
+    - id: "PRIN-002"
+      title: "API優先設計 (API-First Design)"
+      description: "API規格先於實作，作為前後端開發的契約"
+      rationale: "確保前後端團隊能夠並行開發，減少集成問題"
+      
+    - id: "PRIN-003"
+      title: "獨立部署 (Independent Deployment)"
+      description: "前端與後端可以獨立部署與擴展"
+      rationale: "提升系統靈活性與部署效率"
+      
+    - id: "PRIN-004"
+      title: "技術棧自由 (Technology Freedom)"
+      description: "前端與後端可以選擇最適合的技術棧"
+      rationale: "優化開發效率與系統性能"
+      
+    - id: "PRIN-005"
+      title: "版本化契約 (Versioned Contracts)"
+      description: "API版本化管理，確保向後兼容"
+      rationale: "支持漸進式更新與多版本共存"
+  
+  # System Boundaries
+  boundaries:
+    frontend:
+      responsibility: "用戶介面層 (User Interface Layer)"
+      concerns:
+        - "用戶體驗設計 (UX Design)"
+        - "視覺呈現 (Visual Presentation)"
+        - "客戶端狀態管理 (Client State Management)"
+        - "用戶輸入驗證 (Client-side Validation)"
+        - "路由管理 (Routing)"
+        - "客戶端緩存 (Client-side Caching)"
+      technology_stack:
+        preferred:
+          - "React / Vue.js / Angular"
+          - "TypeScript"
+          - "State Management (Redux / Vuex / Pinia)"
+          - "CSS-in-JS / Tailwind CSS"
+        optional:
+          - "Next.js / Nuxt.js (SSR/SSG)"
+          - "GraphQL Client (Apollo / urql)"
+      constraints:
+        - "不應包含業務邏輯運算"
+        - "不應直接訪問數據庫"
+        - "所有數據訪問必須通過API"
+    
+    backend:
+      responsibility: "業務邏輯層與數據層 (Business Logic & Data Layer)"
+      concerns:
+        - "業務邏輯處理 (Business Logic Processing)"
+        - "數據持久化 (Data Persistence)"
+        - "身份驗證與授權 (Authentication & Authorization)"
+        - "數據驗證與完整性 (Data Validation & Integrity)"
+        - "外部服務集成 (External Service Integration)"
+        - "後端緩存與優化 (Backend Caching & Optimization)"
+      technology_stack:
+        preferred:
+          - "Python (FastAPI / Django / Flask)"
+          - "Node.js (Express / NestJS)"
+          - "TypeScript (for Node.js)"
+        optional:
+          - "Go / Java / Rust (for high-performance services)"
+          - "GraphQL Server"
+      constraints:
+        - "不應包含UI邏輯"
+        - "API應該是RESTful或GraphQL標準"
+        - "必須實施適當的安全措施"
+    
+    api_layer:
+      responsibility: "介面契約層 (Interface Contract Layer)"
+      concerns:
+        - "API規格定義 (API Specification)"
+        - "版本管理 (Version Management)"
+        - "文檔生成 (Documentation Generation)"
+        - "Mock數據生成 (Mock Data Generation)"
+        - "契約測試 (Contract Testing)"
+      standards:
+        - "OpenAPI 3.0+ Specification"
+        - "JSON Schema for Data Validation"
+        - "RESTful API Design Principles"
+        - "HTTP Status Code Standards"
+        - "API Versioning Strategy (URI/Header/Content Negotiation)"
+      tools:
+        - "Swagger / OpenAPI Generator"
+        - "Postman / Insomnia"
+        - "Pact (Contract Testing)"
+  
+  # Communication Patterns
+  communication:
+    patterns:
+      - pattern: "RESTful API"
+        use_case: "標準CRUD操作與資源管理"
+        advantages:
+          - "簡單易懂"
+          - "廣泛支援"
+          - "緩存友好"
+        considerations:
+          - "可能產生over-fetching或under-fetching"
+      
+      - pattern: "GraphQL"
+        use_case: "複雜數據查詢與靈活的數據獲取"
+        advantages:
+          - "精確數據獲取"
+          - "減少請求次數"
+          - "強型別系統"
+        considerations:
+          - "學習曲線較高"
+          - "緩存較複雜"
+      
+      - pattern: "WebSocket / Server-Sent Events"
+        use_case: "實時數據推送與雙向通信"
+        advantages:
+          - "低延遲"
+          - "實時更新"
+        considerations:
+          - "連接管理複雜"
+          - "擴展性挑戰"
+    
+    data_formats:
+      primary: "JSON"
+      alternatives:
+        - "Protocol Buffers (高性能場景)"
+        - "MessagePack (二進制優化)"
+        - "XML (遺留系統集成)"
+    
+    authentication:
+      methods:
+        - "JWT (JSON Web Tokens) - Recommended"
+        - "OAuth 2.0 / OpenID Connect"
+        - "API Keys (for service-to-service)"
+      security:
+        - "HTTPS必須啟用"
+        - "CORS適當配置"
+        - "Rate Limiting實施"
+        - "Input Sanitization"
+  
+  # Development Workflow
+  development_workflow:
+    approach: "並行開發 (Parallel Development)"
+    
+    phases:
+      - phase: "1. API規格定義 (API Specification)"
+        duration: "1-2 weeks"
+        activities:
+          - "需求分析與功能定義"
+          - "API端點設計"
+          - "數據模型設計"
+          - "OpenAPI規格編寫"
+          - "API審查與確認"
+        deliverables:
+          - "OpenAPI 3.0 Specification"
+          - "API設計文檔"
+          - "數據模型文檔"
+        stakeholders:
+          - "前端團隊"
+          - "後端團隊"
+          - "產品經理"
+          - "架構師"
+      
+      - phase: "2. 並行開發 (Parallel Development)"
+        duration: "4-8 weeks"
+        frontend_activities:
+          - "基於API規格建立Mock Server"
+          - "開發UI組件"
+          - "實施狀態管理"
+          - "客戶端路由配置"
+          - "前端單元測試"
+        backend_activities:
+          - "實施業務邏輯"
+          - "數據庫設計與實施"
+          - "API端點實現"
+          - "身份驗證與授權"
+          - "後端單元測試"
+        collaboration:
+          - "定期同步會議 (每週)"
+          - "API變更通知機制"
+          - "共享Mock數據"
+      
+      - phase: "3. 集成測試 (Integration Testing)"
+        duration: "1-2 weeks"
+        activities:
+          - "前後端集成"
+          - "契約測試 (Contract Testing)"
+          - "端到端測試 (E2E Testing)"
+          - "性能測試"
+          - "安全測試"
+        deliverables:
+          - "集成測試報告"
+          - "性能測試報告"
+          - "缺陷追蹤"
+      
+      - phase: "4. 部署與監控 (Deployment & Monitoring)"
+        duration: "Ongoing"
+        activities:
+          - "CI/CD配置"
+          - "環境部署 (Dev/Staging/Production)"
+          - "監控與日誌配置"
+          - "錯誤追蹤配置"
+        tools:
+          - "GitHub Actions / GitLab CI"
+          - "Docker / Kubernetes"
+          - "Prometheus / Grafana"
+          - "Sentry / ELK Stack"
+    
+    tools:
+      api_specification:
+        - "OpenAPI / Swagger Editor"
+        - "Stoplight Studio"
+      mock_server:
+        - "Prism (OpenAPI Mock Server)"
+        - "JSON Server"
+        - "MSW (Mock Service Worker)"
+      contract_testing:
+        - "Pact"
+        - "Spring Cloud Contract"
+      documentation:
+        - "Swagger UI"
+        - "ReDoc"
+        - "Postman Documentation"
+  
+  # Quality Assurance
+  quality_assurance:
+    testing_strategy:
+      frontend:
+        - type: "Unit Testing"
+          tools: ["Jest", "Vitest", "Testing Library"]
+          coverage_target: ">80%"
+        - type: "Component Testing"
+          tools: ["Storybook", "Chromatic"]
+          coverage_target: "Critical components"
+        - type: "E2E Testing"
+          tools: ["Cypress", "Playwright"]
+          coverage_target: "Critical user flows"
+      
+      backend:
+        - type: "Unit Testing"
+          tools: ["pytest", "unittest", "Jest"]
+          coverage_target: ">80%"
+        - type: "Integration Testing"
+          tools: ["pytest", "Supertest"]
+          coverage_target: "All API endpoints"
+        - type: "Contract Testing"
+          tools: ["Pact"]
+          coverage_target: "All API contracts"
+      
+      integration:
+        - type: "API Contract Testing"
+          tools: ["Pact", "Dredd"]
+          coverage_target: "100% of API spec"
+        - type: "E2E Testing"
+          tools: ["Cypress", "Playwright"]
+          coverage_target: "Critical business flows"
+        - type: "Performance Testing"
+          tools: ["k6", "Artillery"]
+          coverage_target: "Key endpoints under load"
+    
+    code_quality:
+      frontend:
+        - "ESLint + Prettier"
+        - "TypeScript strict mode"
+        - "Code review required"
+      backend:
+        - "Pylint / Flake8 / Black (Python)"
+        - "ESLint + Prettier (Node.js)"
+        - "Type checking (TypeScript / mypy)"
+        - "Code review required"
+  
+  # Deployment Architecture
+  deployment:
+    strategy: "獨立部署 (Independent Deployment)"
+    
+    frontend_deployment:
+      hosting_options:
+        - "Static Hosting (Netlify / Vercel / CloudFront + S3)"
+        - "CDN Distribution"
+        - "Container-based (Docker + Nginx)"
+      build_process:
+        - "npm run build / yarn build"
+        - "Asset optimization (minification, tree-shaking)"
+        - "Environment-specific configuration"
+      
+    backend_deployment:
+      hosting_options:
+        - "Container Orchestration (Kubernetes / ECS)"
+        - "Serverless (AWS Lambda / Cloud Functions)"
+        - "Traditional VPS/VM (with PM2 / systemd)"
+      deployment_process:
+        - "Zero-downtime deployment"
+        - "Database migration automation"
+        - "Health checks and readiness probes"
+    
+    scalability:
+      frontend:
+        - "CDN caching for static assets"
+        - "Browser caching strategies"
+        - "Code splitting and lazy loading"
+      backend:
+        - "Horizontal scaling (multiple instances)"
+        - "Load balancing"
+        - "Database connection pooling"
+        - "Redis caching layer"
+  
+  # API Versioning Strategy
+  versioning:
+    strategy: "URI Versioning (Recommended)"
+    format: "/api/v{version}/{resource}"
+    example: "/api/v1/users, /api/v2/users"
+    
+    version_lifecycle:
+      - stage: "Beta"
+        duration: "1-2 months"
+        support: "可能包含破壞性變更"
+      - stage: "Stable"
+        duration: "12-24 months"
+        support: "完全支援，向後兼容"
+      - stage: "Deprecated"
+        duration: "6-12 months"
+        support: "維護支援，建議遷移"
+      - stage: "Sunset"
+        duration: "N/A"
+        support: "停止支援"
+    
+    deprecation_process:
+      - "提前3-6個月公告"
+      - "在響應頭中添加棄用警告"
+      - "提供遷移指南"
+      - "監控舊版本使用情況"
+  
+  # Security Considerations
+  security:
+    authentication:
+      - method: "JWT (JSON Web Tokens)"
+        storage: "HttpOnly Cookies (Recommended) or localStorage"
+        refresh_strategy: "Refresh Token Rotation"
+      - method: "OAuth 2.0"
+        flows: ["Authorization Code", "PKCE"]
+    
+    authorization:
+      - "Role-Based Access Control (RBAC)"
+      - "API Gateway層級權限檢查"
+      - "Resource-level permissions"
+    
+    data_protection:
+      - "HTTPS/TLS encryption in transit"
+      - "Data encryption at rest (for sensitive data)"
+      - "Input validation and sanitization"
+      - "SQL injection prevention (parameterized queries)"
+      - "XSS prevention (Content Security Policy)"
+      - "CSRF protection (CSRF tokens)"
+    
+    api_security:
+      - "Rate limiting (防止濫用)"
+      - "API key management (for service accounts)"
+      - "CORS configuration (適當的來源白名單)"
+      - "Security headers (HSTS, X-Frame-Options, etc.)"
+  
+  # Monitoring and Observability
+  observability:
+    frontend:
+      metrics:
+        - "頁面加載時間 (Page Load Time)"
+        - "首次內容繪製 (FCP)"
+        - "最大內容繪製 (LCP)"
+        - "累積版面配置位移 (CLS)"
+        - "首次輸入延遲 (FID)"
+      tools:
+        - "Google Analytics / Matomo"
+        - "Sentry (Error Tracking)"
+        - "LogRocket / FullStory (Session Replay)"
+    
+    backend:
+      metrics:
+        - "請求延遲 (Request Latency)"
+        - "錯誤率 (Error Rate)"
+        - "吞吐量 (Throughput)"
+        - "資源使用率 (CPU/Memory)"
+        - "數據庫查詢性能"
+      tools:
+        - "Prometheus + Grafana"
+        - "Datadog / New Relic"
+        - "ELK Stack (Elasticsearch, Logstash, Kibana)"
+        - "Sentry (Error Tracking)"
+    
+    api:
+      metrics:
+        - "API響應時間"
+        - "API錯誤率 (by endpoint)"
+        - "API使用量 (by version)"
+        - "請求成功率"
+      tools:
+        - "API Gateway Analytics"
+        - "Custom Prometheus metrics"
+  
+  # Migration Strategy (if applicable)
+  migration:
+    from_monolith:
+      approach: "Strangler Fig Pattern"
+      steps:
+        - step: 1
+          description: "識別可分離的功能模塊"
+          duration: "1-2 weeks"
+        - step: 2
+          description: "設計API契約"
+          duration: "2-3 weeks"
+        - step: 3
+          description: "實施新的後端服務"
+          duration: "4-8 weeks"
+        - step: 4
+          description: "開發新的前端介面"
+          duration: "4-8 weeks"
+        - step: 5
+          description: "逐步遷移流量"
+          duration: "2-4 weeks"
+        - step: 6
+          description: "淘汰舊系統"
+          duration: "1-2 weeks"
+      
+      risk_mitigation:
+        - "Feature flags for gradual rollout"
+        - "Comprehensive testing at each stage"
+        - "Rollback plan for each migration step"
+        - "Monitoring and alerting"
+  
+  # Success Metrics
+  success_metrics:
+    development_efficiency:
+      - metric: "前後端並行開發時間縮短"
+        target: ">30% reduction in total development time"
+      - metric: "API變更導致的集成問題"
+        target: "<5 issues per release"
+    
+    system_performance:
+      - metric: "前端加載時間"
+        target: "<3 seconds (LCP)"
+      - metric: "API響應時間"
+        target: "<200ms (p95)"
+      - metric: "系統可用性"
+        target: ">99.9%"
+    
+    team_satisfaction:
+      - metric: "開發者滿意度"
+        target: ">4.0/5.0"
+      - metric: "部署頻率"
+        target: ">1 deployment/day"
+  
+  # References and Resources
+  references:
+    standards:
+      - name: "OpenAPI Specification 3.0"
+        url: "https://swagger.io/specification/"
+      - name: "RESTful API Design Best Practices"
+        url: "https://restfulapi.net/"
+      - name: "12-Factor App"
+        url: "https://12factor.net/"
+    
+    internal_docs:
+      - name: "API Design Specification"
+        path: "gl/30-execution/artifacts/api-design-specification.yaml"
+      - name: "Database Architecture Specification"
+        path: "gl/20-data/artifacts/database-architecture-specification.yaml"
+    
+    tools_documentation:
+      - name: "OpenAPI Generator"
+        url: "https://openapi-generator.tech/"
+      - name: "Pact Contract Testing"
+        url: "https://docs.pact.io/"
+
+status:
+  phase: "active"
+  approved_by: "architecture-committee"
+  approved_at: "2026-01-27T00:00:00Z"
+  last_review: "2026-01-27T00:00:00Z"
+  next_review: "2026-07-27T00:00:00Z"
+  change_history:
+    - version: "1.0.0"
+      date: "2026-01-27"
+      author: "architecture-team"
+      changes: "Initial frontend-backend separation architecture specification"

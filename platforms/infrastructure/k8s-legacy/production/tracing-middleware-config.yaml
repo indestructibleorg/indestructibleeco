@@ -1,0 +1,28 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: tracing-middleware-config
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: machine-native-ops
+  namespace: production
+  annotations:
+    sidecar.istio.io/interceptionMode: "TPROXY"
+    sidecar.istio.io/proxyConfig: |
+      proxyStatsMatcher:
+        inclusionRegexps:
+        - ".*_outbound.*"
+        - ".*_inbound.*"
+spec:
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "15020"
+        prometheus.io/path: "/stats/prometheus"
+        instrumentation.opentelemetry.io/inject-java: "true"
+        instrumentation.opentelemetry.io/inject-python: "true"

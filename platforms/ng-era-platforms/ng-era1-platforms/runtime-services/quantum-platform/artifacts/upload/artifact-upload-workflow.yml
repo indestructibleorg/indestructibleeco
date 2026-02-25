@@ -1,0 +1,94 @@
+# @GL-layer: GQS-L0
+# @GL-governed
+# @GL-layer: GL00-09
+# @GL-semantic: general-component
+# @GL-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/GL-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/GL-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: artifacts.machinenativeops.io/v1
+kind: ArtifactUploadWorkflow
+metadata:
+  name: gl-quantum-artifact-upload
+  namespace: artifacts
+  labels:
+    gl-version: v10.0.0
+    tier: quantum-artifacts
+spec:
+  enabled: true
+  triggers:
+    - type: push
+      paths:
+        - docs/**/*.docx
+        - docs/**/*.pdf
+        - docs/**/*.md
+        
+    - type: schedule
+      cron: "0 */6 * * *"  # Every 6 hours
+      
+  conversion:
+    enabled: true
+    converters:
+      - name: docx-to-yaml
+        inputPattern: "**/*.docx"
+        outputPattern: "artifacts/modules/{{ .Path | replace &quot;.docx&quot; &quot;.yaml&quot; }}"
+        command: python3 artifacts-quantum/converters/docx-to-yaml-converter.py {{ .InputPath }} {{ .OutputPath }}
+        
+      - name: pdf-to-json
+        inputPattern: "**/*.pdf"
+        outputPattern: "artifacts/reports/{{ .Path | replace &quot;.pdf&quot; &quot;.json&quot; }}"
+        command: python3 artifacts-quantum/converters/pdf-to-json-converter.py {{ .InputPath }} {{ .OutputPath }}
+        
+      - name: markdown-to-python
+        inputPattern: "**/*.md"
+        outputPattern: "artifacts/modules/{{ .Path | replace &quot;.md&quot; &quot;.py&quot; }}"
+        command: python3 artifacts-quantum/converters/markdown-to-python-module.py {{ .InputPath }} {{ .OutputPath }}
+        
+  upload:
+    enabled: true
+    destinations:
+      - type: github-artifacts
+        retention: 90d
+        compress: true
+        
+      - type: s3
+        bucket: gl-artifacts
+        prefix: artifacts/
+        retention: 365d
+        
+      - type: registry
+        registry: ghcr.io
+        repository: machinenativeops/artifacts
+        retention: 180d
+        
+  validation:
+    preUpload:
+      - validate-structure
+      - lint-format
+      - security-scan
+      
+    postUpload:
+      - verify-upload
+      - generate-report
+      
+  metadata:
+    capture:
+      - git-commit
+      - author
+      - timestamp
+      - branch
+      - pr-number
+      
+    enrich:
+      - gl-version
+      - tier
+      - environment
+      
+  reporting:
+    enabled: true
+    format: json
+    output: artifacts/upload-reports
+    retention: 90d

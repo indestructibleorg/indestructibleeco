@@ -1,0 +1,270 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLExecutionMode
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-execution-mode.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-execution-mode.yaml"
+  name: gl-execution-mode
+  version: "1.1.0"
+  status: ACTIVE
+  semantic_seal: SEALED
+  activated_at: "2025-01-18T00:00:00Z"
+  sealed_at: "2025-01-18T00:00:00Z"
+execution_state:
+  mode: ACTIVE
+  semantic_seal: SEALED
+  strict_layer_enforcement: true
+  cross_layer_prohibited: true
+  skip_layer_prohibited: true
+  mix_layer_prohibited: true
+  modification_prohibited: true
+  expansion_prohibited: true
+  rewrite_prohibited: true
+layer_semantics:
+  GL00-09:
+    name: "Strategic Layer"
+    name_zh: "戰略層"
+    range: "00-09"
+    scope:
+      - "願景與使命定義"
+      - "架構決策"
+      - "風險管理"
+      - "合規治理"
+      - "安全策略"
+    output_types:
+      - "vision-statement"
+      - "architecture-decision-record"
+      - "risk-assessment"
+      - "compliance-policy"
+      - "security-policy"
+    constraints:
+      - "不涉及具體執行細節"
+      - "不直接操作技術系統"
+      - "決策週期：季度/年度"
+  GL10-29:
+    name: "Operational Layer"
+    name_zh: "運營層"
+    range: "10-29"
+    scope:
+      - "政策制定與落地"
+      - "流程管理"
+      - "工具選型"
+      - "品質管理"
+      - "文化建設"
+    output_types:
+      - "policy-document"
+      - "process-definition"
+      - "tool-configuration"
+      - "quality-standard"
+      - "capability-matrix"
+    constraints:
+      - "依據戰略層指導執行"
+      - "不涉及具體代碼實現"
+      - "決策週期：月度/季度"
+  GL30-49:
+    name: "Execution Layer"
+    name_zh: "執行層"
+    range: "30-49"
+    scope:
+      - "模板與契約"
+      - "Schema 定義"
+      - "自動化腳本"
+      - "配置管理"
+      - "行為契約"
+    output_types:
+      - "template-file"
+      - "schema-definition"
+      - "automation-script"
+      - "config-file"
+      - "behavior-contract"
+    constraints:
+      - "依據運營層政策執行"
+      - "產出可執行成果"
+      - "決策週期：週/日"
+  GL50-59:
+    name: "Observability Layer"
+    name_zh: "觀測層"
+    range: "50-59"
+    scope:
+      - "監控配置"
+      - "指標定義"
+      - "告警規則"
+      - "洞察報告"
+    output_types:
+      - "monitoring-config"
+      - "metric-definition"
+      - "alert-rule"
+      - "insight-report"
+    constraints:
+      - "僅觀測不干預"
+      - "數據驅動"
+      - "即時性要求"
+  GL60-80:
+    name: "Advanced/Feedback Layer"
+    name_zh: "進階/回饋層"
+    range: "60-80"
+    scope:
+      - "AI 優化"
+      - "智能分析"
+      - "回饋機制"
+      - "審計追蹤"
+    output_types:
+      - "ai-model-config"
+      - "optimization-rule"
+      - "feedback-loop"
+      - "audit-trail"
+    constraints:
+      - "基於觀測數據"
+      - "持續優化"
+      - "可解釋性"
+  GL81-83:
+    name: "Extended Layer"
+    name_zh: "擴展層"
+    range: "81-83"
+    scope:
+      - "外部整合"
+      - "自動評論"
+      - "利害關係人橋接"
+    output_types:
+      - "integration-config"
+      - "auto-comment-rule"
+      - "stakeholder-bridge"
+    constraints:
+      - "跨系統協作"
+      - "標準化接口"
+  GL90-99:
+    name: "Meta-Specification Layer"
+    name_zh: "元規範層"
+    range: "90-99"
+    scope:
+      - "命名規範"
+      - "語意定義"
+      - "治理規範"
+      - "元數據管理"
+    output_types:
+      - "naming-convention"
+      - "semantic-definition"
+      - "governance-spec"
+      - "metadata-schema"
+    constraints:
+      - "規範其他層級"
+      - "最高優先級"
+      - "變更需審批"
+execution_rules:
+  - rule_id: "ECO-EXEC-001"
+    name: "層級隔離原則"
+    description: "所有輸出必須依照 GL 層級語意產生，不得跨層、不跳層、不混層"
+    enforcement: STRICT
+  - rule_id: "ECO-EXEC-002"
+    name: "可執行成果原則"
+    description: "僅產出可執行成果（actionable output），不提供分析、摘要、評論或建議"
+    enforcement: STRICT
+  - rule_id: "ECO-EXEC-003"
+    name: "最小變更原則"
+    description: "僅做必要的最小變更（minimal actionable output）"
+    enforcement: STRICT
+  - rule_id: "ECO-EXEC-004"
+    name: "多層級拆解原則"
+    description: "若任務涉及多層級，依 GL 層級順序自動拆解並逐層執行"
+    enforcement: STRICT
+  - rule_id: "ECO-EXEC-005"
+    name: "自動分類原則"
+    description: "所有後續任務依照 GL 層級語意自動分類、執行與產出"
+    enforcement: STRICT
+  - rule_id: "ECO-EXEC-006"
+    name: "治理閉環原則"
+    description: "所有任務必須經過完整的治理閉環：接收→分層→執行→驗證→封存→回饋→下一輪"
+    enforcement: STRICT
+  - rule_id: "ECO-EXEC-007"
+    name: "自動化執行原則"
+    description: "所有任務自動進入治理閉環，不需額外指令，由自動化執行引擎驅動"
+    enforcement: STRICT
+  - rule_id: "ECO-EXEC-008"
+    name: "任務生命週期原則"
+    description: "所有任務必須經過完整九階段生命週期：接收→分層→拆解→執行→驗證→封存→回饋→閉環→下一輪"
+    enforcement: STRICT
+automation_engine:
+  enabled: true
+  status: ACTIVE
+  mode: AUTONOMOUS
+  continuous_execution: true
+  capabilities:
+    - id: "CAP-001"
+      name: "自動接收任務"
+      gl_layer: "GL00-09"
+    - id: "CAP-002"
+      name: "自動判斷 GL 層級"
+      gl_layer: "GL10-29"
+    - id: "CAP-003"
+      name: "自動拆解多層級任務"
+      gl_layer: "GL10-29"
+    - id: "CAP-004"
+      name: "自動依層級語意執行"
+      gl_layer: "GL30-49"
+    - id: "CAP-005"
+      name: "自動產出可執行成果"
+      gl_layer: "GL30-49"
+    - id: "CAP-006"
+      name: "自動進行任務驗證"
+      gl_layer: "GL50-59"
+    - id: "CAP-007"
+      name: "自動執行語意封存"
+      gl_layer: "GL90-99"
+    - id: "CAP-008"
+      name: "自動整合回饋"
+      gl_layer: "GL60-80"
+    - id: "CAP-009"
+      name: "自動進入下一輪"
+      gl_layer: "GL00-09"
+governance_loop:
+  enabled: true
+  current_cycle: 1
+  phases:
+    - phase_id: "PHASE-1"
+      name: "Task Intake"
+      gl_layer: "GL00-09"
+    - phase_id: "PHASE-2"
+      name: "GL Layer Classification"
+      gl_layer: "GL10-29"
+    - phase_id: "PHASE-3"
+      name: "Layered Execution"
+      gl_layer: "GL30-49"
+    - phase_id: "PHASE-4"
+      name: "Validation Layer"
+      gl_layer: "GL50-59"
+    - phase_id: "PHASE-5"
+      name: "Semantic Sealing"
+      gl_layer: "GL90-99"
+    - phase_id: "PHASE-6"
+      name: "Feedback Integration"
+      gl_layer: "GL60-80"
+    - phase_id: "PHASE-7"
+      name: "Next-Cycle Continuation"
+      gl_layer: "GL00-09"
+execution_order:
+  - layer: "GL90-99"
+    priority: 1
+    description: "元規範優先 - 確保規範一致性"
+  - layer: "GL00-09"
+    priority: 2
+    description: "戰略層 - 確定方向與決策"
+  - layer: "GL10-29"
+    priority: 3
+    description: "運營層 - 政策與流程"
+  - layer: "GL30-49"
+    priority: 4
+    description: "執行層 - 具體實現"
+  - layer: "GL50-59"
+    priority: 5
+    description: "觀測層 - 監控與指標"
+  - layer: "GL60-80"
+    priority: 6
+    description: "進階層 - 優化與回饋"
+  - layer: "GL81-83"
+    priority: 7
+    description: "擴展層 - 外部整合"

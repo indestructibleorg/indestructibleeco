@@ -1,0 +1,283 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governance-core
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL90_99-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: pipeline.machinenativeops.io/v1
+kind: MetadataDrivenPipeline
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:ci-pipeline:metadata-driven-pipeline.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/ci-pipeline/metadata-driven-pipeline.yaml"
+  name: gl-quantum-ci-pipeline
+  namespace: ci-cd
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-ci
+spec:
+  enabled: true
+  version: v3
+  
+  metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:ci-pipeline:metadata-driven-pipeline.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/ci-pipeline/metadata-driven-pipeline.yaml"
+    pipeline:
+      name: gl-quantum-pipeline
+      version: "1.0.0"
+      description: "GL Quantum Architecture Platform CI Pipeline"
+      author: "GL Quantum Platform Team"
+      
+    trigger:
+      type: push
+      branchPattern: "main|develop|feature/*"
+      
+  stages:
+    - name: validation
+      order: 1
+      description: "Validate changes before processing"
+      jobs:
+        - name: validate-metadata
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:ci-pipeline:metadata-driven-pipeline.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/ci-pipeline/metadata-driven-pipeline.yaml"
+            type: validation
+            category: quality
+          steps:
+            - name: check-metadata-schema
+              tool: yq
+              command: |
+                yq eval '.metadata | keys' .github/workflows-quantum/pipeline-metadata.yaml
+                
+        - name: lint-workflows
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:ci-pipeline:metadata-driven-pipeline.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/ci-pipeline/metadata-driven-pipeline.yaml"
+            type: validation
+            category: lint
+          steps:
+            - name: actionlint
+              tool: actionlint
+              command: actionlint .github/workflows-quantum/**/*.yml
+              
+    - name: security-scan
+      order: 2
+      description: "Security scanning and vulnerability detection"
+      jobs:
+        - name: dependency-scan
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:ci-pipeline:metadata-driven-pipeline.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/ci-pipeline/metadata-driven-pipeline.yaml"
+            type: security
+            category: dependency
+          steps:
+            - name: trivy-scan
+              tool: trivy
+              command: |
+                trivy fs --severity HIGH,CRITICAL --format json > artifacts/security/dependency-scan.json
+                
+        - name: secrets-scan
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:ci-pipeline:metadata-driven-pipeline.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/ci-pipeline/metadata-driven-pipeline.yaml"
+            type: security
+            category: secrets
+          steps:
+            - name: gitleaks
+              tool: gitleaks
+              command: |
+                gitleaks detect --source . --report-path artifacts/security/secrets-scan.json
+                
+    - name: build
+      order: 3
+      description: "Build artifacts and generate SBOM"
+      jobs:
+        - name: generate-sbom
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:ci-pipeline:metadata-driven-pipeline.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/ci-pipeline/metadata-driven-pipeline.yaml"
+            type: build
+            category: supply-chain
+          steps:
+            - name: syft-sbom
+              tool: syft
+              command: |
+                syft . -o spdx-json > artifacts/sbom/sbom.json
+                
+        - name: sign-artifacts
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:ci-pipeline:metadata-driven-pipeline.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/ci-pipeline/metadata-driven-pipeline.yaml"
+            type: build
+            category: signing
+          steps:
+            - name: cosign-sign
+              tool: cosign
+              command: |
+                cosign sign --key ${{ secrets.COSIGN_PRIVATE_KEY }} ${{ artifacts }}
+                
+    - name: test
+      order: 4
+      description: "Run tests and generate evidence"
+      jobs:
+        - name: unit-tests
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:ci-pipeline:metadata-driven-pipeline.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/ci-pipeline/metadata-driven-pipeline.yaml"
+            type: test
+            category: unit
+          steps:
+            - name: run-unit-tests
+              tool: pytest
+              command: |
+                pytest tests/unit/ --junitxml=artifacts/test-results/unit-tests.xml
+                
+        - name: integration-tests
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:ci-pipeline:metadata-driven-pipeline.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/ci-pipeline/metadata-driven-pipeline.yaml"
+            type: test
+            category: integration
+          steps:
+            - name: run-integration-tests
+              tool: pytest
+              command: |
+                pytest tests/integration/ --junitxml=artifacts/test-results/integration-tests.xml
+                
+    - name: governance
+      order: 5
+      description: "Governance validation and compliance checks"
+      jobs:
+        - name: naming-compliance
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:ci-pipeline:metadata-driven-pipeline.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/ci-pipeline/metadata-driven-pipeline.yaml"
+            type: governance
+            category: naming
+          steps:
+            - name: conftest-validation
+              tool: conftest
+              command: |
+                conftest test infrastructure/ -p governance-quantum/naming/conftest-policy.yaml --output json > artifacts/governance/naming-compliance.json
+                
+        - name: k8s-policy-validation
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:ci-pipeline:metadata-driven-pipeline.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/ci-pipeline/metadata-driven-pipeline.yaml"
+            type: governance
+            category: policy
+          steps:
+            - name: kube-bench
+              tool: kube-bench
+              command: |
+                kube-bench --json > artifacts/governance/kube-bench.json
+                
+    - name: deploy
+      order: 6
+      description: "Deploy artifacts and verify"
+      jobs:
+        - name: deploy-staging
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:ci-pipeline:metadata-driven-pipeline.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/ci-pipeline/metadata-driven-pipeline.yaml"
+            type: deploy
+            category: staging
+          environment: staging
+          steps:
+            - name: kubectl-apply
+              tool: kubectl
+              command: |
+                kubectl apply -f deployment/ --namespace staging
+                
+    - name: verification
+      order: 7
+      description: "Post-deployment verification and evidence collection"
+      jobs:
+        - name: health-check
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:ci-pipeline:metadata-driven-pipeline.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/ci-pipeline/metadata-driven-pipeline.yaml"
+            type: verification
+            category: health
+          steps:
+            - name: check-endpoints
+              tool: curl
+              command: |
+                curl -f https://staging.api.machinenativeops.com/health || exit 1
+                
+        - name: collect-evidence
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:ci-pipeline:metadata-driven-pipeline.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/ci-pipeline/metadata-driven-pipeline.yaml"
+            type: verification
+            category: evidence
+          steps:
+            - name: generate-evidence
+              tool: python
+              command: |
+                python3 scripts/generate-evidence.py --output artifacts/evidence/
+                
+  artifacts:
+    share:
+      enabled: true
+      strategy: job-dependency
+      
+    evidence:
+      enabled: true
+      format: json
+      output: artifacts/evidence/
+      
+    reports:
+      enabled: true
+      format: json
+      output: artifacts/reports/
+      
+  fail_action:
+    onFailure:
+      - notify-team
+      - create-ticket
+      - rollback-if-deployed
+      
+    rollback:
+      enabled: true
+      timeout: 10m
+      strategy: git-revert
+      
+  audit_log:
+    enabled: true
+    format: json
+    output: artifacts/audit/
+    retention: 365d
+    fields:
+      - timestamp
+      - stage
+      - job
+      - step
+      - status
+      - duration
+      - artifacts
+      - evidence
+      - who
+      - why
+      - how

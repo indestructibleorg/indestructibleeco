@@ -1,0 +1,338 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: performance-benchmark-config
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:performance-benchmark-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/performance-benchmark-config.yaml"
+  name: performance-benchmark-config
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: performance-benchmark
+    environment: production
+data:
+  benchmark-config.yaml: |
+    version: "1.0"
+    
+    # Baseline Performance Targets
+    baseline:
+      api:
+        throughput:
+          requests_per_second: 1000
+          concurrent_connections: 500
+        latency:
+          p50: 50ms
+          p95: 200ms
+          p99: 500ms
+        error_rate: 0.01  # 1%
+      
+      database:
+        query_latency:
+          p50: 10ms
+          p95: 50ms
+          p99: 100ms
+        connection_pool:
+          max_connections: 100
+          min_connections: 10
+          idle_timeout: 300s
+      
+      cache:
+        hit_rate: 0.90  # 90%
+        latency:
+          p50: 1ms
+          p95: 5ms
+          p99: 10ms
+      
+      memory:
+        max_heap_size: "2Gi"
+        gc_pause_target: 100ms
+        gc_overhead_target: 0.10  # 10%
+      
+      cpu:
+        max_utilization: 0.80  # 80%
+        steady_state_utilization: 0.50  # 50%
+
+    # Performance Regression Detection
+    regression_detection:
+      enabled: true
+      thresholds:
+        throughput_degradation: 0.05  # 5%
+        latency_increase: 0.10  # 10%
+        error_rate_increase: 0.02  # 2%
+        memory_increase: 0.15  # 15%
+        cpu_increase: 0.15  # 15%
+      alert_on_regression: true
+      create_jira_ticket: true
+      slack_channel: "#performance-alerts"
+
+    # Automated Performance Testing
+    automated_testing:
+      enabled: true
+      schedule:
+        smoke_tests: "*/5 * * * *"  # Every 5 minutes
+        load_tests: "0 * * * *"  # Every hour
+        stress_tests: "0 2 * * *"  # Daily at 2 AM
+        endurance_tests: "0 0 * * 0"  # Weekly on Sunday
+      
+      test_scenarios:
+        - name: "api-health-check"
+          type: "smoke"
+          endpoint: "/health"
+          expected_status: 200
+          timeout: 5s
+          max_latency: 100ms
+        
+        - name: "api-read-operations"
+          type: "load"
+          endpoint: "/api/v1/data"
+          method: "GET"
+          requests_per_second: 100
+          duration: 60s
+          max_latency: 200ms
+          max_error_rate: 0.01
+        
+        - name: "api-write-operations"
+          type: "load"
+          endpoint: "/api/v1/data"
+          method: "POST"
+          requests_per_second: 50
+          duration: 60s
+          max_latency: 300ms
+          max_error_rate: 0.02
+        
+        - name: "concurrent-users"
+          type: "stress"
+          users: 1000
+          ramp_up: 60s
+          duration: 300s
+          max_latency: 500ms
+          max_error_rate: 0.05
+        
+        - name: "memory-leak-test"
+          type: "endurance"
+          duration: 3600s  # 1 hour
+          requests_per_second: 10
+          max_memory_growth: 10%
+      
+      tools:
+        - name: "k6"
+          enabled: true
+          version: "latest"
+          config: "k6-config.js"
+        
+        - name: "locust"
+          enabled: true
+          version: "latest"
+          config: "locustfile.py"
+        
+        - name: "jmeter"
+          enabled: false
+          version: "5.5"
+          config: "jmx/"
+
+    # Performance Trend Analysis
+    trend_analysis:
+      enabled: true
+      retention_days: 90
+      aggregation_intervals:
+        - "1m"  # 1 minute
+        - "5m"  # 5 minutes
+        - "15m"  # 15 minutes
+        - "1h"  # 1 hour
+        - "1d"  # 1 day
+      
+      metrics_to_track:
+        - "http_requests_total"
+        - "http_request_duration_seconds"
+        - "http_requests_failed_total"
+        - "container_cpu_usage_seconds_total"
+        - "container_memory_usage_bytes"
+        - "redis_commands_total"
+        - "redis_query_duration_seconds"
+        - "postgres_query_duration_seconds"
+        - "postgres_connections_active"
+        - "istio_requests_total"
+        - "istio_request_duration_milliseconds"
+      
+      predictions:
+        enabled: true
+        model: "linear_regression"
+        forecast_days: 7
+        confidence_interval: 0.95
+
+    # Performance Optimization Recommendations
+    optimization_recommendations:
+      enabled: true
+      analysis_interval: "1h"
+      
+      rules:
+        - name: "high_latency_detection"
+          condition: "p95_latency > 300ms"
+          severity: "warning"
+          recommendation: "Consider adding more replicas or optimizing database queries"
+          actions:
+            - "check_slow_queries"
+            - "review_database_indexes"
+            - "consider_caching"
+        
+        - name: "low_cache_hit_rate"
+          condition: "cache_hit_rate < 0.80"
+          severity: "warning"
+          recommendation: "Cache hit rate is below 80%. Review caching strategy."
+          actions:
+            - "increase_cache_ttl"
+            - "review_cache_keys"
+            - "optimize_cache_size"
+        
+        - name: "high_memory_usage"
+          condition: "memory_usage > 0.85"
+          severity: "critical"
+          recommendation: "Memory usage is above 85%. Immediate action required."
+          actions:
+            - "increase_memory_limits"
+            - "check_for_memory_leaks"
+            - "optimize_gc_settings"
+        
+        - name: "high_cpu_usage"
+          condition: "cpu_usage > 0.85"
+          severity: "critical"
+          recommendation: "CPU usage is above 85%. Consider scaling up."
+          actions:
+            - "increase_cpu_limits"
+            - "add_more_replicas"
+            - "optimize_cpu_intensive_operations"
+        
+        - name: "database_connection_exhaustion"
+          condition: "active_connections > max_connections * 0.8"
+          severity: "warning"
+          recommendation: "Database connection pool is nearly exhausted."
+          actions:
+            - "increase_max_connections"
+            - "review_connection_leaks"
+            - "optimize_query_performance"
+        
+        - name: "high_error_rate"
+          condition: "error_rate > 0.05"
+          severity: "critical"
+          recommendation: "Error rate is above 5%. Immediate investigation required."
+          actions:
+            - "check_application_logs"
+            - "review_recent_deployments"
+            - "check_external_dependencies"
+      
+      auto_apply:
+        enabled: false  # Manual approval required
+        notify_before: true
+        rollback_on_failure: true
+
+    # Performance SLAs
+    slas:
+      enabled: true
+      reporting_interval: "1h"
+      
+      api_performance:
+        availability: 0.9999  # 99.99%
+        uptime_target: 99.99%
+        response_time_p95: 200ms
+        response_time_p99: 500ms
+        error_rate: 0.001  # 0.1%
+      
+      database_performance:
+        availability: 0.9999
+        query_time_p95: 50ms
+        connection_utilization: 0.80
+      
+      cache_performance:
+        availability: 0.999
+        hit_rate: 0.90
+        response_time_p95: 5ms
+      
+      infrastructure_performance:
+        pod_ready_time: 30s
+        deployment_time: 300s
+        failover_time: 300s
+      
+      sla_breach_actions:
+        - notify_oncall
+        - create_incident
+        - post_to_slack
+        - update_status_page
+        - initiate_rollback
+
+    # Benchmark Reports
+    reports:
+      enabled: true
+      
+      daily_report:
+        enabled: true
+        schedule: "0 6 * * *"  # 6 AM daily
+        recipients:
+          - "engineering@machinenativeops.com"
+          - "ops@machinenativeops.com"
+        include:
+          - performance_summary
+          - regression_alerts
+          - optimization_recommendations
+          - sla_compliance
+      
+      weekly_report:
+        enabled: true
+        schedule: "0 8 * * 1"  # 8 AM Monday
+        recipients:
+          - "management@machinenativeops.com"
+          - "engineering@machinenativeops.com"
+          - "ops@machinenativeops.com"
+        include:
+          - performance_trends
+          - capacity_planning
+          - optimization_impact
+          - sla_compliance_trend
+      
+      monthly_report:
+        enabled: true
+        schedule: "0 8 1 * *"  # 8 AM on 1st of month
+        recipients:
+          - "executive@machinenativeops.com"
+          - "management@machinenativeops.com"
+          - "engineering@machinenativeops.com"
+          - "ops@machinenativeops.com"
+        include:
+          - performance_summary
+          - optimization_achievements
+          - capacity_forecast
+          - sla_compliance_report
+          - cost_analysis
+          - recommendations
+
+    # Performance Monitoring Integration
+    monitoring:
+      prometheus:
+        enabled: true
+        scrape_interval: "15s"
+        retention: "30d"
+      
+      grafana:
+        enabled: true
+        dashboard: "performance-benchmark"
+        auto_refresh: "30s"
+      
+      alertmanager:
+        enabled: true
+        routes:
+          - match:
+              severity: critical
+            receiver: "oncall-engineer"
+          - match:
+              severity: warning
+            receiver: "engineering-team"
+          - match:
+              severity: info
+            receiver: "performance-team"

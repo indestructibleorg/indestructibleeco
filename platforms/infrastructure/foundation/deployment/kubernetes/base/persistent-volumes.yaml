@@ -1,0 +1,70 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: persistent-volumes
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:deployment:kubernetes:base:persistent-volumes.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/deployment/kubernetes/base/persistent-volumes.yaml"
+  name: prometheus-pvc
+  namespace: platform-03
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: fast-ssd
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:deployment:kubernetes:base:persistent-volumes.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/deployment/kubernetes/base/persistent-volumes.yaml"
+  name: grafana-pvc
+  namespace: platform-03
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: fast-ssd
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:deployment:kubernetes:base:persistent-volumes.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/deployment/kubernetes/base/persistent-volumes.yaml"
+  name: alertmanager-pvc
+  namespace: platform-03
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: fast-ssd
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:deployment:kubernetes:base:persistent-volumes.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/deployment/kubernetes/base/persistent-volumes.yaml"
+  name: logs-pvc
+  namespace: platform-03
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: standard

@@ -1,0 +1,73 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: DEFINITION
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLLayerDefinition
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:governance:gl-artifacts:feedback:DEFINITION.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/feedback/DEFINITION.yaml"
+  layer_id: GL60-80
+  name: Advanced/Feedback Layer
+  version: "1.0.0"
+spec:
+  range: "60-80"
+  description: "AI, contracts, audit, optimization, feedback"
+  dimensions:
+    - id: "07-audit"
+      purpose: "Audit and compliance verification"
+      artifacts:
+        - "naming-audit-checklist.yaml"
+      functions:
+        - "run_audit"
+        - "generate_compliance_report"
+      note: "Moved from GL00-09 during semantic stabilization"
+    - id: "60-contracts"
+      purpose: "Advanced contract management"
+    - id: "70-audit"
+      purpose: "Advanced audit capabilities"
+    - id: "80-feedback"
+      purpose: "Feedback loop management"
+  advanced_capabilities:
+    - id: "ai-enhancement"
+      purpose: "AI-powered governance enhancement"
+      planned_features:
+        - "automated_policy_recommendation"
+        - "anomaly_detection"
+        - "predictive_compliance"
+    - id: "optimization"
+      purpose: "Continuous optimization"
+      planned_features:
+        - "performance_optimization"
+        - "cost_optimization"
+        - "process_optimization"
+    - id: "learning"
+      purpose: "Organizational learning"
+      planned_features:
+        - "pattern_recognition"
+        - "best_practice_extraction"
+        - "knowledge_capture"
+  interfaces:
+    input:
+      - "insights"
+      - "audit_requirements"
+      - "performance_data"
+    output:
+      - "audit_reports"
+      - "optimization_recommendations"
+      - "feedback_analysis"
+  dependencies:
+    upstream:
+      - "GL30-49"
+      - "GL50-59"
+    downstream:
+      - "GL81-83"
+  validation:
+    semantic_boundary: "Advanced capabilities - audit, contracts, AI, optimization, feedback"
+    no_conflicts: true
+    no_duplicates: true
+    clear_boundaries: true

@@ -1,0 +1,221 @@
+# @ECO-governed
+# @ECO-layer: instant
+# @ECO-semantic: data-synchronization-configuration
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+#
+# GL Unified Architecture Governance Framework Activated
+# Data Synchronization Service Configuration
+
+apiVersion: instant.machinenativeops.io/v1
+kind: DataSyncConfig
+metadata:
+  name: data-synchronization-service
+  version: "1.0.0"
+  created_at: "2026-01-28T00:00:00Z"
+  layer: "GL90-99"
+  owner: "engineering-team"
+  annotations:
+    governance.machinenativeops.io/classification: "internal"
+    governance.machinenativeops.io/approval: "approved"
+    governance.machinenativeops.io/charter-version: "2.0.0"
+
+spec:
+  # Source System Configuration
+  sourceSystem:
+    type: "api"
+    connectionString: "${SOURCE_API_URL}"
+    auth:
+      type: "bearer"
+      credentials:
+        token: "${SOURCE_API_TOKEN}"
+    options:
+      timeoutSeconds: 30
+      maxRetries: 3
+      batchSize: 100
+
+  # Target System Configuration
+  targetSystem:
+    type: "database"
+    connectionString: "${TARGET_DB_CONNECTION_STRING}"
+    auth:
+      type: "basic"
+      credentials:
+        username: "${TARGET_DB_USERNAME}"
+        password: "${TARGET_DB_PASSWORD}"
+    options:
+      poolSize: 10
+      connectionTimeout: 10000
+      queryTimeout: 30000
+
+  # Synchronization Mode
+  syncMode: "real-time"  # Options: real-time, scheduled, manual
+  
+  # Conflict Resolution Strategy
+  conflictResolution: "latest-timestamp"  # Options: source-wins, target-wins, latest-timestamp, manual
+  
+  # Scheduled Sync Configuration (only for scheduled mode)
+  schedule:
+    cron: "0 */5 * * * *"  # Every 5 minutes
+    timezone: "UTC"
+    enabled: false
+
+  # Retry Policy
+  retryPolicy:
+    maxRetries: 3
+    backoffMultiplier: 2
+    initialDelayMs: 1000
+    maxDelayMs: 30000
+    jitter: true
+
+  # Validation Rules
+  validationRules:
+    - field: "id"
+      type: "required"
+      config:
+        errorMessage: "ID field is required"
+    
+    - field: "email"
+      type: "format"
+      config:
+        pattern: "^[^@]+@[^@]+\\.[^@]+$"
+        errorMessage: "Invalid email format"
+    
+    - field: "timestamp"
+      type: "type"
+      config:
+        expectedType: "number"
+        errorMessage: "Timestamp must be a number"
+    
+    - field: "status"
+      type: "custom"
+      config:
+        allowedValues: ["active", "inactive", "pending"]
+        errorMessage: "Invalid status value"
+
+  # Data Transformation Rules
+  transformations:
+    - field: "createdAt"
+      transform: "timestamp"
+      config:
+        inputFormat: "ISO8601"
+        outputFormat: "unix"
+    
+    - field: "price"
+      transform: "decimal"
+      config:
+        precision: 2
+        scale: 2
+
+  # Change Tracking Configuration
+  changeTracking:
+    enabled: true
+    retentionDays: 90
+    maxHistoryRecords: 10000
+    fields:
+      - "id"
+      - "timestamp"
+      - "version"
+      - "operation"
+
+  # Monitoring Configuration
+  monitoring:
+    enabled: true
+    metricsPort: 9090
+    healthCheckInterval: 30
+    logLevel: "info"
+    
+    # Metrics to collect
+    metrics:
+      - "sync_throughput"
+      - "sync_latency"
+      - "sync_errors"
+      - "sync_conflicts"
+      - "queue_size"
+      - "retry_count"
+    
+    # Alerting Configuration
+    alerting:
+      enabled: true
+      thresholds:
+        failureRate: 0.1  # 10% failure rate
+        conflictRate: 0.05  # 5% conflict rate
+        latencyMs: 5000  # 5 seconds
+        queueSize: 1000
+      
+      # Alert Channels
+      channels:
+        - type: "webhook"
+          url: "${ALERT_WEBHOOK_URL}"
+          severity: "high"
+        
+        - type: "email"
+          recipients:
+            - "${ALERT_EMAIL}"
+          severity: "critical"
+
+  # Performance Configuration
+  performance:
+    maxConcurrentSyncs: 10
+    batchSize: 100
+    throttleRatePerSecond: 50
+    memoryLimitMb: 512
+    
+  # Security Configuration
+  security:
+    encryptData: true
+    encryptFields:
+      - "password"
+      - "token"
+      - "ssn"
+    encryptionKey: "${ENCRYPTION_KEY}"
+    
+    # Data Masking for Logs
+    maskFields:
+      - "password"
+      - "token"
+      - "apiKey"
+
+  # Backup Configuration
+  backup:
+    enabled: true
+    schedule: "0 2 * * *"  # Daily at 2 AM
+    retentionDays: 30
+    location: "${BACKUP_LOCATION}"
+
+  # Audit Logging
+  audit:
+    enabled: true
+    logLevel: "detailed"
+    fields:
+      - "record_id"
+      - "operation"
+      - "timestamp"
+      - "user"
+      - "source_ip"
+    retentionDays: 365
+
+  # Health Check Configuration
+  healthCheck:
+    enabled: true
+    endpoint: "/health"
+    dependencies:
+      - name: "source"
+        timeout: 5000
+      - name: "target"
+        timeout: 5000
+
+status:
+  phase: "configured"
+  conditions:
+    - type: "ConfigurationLoaded"
+      status: "True"
+      lastTransitionTime: "2026-01-28T00:00:00Z"
+      reason: "Configuration successfully loaded"
+    - type: "ValidationRulesApplied"
+      status: "True"
+      lastTransitionTime: "2026-01-28T00:00:00Z"
+      reason: "All validation rules applied"
+    - type: "MonitoringEnabled"
+      status: "True"
+      lastTransitionTime: "2026-01-28T00:00:00Z"
+      reason: "Monitoring system initialized"

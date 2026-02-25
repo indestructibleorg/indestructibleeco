@@ -1,0 +1,363 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: root.specs.mapping
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# 🗺️ Root Layer Mapping Specification
+# Version: 1.0.0
+# Scope: All mapping relationships in root layer
+# Enforcement: Strict (GitHub Actions gate-root-specs.yml)
+
+apiVersion: machinenativeops.io/v1
+kind: RootMappingSpec
+metadata:
+  name: root-mapping-specification
+  namespace: machinenativeops-specs
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    machinenativeops.io/tier: "specs"
+    machinenativeops.io/version: "v1.0.0"
+    machinenativeops.io/component: "mapping-spec"
+  annotations:
+    machinenativeops.io/description: "Machine-verifiable mapping conventions for root layer"
+    machinenativeops.io/enforcement: "strict"
+    machinenativeops.io/last-modified: "2025-12-21T02:00:00Z"
+
+spec:
+  version: 1
+  
+  # === 映射類型定義 ===
+  mapping_types:
+    # 1. 模組映射
+    module_mapping:
+      description: "模組名稱與檔案系統的映射關係"
+      source: "root.registry.modules.yaml"
+      targets:
+        - type: "file_path"
+          pattern: "/opt/machinenativenops/modules/{module_name}/"
+        - type: "config_file"
+          pattern: "config/{module_name}.yaml"
+        - type: "log_file"
+          pattern: "/var/log/machinenativenops/{module_name}.log"
+      validation:
+        - "模組名稱必須唯一"
+        - "檔案路徑必須存在於 root.fs.map"
+        - "配置檔案必須存在"
+      examples:
+        - module_name: "governance-engine"
+          file_path: "/opt/machinenativenops/modules/governance-engine/"
+          config_file: "config/governance-engine.yaml"
+          log_file: "/var/log/machinenativenops/governance-engine.log"
+    
+    # 2. URN 映射
+    urn_mapping:
+      description: "URN 與實際資源的映射關係"
+      source: "root.registry.urns.yaml"
+      format: "urn:machinenativeops:{type}:{identifier}"
+      targets:
+        - type: "module"
+          registry: "root.registry.modules.yaml"
+        - type: "service"
+          registry: "root.registry.modules.yaml"
+        - type: "config"
+          registry: "root.*.yaml"
+        - type: "policy"
+          registry: "root.governance.yaml"
+      validation:
+        - "URN 必須唯一"
+        - "目標資源必須存在"
+        - "類型必須匹配"
+      examples:
+        - urn: "urn:machinenativeops:module:governance-engine"
+          target_type: "module"
+          target_registry: "root.registry.modules.yaml"
+          target_key: "modules[name=governance-engine]"
+    
+    # 3. 設備映射
+    device_mapping:
+      description: "設備檔案與系統資源的映射"
+      source: "root.devices.map"
+      format: "{device_path} -> {resource_type}:{resource_id}"
+      categories:
+        - "block_devices"
+        - "character_devices"
+        - "network_devices"
+        - "virtual_devices"
+      validation:
+        - "設備路徑必須以 /dev/ 開頭"
+        - "資源類型必須有效"
+        - "不可重複映射"
+      examples:
+        - device_path: "/dev/sda1"
+          resource_type: "block"
+          resource_id: "primary_storage"
+    
+    # 4. 檔案系統映射
+    filesystem_mapping:
+      description: "目錄結構與用途的映射"
+      source: "root.fs.map"
+      format: "{directory_path} -> {purpose}:{description}"
+      categories:
+        - "system_directories"
+        - "application_directories"
+        - "data_directories"
+        - "log_directories"
+      validation:
+        - "目錄路徑必須絕對路徑"
+        - "用途必須明確定義"
+        - "不可重複映射"
+      examples:
+        - directory_path: "/opt/machinenativenops"
+          purpose: "application"
+          description: "MachineNativeOps application root"
+    
+    # 5. 核心模組映射
+    kernel_mapping:
+      description: "核心模組與功能的映射"
+      source: "root.kernel.map"
+      format: "{module_name} -> {function}:{description}"
+      categories:
+        - "core_modules"
+        - "driver_modules"
+        - "filesystem_modules"
+        - "network_modules"
+      validation:
+        - "模組名稱必須有效"
+        - "功能描述必須清晰"
+      examples:
+        - module_name: "machinenativeops_core"
+          function: "core"
+          description: "MachineNativeOps core functionality"
+
+  # === 映射規則 ===
+  mapping_rules:
+    - id: "MAP-001"
+      description: "模組名稱必須與檔案路徑一致"
+      severity: "error"
+      check: |
+        對於每個模組 M：
+        - M.name 必須出現在 M.entrypoint 路徑中
+        - 路徑格式：/opt/machinenativenops/modules/{M.name}/
+      examples:
+        valid:
+          - name: "governance-engine"
+            entrypoint: "/opt/machinenativenops/modules/governance-engine/main.py"
+        invalid:
+          - name: "governance-engine"
+            entrypoint: "/opt/machinenativenops/modules/governance/main.py"
+    
+    - id: "MAP-002"
+      description: "URN 必須映射到唯一資源"
+      severity: "error"
+      check: |
+        對於每個 URN U：
+        - U 只能映射到一個資源
+        - 資源必須存在於對應的註冊表中
+      
+    - id: "MAP-003"
+      description: "配置檔案名稱必須與模組名稱一致"
+      severity: "warning"
+      check: |
+        對於每個模組 M：
+        - 如果存在配置檔案，檔名應為 {M.name}.yaml
+        - 配置檔案應位於 config/ 目錄
+      examples:
+        valid:
+          - module: "governance-engine"
+            config: "config/governance-engine.yaml"
+        invalid:
+          - module: "governance-engine"
+            config: "config/governance.yaml"
+    
+    - id: "MAP-004"
+      description: "日誌檔案路徑必須遵循標準格式"
+      severity: "warning"
+      check: |
+        對於每個模組 M：
+        - 日誌檔案應位於 /var/log/machinenativenops/
+        - 檔名格式：{M.name}.log
+      examples:
+        valid:
+          - module: "governance-engine"
+            log: "/var/log/machinenativenops/governance-engine.log"
+    
+    - id: "MAP-005"
+      description: "設備映射不可重複"
+      severity: "error"
+      check: |
+        對於所有設備映射：
+        - 同一設備路徑只能映射一次
+        - 同一資源 ID 只能被一個設備映射
+    
+    - id: "MAP-006"
+      description: "目錄映射必須唯一且不重疊"
+      severity: "error"
+      check: |
+        對於所有目錄映射：
+        - 同一目錄路徑只能映射一次
+        - 子目錄映射不可與父目錄映射衝突
+
+  # === 映射完整性檢查 ===
+  integrity_checks:
+    # 1. 雙向映射一致性
+    bidirectional_consistency:
+      enabled: true
+      description: "驗證正向和反向映射的一致性"
+      checks:
+        - name: "module_to_path"
+          forward: "module_name -> file_path"
+          reverse: "file_path -> module_name"
+          validation: "forward(reverse(x)) == x"
+        
+        - name: "urn_to_resource"
+          forward: "urn -> resource"
+          reverse: "resource -> urn"
+          validation: "forward(reverse(x)) == x"
+    
+    # 2. 映射覆蓋率
+    coverage:
+      enabled: true
+      description: "驗證所有資源都有對應的映射"
+      checks:
+        - resource_type: "modules"
+          required_mappings:
+            - "file_path"
+            - "config_file"
+            - "log_file"
+          coverage_threshold: 100
+        
+        - resource_type: "services"
+          required_mappings:
+            - "urn"
+            - "endpoint"
+          coverage_threshold: 100
+    
+    # 3. 映射唯一性
+    uniqueness:
+      enabled: true
+      description: "驗證映射的唯一性"
+      checks:
+        - mapping_type: "urn"
+          constraint: "unique"
+          scope: "global"
+        
+        - mapping_type: "module_name"
+          constraint: "unique"
+          scope: "global"
+        
+        - mapping_type: "device_path"
+          constraint: "unique"
+          scope: "global"
+    
+    # 4. 映射有效性
+    validity:
+      enabled: true
+      description: "驗證映射目標的有效性"
+      checks:
+        - mapping_type: "file_path"
+          validation: "path_exists_in_fs_map"
+        
+        - mapping_type: "urn"
+          validation: "target_exists_in_registry"
+        
+        - mapping_type: "module_ref"
+          validation: "module_exists_in_registry"
+
+  # === 映射衝突解決 ===
+  conflict_resolution:
+    # 優先級規則
+    priority_rules:
+      - source: "root.registry.modules.yaml"
+        priority: 1
+        description: "模組註冊表具有最高優先級"
+      
+      - source: "root.registry.urns.yaml"
+        priority: 2
+        description: "URN 註冊表次之"
+      
+      - source: "root.*.yaml"
+        priority: 3
+        description: "其他配置檔案"
+    
+    # 衝突處理策略
+    strategies:
+      duplicate_mapping:
+        action: "error"
+        message: "檢測到重複映射，請解決衝突"
+      
+      ambiguous_mapping:
+        action: "warning"
+        message: "映射不明確，建議明確指定"
+      
+      missing_mapping:
+        action: "error"
+        message: "缺少必要的映射關係"
+
+  # === 映射最佳實踐 ===
+  best_practices:
+    - id: "BP-MAP-001"
+      title: "保持映射一致性"
+      description: "同一資源在不同映射中的名稱應保持一致"
+      rationale: "避免混淆和錯誤"
+      
+    - id: "BP-MAP-002"
+      title: "使用描述性映射鍵"
+      description: "映射鍵應清晰描述映射關係"
+      rationale: "提高可讀性"
+      
+    - id: "BP-MAP-003"
+      title: "文檔化複雜映射"
+      description: "複雜的映射關係應在註解中說明"
+      rationale: "便於理解和維護"
+      
+    - id: "BP-MAP-004"
+      title: "定期驗證映射"
+      description: "定期執行映射完整性檢查"
+      rationale: "及早發現問題"
+
+  # === 驗證配置 ===
+  validation:
+    enabled: true
+    enforcement_level: "strict"
+    
+    checks:
+      - name: "consistency_check"
+        enabled: true
+        description: "驗證映射一致性"
+      
+      - name: "coverage_check"
+        enabled: true
+        description: "驗證映射覆蓋率"
+      
+      - name: "uniqueness_check"
+        enabled: true
+        description: "驗證映射唯一性"
+      
+      - name: "validity_check"
+        enabled: true
+        description: "驗證映射有效性"
+    
+    error_handling:
+      on_inconsistency: "block_pr"
+      on_incomplete_coverage: "warning"
+      on_duplicate: "block_pr"
+      on_invalid_target: "block_pr"
+
+# === 狀態 ===
+status:
+  phase: "Active"
+  conditions:
+    - type: "Validated"
+      status: "True"
+      lastTransitionTime: "2025-12-21T02:00:00Z"
+      reason: "SpecificationComplete"
+      message: "Mapping specification is complete and validated"
+  
+  statistics:
+    total_mapping_types: 5
+    total_rules: 6
+    total_checks: 4
+    coverage: "100%"

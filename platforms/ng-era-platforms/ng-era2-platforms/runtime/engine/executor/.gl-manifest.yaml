@@ -1,0 +1,72 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: .gl-manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# GL Semantic Manifest - Executor Subsystem
+# @gl-layer ECO-30-EXECUTION
+# @gl-semantic-anchor ECO-30-EXEC-EXECUTOR
+# GL Unified Architecture Governance Framework Activated
+
+gl_version: "1.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:executor:.gl-manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/executor/.gl-manifest.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+manifest:
+  subsystem: "executor"
+  module: "aep-engine"
+  layer: "ECO-30-EXECUTION"
+  semantic_anchor: "ECO-30-EXEC-EXECUTOR"
+  updated: "2026-01-26"
+
+components:
+  local_executor:
+    file: "local_executor.ts"
+    class: "LocalExecutor"
+    description: "Local system artifact execution"
+    version: "1.0.0"
+    exports:
+      - "LocalExecutor"
+    dependencies:
+      - "child_process"
+      - "util"
+      - "fs"
+      - "path"
+      - "../interfaces.d"
+
+  remote_executor:
+    file: "remote_executor.ts"
+    class: "RemoteExecutor"
+    description: "Remote system artifact execution via SSH/API"
+    version: "1.0.0"
+    exports:
+      - "RemoteExecutor"
+    dependencies:
+      - "./local_executor"
+      - "../interfaces.d"
+
+  rollback:
+    file: "rollback.ts"
+    class: "RollbackManager"
+    description: "Execution rollback and state recovery"
+    version: "1.0.0"
+    exports:
+      - "RollbackManager"
+    dependencies:
+      - "fs"
+      - "path"
+      - "../interfaces.d"
+
+governance:
+  charter_activated: true
+  evidence_required: true
+  audit_compliant: true

@@ -1,0 +1,34 @@
+# @ECO-governed
+# @ECO-layer: search
+# @ECO-semantic: naming-registry
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Naming Convention Registry
+# ECO-Layer: GL06 (Root Policy)
+# Closure-Signal: manifest
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:data-processing:processing-platform:elasticsearch-search-system:root-policy:naming-convention:naming-registry.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/data-processing/processing-platform/elasticsearch-search-system/root-policy/naming-convention/naming-registry.yaml"
+  name: naming-registry
+  version: "1.0.0"
+  layer: "GL06"
+
+conventions:
+  directories:
+    pattern: '^[a-z0-9\-]+$'
+    case: "kebab-case"
+    examples:
+      valid: ["search-system", "indexing", "analytics"]
+      invalid: ["SearchSystem", "search_system", "Search-System"]
+  files:
+    patterns:
+      kebab-case: '^[a-z0-9\-\.]+$'
+      snake_case: '^[a-z0-9_\.]+$'
+    cases: ["kebab-case", "snake_case"]
+    examples:
+      valid: ["search-config.yaml", "bulk_indexer.py", "index-mapping.yaml"]
+      invalid: ["SearchConfig.yaml", "bulkIndexer.py", "indexMapping.yaml"]

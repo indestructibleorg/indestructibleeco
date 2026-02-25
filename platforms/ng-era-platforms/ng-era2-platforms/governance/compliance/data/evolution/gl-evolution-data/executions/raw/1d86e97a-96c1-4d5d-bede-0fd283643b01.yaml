@@ -1,0 +1,48 @@
+# @ECO-layer: GL60-80
+# @ECO-governed
+execution_id: 1d86e97a-96c1-4d5d-bede-0fd283643b01
+input_hash: 2ea8c89f7fc21b367af5c1ac961f615e88d169352cb73dc38cbe4abe54b8c1b7
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:governance:compliance:data:evolution:gl-evolution-data:executions:raw:1d86e97a-96c1-4d5d-bede-0fd283643b01.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/governance/compliance/data/evolution/gl-evolution-data/executions/raw/1d86e97a-96c1-4d5d-bede-0fd283643b01.yaml"
+  contracts:
+  - gl-naming-ontology
+  - gl-platforms
+  - gl-validation-rules
+  environment: production
+  rules:
+  - naming-validation
+  - structure-validation
+  - evidence-coverage
+  user: governance-bot
+  version: 1.2.0
+output_hash: b8975f3231651fcef4a4484b45df17fbdb76111bfcc66a9dbefd1a0fe4655c8b
+raw_data:
+  input:
+    context: 每月例行檢查
+    query: 分析GL生態系統狀態
+  metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:governance:compliance:data:evolution:gl-evolution-data:executions:raw:1d86e97a-96c1-4d5d-bede-0fd283643b01.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/governance/compliance/data/evolution/gl-evolution-data/executions/raw/1d86e97a-96c1-4d5d-bede-0fd283643b01.yaml"
+    contracts:
+    - gl-naming-ontology
+    - gl-platforms
+    - gl-validation-rules
+    environment: production
+    rules:
+    - naming-validation
+    - structure-validation
+    - evidence-coverage
+    user: governance-bot
+    version: 1.2.0
+  output:
+    contracts_validated: 48
+    issues_found: 2
+    recommendations: 8
+  status: success
+  type: fact-pipeline
+status: success
+timestamp: '2026-02-01T11:30:39.142217'
+type: fact-pipeline

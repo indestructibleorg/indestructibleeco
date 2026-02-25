@@ -1,0 +1,30 @@
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: esync-dev
+
+resources:
+  - ../../base/my-app
+
+namePrefix: dev-
+
+commonLabels:
+  environment: dev
+
+patchesStrategicMerge:
+  - deployment.yaml
+  - service.yaml
+
+replicas:
+  - name: esync-api-deploy
+    count: 1

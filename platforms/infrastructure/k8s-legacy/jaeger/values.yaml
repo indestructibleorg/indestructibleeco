@@ -1,0 +1,480 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: values
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Jaeger Production Configuration Values
+# Enterprise-grade configuration for production deployment
+
+# Global configuration
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storage:
+    type: elasticsearch  # elasticsearch, cassandra, badger
+    cassandra:
+      host: cassandra
+      port: 9042
+      tls:
+        enabled: false
+      user: cassandra
+      password: cassandra
+      keyspace: jaeger_v1_dc1
+      consistency: ONE
+      replicationFactor: 2
+      localStorage:
+        enabled: false
+    elasticsearch:
+      host: elasticsearch-master
+      port: 9200
+      scheme: http
+      user: elastic
+      password: ""
+      indexPrefix: jaeger
+      useILM: true
+      ilmPolicyName: jaeger-ilm-policy
+      nodesWanOnly: false
+      healthCheck: true
+      waitForDataReady: 30s
+      version: 7
+metadata:
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+      tls:
+        enabled: false
+      sniffer:
+        enabled: false
+        sniffOnStart: true
+      storageType: filesystem
+      maxDocCount: 100000
+      maxSpanAge: 72h
+      timeout: 60s
+      username: ""
+      password: ""
+      tlsSkipVerify: true
+    pluginStorage:
+      enabled: false
+      type: ""
+      host: ""
+      port: ""
+      path: ""
+
+# Provision data store
+provisionDataStore:
+  cassandra: false
+  elasticsearch: true
+  kafka: false
+  kafkaTopic: jaeger-spans
+
+# All-in-One Deployment (for development)
+allInOne:
+  enabled: false
+  image: jaegertracing/all-in-one
+  tag: 1.52.0
+  pullPolicy: IfNotPresent
+  extraEnv: []
+  args:
+    - "--log-level=info"
+  service:
+    otlp:
+      grpc:
+        enabled: true
+      http:
+        enabled: true
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  portForward: true
+
+# Agent Deployment
+agent:
+  enabled: true
+  image: jaegertracing/jaeger-agent
+  tag: 1.52.0
+  pullPolicy: IfNotPresent
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+  replicaCount: 3
+  annotations: {}
+  service:
+    annotations: {}
+    type: ClusterIP
+    # Service headless is required for agent
+    headless: true
+    ports:
+      zipkin-thrift:
+        enabled: true
+        nodePort: 5775
+        # Port for Zipkin compact Thrift
+        compactThrift:
+          port: 6831
+          # Port for Zipkin compact Thrift over HTTP
+          httpCompactThrift:
+            port: 5775
+      jaeger-thrift:
+        enabled: true
+        # Port for Jaeger compact Thrift
+        compactThrift:
+          port: 6831
+        # Port for Jaeger compact Thrift over HTTP
+        httpCompactThrift:
+          port: 14268
+        # Port for Jaeger Thrift binary
+        binaryThrift:
+          port: 6832
+      grpc:
+        enabled: true
+        # Port for gRPC
+        port: 14250
+      admin:
+        enabled: true
+        port: 14271
+    extraPorts: []
+  daemonset:
+    useHostPort: false
+    hostNetwork: false
+  sidecarSecurityContext: {}
+  command:
+    - /go/bin/agent-linux
+  args:
+    - "--reporter.grpc.host-port=jaeger-collector.{{ .Release.Namespace }}.svc:14250"
+    - "--reporter.type=grpc"
+    - "--log-level=info"
+  extraEnv: []
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  livenessProbe:
+    tcpSocket:
+      port: 14271
+    initialDelaySeconds: 5
+    periodSeconds: 15
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 14271
+    initialDelaySeconds: 1
+  tolerations: []
+  nodeSelector: {}
+  affinity: {}
+  securityContext: {}
+  priorityClassName: ""
+
+# Collector Deployment
+collector:
+  enabled: true
+  image: jaegertracing/jaeger-collector
+  tag: 1.52.0
+  pullPolicy: IfNotPresent
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  replicaCount: 3
+  annotations: {}
+  service:
+    annotations: {}
+    type: ClusterIP
+    ports:
+      grpc:
+        enabled: true
+        port: 14250
+      http:
+        enabled: true
+        port: 14268
+      zipkin:
+        enabled: true
+        port: 9411
+      otlp:
+        grpc:
+          enabled: true
+          port: 4317
+        http:
+          enabled: true
+          port: 4318
+    extraPorts: []
+  serviceAccount:
+    create: true
+    name: jaeger-collector
+    automountToken: false
+  command:
+    - /go/bin/collector-linux
+  args:
+    - "--config-file=/conf/collector.yaml"
+  extraEnv: []
+  extraSecretMounts: []
+  resources:
+    limits:
+      cpu: "2000m"
+      memory: "2Gi"
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 14269
+    initialDelaySeconds: 30
+    periodSeconds: 20
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 14269
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+  autoscaling:
+    enabled: false
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+  tolerations: []
+  nodeSelector: {}
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - jaeger-collector
+          topologyKey: kubernetes.io/hostname
+  securityContext: {}
+  priorityClassName: ""
+
+# Query Deployment
+query:
+  enabled: true
+  image: jaegertracing/jaeger-query
+  tag: 1.52.0
+  pullPolicy: IfNotPresent
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  replicaCount: 2
+  annotations: {}
+  service:
+    annotations: {}
+    type: ClusterIP
+    ports:
+      http-query:
+        enabled: true
+        port: 16686
+        nodePort: 32686
+      grpc-query:
+        enabled: true
+        port: 16685
+      admin:
+        enabled: true
+        port: 16687
+    extraPorts: []
+  serviceAccount:
+    create: true
+    name: jaeger-query
+    automountToken: false
+  command:
+    - /go/bin/query-linux
+  args:
+    - "--config-file=/conf/query.yaml"
+  extraEnv: []
+  extraSecretMounts: []
+  resources:
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+    requests:
+      cpu: "200m"
+      memory: "512Mi"
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 16687
+    initialDelaySeconds: 30
+    periodSeconds: 20
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 16687
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 70
+  tolerations: []
+  nodeSelector: {}
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - jaeger-query
+          topologyKey: kubernetes.io/hostname
+  securityContext: {}
+  priorityClassName: ""
+
+# Ingester Deployment
+ingester:
+  enabled: false
+  image: jaegertracing/jaeger-ingester
+  tag: 1.52.0
+  pullPolicy: IfNotPresent
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  replicaCount: 2
+  annotations: {}
+  command:
+    - /go/bin/ingester-linux
+  args:
+    - "--config-file=/conf/ingester.yaml"
+  extraEnv: []
+  resources:
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+    requests:
+      cpu: "200m"
+      memory: "512Mi"
+  tolerations: []
+  nodeSelector: {}
+  affinity: {}
+  securityContext: {}
+  priorityClassName: ""
+
+# Spark Dependencies
+spark:
+  enabled: false
+
+# Elasticsearch CRD configuration
+esIndexCleaner:
+  enabled: true
+  schedule: "55 23 * * *"
+  image: jaegertracing/jaeger-es-index-cleaner
+  tag: 1.52.0
+  numberOfDays: 7
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 10m
+      memory: 32Mi
+  annotations: {}
+
+esRollover:
+  enabled: true
+  schedule: "0 0 * * *"
+  image: jaegertracing/jaeger-es-rollover
+  tag: 1.52.0
+  conditions: "{&quot;max_age&quot;: &quot;24h&quot;, &quot;max_size&quot;: &quot;50gb&quot;}"
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 10m
+      memory: 32Mi
+  annotations: {}
+  readTTL: 7d
+
+esLookback:
+  enabled: true
+  schedule: "0 1 * * *"
+  image: jaegertracing/jaeger-es-lookback
+  tag: 1.52.0
+  unit: days
+  count: 7
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 10m
+      memory: 32Mi
+  annotations: {}
+
+# Sampling strategies
+samplingStrategiesConfigMap:
+  enabled: true
+  content:
+    service_strategies:
+      - service: machine-native-ops
+        type: probabilistic
+        param: 10
+      - service: machine-native-ops-critical
+        type: probabilistic
+        param: 100
+      - service: machine-native-ops-background
+        type: probabilistic
+        param: 5
+    default_strategy:
+      type: probabilistic
+      param: 10
+
+# Hotrod example (for testing)
+hotrod:
+  enabled: false
+
+# Cassandra schema job
+cassandraSchema:
+  enabled: false
+
+# Kafka
+kafka:
+  brokers:
+    - "my-kafka-broker:9092"
+  topic: jaeger-spans
+  consumer:
+    replicas: 3
+    groupId: jaeger-spans-consumer
+    brokers:
+      - "my-kafka-broker:9092"
+    topic: jaeger-spans
+
+# Tracing configuration
+tracing:
+  enabled: true
+  otlp:
+    grpc:
+      host: jaeger-collector
+      port: 4317
+    http:
+      host: jaeger-collector
+      port: 4318

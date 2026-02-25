@@ -1,0 +1,34 @@
+# @ECO-layer: GL60-80
+# @ECO-governed
+version: "1.0.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:governance:compliance:data:evolution:gl-evolution-data:deltas:50f2098a-6082-4847-a71d-4185b4fdd081.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/governance/compliance/data/evolution/gl-evolution-data/deltas/50f2098a-6082-4847-a71d-4185b4fdd081.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+base_execution: 1d86e97a-96c1-4d5d-bede-0fd283643b01
+comparison_id: 50f2098a-6082-4847-a71d-4185b4fdd081
+evolution_metrics:
+  automation_level_delta: 0.05
+  process_maturity_delta: 0.1
+  self_healing_capability_delta: 0.08
+improvements: []
+regressions: []
+significant_changes: []
+target_execution: ce140863-b63f-4094-a82c-ebc7ab1274b6
+upgrade_triggers:
+- autoUpgrade: false
+  condition: analysis.failurePatterns = 1
+  evidence: analysis:ce140863-b63f-4094-a82c-ebc7ab1274b6
+  severity: high
+  trigger: ANALYSIS_FAILURE_PATTERN
+- autoUpgrade: false
+  condition: analysis.recommendations.priority == p0
+  evidence: analysis:ce140863-b63f-4094-a82c-ebc7ab1274b6
+  severity: high
+  trigger: ANALYSIS_CRITICAL_OPPORTUNITY

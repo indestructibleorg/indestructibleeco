@@ -1,0 +1,133 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governance-core
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL90_99-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: supplychain.machinenativeops.io/v1
+kind: WorkflowHardener
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:supply-chain:workflow-hardening.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/supply-chain/workflow-hardening.yaml"
+  name: gl-quantum-workflow-hardener
+  namespace: governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-supply-chain
+spec:
+  enabled: true
+  scanInterval: 1h
+  
+  permissions:
+    default:
+      contents: read
+      issues: write
+      pull-requests: write
+      checks: write
+      statuses: write
+        
+    enforcement:
+      enabled: true
+      strictMode: true
+      blockOnViolation: true
+        
+  pinnedActions:
+    enforcement:
+      enabled: true
+      blockUnpinned: true
+        
+    pinned:
+      actions/checkout@v3:
+        sha: 8ade135a41bc03ea155e62e844d188df1ea18608
+        
+      actions/setup-node@v3:
+        sha: 64ed1c7eab4cce3362f8c9dea7d51af4b31a064d
+        
+      actions/setup-python@v4:
+        sha: b55c28f9c9bbb6369b725b2853c1275c637c5f1b
+        
+      actions/setup-go@v4:
+        sha: 93397bea11091af506dff004f7f4b0c0cdddaad8
+        
+      actions/upload-artifact@v3:
+        sha: 5d5d22a31266ced268874388b861e4b58bb5c2f3
+        
+      actions/download-artifact@v3:
+        sha: f44cd7b26bfd925d344808df135416398c3a1d95
+        
+      docker/build-push-action@v4:
+        sha: 3b5e8027fcad23fda58b3178a31e17a45a250b11
+        
+      docker/login-action@v2:
+        sha: c44eb295dc67234974c5daa9f63bc740ec020529
+        
+      docker/setup-buildx-action@v2:
+        sha: d86c2d3e2e6cc85c627de17e45838241026565c9
+        
+      docker/metadata-action@v4:
+        sha: 9ec57ed1fcdbde390a828b3c0786c29e6b3e717b
+        
+  concurrency:
+    enabled: true
+    defaultGroup: ${{ github.workflow }}-${{ github.ref }}
+    cancelInProgress: true
+    
+  retry:
+    enabled: true
+    defaultStrategy:
+      maxAttempts: 3
+      delay: 5000
+        
+  cache:
+    enabled: true
+    strategies:
+      - name: pnpm
+        path: ~/.pnpm-store
+        key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-
+          
+      - name: go
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+          
+      - name: docker
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+        
+  tokenRestrictions:
+    enabled: true
+    defaultPermissions: read
+    allowedTokens:
+      - GITHUB_TOKEN
+      - GH_TOKEN
+    deniedTokens:
+      - ADMIN_TOKEN
+        
+  secrets:
+    scanning:
+      enabled: true
+      tool: gitleaks
+      failOnDetection: true
+        
+    handling:
+      logLevel: error
+      maskInLogs: true
+        
+  reporting:
+    enabled: true
+    format: json
+    output: artifacts/reports/workflow-hardening
+    retention: 90d

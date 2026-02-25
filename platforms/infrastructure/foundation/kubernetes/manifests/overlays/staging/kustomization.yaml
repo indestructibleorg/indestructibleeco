@@ -1,0 +1,55 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: kubernetes-kustomization-staging
+# @ECO-audit-trail: ../../../engine/governance/GL_SEMANTIC_ANCHOR.json
+#
+# GL Unified Architecture Governance Framework Activated
+# Kubernetes Staging Overlay Kustomization
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: platform-03-staging
+
+namePrefix: staging-
+
+commonLabels:
+  env: staging
+  governance.machinenativeops.io/environment: staging
+
+images:
+  - name: machinenativeops/aep-engine
+    newName: machinenativeops/aep-engine
+    newTag: v2.0.0-staging
+  - name: machinenativeops/file-organizer-system
+    newName: machinenativeops/file-organizer-system
+    newTag: v2.0.0-staging
+  - name: machinenativeops/instant-system
+    newName: machinenativeops/instant-system
+    newTag: v2.0.0-staging
+  - name: machinenativeops/elasticsearch-search-system
+    newName: machinenativeops/elasticsearch-search-system
+    newTag: v2.0.0-staging
+  - name: machinenativeops/esync-platform
+    newName: machinenativeops/esync-platform
+    newTag: v2.0.0-staging
+
+resources:
+  - ../../base
+  - ../../systems/engine
+  - ../../systems/file-organizer-system
+  - ../../systems/instant
+  - ../../systems/elasticsearch-search-system
+  - ../../systems/esync-platform
+
+replicas:
+  - name: aep-engine
+    count: 2
+  - name: file-organizer-system
+    count: 1
+  - name: instant-system
+    count: 2
+  - name: elasticsearch-search-system
+    count: 1
+  - name: esync-platform
+    count: 1

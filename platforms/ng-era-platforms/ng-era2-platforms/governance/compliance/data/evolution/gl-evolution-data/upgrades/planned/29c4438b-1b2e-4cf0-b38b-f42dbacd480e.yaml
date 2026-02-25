@@ -1,0 +1,36 @@
+# @ECO-layer: GL60-80
+# @ECO-governed
+version: "1.0.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:governance:compliance:data:evolution:gl-evolution-data:upgrades:planned:29c4438b-1b2e-4cf0-b38b-f42dbacd480e.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/governance/compliance/data/evolution/gl-evolution-data/upgrades/planned/29c4438b-1b2e-4cf0-b38b-f42dbacd480e.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+expected_impact:
+  confidence: 0.75
+  expected_benefit: improved_validation
+  process_improvement: medium
+  risk_level: low
+planned_changes:
+- description: 增強失敗檢測規則
+  impact: medium
+  operation: add
+  rule: gl.validation.failure-detection-v2
+  trigger: failure_pattern_detected
+  type: rule_upgrade
+priority: !!python/object/apply:__main__.Priority
+- p0
+risk_assessment:
+  mitigation_strategies:
+  - gradual_rollout
+  - monitoring
+  potential_issues: []
+  risk_level: low
+  rollback_available: true
+trigger_reason: failure_pattern_detected|critical_optimization_opportunity
+upgrade_id: 29c4438b-1b2e-4cf0-b38b-f42dbacd480e

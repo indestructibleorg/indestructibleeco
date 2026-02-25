@@ -1,0 +1,293 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1alpha1
+kind: GovernancePolicy
+metadata:
+  name: exception-handling-policy
+  description: "合规例外处理流程与规范"
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    category: "process"
+    domain: "compliance"
+  annotations:
+    version: "v1.0.0"
+    lastReviewed: "2025-12-17"
+
+spec:
+  # 例外类型
+  exceptionTypes:
+    - type: "Naming Compliance Exception"
+      description: "命名规范例外"
+      typicalReasons:
+        - "遗留系统迁移成本过高"
+        - "第三方集成依赖现有名称"
+        - "业务连续性要求"
+      maxDuration: "6 months"
+      renewalAllowed: true
+      maxRenewals: 2
+
+    - type: "Security Policy Exception"
+      description: "安全策略例外"
+      typicalReasons:
+        - "特定业务需求"
+        - "技术限制"
+        - "临时解决方案"
+      maxDuration: "3 months"
+      renewalAllowed: false
+      requiresCompensatingControls: true
+
+    - type: "Change Management Exception"
+      description: "变更管理流程例外"
+      typicalReasons:
+        - "紧急生产问题"
+        - "安全漏洞修复"
+        - "监管要求"
+      maxDuration: "Immediate"
+      postApprovalReview: true
+
+    - type: "Documentation Exception"
+      description: "文档要求例外"
+      typicalReasons:
+        - "临时试验项目"
+        - "POC 阶段"
+      maxDuration: "1 month"
+      renewalAllowed: false
+
+  # 风险评估要求
+  riskAssessment:
+    required: true
+    components:
+      - name: "风险等级"
+        values: ["高", "中", "低"]
+        description: "评估例外带来的风险等级"
+
+      - name: "影响范围"
+        description: "受影响的系统、服务、用户"
+        required: true
+
+      - name: "缓解措施"
+        description: "降低风险的补偿控制措施"
+        required: true
+        minCount: 1
+
+      - name: "剩余风险"
+        description: "实施缓解措施后的剩余风险"
+        required: true
+
+  # 审批流程
+  approvalProcess:
+    levels:
+      - riskLevel: "低"
+        approvers:
+          - role: "Team Lead"
+            count: 1
+        sla: "2 business days"
+
+      - riskLevel: "中"
+        approvers:
+          - role: "Department Manager"
+            count: 1
+          - role: "Governance Board Member"
+            count: 1
+        sla: "5 business days"
+
+      - riskLevel: "高"
+        approvers:
+          - role: "VP Engineering"
+            count: 1
+          - role: "CISO"
+            count: 1
+          - role: "Governance Board"
+            count: 1
+        sla: "10 business days"
+        additionalReview:
+          - "Legal review (if applicable)"
+          - "Compliance review"
+
+    approvalCriteria:
+      - "明确的业务或技术理由"
+      - "合理的风险评估"
+      - "有效的缓解措施"
+      - "明确的到期日期和补救计划"
+      - "不会创建先例或滥用"
+
+  # 例外期限
+  durationLimits:
+    default: "3 months"
+    maximum: "12 months"
+    extensions:
+      maxCount: 2
+      approvalRequired: "Original approvers + Governance Board"
+      justificationRequired: true
+
+  # 监控和审计
+  monitoring:
+    reviewFrequency:
+      低: "quarterly"
+      中: "monthly"
+      高: "weekly"
+
+    automaticAlerts:
+      - trigger: "30 days before expiration"
+        action: "Notify owner and approvers"
+      - trigger: "7 days before expiration"
+        action: "Escalate to manager"
+      - trigger: "Expiration"
+        action: "Automatic revocation"
+
+    metrics:
+      - name: "Active exceptions"
+        tracking: "Real-time count"
+      - name: "Exception rate by policy"
+        tracking: "Monthly trend"
+      - name: "Average exception duration"
+        tracking: "Monthly average"
+      - name: "Expired exceptions"
+        tracking: "Alert if > 0"
+
+  # 补救要求
+  remediation:
+    planRequired: true
+    components:
+      - name: "目标日期"
+        description: "计划何时符合标准规范"
+        required: true
+
+      - name: "实施步骤"
+        description: "如何最终符合规范的具体步骤"
+        required: true
+
+      - name: "负责人"
+        description: "补救计划负责人"
+        required: true
+
+      - name: "依赖项"
+        description: "补救计划的依赖和阻塞因素"
+        required: false
+
+  # 禁止事项
+  prohibitions:
+    - description: "不得为避免工作而申请例外"
+      example: "因为不想更新文档而申请文档例外"
+
+    - description: "不得滥用紧急例外流程"
+      example: "非紧急情况使用紧急变更例外"
+
+    - description: "不得无限期续期例外"
+      example: "连续多次续期而无实质补救进展"
+
+    - description: "不得将例外范围扩大"
+      example: "批准单一服务的例外，但应用到多个服务"
+
+  # 例外生命周期
+  lifecycle:
+    states:
+      - state: "Draft"
+        description: "申请人准备中"
+        actions: ["Edit", "Submit"]
+
+      - state: "Under Review"
+        description: "等待审批"
+        actions: ["Approve", "Reject", "Request More Info"]
+
+      - state: "Approved"
+        description: "已批准"
+        actions: ["Activate", "Withdraw"]
+
+      - state: "Active"
+        description: "例外生效中"
+        actions: ["Review", "Extend", "Revoke", "Remediate"]
+        monitoring: "Active"
+
+      - state: "Expired"
+        description: "已过期"
+        actions: ["Archive"]
+        automaticAction: "Revoke privileges"
+
+      - state: "Revoked"
+        description: "已撤销"
+        actions: ["Archive"]
+
+      - state: "Remediated"
+        description: "已补救完成"
+        actions: ["Archive"]
+        verification: "Required"
+
+  # 报告要求
+  reporting:
+    frequency: "Monthly"
+    recipients:
+      - "Governance Board"
+      - "Department Managers"
+      - "Compliance Team"
+    contents:
+      - "Active exceptions by type and risk level"
+      - "New exceptions this period"
+      - "Expired/revoked exceptions"
+      - "Exceptions nearing expiration"
+      - "Remediation progress"
+      - "Trends and patterns"
+
+  # 培训要求
+  training:
+    requiredFor:
+      - "Team leads"
+      - "Managers"
+      - "Governance board members"
+    topics:
+      - "Exception policy overview"
+      - "Risk assessment methodology"
+      - "Approval process"
+      - "Monitoring and reporting"
+    frequency: "Annually"
+
+  # 合规性
+  compliance:
+    auditTrail:
+      enabled: true
+      retention: "5 years"
+      includes:
+        - "All exception requests"
+        - "Approval decisions and rationale"
+        - "Reviews and updates"
+        - "Expiration and revocation events"
+
+    regulatoryAlignment:
+      - framework: "SOC 2"
+        controls: ["CC3.1", "CC3.2"]
+      - framework: "ISO 27001"
+        controls: ["A.6.1.1", "A.18.1.1"]
+
+  enforcement:
+    level: "error"
+    violations:
+      unapprovedDeviation:
+        severity: "Critical"
+        action: "Immediate escalation to management"
+
+      expiredExceptionInUse:
+        severity: "High"
+        action: "Automatic revocation + incident report"
+
+      missingRemediation:
+        severity: "Medium"
+        action: "Prevent renewal until plan provided"
+
+  metadata:
+    version: "v1.0.0"
+    owner: "governance-board"
+    approvers:
+      - "cto@example.com"
+      - "ciso@example.com"
+    reviewDate: "2025-12-17"
+    nextReviewDate: "2026-06-17"
+
+  references:
+    - title: "NIST Risk Management Framework"
+      url: "https://csrc.nist.gov/projects/risk-management"
+    - title: "COBIT Exception Management"
+      url: "https://www.isaca.org/resources/cobit"

@@ -1,0 +1,113 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: security.machinenativeops.io/v1
+kind: KubeBenchConfig
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:infrastructure:scanners:kube-bench-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/infrastructure/scanners/kube-bench-config.yaml"
+  name: gl-quantum-kube-bench
+  namespace: infrastructure
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-scanners
+spec:
+  enabled: true
+  cisVersion: "1.6.0"
+  benchmark: "cis-1.6"
+  
+  schedule:
+    cron: "0 */6 * * *"  # Every 6 hours
+    
+  targets:
+    - name: control-plane
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      
+    - name: worker-nodes
+      nodeSelector:
+        node-role.kubernetes.io/worker: ""
+        
+  controls:
+    include:
+      - "1.*"  # Master Node Security Configuration
+      - "2.*"  # Worker Node Security Configuration
+      - "3.*"  # Control Plane Configuration
+      - "4.*"  # Logging and Monitoring
+      
+    exclude:
+      - "1.1.10"  # Specific control to exclude
+      
+  severity:
+    critical:
+      failAction: block
+      notify: true
+      
+    high:
+      failAction: warn
+      notify: true
+      
+    medium:
+      failAction: warn
+      notify: false
+      
+    low:
+      failAction: info
+      notify: false
+      
+  output:
+    format:
+      - json
+      - junit
+      
+    locations:
+      - type: elasticsearch
+        index: kube-bench-results
+        endpoint: ${{ secrets.ELASTICSEARCH_ENDPOINT }}
+        
+      - type: s3
+        bucket: gl-security-scans
+        prefix: kube-bench/
+        
+  remediation:
+    autoRemediate: false
+    suggestionsEnabled: true
+    
+    strategies:
+      - name: fix-kubelet-config
+        command: |
+          sed -i 's/--authorization-mode=AlwaysAllow/--authorization-mode=Node,RBAC/' /etc/kubernetes/kubelet-config.yaml
+          systemctl restart kubelet
+          
+      - name: enable-audit-log
+        command: |
+          cat >> /etc/kubernetes/audit-policy.yaml <<EOF
+          apiVersion: audit.k8s.io/v1
+          kind: Policy
+          rules:
+          - level: Metadata
+          EOF
+          
+  reporting:
+    enabled: true
+    dashboard: true
+    slackNotifications: true
+    
+    slack:
+      webhook: ${{ secrets.SLACK_WEBHOOK }}
+      channel: "#security-alerts"
+      
+  audit:
+    logResults: true
+    retention: 365d

@@ -1,0 +1,351 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# Canonical Naming Regex Policy
+# 定義核心命名正則表達式規則
+# 此文件應從 canonical/machine-spec.yaml 派生
+
+apiVersion: governance.machinenativeops.io/v1alpha1
+kind: NamingPolicy
+metadata:
+  name: canonical-regex-policy
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    category: naming
+    module: canonical-naming
+    enforcement: strict
+  annotations:
+    source: "canonical/machine-spec.yaml"
+    generated: "false"  # 未來應標記為 true（從 machine-spec codegen）
+    description: "命名正則表達式驗證策略"
+
+spec:
+  # 應用範圍
+  scope:
+    resourceTypes:
+      - "Namespace"
+      - "Deployment"
+      - "StatefulSet"
+      - "DaemonSet"
+      - "Service"
+      - "Ingress"
+      - "ConfigMap"
+      - "Secret"
+      - "PersistentVolumeClaim"
+
+    environments:
+      - "dev"
+      - "test"
+      - "staging"
+      - "prod"
+      - "learn"
+
+  # 核心正則表達式（從 machine-spec.yaml 複製）
+  canonical:
+    # 主正則表達式
+    primary_regex: "^(team|tenant|dev|test|staging|prod|learn)-[a-z0-9-]{1,56}[a-z0-9]$"
+
+    # 基礎約束
+    constraints:
+      allowed_chars: "[a-z0-9-]"
+      case: "lower"
+      max_length: 63
+      min_length: 3
+      start_with: "[a-z0-9]"
+      end_with: "[a-z0-9]"
+      no_consecutive_hyphens: true
+
+  # 命名模式（與 machine-spec.yaml 保持同步）
+  patterns:
+    # 模式 1: team-domain-env
+    - id: "team-domain-env"
+      regex: "^team-[a-z0-9-]+-(?:dev|test|staging|prod|learn)$"
+      description: "團隊級命名空間模式"
+      examples:
+        valid:
+          - "team-frontend-prod"
+          - "team-backend-dev"
+          - "team-data-staging"
+        invalid:
+          - "Team-Frontend-Prod"  # 大小寫錯誤
+          - "team_frontend_prod"  # 使用底線
+          - "teamfrontendprod"    # 缺少分隔符
+
+    # 模式 2: tenant-workload-env-region
+    - id: "tenant-workload-env-region"
+      regex: "^tenant-[a-z0-9-]+-(?:dev|test|staging|prod)-[a-z0-9-]+$"
+      description: "多租戶跨區域部署模式"
+      examples:
+        valid:
+          - "tenant-payment-prod-uswest"
+          - "tenant-auth-staging-eucentral"
+          - "tenant-analytics-dev-apsouth"
+        invalid:
+          - "tenant-payment-prod"        # 缺少 region
+          - "tenant-payment-production-uswest"  # 環境名稱錯誤
+
+    # 模式 3: env-app-version
+    - id: "env-app-version"
+      regex: "^(?:dev|test|staging|prod)-[a-z0-9-]+-v[0-9]+$"
+      description: "環境-應用-版本模式（多版本共存）"
+      examples:
+        valid:
+          - "prod-api-v2"
+          - "staging-frontend-v3"
+          - "dev-backend-v1"
+        invalid:
+          - "prod-api-2"      # 缺少 'v' 前綴
+          - "prod-api-v2.0"   # 版本號包含小數點
+
+  # 保留關鍵字（不可用於命名）
+  reserved:
+    keywords:
+      - "core"
+      - "internal"
+      - "system"
+      - "legacy"
+      - "experimental"
+      - "kube"
+      - "kubernetes"
+      - "default"
+    error_message: "資源名稱不能包含保留關鍵字: {keyword}"
+
+  # 驗證規則
+  validation:
+    # 規則 1: 命名格式驗證
+    - id: "VAL-001"
+      name: "Canonical Pattern Match"
+      description: "驗證資源名稱符合 canonical pattern"
+      severity: "critical"
+      rule:
+        type: "regex"
+        pattern: "^(team|tenant|dev|test|staging|prod|learn)-[a-z0-9-]{1,56}[a-z0-9]$"
+      error_message: "資源名稱不符合 Canonical 命名模式"
+      remediation: "使用 team-{domain}-{env}、tenant-{workload}-{env}-{region} 或 env-{app}-{version} 格式"
+
+    # 規則 2: 字符限制驗證
+    - id: "VAL-002"
+      name: "Character Constraint"
+      description: "驗證僅使用允許的字符"
+      severity: "critical"
+      rule:
+        type: "regex"
+        pattern: "^[a-z0-9-]+$"
+      error_message: "資源名稱只能包含小寫字母、數字和破折號"
+      remediation: "移除大寫字母、底線和特殊字符"
+
+    # 規則 3: 長度限制驗證
+    - id: "VAL-003"
+      name: "Length Constraint"
+      description: "驗證名稱長度在允許範圍內"
+      severity: "high"
+      rule:
+        type: "length"
+        min: 3
+        max: 63
+      error_message: "資源名稱長度必須在 3-63 字符之間"
+      remediation: "縮短或延長資源名稱"
+
+    # 規則 4: 保留關鍵字檢查
+    - id: "VAL-004"
+      name: "Reserved Keyword Check"
+      description: "驗證不包含保留關鍵字"
+      severity: "critical"
+      rule:
+        type: "deny_list"
+        values: ["core", "internal", "system", "legacy", "experimental", "kube", "kubernetes", "default"]
+      error_message: "資源名稱包含保留關鍵字"
+      remediation: "使用不同的命名"
+
+    # 規則 5: 連續破折號檢查
+    - id: "VAL-005"
+      name: "No Consecutive Hyphens"
+      description: "驗證不包含連續破折號"
+      severity: "medium"
+      rule:
+        type: "regex"
+        pattern: "^(?!.*--).*$"
+      error_message: "資源名稱包含連續破折號"
+      remediation: "移除多餘的破折號"
+
+  # 豁免管理
+  exemptions:
+    # Kubernetes 系統命名空間
+    - resource: "kube-system"
+      reason: "Kubernetes 核心系統命名空間"
+      approved_by: "platform-team"
+      expires_at: "permanent"
+
+    - resource: "kube-public"
+      reason: "Kubernetes 公共命名空間"
+      approved_by: "platform-team"
+      expires_at: "permanent"
+
+    - resource: "kube-node-lease"
+      reason: "Kubernetes 節點租約命名空間"
+      approved_by: "platform-team"
+      expires_at: "permanent"
+
+    - resource: "default"
+      reason: "Kubernetes 默認命名空間"
+      approved_by: "platform-team"
+      expires_at: "permanent"
+
+    # 歷史遺留系統（有過期時間）
+    - resource: "legacy-*"
+      reason: "歷史遺留系統，遷移計劃中"
+      approved_by: "governance-board"
+      expires_at: "2025-12-31T23:59:59Z"
+
+  # 強制執行
+  enforcement:
+    mode: "enforce"  # enforce | warn | advisory
+    description: |
+      enforce: 嚴格執行，違規資源將被拒絕創建
+      warn: 警告但允許創建
+      advisory: 僅記錄，不阻止
+
+    # 按環境區分強制級別
+    by_environment:
+      production:
+        mode: "enforce"
+        fail_on: ["critical", "high"]
+      staging:
+        mode: "enforce"
+        fail_on: ["critical"]
+      dev:
+        mode: "warn"
+        fail_on: []
+
+  # 工具集成
+  tooling:
+    # Gatekeeper 配置
+    gatekeeper:
+      enabled: true
+      constraint_template: "policies/gatekeeper/namespace-constraints.yaml"
+      enforcement_action: "deny"
+
+    # Conftest 配置
+    conftest:
+      enabled: true
+      policy_file: "templates/conftest/naming.rego"
+      namespace: "main"
+
+    # CI/CD 配置
+    cicd:
+      github_actions:
+        enabled: true
+        workflow: ".github/workflows/naming-validation.yml"
+        block_on_failure: true
+
+  # 報告配置
+  reporting:
+    slack:
+      enabled: true
+      channel: "#naming-violations"
+      notify_on: ["critical", "high"]
+
+    email:
+      enabled: false
+      recipients: ["governance-team@example.com"]
+
+  # 審計追蹤
+  audit:
+    enabled: true
+    log_violations: true
+    retention: "90d"
+    fields:
+      - "timestamp"
+      - "resource_type"
+      - "resource_name"
+      - "violation_rule"
+      - "severity"
+      - "action_taken"
+
+# 使用示例
+examples:
+  # 示例 1: 驗證 Namespace 名稱
+  - description: "驗證 team-frontend-prod 命名"
+    resource:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "team-frontend-prod"
+    expected: "PASS"
+    reason: "符合 team-domain-env 模式"
+
+  # 示例 2: 拒絕大寫命名
+  - description: "拒絕 Team-Frontend-Prod 命名"
+    resource:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "Team-Frontend-Prod"
+    expected: "FAIL"
+    reason: "包含大寫字母，違反 VAL-002"
+
+  # 示例 3: 拒絕底線命名
+  - description: "拒絕 team_frontend_prod 命名"
+    resource:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "team_frontend_prod"
+    expected: "FAIL"
+    reason: "使用底線而非破折號，違反 VAL-002"
+
+  # 示例 4: 拒絕保留關鍵字
+  - description: "拒絕 team-core-prod 命名"
+    resource:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "team-core-prod"
+    expected: "FAIL"
+    reason: "包含保留關鍵字 'core'，違反 VAL-004"
+
+  # 示例 5: 多租戶模式
+  - description: "驗證 tenant-payment-prod-uswest 命名"
+    resource:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "tenant-payment-prod-uswest"
+    expected: "PASS"
+    reason: "符合 tenant-workload-env-region 模式"
+
+  # 示例 6: 版本共存模式
+  - description: "驗證 prod-api-v2 命名"
+    resource:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "prod-api-v2"
+    expected: "PASS"
+    reason: "符合 env-app-version 模式"
+
+# 測試命令
+testing:
+  commands:
+    # Conftest 測試
+    - description: "使用 Conftest 驗證 manifests"
+      command: "conftest test manifests/ --policy templates/conftest/"
+
+    # Python 驗證工具
+    - description: "使用 Python 工具驗證"
+      command: "python tools/governance/python/validate_naming.py --spec canonical/machine-spec.yaml --resource manifests/"
+
+    # Gatekeeper Dry-run
+    - description: "Gatekeeper Dry-run 測試"
+      command: "kubectl apply -f manifests/namespace.yaml --dry-run=server"
+
+# 維護信息
+maintenance:
+  version: "v1.0"
+  last_updated: "2025-01-15"
+  next_review: "2025-04-15"
+  owner: "Platform Engineering Team"
+  contact: "governance-team@example.com"

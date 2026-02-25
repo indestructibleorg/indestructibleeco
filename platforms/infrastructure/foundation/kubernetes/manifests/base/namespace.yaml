@@ -1,0 +1,25 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: kubernetes-namespace
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+#
+# GL Unified Architecture Governance Framework Activated
+# Kubernetes Base Namespace Manifest
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: machine-native-ops
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    name: machine-native-ops
+    app.kubernetes.io/name: machine-native-ops
+    app.kubernetes.io/part-of: infrastructure
+    app.kubernetes.io/managed-by: kubectl
+    governance.machinenativeops.io/charter-version: "2.0.0"
+    governance.machinenativeops.io/layer: "infrastructure"
+  annotations:
+    description: "MachineNativeOps Infrastructure Namespace"
+    governance.machinenativeops.io/classification: "internal"
+    governance.machinenativeops.io/approval: "approved"

@@ -1,0 +1,332 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: backup-schedules
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+---
+# Velero Backup Schedules
+# Enterprise-grade backup schedules with retention policies
+
+# Daily full backup - All namespaces
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:disaster-recovery:schedules:backup-schedules.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/disaster-recovery/schedules/backup-schedules.yaml"
+  name: daily-full-backup-all
+  namespace: velero
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/component: backup
+    type: full
+    frequency: daily
+spec:
+  schedule: "0 2 * * *"  # 2 AM daily
+  template:
+    includedNamespaces:
+    - '*'
+    excludedNamespaces:
+    - kube-system
+    - kube-public
+    - velero
+    storageLocation: aws-s3
+    volumeSnapshotLocations:
+    - aws-s3
+    ttl: 720h  # 30 days retention
+    volumeSnapshotLocations:
+    - aws-s3
+    hooks:
+      resources:
+      - name: pre-backup-hook-database
+        includedNamespaces:
+        - machine-native-ops
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: postgres
+        pre:
+        - exec:
+            container: postgres
+            command:
+            - /bin/sh
+            - -c
+            - "pg_dumpall -U postgres > /tmp/pre-backup.sql"
+            onError: Continue
+            timeout: 600s
+      - name: pre-backup-hook-redis
+        includedNamespaces:
+        - machine-native-ops
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: redis
+        pre:
+        - exec:
+            container: redis
+            command:
+            - /bin/sh
+            - -c
+            - "redis-cli BGSAVE"
+            onError: Continue
+            timeout: 120s
+---
+# Hourly incremental backup - MachineNativeOps namespace
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:disaster-recovery:schedules:backup-schedules.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/disaster-recovery/schedules/backup-schedules.yaml"
+  name: hourly-incremental-backup
+  namespace: velero
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/component: backup
+    type: incremental
+    frequency: hourly
+spec:
+  schedule: "0 * * * *"  # Every hour
+  template:
+    includedNamespaces:
+    - machine-native-ops
+    storageLocation: aws-s3
+    ttl: 168h  # 7 days retention
+    snapshotVolumes: false
+    defaultVolumesToFsBackup: false
+    orderedResources:
+    - resource: persistentvolumeclaims
+      includedResourceTypes:
+      - persistentvolumeclaims
+---
+# Daily backup - Monitoring stack
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:disaster-recovery:schedules:backup-schedules.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/disaster-recovery/schedules/backup-schedules.yaml"
+  name: daily-monitoring-backup
+  namespace: velero
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/component: backup
+    type: full
+    frequency: daily
+spec:
+  schedule: "0 3 * * *"  # 3 AM daily
+  template:
+    includedNamespaces:
+    - monitoring
+    - logging
+    - jaeger
+    storageLocation: aws-s3
+    ttl: 720h  # 30 days retention
+    snapshotVolumes: false
+---
+# Weekly full backup - With long retention
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:disaster-recovery:schedules:backup-schedules.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/disaster-recovery/schedules/backup-schedules.yaml"
+  name: weekly-full-backup
+  namespace: velero
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/component: backup
+    type: full
+    frequency: weekly
+spec:
+  schedule: "0 4 * * 0"  # Sunday 4 AM
+  template:
+    includedNamespaces:
+    - '*'
+    excludedNamespaces:
+    - kube-system
+    - kube-public
+    storageLocation: aws-s3
+    volumeSnapshotLocations:
+    - aws-s3
+    ttl: 2160h  # 90 days retention
+---
+# Monthly archive backup - Very long retention
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:disaster-recovery:schedules:backup-schedules.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/disaster-recovery/schedules/backup-schedules.yaml"
+  name: monthly-archive-backup
+  namespace: velero
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/component: backup
+    type: archive
+    frequency: monthly
+spec:
+  schedule: "0 5 1 * *"  # 1st of month 5 AM
+  template:
+    includedNamespaces:
+    - machine-native-ops
+    storageLocation: aws-s3-archive
+    ttl: 8760h  # 365 days retention
+    snapshotVolumes: true
+    volumeSnapshotLocations:
+    - aws-s3-archive
+---
+# Configuration backup - On change
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:disaster-recovery:schedules:backup-schedules.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/disaster-recovery/schedules/backup-schedules.yaml"
+  name: config-backup
+  namespace: velero
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/component: backup
+    type: config
+    frequency: hourly
+spec:
+  schedule: "*/30 * * * *"  # Every 30 minutes
+  template:
+    includedNamespaces:
+    - machine-native-ops
+    includedResources:
+    - configmaps
+    - secrets
+    - deployments
+    - statefulsets
+    - daemonsets
+    - services
+    - ingresses
+    storageLocation: aws-s3
+    ttl: 2160h  # 90 days retention
+    snapshotVolumes: false
+---
+# PV Snapshot schedule - For persistent volumes
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:disaster-recovery:schedules:backup-schedules.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/disaster-recovery/schedules/backup-schedules.yaml"
+  name: pv-snapshot-backup
+  namespace: velero
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/component: backup
+    type: snapshot
+    frequency: daily
+spec:
+  schedule: "0 6 * * *"  # 6 AM daily
+  template:
+    includedNamespaces:
+    - machine-native-ops
+    storageLocation: aws-s3
+    volumeSnapshotLocations:
+    - aws-s3
+    ttl: 168h  # 7 days retention
+    snapshotVolumes: true
+    includedResources:
+    - persistentvolumes
+    - persistentvolumeclaims
+---
+# etcd Backup Schedule - For cluster state
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:disaster-recovery:schedules:backup-schedules.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/disaster-recovery/schedules/backup-schedules.yaml"
+  name: etcd-backup
+  namespace: velero
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/component: backup
+    type: etcd
+    frequency: hourly
+spec:
+  schedule: "15 * * * *"  # Every hour at 15 minutes
+  template:
+    includedNamespaces:
+    - '*'
+    storageLocation: aws-s3
+    ttl: 720h  # 30 days retention
+    snapshotVolumes: false
+    includedResources:
+    - leases
+    - endpoints
+    - events
+    - configmaps
+    - secrets
+---
+# Application data backup - Critical business data
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:disaster-recovery:schedules:backup-schedules.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/disaster-recovery/schedules/backup-schedules.yaml"
+  name: app-data-backup
+  namespace: velero
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/component: backup
+    type: data
+    frequency: hourly
+spec:
+  schedule: "30 * * * *"  # Every hour at 30 minutes
+  template:
+    includedNamespaces:
+    - machine-native-ops
+    includedResources:
+    - persistentvolumeclaims
+    storageLocation: aws-s3
+    volumeSnapshotLocations:
+    - aws-s3
+    ttl: 720h  # 30 days retention
+    snapshotVolumes: true
+    labelSelector:
+      matchLabels:
+        backup: "critical"
+---
+# Validate backups schedule - Automated validation
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:disaster-recovery:schedules:backup-schedules.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/disaster-recovery/schedules/backup-schedules.yaml"
+  name: validate-backups
+  namespace: velero
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/component: validation
+    type: validation
+    frequency: daily
+spec:
+  schedule: "0 7 * * *"  # 7 AM daily
+  template:
+    includedNamespaces:
+    - '*'
+    storageLocation: aws-s3
+    ttl: 24h  # 1 day retention
+    snapshotVolumes: false
+    orderedResources:
+    - resource: configmaps
+      includedResourceTypes:
+      - configmaps

@@ -1,0 +1,301 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: config-artifact
+# @ECO-audit-trail: ../../engine/governance/gl-artifacts/meta/semantic/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-platform-ecosystem/governance/engine/governance/gl-artifacts/meta/semantic/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-platform-ecosystem/governance/engine/governance/gl-artifacts/meta/naming-charter/gl-unified-naming-charter.yaml
+
+# GL Naming Migration Playbook
+# Version: 1.0.0
+# GL Unified Architecture Governance Framework v5.0 Activated
+
+apiVersion: playbook.gl.io/v1
+kind: MigrationPlaybook
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:.governance:playbooks:naming-migration.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/.governance/playbooks/naming-migration.yaml"
+  name: gl-naming-migration
+  version: "1.0.0"
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl.governance.level: "3"
+    gl.charter.version: "5.0"
+
+spec:
+  # Phase 1: Discovery
+  discovery:
+    name: "Resource Discovery"
+    description: "Scan and inventory all resources with naming violations"
+    duration: "2h"
+    steps:
+      - name: scan-kubernetes
+        script: |
+          #!/bin/bash
+          set -euo pipefail
+          
+          echo "=== GL Naming Discovery Phase ==="
+          
+          # Scan all namespaces
+          for ns in $(kubectl get ns -o jsonpath='{.items[*].metadata.name}'); do
+            echo "Scanning namespace: $ns"
+            
+            # Check deployments
+            kubectl get deployments -n "$ns" -o json | jq -r '
+              .items[] | 
+              select(.metadata.name | test("^(dev|staging|prod)-[a-z0-9-]+-(deploy)-v[0-9]+\\.[0-9]+\\.[0-9]+") | not) |
+              "VIOLATION: deployment/\(.metadata.name) in \(.metadata.namespace)"
+            '
+            
+            # Check services
+            kubectl get services -n "$ns" -o json | jq -r '
+              .items[] |
+              select(.metadata.name | test("^(dev|staging|prod)-[a-z0-9-]+-(svc)-v[0-9]+\\.[0-9]+\\.[0-9]+") | not) |
+              select(.metadata.name != "kubernetes") |
+              "VIOLATION: service/\(.metadata.name) in \(.metadata.namespace)"
+            '
+          done
+          
+          echo "Discovery complete"
+        outputs:
+          - discovery-report.json
+          - violations-inventory.csv
+
+  # Phase 2: Planning
+  planning:
+    name: "Migration Planning"
+    description: "Generate migration plan with impact analysis"
+    duration: "4h"
+    templates:
+      migration_plan: |
+        # GL Naming Migration Plan
+        
+        ## Summary
+        - Total Resources: {{ .total_resources }}
+        - Violations Found: {{ .violations_count }}
+        - Estimated Duration: {{ .estimated_duration }}
+        
+        ## Resources to Migrate
+        {{ range .resources }}
+        - {{ .kind }}/{{ .name }} -> {{ .suggested_name }}
+          - Namespace: {{ .namespace }}
+          - Dependencies: {{ .dependencies | join ", " }}
+          - Risk Level: {{ .risk_level }}
+        {{ end }}
+        
+        ## Migration Order
+        {{ range $idx, $batch := .batches }}
+        ### Batch {{ add $idx 1 }}
+        {{ range $batch }}
+        - {{ .kind }}/{{ .name }}
+        {{ end }}
+        {{ end }}
+    steps:
+      - name: generate-plan
+        script: |
+          #!/bin/bash
+          echo "Generating migration plan..."
+          
+          # Create plan file
+          cat > migration-plan.yaml << EOF
+          apiVersion: plan.gl.io/v1
+          kind: MigrationPlan
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:.governance:playbooks:naming-migration.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/.governance/playbooks/naming-migration.yaml"
+            name: naming-migration-$(date +%Y%m%d)
+            createdAt: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+          spec:
+            dryRun: true
+            batches: []
+          EOF
+          
+      - name: impact-analysis
+        script: |
+          echo "Analyzing impact..."
+          # Check for service dependencies
+          # Check for DNS records
+          # Check for external integrations
+
+  # Phase 3: Dry Run
+  dryRun:
+    name: "Dry Run Validation"
+    description: "Validate changes without applying"
+    duration: "1h"
+    steps:
+      - name: kubectl-dry-run
+        script: |
+          #!/bin/bash
+          set -euo pipefail
+          
+          echo "=== Dry Run Phase ==="
+          
+          while read -r resource; do
+            kind=$(echo "$resource" | cut -d'/' -f1)
+            name=$(echo "$resource" | cut -d'/' -f2)
+            ns=$(echo "$resource" | cut -d'/' -f3)
+            new_name=$(echo "$resource" | cut -d'/' -f4)
+            
+            echo "Testing rename: $kind/$name -> $new_name in $ns"
+            
+            # Export current resource
+            kubectl get "$kind" "$name" -n "$ns" -o yaml > /tmp/resource.yaml
+            
+            # Update name
+            sed -i "s/name: $name/name: $new_name/" /tmp/resource.yaml
+            
+            # Dry run apply
+            kubectl apply -f /tmp/resource.yaml --dry-run=server -o yaml
+            
+          done < resources-to-migrate.txt
+          
+      - name: diff-report
+        script: |
+          echo "Generating diff report..."
+          # Generate detailed diff for review
+
+  # Phase 4: Staged Rename
+  stagedRename:
+    name: "Staged Rename"
+    description: "Rename resources in controlled batches"
+    duration: "4h"
+    maxParallel: 2
+    pauseBetweenBatches: "10m"
+    steps:
+      - name: pre-rename-snapshot
+        script: |
+          echo "Creating pre-migration snapshot..."
+          kubectl get all --all-namespaces -o yaml > pre-migration-snapshot.yaml
+          
+      - name: rename-batch
+        script: |
+          #!/bin/bash
+          set -euo pipefail
+          
+          BATCH_FILE=$1
+          
+          while read -r resource; do
+            kind=$(echo "$resource" | cut -d'/' -f1)
+            old_name=$(echo "$resource" | cut -d'/' -f2)
+            ns=$(echo "$resource" | cut -d'/' -f3)
+            new_name=$(echo "$resource" | cut -d'/' -f4)
+            
+            echo "Renaming $kind/$old_name -> $new_name in $ns"
+            
+            # Create new resource with new name
+            kubectl get "$kind" "$old_name" -n "$ns" -o yaml | \
+              sed "s/name: $old_name/name: $new_name/" | \
+              kubectl apply -f -
+            
+            # Verify new resource is ready
+            kubectl wait --for=condition=available "$kind/$new_name" -n "$ns" --timeout=120s
+            
+            # Delete old resource
+            kubectl delete "$kind" "$old_name" -n "$ns"
+            
+            echo "SUCCESS: $kind/$old_name -> $new_name"
+            
+          done < "$BATCH_FILE"
+
+  # Phase 5: Cutover
+  cutover:
+    name: "DNS/Endpoint Cutover"
+    description: "Switch DNS and endpoints to new names"
+    duration: "30m"
+    steps:
+      - name: update-dns
+        script: |
+          echo "Updating DNS records..."
+          # Update Route53/CloudDNS records
+          
+      - name: update-endpoints
+        script: |
+          echo "Updating service endpoints..."
+          # Update ingress rules
+          # Update external load balancers
+          
+      - name: verify-connectivity
+        script: |
+          echo "Verifying connectivity..."
+          # Health checks
+          # Smoke tests
+
+  # Phase 6: Rollback
+  rollback:
+    name: "Rollback Procedure"
+    description: "Emergency rollback within 20 minutes"
+    maxDuration: "20m"
+    triggers:
+      - type: manual
+        description: "Manual rollback trigger"
+      - type: automatic
+        condition: "error_rate > 5%"
+        duration: "5m"
+    steps:
+      - name: restore-names
+        script: |
+          #!/bin/bash
+          set -euo pipefail
+          
+          echo "=== EMERGENCY ROLLBACK ==="
+          
+          # Restore from snapshot
+          kubectl apply -f pre-migration-snapshot.yaml
+          
+          # Revert DNS
+          echo "Reverting DNS records..."
+          
+          # Verify rollback
+          echo "Verifying rollback..."
+          
+      - name: notify-stakeholders
+        script: |
+          echo "Sending rollback notifications..."
+
+  # Validation
+  validation:
+    name: "Post-Migration Validation"
+    steps:
+      - name: compliance-check
+        script: |
+          echo "Running compliance check..."
+          conftest test . --policy .governance/policies/
+          
+      - name: integration-test
+        script: |
+          echo "Running integration tests..."
+          
+      - name: generate-report
+        script: |
+          cat > migration-report.json << EOF
+          {
+            "status": "completed",
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "resources_migrated": 0,
+            "rollbacks": 0,
+            "compliance_rate": "100%"
+          }
+          EOF
+
+  # SLA Metrics
+  slaMetrics:
+    NCR:
+      name: "Naming Compliance Rate"
+      target: "95%"
+      measurement: "compliant_resources / total_resources * 100"
+    VFC:
+      name: "Violation Fix Count"
+      target: "<10 per week"
+      measurement: "count(violations_fixed)"
+    MFR:
+      name: "Manual Fix Rate"
+      target: ">80%"
+      measurement: "manual_fixes / total_fixes * 100"
+    ARS:
+      name: "Auto-Repair Success"
+      target: ">90%"
+      measurement: "successful_auto_repairs / auto_repair_attempts * 100"

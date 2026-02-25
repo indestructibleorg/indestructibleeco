@@ -1,0 +1,218 @@
+# @ECO-governed
+# @ECO-layer: GL50-59
+# @ECO-semantic: audit-logging
+# @ECO-audit-trail: ../../../engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# RKE2 API Server Audit Policy
+# Comprehensive audit logging for security compliance and forensic analysis
+
+# ============================================================================
+# Audit Levels
+# ============================================================================
+# None: No events are logged.
+# Metadata: Log request metadata (requesting user, timestamp, resource, verb)
+#   but not request or response body.
+# Request: Log event metadata and request body but not response body.
+# RequestResponse: Log event metadata, request and response bodies.
+
+# ============================================================================
+# Audit Policy Configuration
+# ============================================================================
+apiVersion: audit.k8s.io/v1
+kind: Policy
+# Don't log authenticated requests to certain non-sensitive API paths
+omitStages:
+  - "RequestReceived"
+rules:
+  # ============================================================================
+  # Secret Operations - Highest Security Level
+  # ============================================================================
+  - level: RequestResponse
+    resources:
+      - group: "" # core API group
+        resources: ["secrets"]
+  
+  # ============================================================================
+  # ConfigMap Operations
+  # ============================================================================
+  - level: RequestResponse
+    resources:
+      - group: ""
+        resources: ["configmaps"]
+  
+  # ============================================================================
+  # Admission Review Operations (Critical Security Events)
+  # ============================================================================
+  - level: RequestResponse
+    resources:
+      - group: "authorization.k8s.io"
+        resources: ["subjectaccessreviews", "selfsubjectaccessreviews"]
+      - group: "authentication.k8s.io"
+        resources: ["tokenreviews"]
+  
+  # ============================================================================
+  # Role-Based Access Control (RBAC) Operations
+  # ============================================================================
+  - level: RequestResponse
+    resources:
+      - group: "rbac.authorization.k8s.io"
+        resources:
+          - roles
+          - rolebindings
+          - clusterroles
+          - clusterrolebindings
+  
+  # ============================================================================
+  # Pod Operations (Pod Security Standard)
+  # ============================================================================
+  - level: RequestResponse
+    resources:
+      - group: ""
+        resources: ["pods"]
+  
+  # ============================================================================
+  # Persistent Volume Claims
+  # ============================================================================
+  - level: RequestResponse
+    resources:
+      - group: ""
+        resources: ["persistentvolumeclaims"]
+  
+  # ============================================================================
+  # Node Operations
+  # ============================================================================
+  - level: Metadata
+    resources:
+      - group: ""
+        resources: ["nodes"]
+  
+  # ============================================================================
+  # Service Account Operations
+  # ============================================================================
+  - level: Request
+    resources:
+      - group: ""
+        resources: ["serviceaccounts"]
+  
+  # ============================================================================
+  # Deployment, StatefulSet, DaemonSet, ReplicaSet Operations
+  # ============================================================================
+  - level: Request
+    resources:
+      - group: "apps"
+        resources:
+          - deployments
+          - statefulsets
+          - daemonsets
+          - replicasets
+  
+  # ============================================================================
+  # Ingress Operations
+  # ============================================================================
+  - level: Request
+    resources:
+      - group: "networking.k8s.io"
+        resources: ["ingresses"]
+  
+  # ============================================================================
+  # Network Policy Operations
+  # ============================================================================
+  - level: Request
+    resources:
+      - group: "networking.k8s.io"
+        resources: ["networkpolicies"]
+  
+  # ============================================================================
+  # Custom Resource Definitions
+  # ============================================================================
+  - level: Request
+    resources:
+      - group: "apiextensions.k8s.io"
+        resources: ["customresourcedefinitions"]
+  
+  # ============================================================================
+  # Namespace Operations
+  # ============================================================================
+  - level: Request
+    resources:
+      - group: ""
+        resources: ["namespaces"]
+  
+  # ============================================================================
+  # Events
+  # ============================================================================
+  - level: Metadata
+    resources:
+      - group: ""
+        resources: ["events"]
+  
+  # ============================================================================
+  # Default Policy - Log all other requests at metadata level
+  # ============================================================================
+  - level: Metadata
+    verbs: ["create", "update", "patch", "delete", "deletecollection"]
+  
+  # ============================================================================
+  # Read operations - Lower logging level
+  # ============================================================================
+  - level: None
+    verbs: ["get", "list", "watch"]
+
+# ============================================================================
+# GL Compliance
+# ============================================================================
+# - GL30-39: Process & Control - Audit trail
+# - GL50-59: Observability Layer - Comprehensive logging
+# - GL90-99: Meta-Specification - Audit policy governance
+
+# ============================================================================
+# Audit Log Analysis
+# ============================================================================
+# Analyze audit logs using:
+# 1. jq: cat /var/log/rke2/audit.log | jq '.'
+# 2. grep: grep "secrets" /var/log/rke2/audit.log
+# 3. audit2rbac: Convert audit logs to RBAC rules
+# 4. Falco: Runtime security monitoring
+# 5. ELK Stack: Centralized log aggregation
+
+# ============================================================================
+# Security Event Detection
+# ============================================================================
+# Monitor for suspicious activities:
+# - Failed authentication attempts
+# - Unauthorized secret access
+# - Privilege escalation attempts
+# - Pod creation with hostNetwork: true
+# - Node access from unauthorized users
+# - RBAC modifications
+
+# ============================================================================
+# Alerting
+# ============================================================================
+# Set up alerts for:
+# - Secret access from non-admin users
+# - RBAC role/rolebinding changes
+# - Pod creation with securityContext violations
+# - Failed authentication spikes
+# - Network policy modifications
+
+# ============================================================================
+# Retention and Rotation
+# ============================================================================
+# - Max age: 30 days (configured in config.yaml)
+# - Max backups: 10 (configured in config.yaml)
+# - Max size: 100MB (configured in config.yaml)
+# - Archive old logs to long-term storage (S3, GCS, etc.)
+# - Compress archived logs to save space
+
+# ============================================================================
+# Compliance Requirements
+# ============================================================================
+# This audit policy meets requirements for:
+# - CIS 1.2.24 - Ensure that the --audit-log-path is set
+# - CIS 1.2.25 - Ensure that the --audit-log-maxage is set
+# - CIS 1.2.26 - Ensure that the --audit-log-maxbackup is set
+# - CIS 1.2.27 - Ensure that the --audit-log-maxsize is set
+# - PCI DSS 10.2 - Audit trail for system components
+# - HIPAA - Audit controls for protected health information
+# - SOC 2 - Monitoring and logging of access to systems

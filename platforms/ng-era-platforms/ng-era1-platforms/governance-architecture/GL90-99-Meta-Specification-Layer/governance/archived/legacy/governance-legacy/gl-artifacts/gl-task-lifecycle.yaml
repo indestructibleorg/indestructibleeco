@@ -1,0 +1,409 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLTaskLifecycle
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-task-lifecycle.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-task-lifecycle.yaml"
+  name: gl-task-lifecycle
+  version: "1.0.0"
+  status: ACTIVE
+  created_at: "2025-01-18T00:00:00Z"
+  owner: governance-committee
+lifecycle_state:
+  current_cycle: 1
+  status: ACTIVE
+  mode: AUTONOMOUS
+  continuous: true
+phase_1_task_intake:
+  phase_id: "LIFECYCLE-PHASE-1"
+  name: "Task Intake"
+  name_zh: "任務接收"
+  gl_layer: "GL00-09"
+  status: ACTIVE
+  intake_workflow:
+    steps:
+      - step_id: "INTAKE-01"
+        action: "receive_task"
+        description: "接收任務請求"
+      - step_id: "INTAKE-02"
+        action: "validate_task_definition"
+        description: "驗證任務定義完整性"
+        checks:
+          - "task_id_exists"
+          - "task_description_defined"
+          - "task_scope_specified"
+          - "task_deliverables_listed"
+      - step_id: "INTAKE-03"
+        action: "assign_priority"
+        description: "分配任務優先級"
+        priority_levels:
+          - "CRITICAL"
+          - "HIGH"
+          - "MEDIUM"
+          - "LOW"
+      - step_id: "INTAKE-04"
+        action: "register_task"
+        description: "註冊任務到任務登錄表"
+      - step_id: "INTAKE-05"
+        action: "forward_to_classification"
+        description: "轉發至分層階段"
+phase_2_layer_classification:
+  phase_id: "LIFECYCLE-PHASE-2"
+  name: "GL Layer Classification"
+  name_zh: "任務分層"
+  gl_layer: "GL10-29"
+  status: ACTIVE
+  classification_workflow:
+    steps:
+      - step_id: "CLASS-01"
+        action: "analyze_task_keywords"
+        description: "分析任務關鍵字"
+      - step_id: "CLASS-02"
+        action: "match_gl_layer"
+        description: "匹配 GL 層級"
+        classification_rules:
+          GL00-09:
+            patterns: ["vision", "strategy", "charter", "architecture", "risk", "compliance", "security"]
+          GL10-29:
+            patterns: ["policy", "process", "resource", "quality", "capability", "culture"]
+          GL30-49:
+            patterns: ["template", "schema", "automation", "config", "script", "contract"]
+          GL50-59:
+            patterns: ["monitoring", "alerting", "logging", "tracing", "dashboard", "metrics"]
+          GL60-80:
+            patterns: ["feedback", "optimization", "ai", "audit", "innovation", "analysis"]
+          GL81-83:
+            patterns: ["integration", "stakeholder", "external", "auto-comment", "bridge"]
+          GL90-99:
+            patterns: ["naming", "semantic", "specification", "meta", "standard", "convention"]
+      - step_id: "CLASS-03"
+        action: "determine_layer_count"
+        description: "判斷任務涉及層級數量"
+      - step_id: "CLASS-04"
+        action: "assign_primary_layer"
+        description: "指定主要層級"
+      - step_id: "CLASS-05"
+        action: "forward_to_decomposition"
+        description: "轉發至拆解階段"
+phase_3_layered_decomposition:
+  phase_id: "LIFECYCLE-PHASE-3"
+  name: "Layered Decomposition"
+  name_zh: "任務拆解"
+  gl_layer: "GL10-29"
+  status: ACTIVE
+  decomposition_workflow:
+    steps:
+      - step_id: "DECOMP-01"
+        action: "check_multi_layer"
+        description: "檢查是否為多層級任務"
+      - step_id: "DECOMP-02"
+        action: "decompose_by_layer"
+        description: "依層級拆解任務"
+        decomposition_rules:
+          - rule: "single_layer_task"
+            action: "direct_execution"
+          - rule: "multi_layer_task"
+            action: "sequential_decomposition"
+      - step_id: "DECOMP-03"
+        action: "sort_by_gl_priority"
+        description: "依 GL 優先級排序"
+        priority_order:
+          - "GL90-99"
+          - "GL00-09"
+          - "GL10-29"
+          - "GL30-49"
+          - "GL50-59"
+          - "GL60-80"
+          - "GL81-83"
+      - step_id: "DECOMP-04"
+        action: "create_subtasks"
+        description: "創建子任務"
+      - step_id: "DECOMP-05"
+        action: "forward_to_execution"
+        description: "轉發至執行階段"
+phase_4_layered_execution:
+  phase_id: "LIFECYCLE-PHASE-4"
+  name: "Layered Execution"
+  name_zh: "任務執行"
+  gl_layer: "GL30-49"
+  status: ACTIVE
+  execution_workflow:
+    steps:
+      - step_id: "EXEC-01"
+        action: "load_layer_executor"
+        description: "載入層級執行器"
+      - step_id: "EXEC-02"
+        action: "verify_layer_constraints"
+        description: "驗證層級約束"
+        constraints:
+          - "no_cross_layer"
+          - "no_skip_layer"
+          - "no_mix_layer"
+      - step_id: "EXEC-03"
+        action: "execute_layer_task"
+        description: "執行層級任務"
+      - step_id: "EXEC-04"
+        action: "generate_artifacts"
+        description: "生成層級產物"
+        artifact_rules:
+          GL00-09:
+            types: ["vision-statement", "governance-charter", "strategic-objectives", "architecture-decision-record", "risk-assessment"]
+          GL10-29:
+            types: ["policy-document", "process-definition", "operational-plan", "resource-allocation", "capability-matrix"]
+          GL30-49:
+            types: ["template-file", "schema-definition", "automation-script", "config-file", "behavior-contract"]
+          GL50-59:
+            types: ["monitoring-config", "metric-definition", "alert-rule", "dashboard-definition", "insight-report"]
+          GL60-80:
+            types: ["ai-model-config", "optimization-rule", "feedback-mechanism", "audit-trail", "innovation-registry"]
+          GL81-83:
+            types: ["integration-config", "auto-comment-rule", "stakeholder-bridge", "external-integration-config"]
+          GL90-99:
+            types: ["naming-convention", "semantic-definition", "governance-spec", "metadata-schema", "governance-standards"]
+      - step_id: "EXEC-05"
+        action: "forward_to_validation"
+        description: "轉發至驗證階段"
+phase_5_validation:
+  phase_id: "LIFECYCLE-PHASE-5"
+  name: "Validation Layer"
+  name_zh: "任務驗證"
+  gl_layer: "GL50-59"
+  status: ACTIVE
+  validation_workflow:
+    steps:
+      - step_id: "VAL-01"
+        action: "validate_layer_mapping"
+        description: "驗證層級對應"
+      - step_id: "VAL-02"
+        action: "validate_semantic_boundary"
+        description: "驗證語意邊界"
+      - step_id: "VAL-03"
+        action: "validate_actionable_output"
+        description: "驗證可執行成果"
+      - step_id: "VAL-04"
+        action: "detect_cross_layer"
+        description: "檢測跨層問題"
+      - step_id: "VAL-05"
+        action: "detect_semantic_drift"
+        description: "檢測語意漂移"
+      - step_id: "VAL-06"
+        action: "validate_artifact_classification"
+        description: "驗證產物分類"
+      - step_id: "VAL-07"
+        action: "generate_validation_report"
+        description: "生成驗證報告"
+      - step_id: "VAL-08"
+        action: "auto_fix_if_needed"
+        description: "自動修復問題"
+        auto_fix_rules:
+          - trigger: "layer_mismatch"
+            action: "relocate_artifact"
+          - trigger: "semantic_drift"
+            action: "realign_semantic"
+          - trigger: "missing_artifact"
+            action: "generate_minimal_artifact"
+      - step_id: "VAL-09"
+        action: "forward_to_sealing"
+        description: "轉發至封存階段"
+phase_6_semantic_sealing:
+  phase_id: "LIFECYCLE-PHASE-6"
+  name: "Semantic Sealing"
+  name_zh: "語意封存"
+  gl_layer: "GL90-99"
+  status: ACTIVE
+  sealing_workflow:
+    steps:
+      - step_id: "SEAL-01"
+        action: "verify_completion"
+        description: "驗證任務完成"
+      - step_id: "SEAL-02"
+        action: "freeze_semantic"
+        description: "凍結語意定義"
+        freeze_rules:
+          - "no_modification"
+          - "no_expansion"
+          - "no_rewrite"
+      - step_id: "SEAL-03"
+        action: "freeze_boundary"
+        description: "凍結邊界定義"
+      - step_id: "SEAL-04"
+        action: "freeze_responsibility"
+        description: "凍結責任定義"
+      - step_id: "SEAL-05"
+        action: "freeze_artifacts"
+        description: "凍結產物定義"
+      - step_id: "SEAL-06"
+        action: "generate_integrity_hash"
+        description: "生成完整性雜湊"
+      - step_id: "SEAL-07"
+        action: "apply_seal"
+        description: "應用封存"
+      - step_id: "SEAL-08"
+        action: "record_seal_signature"
+        description: "記錄封存簽章"
+      - step_id: "SEAL-09"
+        action: "forward_to_feedback"
+        description: "轉發至回饋階段"
+phase_7_feedback_integration:
+  phase_id: "LIFECYCLE-PHASE-7"
+  name: "Feedback Integration"
+  name_zh: "回饋整合"
+  gl_layer: "GL60-80"
+  status: ACTIVE
+  feedback_workflow:
+    steps:
+      - step_id: "FB-01"
+        action: "collect_execution_feedback"
+        description: "收集執行回饋"
+        sources:
+          - "GL30-49"
+          - "GL50-59"
+      - step_id: "FB-02"
+        action: "collect_validation_feedback"
+        description: "收集驗證回饋"
+        sources:
+          - "GL50-59"
+      - step_id: "FB-03"
+        action: "collect_sealing_feedback"
+        description: "收集封存回饋"
+        sources:
+          - "GL90-99"
+      - step_id: "FB-04"
+        action: "analyze_patterns"
+        description: "分析回饋模式"
+      - step_id: "FB-05"
+        action: "generate_improvements"
+        description: "生成改進建議"
+      - step_id: "FB-06"
+        action: "integrate_to_gl60_80"
+        description: "整合至 GL60-80"
+        integration_targets:
+          - "feedback-mechanism.yaml"
+          - "innovation-registry.yaml"
+      - step_id: "FB-07"
+        action: "update_feedback_channels"
+        description: "更新回饋通道"
+        channels:
+          - source: "GL30-49"
+            target: "GL10-29"
+            type: "execution_efficiency"
+          - source: "GL50-59"
+            target: "GL00-09"
+            type: "validation_results"
+          - source: "GL90-99"
+            target: "GL00-09"
+            type: "semantic_consistency"
+      - step_id: "FB-08"
+        action: "forward_to_closure"
+        description: "轉發至閉環階段"
+phase_8_task_closure:
+  phase_id: "LIFECYCLE-PHASE-8"
+  name: "Task Closure"
+  name_zh: "任務閉環"
+  gl_layer: "GL00-09"
+  status: ACTIVE
+  closure_workflow:
+    steps:
+      - step_id: "CLOSE-01"
+        action: "verify_all_phases_complete"
+        description: "驗證所有階段完成"
+        required_phases:
+          - "LIFECYCLE-PHASE-1"
+          - "LIFECYCLE-PHASE-2"
+          - "LIFECYCLE-PHASE-3"
+          - "LIFECYCLE-PHASE-4"
+          - "LIFECYCLE-PHASE-5"
+          - "LIFECYCLE-PHASE-6"
+          - "LIFECYCLE-PHASE-7"
+      - step_id: "CLOSE-02"
+        action: "verify_all_artifacts_sealed"
+        description: "驗證所有產物已封存"
+      - step_id: "CLOSE-03"
+        action: "verify_feedback_integrated"
+        description: "驗證回饋已整合"
+      - step_id: "CLOSE-04"
+        action: "generate_closure_report"
+        description: "生成閉環報告"
+      - step_id: "CLOSE-05"
+        action: "mark_task_complete"
+        description: "標記任務完成"
+        status: "COMPLETE"
+      - step_id: "CLOSE-06"
+        action: "archive_task"
+        description: "歸檔任務"
+      - step_id: "CLOSE-07"
+        action: "forward_to_next_cycle"
+        description: "轉發至下一輪"
+phase_9_next_cycle:
+  phase_id: "LIFECYCLE-PHASE-9"
+  name: "Next-Cycle Continuation"
+  name_zh: "進入下一輪"
+  gl_layer: "GL00-09"
+  status: ACTIVE
+  continuation_workflow:
+    steps:
+      - step_id: "NEXT-01"
+        action: "increment_cycle_counter"
+        description: "遞增循環計數器"
+      - step_id: "NEXT-02"
+        action: "reset_phase_states"
+        description: "重置階段狀態"
+      - step_id: "NEXT-03"
+        action: "apply_feedback_improvements"
+        description: "應用回饋改進"
+      - step_id: "NEXT-04"
+        action: "initialize_next_cycle"
+        description: "初始化下一輪"
+      - step_id: "NEXT-05"
+        action: "await_next_task"
+        description: "等待下一個任務"
+        mode: "AUTONOMOUS"
+lifecycle_executor:
+  executor_id: "ECO-LIFECYCLE-EXEC-001"
+  version: "1.0.0"
+  execution_sequence:
+    - phase: "LIFECYCLE-PHASE-1"
+      name: "Task Intake"
+      gl_layer: "GL00-09"
+    - phase: "LIFECYCLE-PHASE-2"
+      name: "GL Layer Classification"
+      gl_layer: "GL10-29"
+    - phase: "LIFECYCLE-PHASE-3"
+      name: "Layered Decomposition"
+      gl_layer: "GL10-29"
+    - phase: "LIFECYCLE-PHASE-4"
+      name: "Layered Execution"
+      gl_layer: "GL30-49"
+    - phase: "LIFECYCLE-PHASE-5"
+      name: "Validation Layer"
+      gl_layer: "GL50-59"
+    - phase: "LIFECYCLE-PHASE-6"
+      name: "Semantic Sealing"
+      gl_layer: "GL90-99"
+    - phase: "LIFECYCLE-PHASE-7"
+      name: "Feedback Integration"
+      gl_layer: "GL60-80"
+    - phase: "LIFECYCLE-PHASE-8"
+      name: "Task Closure"
+      gl_layer: "GL00-09"
+    - phase: "LIFECYCLE-PHASE-9"
+      name: "Next-Cycle Continuation"
+      gl_layer: "GL00-09"
+  constraints:
+    - "每階段僅產出可執行成果"
+    - "不得跨層、不跳層、不混層"
+    - "驗證失敗時產出 minimal actionable fixes"
+    - "封存後不可修改、不可擴張、不可重寫"
+    - "回饋必須整合至 GL60-80"
+    - "任務閉環後準備進入下一輪"
+lifecycle_signature:
+  lifecycle_id: "ECO-LIFECYCLE-001"
+  version: "1.0.0"
+  phases_count: 9
+  status: ACTIVE
+  activated_at: "2025-01-18T00:00:00Z"

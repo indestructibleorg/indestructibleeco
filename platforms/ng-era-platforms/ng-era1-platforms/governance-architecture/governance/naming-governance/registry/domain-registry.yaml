@@ -1,0 +1,196 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: naming-governance
+# @ECO-audit-trail: gl-platform-ecosystem/governance/audit-trails/GL90_99-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-platform-ecosystem/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-platform-ecosystem/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: gl-runtime.io/v1.0.0
+kind: DomainRegistry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:governance:naming-governance:registry:domain-registry.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/governance/naming-governance/registry/domain-registry.yaml"
+  name: domain-registry
+  version: v1.0.0
+  description: "GL Domain Registry - 定義所有可用的 domain"
+  namespace: gl-platform-ecosystem
+spec:
+  domains:
+    - domain_id: runtime
+      abbr: rt
+      name: "Runtime"
+      description: "運行時環境與執行引擎"
+      semantics:
+        - "execution"
+        - "orchestration"
+        - "coordination"
+        - "state-management"
+      capabilities:
+        - dag
+        - workflow
+        - executor
+        - scheduler
+        - state-manager
+      status: ACTIVE
+    
+    - domain_id: quantum
+      abbr: qm
+      name: "Quantum"
+      description: "量子計算與模擬"
+      semantics:
+        - "quantum-computation"
+        - "superposition"
+        - "entanglement"
+        - "quantum-gates"
+      capabilities:
+        - compute
+        - simulation
+        - circuit
+        - optimization
+      status: ACTIVE
+    
+    - domain_id: api
+      abbr: api
+      name: "API"
+      description: "API 與服務接口"
+      semantics:
+        - "interface-definition"
+        - "schema-validation"
+        - "protocol-communication"
+        - "contract-enforcement"
+      capabilities:
+        - schema
+        - gateway
+        - documentation
+        - validation
+        - versioning
+      status: ACTIVE
+    
+    - domain_id: agent
+      abbr: ag
+      name: "Agent"
+      description: "AI 智能體與自主代理"
+      semantics:
+        - "autonomous-execution"
+        - "decision-making"
+        - "behavior-modeling"
+        - "agent-communication"
+      capabilities:
+        - max
+        - planning
+        - reasoning
+        - behavior
+        - coordination
+      status: ACTIVE
+    
+    - domain_id: multimodal
+      abbr: mm
+      name: "Multimodal"
+      description: "多模態處理（文本、圖像、音頻）"
+      semantics:
+        - "text-processing"
+        - "image-analysis"
+        - "audio-processing"
+        - "cross-modal-fusion"
+      capabilities:
+        - vision
+        - text
+        - audio
+        - fusion
+        - embedding
+      status: ACTIVE
+    
+    - domain_id: database
+      abbr: db
+      name: "Database"
+      description: "數據庫與數據存儲"
+      semantics:
+        - "data-persistence"
+        - "query-execution"
+        - "transaction-management"
+        - "data-consistency"
+      capabilities:
+        - shard
+        - replication
+        - backup
+        - query
+        - migration
+      status: ACTIVE
+    
+    - domain_id: compute
+      abbr: cp
+      name: "Compute"
+      description: "計算與處理能力"
+      semantics:
+        - "computation"
+        - "processing"
+        - "calculation"
+        - "resource-allocation"
+      capabilities:
+        - batch
+        - stream
+        - ml
+        - inference
+      status: ACTIVE
+    
+    - domain_id: storage
+      abbr: st
+      name: "Storage"
+      description: "存儲與資產管理"
+      semantics:
+        - "object-storage"
+        - "file-system"
+        - "blob-storage"
+        - "archive-management"
+      capabilities:
+        - object
+        - file
+        - archive
+        - cache
+      status: ACTIVE
+    
+    - domain_id: governance
+      abbr: gov
+      name: "Governance"
+      description: "治理與合規"
+      semantics:
+        - "policy-enforcement"
+        - "compliance-validation"
+        - "audit-trail"
+        - "governance-automation"
+      capabilities:
+        - policy
+        - audit
+        - compliance
+        - validation
+        - enforcement
+      status: ACTIVE
+    
+    - domain_id: semantic
+      abbr: sem
+      name: "Semantic"
+      description: "語意圖與知識表示"
+      semantics:
+        - "semantic-representation"
+        - "knowledge-graph"
+        - "semantic-reasoning"
+        - "ontology-management"
+      capabilities:
+        - graph
+        - reasoning
+        - ontology
+        - mapping
+      status: ACTIVE
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:governance:naming-governance:registry:domain-registry.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/governance/naming-governance/registry/domain-registry.yaml"
+  created_at: "2026-01-31T00:00:00Z"
+  updated_at: "2026-01-31T00:00:00Z"
+  total_domains: 10
+  active_domains: 10

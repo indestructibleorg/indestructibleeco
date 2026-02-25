@@ -1,0 +1,138 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: servicemesh.machinenativeops.io/v1
+kind: ServiceMeshPolicies
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:infrastructure:service-mesh:service-mesh-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/infrastructure/service-mesh/service-mesh-policies.yaml"
+  name: gl-quantum-service-mesh-policies
+  namespace: infrastructure
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-servicemesh
+spec:
+  enabled: true
+  
+  securityPolicies:
+    - name: mtls-policy
+      description: "Enforce mTLS for all services"
+      scope: namespace
+      namespaces:
+        - gl-quantum-prod
+        - gl-quantum-staging
+      mode: STRICT
+      
+    - name: jwt-authentication-policy
+      description: "Enforce JWT authentication for API endpoints"
+      scope: workload
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: gl-quantum-api
+      jwt:
+        issuer: "https://auth.machinenativeops.com"
+        audiences:
+          - "gl-quantum-api"
+        jwksUri: "https://auth.machinenativeops.com/.well-known/jwks.json"
+        
+  trafficManagement:
+    - name: circuit-breaker-policy
+      description: "Circuit breaker for API service"
+      target:
+        service: gl-quantum-api
+        namespace: gl-quantum-prod
+      settings:
+        consecutiveErrors: 5
+        interval: 30s
+        baseEjectionTime: 30s
+        maxEjectionPercent: 50
+      outlierDetection:
+        consecutive5xxErrors: 3
+        interval: 10s
+        baseEjectionTime: 30s
+        maxEjectionPercent: 50
+        
+    - name: timeout-policy
+      description: "Timeout policy for different services"
+      services:
+        - name: gl-quantum-api
+          timeout: 10s
+        - name: gl-quantum-webhook
+          timeout: 30s
+        - name: gl-quantum-worker
+          timeout: 300s
+          
+    - name: retry-policy
+      description: "Retry policy for API calls"
+      services:
+        - name: gl-quantum-api
+          attempts: 3
+          perTryTimeout: 5s
+          retryOn: "5xx,connect-failure,refused-stream"
+          
+  faultInjection:
+    - name: delay-injection
+      description: "Inject delays for testing"
+      enabled: false
+      target:
+        service: gl-quantum-api
+      settings:
+        delay:
+          percentage:
+            value: 10
+          fixedDelay: 2s
+        match:
+          - headers:
+              x-fault-delay:
+                exact: "true"
+                
+    - name: abort-injection
+      description: "Inject aborts for testing"
+      enabled: false
+      target:
+        service: gl-quantum-api
+      settings:
+        abort:
+          percentage:
+            value: 5
+          httpStatus: 503
+        match:
+          - headers:
+              x-fault-abort:
+                exact: "true"
+                
+  rateLimiting:
+    - name: api-rate-limit
+      description: "Rate limit for API endpoints"
+      target:
+        service: gl-quantum-api
+      limits:
+        - type: header
+          header:
+            name: x-api-key
+          actions:
+            - type: requestCount
+              limit:
+                value: 100
+                unit: MINUTE
+                
+        - type: source
+          source:
+            remoteIP:
+              value: "0.0.0.0/0"
+          actions:
+            - type: requestCount
+              limit:
+                value: 1000
+                unit: MINUTE

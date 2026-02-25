@@ -1,0 +1,186 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GovernanceLayersDefinition
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-layers.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-layers.yaml"
+  name: gl-layers-architecture
+  version: "1.0.0"
+  upgraded_from: dimension-layers
+  upgrade_date: "2026-01-18"
+governance_layers:
+  GL00-09:
+    name: Strategic Layer
+    range: "00-09"
+    description: Vision, architecture, decision, risk, compliance, security
+    dimensions:
+      - "00-vision-strategy"
+      - "01-architecture"
+      - "02-decision"
+      - "03-change"
+      - "04-risk"
+      - "05-compliance"
+      - "06-security"
+      - "08-process"
+      - "09-performance"
+  GL10-19:
+    name: Operational Layer
+    range: "10-19"
+    description: Policy, culture, metrics, improvement, quality
+    dimensions:
+      - "10-policy"
+      - "11-tools-systems"
+      - "12-culture-capability"
+      - "13-metrics-reporting"
+      - "14-improvement"
+      - "15-economic"
+      - "16-psychological"
+      - "17-sociological"
+      - "18-complex-system"
+      - "19-evolutionary"
+  GL20-29:
+    name: Data Science / Data Access Layer
+    range: "20-29"
+    description: Data ingestion, catalog, metadata, assets management
+    dimensions:
+      - "20-data-ingestion"
+      - "21-data-catalog"
+      - "22-metadata"
+      - "23-data-assets"
+      - "24-data-quality"
+      - "25-data-governance"
+      - "26-data-lineage"
+      - "27-data-privacy"
+      - "28-data-security"
+      - "29-data-operations"
+  GL30-39:
+    name: Execution Layer
+    range: "30-39"
+    description: Schemas, templates, contracts, automation, tools
+    dimensions:
+      - "26-tools"
+      - "27-templates"
+      - "30-agents"
+      - "31-schemas"
+      - "32-rules"
+      - "33-common"
+      - "34-config"
+      - "35-scripts"
+      - "36-modules"
+      - "37-behavior-contracts"
+      - "38-sbom"
+      - "39-automation"
+  GL40-49:
+    name: Algorithm Layer
+    range: "40-49"
+    description: Models, pipelines, feature engineering, ML operations
+    dimensions:
+      - "40-model-registry"
+      - "41-pipelines"
+      - "42-feature-engineering"
+      - "43-training"
+      - "44-inference"
+      - "45-model-evaluation"
+      - "46-model-deployment"
+      - "47-model-monitoring"
+      - "48-hyperparameter-tuning"
+      - "49-ml-operations"
+  GL50-59:
+    name: CUDA / GPU Acceleration Layer
+    range: "50-59"
+    description: CUDA kernels, GPU scheduling, accelerators, optimization
+    dimensions:
+      - "50-cuda-kernels"
+      - "51-gpu-scheduler"
+      - "52-accelerators"
+      - "53-gpu-optimization"
+      - "54-memory-management"
+      - "55-parallel-computing"
+      - "56-tensor-operations"
+      - "57-inference-acceleration"
+      - "58-gpu-monitoring"
+      - "59-resource-allocation"
+  GL60-69:
+    name: Observability Layer
+    range: "60-69"
+    description: Monitoring, alerting, insights
+    dimensions:
+      - "60-monitoring"
+      - "61-alerting"
+      - "62-logging"
+      - "63-tracing"
+      - "64-dashboards"
+      - "65-insights"
+  GL70-79:
+    name: Advanced/Feedback Layer
+    range: "70-79"
+    description: AI, contracts, audit, optimization, feedback
+    dimensions:
+      - "07-audit"
+      - "70-contracts"
+      - "71-audit"
+      - "80-feedback"
+  GL80-89:
+    name: Integration Layer
+    range: "80-89"
+    description: Auto-comment, stakeholder, integration
+    dimensions:
+      - "81-auto-comment"
+      - "82-stakeholder"
+      - "83-integration"
+  GL90-99:
+    name: Meta-Specification Layer
+    range: "90-99"
+    description: Naming conventions, meta-governance
+    dimensions:
+      - "99-naming-convention"
+layer_mapping:
+  - dimension_layer: "00-09: Strategic Layer"
+    gl_layer: "GL00-09: Strategic Layer"
+    status: mapped
+  - dimension_layer: "10-19: Operational Layer"
+    gl_layer: "GL10-19: Operational Layer"
+    status: mapped
+  - dimension_layer: "20-29: Data Science / Data Access Layer"
+    gl_layer: "GL20-29: Data Science / Data Access Layer"
+    status: mapped
+  - dimension_layer: "30-39: Execution Layer"
+    gl_layer: "GL30-39: Execution Layer"
+    status: mapped
+  - dimension_layer: "40-49: Algorithm Layer"
+    gl_layer: "GL40-49: Algorithm Layer"
+    status: mapped
+  - dimension_layer: "50-59: CUDA / GPU Acceleration Layer"
+    gl_layer: "GL50-59: CUDA / GPU Acceleration Layer"
+    status: mapped
+  - dimension_layer: "60-69: Observability Layer"
+    gl_layer: "GL60-69: Observability Layer"
+    status: mapped
+  - dimension_layer: "70-79: Advanced/Feedback Layer"
+    gl_layer: "GL70-79: Advanced/Feedback Layer"
+    status: mapped
+  - dimension_layer: "80-89: Integration Layer"
+    gl_layer: "GL80-89: Integration Layer"
+    status: mapped
+  - dimension_layer: "90-99: Meta-Specification Layer"
+    gl_layer: "GL90-99: Meta-Specification Layer"
+    status: mapped
+urn_format:
+  pattern: "urn:machinenativeops:{domain}:{resource}:{version}"
+  registered_domains:
+    - governance
+    - ai
+    - core
+    - autonomous
+    - config
+    - dimension
+    - gl
+naming_standards:
+  directories: kebab-case
+  yaml_keys: snake_case
+  json_api: camelCase

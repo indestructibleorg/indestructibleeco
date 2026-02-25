@@ -1,0 +1,201 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: geo-dns-routing
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Geo-DNS Routing Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:geo-dns-routing.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/geo-dns-routing.yaml"
+  name: geo-dns-config
+  namespace: production
+data:
+  geo-routing-policy.yaml: |
+    # Geo-DNS routing configuration
+    geoRouting:
+      enabled: true
+      provider: route53  # AWS Route53
+      
+      # DNS configuration
+      dns:
+        domain: machine-native-ops.com
+        ttl: 60  # Time to live: 60 seconds
+        healthCheckEnabled: true
+        healthCheckInterval: 30s
+        healthCheckThreshold: 3
+      
+      # Regional routing rules
+      routingRules:
+        # US-East region routing
+        - name: us-east-routing
+          region: us-east-1
+          endpoints:
+            - hostname: us-east.machine-native-ops.com
+              weight: 70
+              healthCheck: /health
+              latency: 100ms
+          geoPolicy:
+            type: proximity  # proximity | latency | routing-policy
+            countries:
+              - US
+              - CA
+            states:
+              - NY
+              - NJ
+              - MA
+              - CT
+              - PA
+              - VA
+              - DC
+              - MD
+              - NC
+              - SC
+              - GA
+              - FL
+        
+        # US-West region routing
+        - name: us-west-routing
+          region: us-west-2
+          endpoints:
+            - hostname: us-west.machine-native-ops.com
+              weight: 30
+              healthCheck: /health
+              latency: 150ms
+          geoPolicy:
+            type: proximity
+            countries:
+              - US
+              - CA
+            states:
+              - CA
+              - OR
+              - WA
+              - NV
+              - AZ
+              - UT
+              - CO
+              - NM
+              - TX
+              - AK
+              - HI
+        
+        # EU region routing
+        - name: eu-west-routing
+          region: eu-west-1
+          endpoints:
+            - hostname: eu.machine-native-ops.com
+              weight: 20
+              healthCheck: /health
+              latency: 200ms
+          geoPolicy:
+            type: proximity
+            countries:
+              - GB
+              - IE
+              - FR
+              - DE
+              - NL
+              - BE
+              - LU
+              - CH
+              - AT
+              - ES
+              - PT
+              - IT
+              - DK
+              - SE
+              - NO
+              - FI
+              - PL
+              - CZ
+              - HU
+              - GR
+              - TR
+      
+      # Failover routing
+      failover:
+        enabled: true
+        mode: automatic
+        primaryRegion: us-east-1
+        failoverRegions:
+          - us-west-2
+            priority: 1
+            latencyThreshold: 500ms
+            healthCheckFailureThreshold: 3
+          - eu-west-1
+            priority: 2
+            latencyThreshold: 1000ms
+            healthCheckFailureThreshold: 5
+        failbackMode: manual
+        failbackCooldown: 4h
+      
+      # Latency-based routing
+      latencyRouting:
+        enabled: true
+        measurementInterval: 30s
+        threshold:
+          maxLatency: 500ms
+          deviation: 100ms
+        routing:
+          type: lowest-latency
+          fallback: proximity
+      
+      # Weighted routing for traffic distribution
+      weightedRouting:
+        enabled: true
+        weights:
+          us-east-1: 70
+          us-west-2: 20
+          eu-west-1: 10
+        adjustment:
+          enabled: true
+          interval: 5m
+          factors:
+            - latency
+            - errorRate
+            - capacity
+      
+      # Health check configuration
+      healthChecks:
+        enabled: true
+        protocol: https
+        path: /health
+        port: 443
+        interval: 30s
+        timeout: 5s
+        healthyThreshold: 2
+        unhealthyThreshold: 3
+        failureCodes:
+          - 500
+          - 502
+          - 503
+          - 504
+      
+      # DNS caching and TTL management
+      caching:
+        enabled: true
+        strategy:
+          - healthy: low-ttl
+            ttl: 60
+          - degraded: medium-ttl
+            ttl: 120
+          - failover: high-ttl
+            ttl: 300
+      
+      # Monitoring and alerting
+      monitoring:
+        enabled: true
+        metrics:
+          - dnsQueries
+          - latencyByRegion
+          - errorRate
+          - failoverCount
+        alerting:
+          - failoverTriggered
+          - highLatency
+          - healthCheckFailure

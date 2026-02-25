@@ -1,0 +1,79 @@
+# @ECO-governed
+# @ECO-layer: search
+# @ECO-semantic: manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Search Indexing System Manifest
+# ECO-Layer: GL30-49 (Execution)
+# Closure-Signal: manifest
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:data-processing:search:manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/data-processing/search/manifest.yaml"
+  name: elasticsearch-search-system
+  version: "1.0.0"
+  description: "Comprehensive Elasticsearch search indexing system"
+  layer: "GL30-49"
+  last-updated: "2024-01-01T00:00:00Z"
+  responsible: "data-engineering-team"
+
+components:
+  elasticsearch:
+    - name: es-client-manager
+      type: service
+      file: workspace/projects/search-system/src/elasticsearch/client.py
+      gl-layer: "GL30-49"
+  
+  indexing:
+    - name: bulk-indexer
+      type: service
+      file: workspace/projects/search-system/src/indexing/bulk_indexer.py
+      gl-layer: "GL30-49"
+    - name: incremental-updater
+      type: service
+      file: workspace/projects/search-system/src/indexing/incremental_updater.py
+      gl-layer: "GL30-49"
+    - name: index-optimizer
+      type: service
+      file: workspace/projects/search-system/src/indexing/index_optimizer.py
+      gl-layer: "GL30-49"
+  
+  search:
+    - name: full-text-search
+      type: service
+      file: workspace/projects/search-system/src/search/full_text_search.py
+      gl-layer: "GL30-49"
+    - name: faceted-search
+      type: service
+      file: workspace/projects/search-system/src/search/faceted_search.py
+      gl-layer: "GL30-49"
+    - name: autocomplete
+      type: service
+      file: workspace/projects/search-system/src/search/autocomplete.py
+      gl-layer: "GL30-49"
+  
+  analytics:
+    - name: search-analytics
+      type: service
+      file: workspace/projects/search-system/src/analytics/search_analytics.py
+      gl-layer: "GL50-59"
+    - name: relevance-tuning
+      type: service
+      file: workspace/projects/search-system/src/analytics/relevance_tuning.py
+      gl-layer: "GL30-49"
+
+tools:
+  - name: structure-validator
+    type: validation
+    file: tools/search/structure_validator.py
+    gl-layer: "GL90-99"
+
+evidence:
+  location: var/evidence
+  retention-days: 2555
+
+version:
+  current: "1.0.0"

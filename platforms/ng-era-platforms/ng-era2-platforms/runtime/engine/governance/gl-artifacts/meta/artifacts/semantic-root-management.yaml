@@ -1,0 +1,94 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: semantic-root-management
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLSemanticRootManagement
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:governance:gl-artifacts:meta:artifacts:semantic-root-management.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/artifacts/semantic-root-management.yaml"
+  name: semantic-root-management
+  version: '1.0.0'
+  created: '2026-01-21'
+  layer: 'GL90-99'
+semantic_root_system:
+  name: Semantic Root Management System
+  description: Unified semantic root management with full traceability
+unified_semantic_root:
+  urn: urn:machinenativeops:governance:semantic-root:v1
+  version: '1.0.0'
+  status: ACTIVE
+  description: Unified semantic root for all governance layers
+semantic_structure:
+  entities:
+    - entity_id: ENTITY-001
+      name: Governance Entity
+      urn: urn:machinenativeops:gl:entity:governance:1.0.0
+      description: Governance entity semantic root
+    - entity_id: ENTITY-002
+      name: Layer Entity
+      urn: urn:machinenativeops:gl:entity:layer:1.0.0
+      description: Layer entity semantic root
+    - entity_id: ENTITY-003
+      name: Artifact Entity
+      urn: urn:machinenativeops:gl:entity:artifact:1.0.0
+      description: Artifact entity semantic root
+semantic_mapping:
+  enabled: true
+  reversibility: 100%
+  traceability: 100%
+  consistency: 99.9%
+review_mechanisms:
+  - mechanism_id: REVIEW-1
+    name: Forward Review
+    description: Review forward changes
+    semantic_boundary: urn:machinenativeops:gl:review:forward:1.0.0
+  - mechanism_id: REVIEW-2
+    name: Backward Review
+    description: Review backward changes
+    semantic_boundary: urn:machinenativeops:gl:review:backward:1.0.0
+  - mechanism_id: REVIEW-3
+    name: Change Review
+    description: Review all changes
+    semantic_boundary: urn:machinenativeops:gl:review:change:1.0.0
+  - mechanism_id: REVIEW-4
+    name: Audit Review
+    description: Review audit trails
+    semantic_boundary: urn:machinenativeops:gl:review:audit:1.0.0
+semantic_detection:
+  kl_divergence:
+    enabled: true
+    threshold: < 0.01
+    current: 0.008
+  graph_edit_distance:
+    enabled: true
+    threshold: < 0.05
+    current: 0.032
+semantic_sealing:
+  mechanism: SHA-256
+  integrity_check: 100%
+  verification_frequency: Real-time
+  seal_status: ACTIVE
+version_management:
+  versioning_enabled: true
+  locking_enabled: true
+  rollback_capability: true
+  version_history_retention: 90 days
+tracking_dimensions:
+  - dimension: Forward
+    description: Track forward changes
+    capability: Full forward trace
+  - dimension: Backward
+    description: Track backward changes
+    capability: Full backward trace
+  - dimension: Change
+    description: Track all changes
+    capability: Full change history
+  - dimension: Audit
+    description: Track audit trails
+    capability: Full audit trace
+activation_status: ACTIVE

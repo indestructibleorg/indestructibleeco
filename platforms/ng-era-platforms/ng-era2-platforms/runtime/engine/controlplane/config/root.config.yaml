@@ -1,0 +1,293 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: root.config
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# 🌐 Root 全域基本配置
+# MachineNativeOps Root Layer Global Configuration
+# Version: 1.0.0
+
+apiVersion: machinenativeops.io/v1
+kind: RootGlobalConfig
+metadata:
+  name: global-baseline-config
+  namespace: machinenativeops-root
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    machinenativeops.io/tier: "baseline"
+    machinenativeops.io/version: "v1.0.0"
+    machinenativeops.io/component: "global-configuration"
+  annotations:
+    machinenativeops.io/description: "Root layer global configuration for MachineNativeOps system"
+    machinenativeops.io/last-modified: "2025-12-20T22:00:00Z"
+
+spec:
+  # === 基本系統資訊 ===
+  system:
+    name: "MachineNativeOps"
+    version: "1.0.0"
+    deployment_mode: "production"
+    environment: "root-layer"
+    system_id: "mno-root-001"
+    instance_id: "${HOSTNAME:-mno-root-default}"
+    
+  # === 命名空間配置 ===
+  namespace:
+    default: "machinenativeops-root"
+    governance: "machinenativeops-governance"
+    modules: "machinenativeops-modules"
+    trust: "machinenativeops-trust"
+    provenance: "machinenativeops-provenance"
+    execution: "machinenativeops-execution"
+    
+  # === 時區與地區設定 ===
+  localization:
+    timezone: "UTC"
+    locale: "en_US.UTF-8"
+    date_format: "YYYY-MM-DD"
+    time_format: "HH:mm:ss"
+    datetime_format: "YYYY-MM-DD HH:mm:ss"
+    
+  # === 日誌配置 ===
+  logging:
+    level: "INFO"
+    format: "structured"
+    outputs:
+      - type: "file"
+        path: "/var/log/machinenativenops/root.log"
+        rotation: "daily"
+        retention: "30d"
+      - type: "syslog"
+        facility: "daemon"
+        tag: "machinenativenops-root"
+      - type: "stdout"
+        format: "json"
+        
+  # === 監控配置 ===
+  monitoring:
+    enabled: true
+    metrics_port: 9090
+    health_check_port: 8080
+    prometheus:
+      enabled: true
+      endpoint: "/metrics"
+      namespace: "machinenativenops_root"
+    tracing:
+      enabled: true
+      jaeger_endpoint: "http://jaeger:14268/api/traces"
+      sampling_rate: 0.1
+      
+  # === 安全配置 ===
+  security:
+    encryption:
+      algorithm: "AES-256-GCM"
+      key_rotation_period: "90d"
+    authentication:
+      method: "mutual_tls"
+      certificate_ttl: "365d"
+    authorization:
+      default_policy: "deny_all"
+      audit_enabled: true
+      
+  # === 資源限制 ===
+  resources:
+    cpu:
+      request: "100m"
+      limit: "2000m"
+    memory:
+      request: "128Mi"
+      limit: "2Gi"
+    storage:
+      request: "1Gi"
+      limit: "10Gi"
+      
+  # === 網路配置 ===
+  network:
+    listen_port: 8443
+    tls_enabled: true
+    certificate_path: "/etc/machinenativenops/certs/server.crt"
+    private_key_path: "/etc/machinenativenops/certs/server.key"
+    allowed_origins:
+      - "https://console.machinenativenops.io"
+      - "https://api.machinenativenops.io"
+      
+  # === 資料庫配置 ===
+  database:
+    type: "postgresql"
+    host: "postgres.machinenativenops.svc.cluster.local"
+    port: 5432
+    name: "machinenativenops_root"
+    username: "mno_root_user"
+    connection_pool:
+      max_connections: 20
+      min_connections: 5
+      connection_timeout: "30s"
+      
+  # === 快取配置 ===
+  cache:
+    type: "redis"
+    host: "redis.machinenativenops.svc.cluster.local"
+    port: 6379
+    database: 0
+    ttl: "1h"
+    max_memory: "256Mi"
+    
+  # === 訊息佇列配置 ===
+  message_queue:
+    type: "nats"
+    servers:
+      - "nats://nats-1.machinenativenops.svc.cluster.local:4222"
+      - "nats://nats-2.machinenativenops.svc.cluster.local:4222"
+      - "nats://nats-3.machinenativenops.svc.cluster.local:4222"
+    max_reconnects: 10
+    reconnect_wait: "2s"
+    
+  # === 備份配置 ===
+  backup:
+    enabled: true
+    schedule: "0 2 * * *"  # 每日凌晨2點
+    retention: "30d"
+    storage:
+      type: "s3"
+      bucket: "machinenativenops-backups"
+      region: "us-west-2"
+      prefix: "root-layer/"
+      
+  # === 環境變數覆寫 ===
+  environment_overrides:
+    - name: "LOG_LEVEL"
+      default: "INFO"
+      description: "Override default logging level"
+    - name: "MONITORING_ENABLED"
+      default: "true"
+      description: "Enable or disable monitoring"
+    - name: "DEPLOYMENT_MODE"
+      default: "production"
+      description: "Set deployment mode (development/staging/production)"
+    - name: "NAMESPACE"
+      default: "machinenativenops-root"
+      description: "Override default namespace"
+      
+  # === 功能開關 ===
+  feature_flags:
+    enable_advanced_security: true
+    enable_experimental_features: false
+    enable_debug_mode: false
+    enable_performance_profiling: false
+    enable_extended_logging: true
+    
+  # === 相依性版本 ===
+  dependencies:
+    kubernetes: ">=1.24.0"
+    docker: ">=20.10.0"
+    postgresql: ">=13.0"
+    redis: ">=6.0"
+    nats: ">=2.8.0"
+    prometheus: ">=2.30.0"
+    jaeger: ">=1.30.0"
+    
+  # === 相容性設定 ===
+  compatibility:
+    legacy_api_support: true
+    deprecated_feature_warning: true
+    migration_mode: false
+    
+status:
+  phase: "Ready"
+  conditions:
+    - type: "ConfigurationValidated"
+      status: "True"
+      lastTransitionTime: "2025-12-20T22:00:00Z"
+      reason: "ValidationPassed"
+      message: "Root configuration validation passed successfully"
+    - type: "DependenciesResolved"
+      status: "True"
+      lastTransitionTime: "2025-12-20T22:00:00Z"
+      reason: "DependenciesAvailable"
+      message: "All required dependencies are available"
+    - type: "SecurityConfigured"
+      status: "True"
+      lastTransitionTime: "2025-12-20T22:00:00Z"
+      reason: "SecuritySetupComplete"
+      message: "Security configuration completed successfully"
+
+---
+# Schema 定義
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: root-config-schema
+  namespace: machinenativenops-root
+data:
+  schema.yaml: |
+    # Root Global Configuration Schema
+    type: object
+    properties:
+      system:
+        type: object
+        properties:
+          name:
+            type: string
+            pattern: "^[a-zA-Z][a-zA-Z0-9-]*$"
+          version:
+            type: string
+            pattern: "^\\d+\\.\\d+\\.\\d+$"
+          deployment_mode:
+            type: string
+            enum: ["development", "staging", "production"]
+          environment:
+            type: string
+          system_id:
+            type: string
+            pattern: "^[a-z0-9-]+$"
+          instance_id:
+            type: string
+        required: ["name", "version", "deployment_mode", "system_id"]
+      namespace:
+        type: object
+        properties:
+          default:
+            type: string
+          governance:
+            type: string
+          modules:
+            type: string
+          trust:
+            type: string
+          provenance:
+            type: string
+          execution:
+            type: string
+        required: ["default"]
+      localization:
+        type: object
+        properties:
+          timezone:
+            type: string
+          locale:
+            type: string
+          date_format:
+            type: string
+          time_format:
+            type: string
+          datetime_format:
+            type: string
+        required: ["timezone", "locale"]
+      logging:
+        type: object
+        properties:
+          level:
+            type: string
+            enum: ["DEBUG", "INFO", "WARN", "ERROR", "FATAL"]
+          format:
+            type: string
+            enum: ["structured", "unstructured"]
+          outputs:
+            type: array
+            items:
+              type: object
+        required: ["level", "format", "outputs"]
+    required: ["system", "namespace", "localization", "logging"]

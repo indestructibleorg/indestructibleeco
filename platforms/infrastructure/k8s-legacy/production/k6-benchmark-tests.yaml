@@ -1,0 +1,157 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: k6-benchmark-tests
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:k6-benchmark-tests.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/k6-benchmark-tests.yaml"
+  name: k6-tests
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: performance-benchmark
+    environment: production
+data:
+  health-check.js: |
+    import http from 'k6/http';
+    import { check } from 'k6';
+    
+    export let options = {
+      vus: 10,
+      duration: '30s',
+      thresholds: {
+        http_req_duration: ['p(95)<100'],
+        http_req_failed: ['rate<0.01'],
+      },
+    };
+    
+    export default function () {
+      let response = http.get('http://machine-native-ops.production.svc.cluster.local:8000/health');
+      
+      check(response, {
+        'status is 200': (r) => r.status === 200,
+        'response time < 100ms': (r) => r.timings.duration < 100,
+        'health status is OK': (r) => JSON.parse(r.body).status === 'OK',
+      });
+    }
+
+  api-load-test.js: |
+    import http from 'k6/http';
+    import { check, sleep } from 'k6';
+    
+    export let options = {
+      stages: [
+        { duration: '1m', target: 50 },   // Ramp up to 50 users
+        { duration: '5m', target: 50 },   // Stay at 50 users
+        { duration: '1m', target: 100 },  // Ramp up to 100 users
+        { duration: '5m', target: 100 },  // Stay at 100 users
+        { duration: '1m', target: 0 },    // Ramp down to 0 users
+      ],
+      thresholds: {
+        http_req_duration: ['p(95)<200', 'p(99)<500'],
+        http_req_failed: ['rate<0.01'],
+      },
+    };
+    
+    export default function () {
+      // GET request
+      let getResponse = http.get('http://machine-native-ops.production.svc.cluster.local:8000/api/v1/data');
+      
+      check(getResponse, {
+        'GET status is 200': (r) => r.status === 200,
+        'GET response time < 200ms': (r) => r.timings.duration < 200,
+      });
+      
+      sleep(1);
+      
+      // POST request
+      let payload = JSON.stringify({
+        key: `test_${__VU}_${__ITER}`,
+        value: 'test value',
+      });
+      
+      let postResponse = http.post(
+        'http://machine-native-ops.production.svc.cluster.local:8000/api/v1/data',
+        payload,
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+      
+      check(postResponse, {
+        'POST status is 201': (r) => r.status === 201,
+        'POST response time < 300ms': (r) => r.timings.duration < 300,
+      });
+      
+      sleep(1);
+    }
+
+  stress-test.js: |
+    import http from 'k6/http';
+    import { check, sleep } from 'k6';
+    
+    export let options = {
+      stages: [
+        { duration: '2m', target: 100 },  // Ramp up to 100 users
+        { duration: '5m', target: 100 },  // Stay at 100 users
+        { duration: '2m', target: 500 },  // Ramp up to 500 users
+        { duration: '5m', target: 500 },  // Stay at 500 users
+        { duration: '2m', target: 1000 }, // Ramp up to 1000 users
+        { duration: '5m', target: 1000 }, // Stay at 1000 users
+        { duration: '2m', target: 0 },    // Ramp down to 0 users
+      ],
+      thresholds: {
+        http_req_duration: ['p(95)<500', 'p(99)<1000'],
+        http_req_failed: ['rate<0.05'],
+      },
+    };
+    
+    export default function () {
+      let responses = http.batch([
+        ['GET', 'http://machine-native-ops.production.svc.cluster.local:8000/api/v1/data'],
+        ['GET', 'http://machine-native-ops.production.svc.cluster.local:8000/api/v1/metrics'],
+        ['GET', 'http://machine-native-ops.production.svc.cluster.local:8000/health'],
+      ]);
+      
+      responses.forEach((response) => {
+        check(response, {
+          'status is 200': (r) => r.status === 200,
+          'response time < 500ms': (r) => r.timings.duration < 500,
+        });
+      });
+      
+      sleep(Math.random() * 2);
+    }
+
+  memory-leak-test.js: |
+    import http from 'k6/http';
+    import { check, sleep } from 'k6';
+    
+    export let options = {
+      stages: [
+        { duration: '10m', target: 10 },
+        { duration: '50m', target: 10 },
+        { duration: '10m', target: 0 },
+      ],
+      thresholds: {
+        http_req_duration: ['p(95)<300'],
+        http_req_failed: ['rate<0.02'],
+      },
+    };
+    
+    export default function () {
+      let response = http.get('http://machine-native-ops.production.svc.cluster.local:8000/api/v1/data');
+      
+      check(response, {
+        'status is 200': (r) => r.status === 200,
+      });
+      
+      sleep(1);
+    }

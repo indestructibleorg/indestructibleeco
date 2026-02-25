@@ -1,0 +1,97 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: naming-governance
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: gl-quantum-naming-violations
+  namespace: monitoring
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-monitoring
+    release: prometheus
+spec:
+  groups:
+    - name: naming.governance.violations
+      interval: 30s
+      rules:
+        - alert: NamingConventionViolationDetected
+          expr: |
+            sum(increase(glnamingconvention_violations_total[5m])) by (namespace, kind) > 0
+          for: 1m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            category: naming-governance
+          annotations:
+            summary: "Naming convention violation detected in namespace {{ $labels.namespace }}"
+            description: "{{ $value }} naming violations detected for {{ $labels.kind }} resources in namespace {{ $labels.namespace }} over the last 5 minutes"
+            
+        - alert: NamingComplianceRateLow
+          expr: |
+            (
+              sum(kube_pod_info) by (namespace)
+              - sum(increase(glnamingconvention_violations_total[1h])) by (namespace)
+            ) / sum(kube_pod_info) by (namespace) < 0.95
+          for: 15m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            category: naming-governance
+          annotations:
+            summary: "Naming compliance rate below 95% in namespace {{ $labels.namespace }}"
+            description: "Naming compliance rate is {{ $value | humanizePercentage }} in namespace {{ $labels.namespace }}"
+            
+        - alert: CriticalNamingViolation
+          expr: |
+            sum(increase(glnamingconvention_violations_total{severity="critical"}[5m])) > 0
+          for: 1m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: critical
+            category: naming-governance
+          annotations:
+            summary: "Critical naming convention violation detected"
+            description: "{{ $value }} critical naming violations detected over the last 5 minutes"
+            
+    - name: naming.governance.remediation
+      interval: 30s
+      rules:
+        - alert: AutoRemediationFailed
+          expr: |
+            sum(increase(naming_remediation_failures_total[10m])) > 0
+          for: 5m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            category: naming-governance
+          annotations:
+            summary: "Auto-remediation of naming violations failed"
+            description: "{{ $value }} auto-remediation attempts failed over the last 10 minutes"
+            
+        - alert: MigrationInProgressTooLong
+          expr: |
+            time() - naming_migration_start_timestamp_seconds > 7200
+          for: 5m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            category: naming-governance
+          annotations:
+            summary: "Naming migration in progress for more than 2 hours"
+            description: "Migration started at {{ $value | humanizeTimestamp }} is still running"

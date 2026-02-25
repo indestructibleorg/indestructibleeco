@@ -1,0 +1,335 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: directory-standards
+# @ECO-audit-trail: gl-platform-ecosystem/governance/audit-trails/GL90_99-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-platform-ecosystem/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-platform-ecosystem/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+apiVersion: gl-runtime.io/v1.0.0
+kind: DirectoryStandardsSpecification
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:governance:naming-governance:contracts:directory-standards.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/governance/naming-governance/contracts/directory-standards.yaml"
+  name: directory-standards
+  version: v2.0.0
+  description: "大型儲存庫目錄編排規範與責任邊界規範"
+  namespace: gl-enterprise-architecture
+spec:
+  ## 1. 架構原則
+  architectural_principles:
+    - 分層架構：清晰的職責分離
+    - 領域驅動：基於業務領域劃分
+    - 平台獨立：支持多平台並行開發
+    - 橫向擴展：支持橫向業務擴展
+    - 邊界清晰：明確的責任邊界
+    
+  ## 2. 根目錄結構（大型儲存庫標準）
+  root_structure:
+    # 第 1 層：企業架構層（GL00-09）
+    - name: gl-enterprise-architecture
+      type: strategic-governance
+      purpose: 企業級治理框架與規範定義
+      responsibilities:
+        - 治理框架定義
+        - 架構規範制定
+        - 跨域協調機制
+        
+    # 第 2 層：平台服務層（GL10-29）
+    - name: gl-platform-services
+      type: operational-platform
+      purpose: 平台級服務與運營支撐
+      responsibilities:
+        - 平台服務運維
+        - 跨平台協調
+        - 服務發現機制
+        
+    # 第 3 層：執行運行時（GL30-49）
+    - name: gl-execution-runtime
+      type: execution-engine
+      purpose: 執行引擎與運行時環境
+      responsibilities:
+        - 執行引擎實現
+        - 任務編排與調度
+        - 資源管理與分配
+        
+    # 第 4 層：數據處理層（GL20-29）
+    - name: gl-data-processing
+      type: data-pipeline
+      purpose: 數據處理與數據工程
+      responsibilities:
+        - 數據管道建設
+        - 數據湖管理
+        - ETL 流程實現
+        
+    # 第 5 層：觀測性層（GL50-59）
+    - name: gl-observability
+      type: monitoring-logging
+      purpose: 系統監控與可觀測性
+      responsibilities:
+        - 監控指標採集
+        - 日志聚合分析
+        - 性能追蹤報告
+        
+    # 第 6 層：治理合規層（GL60-80）
+    - name: gl-governance-compliance
+      type: governance-enforcement
+      purpose: 治理執行與合規檢查
+      responsibilities:
+        - 治理策略執行
+        - 合規性驗證
+        - 審計追蹤
+        
+    # 第 7 層：擴展服務層（GL81-83）
+    - name: gl-extension-services
+      type: extension-platform
+      purpose: 擴展服務與插件機制
+      responsibilities:
+        - 插件架構實現
+        - 擴展點管理
+        - 第三方集成
+        
+    # 第 8 層：元規範層（GL90-99）
+    - name: gl-meta-specifications
+      type: meta-standards
+      purpose: 元規範定義與文檔化
+      responsibilities:
+        - 規範文檔化
+        - 元數據管理
+        - 標準化定義
+
+  ## 3. 責任邊界規範
+  responsibility_boundaries:
+    # 垂直邊界（跨層級）
+    vertical_boundaries:
+      - principle: "嚴格的單向依賴"
+      description: "高層級可以依賴低層級，低層級不能依賴高層級"
+      examples:
+        - GL90-99 可以依賴所有層級
+        - GL00-09 不能依賴任何其他層級
+        - GL30-49 只能依賴 GL00-09 和 GL10-29
+        
+    # 水平邊界（同層級）
+    horizontal_boundaries:
+      - principle: "清晰的模組邊界"
+      description: "同層級內的模組之間有清晰的介面和契約"
+      enforcement:
+        - 通過 API 契約定義介面
+        - 通過事件進行通信
+        - 通過共享數據庫進行協作
+        
+    # 平台邊界（跨平台）
+    platform_boundaries:
+      - principle: "平台獨立運行"
+      description: "每個平台應該能夠獨立運行和部署"
+      requirements:
+        - 獨立的配置管理
+        - 獨立的數據存儲
+        - 獨立的服務發現
+        
+    # 領域邊界（跨領域）
+    domain_boundaries:
+      - principle: "領域驅動設計"
+      description: "基於業務領域劃分責任邊界"
+      implementation:
+        - 每個領域有自己的數據模型
+        - 每個領域有自己的 API
+        - 每個領域有自己的服務
+
+  ## 4. 目錄命名規範
+  directory_naming:
+    # 根目錄命名
+    root_directories:
+      format: "gl-{layer-name}"
+      examples:
+        - gl-enterprise-architecture
+        - gl-platform-services
+        - gl-execution-runtime
+        - gl-data-processing
+        
+    # 平台目錄命名
+    platform_directories:
+      format: "gl-{domain}-{capability}-platform/"
+      naming_rules:
+        - 必須以 gl- 開頭
+        - 必須以 -platform/ 結尾
+        - domain 必須是預定義的 10 個領域之一
+        - capability 必須是預定義的能力之一
+      examples:
+        - gl-runtime-dag-platform/
+        - gl-quantum-compute-platform/
+        - gl-api-schema-platform/
+        - gl-agent-max-platform/
+        
+    # 服務目錄命名
+    service_directories:
+      format: "gl-{domain}-{capability}-service/"
+      naming_rules:
+        - 必須以 gl- 開頭
+        - 必須以 -service/ 結尾
+        - domain/capability 必須符合命名規範
+      examples:
+        - gl-runtime-dag-service/
+        - gl-quantum-compute-service/
+        - gl-api-schema-service/
+        
+    # 模塊目錄命名
+    module_directories:
+      format: "gl-{domain}-{capability}-module/"
+      naming_rules:
+        - 必須以 gl- 開頭
+        - 必須以 -module/ 結尾
+        - 適用於可重用的功能模組
+      examples:
+        - gl-authentication-module/
+        - gl-authorization-module/
+        - gl-logging-module/
+        
+    # 標準子目錄結構
+    standard_subdirectories:
+      # 源代碼目錄
+      src/:
+        - src/api/
+        - src/core/
+        - src/services/
+        - src/models/
+        - src/adapters/
+        - src/utils/
+        - src/tests/
+        
+      # 配置目錄
+      configs/:
+        - configs/production/
+        - configs/staging/
+        - configs/development/
+        
+      # 文檔目錄
+      docs/:
+        - docs/api/
+        - docs/architecture/
+        - docs/deployment/
+        - docs/operations/
+        
+      # 測試目錄
+      tests/:
+        - tests/unit/
+        - tests/integration/
+        - tests/e2e/
+        
+      # 部署目錄
+      deployments/:
+        - deployments/kubernetes/
+        - deployments/helm/
+        - deployments/docker/
+        
+      # 治理目錄
+      governance/:
+        - governance/policies/
+        - governance/contracts/
+        - governance/validators/
+
+  ## 5. 多平台並行架構支援
+  multi_platform_support:
+    # 平台命名約定
+    platform_convention:
+      prefix: "platform-"
+      format: "platform-{platform-name}"
+      examples:
+        - platform-aws
+        - platform-gcp
+        - platform-azure
+        - platform-on-premise
+        
+    # 平台隔離策略
+    isolation_strategy:
+      - 每個平台有獨立的目錄結構
+      - 共享代碼通過符號連接或 monorepo 管理
+      - 平台特定配置存儲在各自目錄
+      
+    # 跨平台共用策略
+    sharing_strategy:
+      - 共享模組存儲在 common/ 目錄
+      - 平台特定實現存儲在 platforms/{name}/ 目錄
+      - 通過依賴注入實現平台差異
+
+  ## 6. 大型儲存庫組織規範
+  large_repository_organization:
+    # 頂層組織
+    top_level:
+      - gl-enterprise-architecture/    # 治理層
+      - gl-platform-services/          # 平台層
+      - gl-execution-runtime/          # 執行層
+      - gl-data-processing/           # 數據層
+      - gl-observability/             # 可觀測層
+      - gl-governance-compliance/     # 治理執行層
+      - shared-components/            # 共享組件
+      - infrastructure/              # 基礎設施
+      - docs/                        # 文檔
+      - scripts/                     # 腳本
+      
+    # 中層組織（在頂層目錄內）
+    mid_level:
+      - src/                         # 源代碼
+      - api/                         # API 定義
+      - contracts/                   # 契約定義
+      - configs/                     # 配置
+      - deployments/                 # 部署
+      - tests/                       # 測試
+      - docs/                        # 文檔
+      
+    # 底層組織（模塊級別）
+    bottom_level:
+      - services/                    # 服務
+      - models/                      # 模型
+      - controllers/                 # 控制器
+      - repositories/                # 倉存
+      - utils/                       # 工具
+
+  ## 7. 驗證與合規檢查
+  validation:
+    # 必須檢查的規則
+    mandatory_checks:
+      - 目錄名稱符合命名規範
+      - 目錄深度不超過 5 層
+      - 沒有循環依賴
+      - 責任邊界清晰
+      - 跨層依賴單向
+      
+    # 推薦檢查
+    recommended_checks:
+      - 目錄大小合理（< 1000 文件）
+      - 模塊內聚性高
+      - 模塊耦合度低
+      - 文檔完整性
+
+  ## 8. 文檔化要求
+  documentation:
+    # 每個頂層目錄必須有
+    required_docs:
+      - README.md                    # 說明目錄用途
+      - ARCHITECTURE.md               # 架構說明
+      - RESPONSIBILITIES.md          # 職責說明
+      - API.md                       # API 文檔（如有）
+      
+    # 每個子目錄推薦有
+    recommended_docs:
+      - README.md
+      - CONTRIBUTING.md
+      - CHANGELOG.md
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:governance:naming-governance:contracts:directory-standards.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/governance/naming-governance/contracts/directory-standards.yaml"
+  created_at: "2026-01-31T00:00:00Z"
+  updated_at: "2026-01-31T00:00:00Z"
+  version: "v2.0.0"
+  governance_level: CONSTITUTIONAL
+  enforcement: MANDATORY
+  applicable_to:
+    - 大型儲存庫（>1000 文件）
+    - 多平台並行架構
+    - 微服務架構
+    - Monorepo 項目錄結構

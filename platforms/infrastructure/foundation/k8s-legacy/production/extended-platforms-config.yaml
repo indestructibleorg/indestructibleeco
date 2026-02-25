@@ -1,0 +1,545 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: extended-platforms-config
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Extended Platforms Configuration
+# Supports Cloudflare, Supabase, GitBook, and additional third-party platforms
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:extended-platforms-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/extended-platforms-config.yaml"
+  name: extended-platforms-config
+  namespace: production
+data:
+  # Cloudflare Configuration
+  cloudflare.yaml: |
+    cloudflare:
+      enabled: ${CLOUDFLARE_ENABLED:-false}
+      apiToken: ${CLOUDFLARE_API_TOKEN:-}
+      accountId: ${CLOUDFLARE_ACCOUNT_ID:-}
+      email: ${CLOUDFLARE_EMAIL:-}
+      
+      # Cloudflare Workers
+      workers:
+        enabled: ${CLOUDFLARE_WORKERS_ENABLED:-false}
+        scriptName: ${CLOUDFLARE_WORKER_NAME:-machine-native-ops-worker}
+        runtime: nodejs
+        bindings:
+          - name: KV_NAMESPACE
+            type: kv
+            namespaceId: ${CLOUDFLARE_KV_NAMESPACE_ID:-}
+          - name: DURABLE_OBJECT
+            type: durable-object
+            className: MachineNativeOpsObject
+          - name: R2_BUCKET
+            type: r2
+            bucketName: ${CLOUDFLARE_R2_BUCKET:-machine-native-ops}
+          - name: D1_DATABASE
+            type: d1
+            databaseId: ${CLOUDFLARE_D1_DATABASE_ID:-}
+        routes:
+          - pattern: https://api.machine-native-ops.com/*
+            zoneId: ${CLOUDFLARE_ZONE_ID:-}
+          - pattern: https://*.machine-native-ops.com/*
+            zoneId: ${CLOUDFLARE_ZONE_ID:-}
+        env:
+          - name: ENVIRONMENT
+            value: production
+          - name: LOG_LEVEL
+            value: ${LOG_LEVEL:-info}
+          - name: DATABASE_URL
+            value: ${DATABASE_URL:-}
+          - name: REDIS_URL
+            value: ${REDIS_URL:-}
+      
+      # Cloudflare Pages
+      pages:
+        enabled: ${CLOUDFLARE_PAGES_ENABLED:-false}
+        projectName: ${CLOUDFLARE_PAGES_PROJECT:-machine-native-ops-docs}
+        productionBranch: main
+        buildCommand: npm run build
+        outputDirectory: dist
+        environmentVariables:
+          - name: NODE_ENV
+            value: production
+          - name: VITE_API_URL
+            value: https://api.machine-native-ops.com
+        headers:
+          - pattern: /*
+            headers:
+              - name: X-Frame-Options
+                value: DENY
+              - name: X-Content-Type-Options
+                value: nosniff
+              - name: X-XSS-Protection
+                value: 1; mode=block
+        redirects:
+          - source: /docs/*
+            destination: https://docs.machine-native-ops.com/:splat
+            statusCode: 301
+      
+      # Cloudflare D1 Database
+      d1:
+        enabled: ${CLOUDFLARE_D1_ENABLED:-false}
+        databaseId: ${CLOUDFLARE_D1_DATABASE_ID:-}
+        databaseName: ${CLOUDFLARE_D1_DATABASE_NAME:-machine-native-ops-db}
+        migrations:
+          path: ./migrations
+          autoApply: true
+        queries:
+          - name: get-user-by-id
+            query: SELECT * FROM users WHERE id = ?
+          - name: create-user
+            query: INSERT INTO users (id, name, email) VALUES (?, ?, ?)
+      
+      # Cloudflare KV Storage
+      kv:
+        enabled: ${CLOUDFLARE_KV_ENABLED:-false}
+        namespaceId: ${CLOUDFLARE_KV_NAMESPACE_ID:-}
+        namespaceName: ${CLOUDFLARE_KV_NAMESPACE_NAME:-machine-native-ops-kv}
+        ttl: ${CLOUDFLARE_KV_TTL:-3600}
+        keys:
+          - name: config
+            value: ${CLOUDFLARE_KV_CONFIG:-}
+          - name: cache
+            value: ${CLOUDFLARE_KV_CACHE:-}
+      
+      # Cloudflare R2 Storage
+      r2:
+        enabled: ${CLOUDFLARE_R2_ENABLED:-false}
+        bucketName: ${CLOUDFLARE_R2_BUCKET:-machine-native-ops}
+        accessKeyId: ${CLOUDFLARE_R2_ACCESS_KEY_ID:-}
+        secretAccessKey: ${CLOUDFLARE_R2_SECRET_ACCESS_KEY:-}
+        accountId: ${CLOUDFLARE_ACCOUNT_ID:-}
+        endpoint: https://r2.cloudflarestorage.com
+        publicAccess: false
+        cors:
+          allowedOrigins:
+            - https://machine-native-ops.com
+            - https://*.machine-native-ops.com
+          allowedMethods:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+          allowedHeaders:
+            - "*"
+          maxAge: 3600
+      
+      # Cloudflare Durable Objects
+      durableObjects:
+        enabled: ${CLOUDFLARE_DURABLE_OBJECTS_ENABLED:-false}
+        className: MachineNativeOpsObject
+        scriptName: ${CLOUDFLARE_WORKER_NAME:-machine-native-ops-worker}
+        env:
+          - name: ENVIRONMENT
+            value: production
+      
+      # Cloudflare Email Routing
+      emailRouting:
+        enabled: ${CLOUDFLARE_EMAIL_ROUTING_ENABLED:-false}
+        zoneId: ${CLOUDFLARE_ZONE_ID:-}
+        rules:
+          - name: catch-all
+            enabled: true
+            matchers:
+              - type: all
+            actions:
+              - type: forward
+                value: ${EMAIL_FORWARD_ADDRESS:-}
+      
+      # Cloudflare Access (Zero Trust)
+      access:
+        enabled: ${CLOUDFLARE_ACCESS_ENABLED:-false}
+        applications:
+          - name: MachineNativeOps Dashboard
+            domain: dashboard.machine-native-ops.com
+            sessionDuration: 24h
+            authProviders:
+              - type: oidc
+                config:
+                  issuerUrl: https://accounts.google.com
+                  clientId: ${GOOGLE_OAUTH_CLIENT_ID:-}
+                  clientSecret: ${GOOGLE_OAUTH_CLIENT_SECRET:-}
+            policies:
+              - name: allow-verified-users
+                include:
+                  - email:
+                      email: "*@machine-native-ops.com"
+                decision: allow
+              - name: deny-all
+                decision: deny
+  
+  # Supabase Configuration
+  supabase.yaml: |
+    supabase:
+      enabled: ${SUPABASE_ENABLED:-false}
+      projectId: ${SUPABASE_PROJECT_ID:-}
+      apiUrl: ${SUPABASE_API_URL:-https://${SUPABASE_PROJECT_ID}.supabase.co}
+      anonKey: ${SUPABASE_ANON_KEY:-}
+      serviceRoleKey: ${SUPABASE_SERVICE_ROLE_KEY:-}
+      
+      # PostgreSQL Database
+      database:
+        enabled: ${SUPABASE_DATABASE_ENABLED:-true}
+        connectionString: ${SUPABASE_DATABASE_URL:-postgresql://postgres:[YOUR-PASSWORD]@db.${SUPABASE_PROJECT_ID}.supabase.co:5432/postgres}
+        poolSize: ${SUPABASE_POOL_SIZE:-10}
+        connectionTimeout: 30
+        migrations:
+          path: ./supabase/migrations
+          autoApply: true
+        schemas:
+          - public
+          - storage
+          - auth
+          - graphql_public
+        functions:
+          - name: get-user-profile
+            schema: public
+            language: plpgsql
+            body: |
+              BEGIN
+                RETURN SELECT * FROM profiles WHERE user_id = auth.uid();
+              END;
+          - name: calculate-metrics
+            schema: public
+            language: plpgsql
+            body: |
+              BEGIN
+                -- Custom metrics calculation logic
+              END;
+        rowLevelSecurity:
+          enabled: true
+          policies:
+            - name: users-select-own
+              table: profiles
+              operation: SELECT
+              definition: "auth.uid() = user_id"
+            - name: users-insert-own
+              table: profiles
+              operation: INSERT
+              definition: "auth.uid() = user_id"
+            - name: users-update-own
+              table: profiles
+              operation: UPDATE
+              definition: "auth.uid() = user_id"
+      
+      # Supabase Auth
+      auth:
+        enabled: ${SUPABASE_AUTH_ENABLED:-true}
+        providers:
+          - name: email
+            enabled: true
+            requireEmailConfirmation: true
+            minPasswordLength: 8
+          - name: google
+            enabled: ${GOOGLE_AUTH_ENABLED:-true}
+            clientId: ${GOOGLE_OAUTH_CLIENT_ID:-}
+            clientSecret: ${GOOGLE_OAUTH_CLIENT_SECRET:-}
+            scopes:
+              - email
+              - profile
+          - name: github
+            enabled: ${GITHUB_AUTH_ENABLED:-true}
+            clientId: ${GITHUB_OAUTH_CLIENT_ID:-}
+            clientSecret: ${GITHUB_OAUTH_CLIENT_SECRET:-}
+            scopes:
+              - user:email
+              - read:user
+          - name: azure-ad
+            enabled: ${AZURE_AD_AUTH_ENABLED:-false}
+            clientId: ${AZURE_AD_CLIENT_ID:-}
+            clientSecret: ${AZURE_AD_CLIENT_SECRET:-}
+            tenantId: ${AZURE_AD_TENANT_ID:-}
+        emailTemplates:
+          confirmation:
+            subject: Confirm your email
+            template: ./supabase/templates/confirmation.html
+          recovery:
+            subject: Reset your password
+            template: ./supabase/templates/recovery.html
+          emailChange:
+            subject: Confirm email change
+            template: ./supabase/templates/email-change.html
+        session:
+          duration: 3600  # 1 hour
+          inactivityTimeout: 300  # 5 minutes
+        mfa:
+          enabled: ${SUPABASE_MFA_ENABLED:-true}
+          factor: totp
+          issuer: MachineNativeOps
+      
+      # Supabase Storage
+      storage:
+        enabled: ${SUPABASE_STORAGE_ENABLED:-true}
+        buckets:
+          - name: documents
+            public: false
+            fileSizeLimit: 10485760  # 10MB
+            allowedMimeTypes:
+              - application/pdf
+              - application/msword
+              - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+              - text/plain
+            cors:
+              allowedOrigins:
+                - https://machine-native-ops.com
+                - https://*.machine-native-ops.com
+              allowedMethods:
+                - POST
+                - GET
+                - PUT
+                - DELETE
+              allowedHeaders:
+                - "*"
+              maxAge: 3600
+          - name: images
+            public: true
+            fileSizeLimit: 5242880  # 5MB
+            allowedMimeTypes:
+              - image/jpeg
+              - image/png
+              - image/gif
+              - image/webp
+            transformations:
+              enabled: true
+              formats:
+                - thumbnail:
+                    width: 200
+                    height: 200
+                    fit: cover
+                - medium:
+                    width: 800
+                    height: 600
+                    fit: inside
+                - large:
+                    width: 1920
+                    height: 1080
+                    fit: inside
+          - name: backups
+            public: false
+            fileSizeLimit: 1073741824  # 1GB
+            allowedMimeTypes:
+              - application/zip
+              - application/x-tar
+              - application/gzip
+        policies:
+          - name: documents-select-own
+            bucket: documents
+            operation: SELECT
+            definition: "auth.uid() = storage.foldername"
+          - name: documents-insert-own
+            bucket: documents
+            operation: INSERT
+            definition: "auth.uid() = storage.foldername"
+      
+      # Supabase Edge Functions
+      edgeFunctions:
+        enabled: ${SUPABASE_EDGE_FUNCTIONS_ENABLED:-true}
+        runtime: deno
+        timeout: 60
+        memory: 512
+        functions:
+          - name: hello-world
+            path: /hello
+            method: GET
+            code: |
+              import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+              
+              serve(async (req) => {
+                const url = new URL(req.url)
+                const name = url.searchParams.get('name') || 'World'
+                
+                return new Response(JSON.stringify({ message: `Hello ${name}!` }), {
+                  headers: { 'Content-Type': 'application/json' },
+                })
+              })
+          - name: webhook-handler
+            path: /webhook
+            method: POST
+            code: ./supabase/functions/webhook-handler/index.ts
+            env:
+              - name: WEBHOOK_SECRET
+                value: ${WEBHOOK_SECRET:-}
+      
+      # Supabase Realtime
+      realtime:
+        enabled: ${SUPABASE_REALTIME_ENABLED:-true}
+        channels:
+          - name: notifications
+            enabled: true
+            broadcast:
+              - self: true
+              - others: true
+            presence:
+              - key: user_id
+            postgresChanges:
+              - event: INSERT
+                schema: public
+                table: notifications
+                filter: user_id=eq.user_id()
+          - name: tasks
+            enabled: true
+            broadcast:
+              - self: true
+            postgresChanges:
+              - event: ALL
+                schema: public
+                table: tasks
+  
+  # GitBook Configuration
+  gitbook.yaml: |
+    gitbook:
+      enabled: ${GITBOOK_ENABLED:-false}
+      spaceId: ${GITBOOK_SPACE_ID:-}
+      accessToken: ${GITBOOK_ACCESS_TOKEN:-}
+      
+      # GitBook Space Configuration
+      space:
+        name: ${GITBOOK_SPACE_NAME:-MachineNativeOps Documentation}
+        description: Comprehensive documentation for MachineNativeOps platform
+        visibility: public
+        url: ${GITBOOK_SPACE_URL:-https://machine-native-ops.gitbook.io}
+      
+      # Content Configuration
+      content:
+        mainBranch: main
+        rootPath: docs
+        structure:
+          - name: Getting Started
+            path: getting-started
+            order: 1
+            sections:
+              - name: Introduction
+                path: introduction.md
+              - name: Quick Start
+                path: quick-start.md
+              - name: Installation
+                path: installation.md
+          - name: Guides
+            path: guides
+            order: 2
+            sections:
+              - name: Deployment Guide
+                path: deployment.md
+              - name: Configuration Guide
+                path: configuration.md
+              - name: API Reference
+                path: api-reference.md
+          - name: Tutorials
+            path: tutorials
+            order: 3
+            sections:
+              - name: Basic Tutorial
+                path: basic-tutorial.md
+              - name: Advanced Tutorial
+                path: advanced-tutorial.md
+          - name: Reference
+            path: reference
+            order: 4
+            sections:
+              - name: Glossary
+                path: glossary.md
+              - name: FAQ
+                path: faq.md
+      
+      # GitBook Features
+      features:
+        # API Reference
+        apiReference:
+          enabled: ${GITBOOK_API_REFERENCE_ENABLED:-true}
+          openApiSpec: ./openapi.yaml
+          theme: light
+        # Code Samples
+        codeSamples:
+          enabled: ${GITBOOK_CODE_SAMPLES_ENABLED:-true}
+          languages:
+            - javascript
+            - python
+            - go
+            - rust
+        # Interactive Components
+        interactiveComponents:
+          enabled: ${GITBOOK_INTERACTIVE_ENABLED:-true}
+          components:
+            - type: code-block
+              config:
+                theme: dark
+                lineNumbers: true
+            - type: mermaid-diagram
+              config:
+                theme: default
+            - type: embed
+              config:
+                allowlist:
+                  - youtube.com
+                  - vimeo.com
+                  - figma.com
+        # SEO Configuration
+        seo:
+          enabled: true
+          title: MachineNativeOps Documentation
+          description: Comprehensive documentation for the MachineNativeOps platform
+          keywords:
+            - MachineNativeOps
+            - Machine Learning
+            - AI
+            - Infrastructure
+            - DevOps
+          ogImage: ${GITBOOK_OG_IMAGE:-https://machine-native-ops.com/og-image.png}
+          twitterCard: summary_large_image
+      
+      # GitBook Integrations
+      integrations:
+        # GitHub Integration
+        github:
+          enabled: ${GITBOOK_GITHUB_INTEGRATION_ENABLED:-true}
+          repository: MachineNativeOps/machine-native-ops
+          syncBranches:
+            - main
+            - develop
+          autoSync: true
+          syncInterval: 300  # 5 minutes
+        
+        # Slack Integration
+        slack:
+          enabled: ${GITBOOK_SLACK_INTEGRATION_ENABLED:-false}
+          webhookUrl: ${SLACK_WEBHOOK_URL:-}
+          channels:
+            - name: documentation-updates
+              events:
+                - page_published
+                - page_updated
+                - page_deleted
+        
+        # Analytics Integration
+        analytics:
+          enabled: ${GITBOOK_ANALYTICS_ENABLED:-true}
+          providers:
+            - name: google-analytics
+              trackingId: ${GA_TRACKING_ID:-}
+            - name: plausible
+              domain: ${PLAUSIBLE_DOMAIN:-}
+            - name: amplitude
+              apiKey: ${AMPLITUDE_API_KEY:-}
+      
+      # GitBook Webhooks
+      webhooks:
+        enabled: ${GITBOOK_WEBHOOKS_ENABLED:-true}
+        events:
+          - content.published
+          - content.updated
+          - content.deleted
+          - content.moved
+        endpoints:
+          - url: ${WEBHOOK_ENDPOINT:-https://api.machine-native-ops.com/webhooks/gitbook}
+            secret: ${WEBHOOK_SECRET:-}
+            events:
+              - content.published
+              - content.updated

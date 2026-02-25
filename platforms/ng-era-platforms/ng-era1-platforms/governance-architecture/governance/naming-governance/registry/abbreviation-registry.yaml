@@ -1,0 +1,549 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: naming-governance
+# @ECO-audit-trail: gl-platform-ecosystem/governance/audit-trails/GL90_99-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-platform-ecosystem/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-platform-ecosystem/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: gl-runtime.io/v1.0.0
+kind: AbbreviationRegistry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:governance:naming-governance:registry:abbreviation-registry.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/governance/naming-governance/registry/abbreviation-registry.yaml"
+  name: abbreviation-registry
+  version: v1.0.0
+  description: "GL Abbreviation Registry - 定義所有標準縮寫"
+  namespace: gl-platform-ecosystem
+spec:
+  abbreviations:
+    ## Domain Abbreviations
+    domains:
+      - term: runtime
+        abbr: rt
+        description: "Runtime domain"
+        category: domain
+    
+      - term: quantum
+        abbr: qm
+        description: "Quantum domain"
+        category: domain
+    
+      - term: api
+        abbr: api
+        description: "API domain"
+        category: domain
+    
+      - term: agent
+        abbr: ag
+        description: "Agent domain"
+        category: domain
+    
+      - term: multimodal
+        abbr: mm
+        description: "Multimodal domain"
+        category: domain
+    
+      - term: database
+        abbr: db
+        description: "Database domain"
+        category: domain
+    
+      - term: compute
+        abbr: cp
+        description: "Compute domain"
+        category: domain
+    
+      - term: storage
+        abbr: st
+        description: "Storage domain"
+        category: domain
+    
+      - term: governance
+        abbr: gov
+        description: "Governance domain"
+        category: domain
+    
+      - term: semantic
+        abbr: sem
+        description: "Semantic domain"
+        category: domain
+    
+    ## Capability Abbreviations
+    capabilities:
+      - term: dag
+        abbr: dag
+        description: "Directed Acyclic Graph"
+        category: capability
+        domain: runtime
+    
+      - term: workflow
+        abbr: wf
+        description: "Workflow"
+        category: capability
+        domain: runtime
+    
+      - term: executor
+        abbr: exec
+        description: "Executor"
+        category: capability
+        domain: runtime
+    
+      - term: scheduler
+        abbr: sched
+        description: "Scheduler"
+        category: capability
+        domain: runtime
+    
+      - term: compute
+        abbr: comp
+        description: "Compute"
+        category: capability
+        domain: quantum
+    
+      - term: simulation
+        abbr: sim
+        description: "Simulation"
+        category: capability
+        domain: quantum
+    
+      - term: schema
+        abbr: sch
+        description: "Schema"
+        category: capability
+        domain: api
+    
+      - term: gateway
+        abbr: gw
+        description: "Gateway"
+        category: capability
+        domain: api
+    
+      - term: validation
+        abbr: val
+        description: "Validation"
+        category: capability
+        domain: api
+    
+      - term: versioning
+        abbr: ver
+        description: "Versioning"
+        category: capability
+        domain: api
+    
+      - term: max
+        abbr: max
+        description: "Max AI Agent"
+        category: capability
+        domain: agent
+    
+      - term: planning
+        abbr: plan
+        description: "Planning"
+        category: capability
+        domain: agent
+    
+      - term: reasoning
+        abbr: reas
+        description: "Reasoning"
+        category: capability
+        domain: agent
+    
+      - term: behavior
+        abbr: beh
+        description: "Behavior"
+        category: capability
+        domain: agent
+    
+      - term: coordination
+        abbr: coord
+        description: "Coordination"
+        category: capability
+        domain: agent
+    
+      - term: vision
+        abbr: vis
+        description: "Vision"
+        category: capability
+        domain: multimodal
+    
+      - term: text
+        abbr: txt
+        description: "Text"
+        category: capability
+        domain: multimodal
+    
+      - term: audio
+        abbr: aud
+        description: "Audio"
+        category: capability
+        domain: multimodal
+    
+      - term: fusion
+        abbr: fus
+        description: "Fusion"
+        category: capability
+        domain: multimodal
+    
+      - term: embedding
+        abbr: emb
+        description: "Embedding"
+        category: capability
+        domain: multimodal
+    
+      - term: shard
+        abbr: shd
+        description: "Shard"
+        category: capability
+        domain: database
+    
+      - term: replication
+        abbr: repl
+        description: "Replication"
+        category: capability
+        domain: database
+    
+      - term: backup
+        abbr: bkp
+        description: "Backup"
+        category: capability
+        domain: database
+    
+      - term: query
+        abbr: qry
+        description: "Query"
+        category: capability
+        domain: database
+    
+      - term: migration
+        abbr: mig
+        description: "Migration"
+        category: capability
+        domain: database
+    
+      - term: batch
+        abbr: batch
+        description: "Batch"
+        category: capability
+        domain: compute
+    
+      - term: stream
+        abbr: str
+        description: "Stream"
+        category: capability
+        domain: compute
+    
+      - term: ml
+        abbr: ml
+        description: "Machine Learning"
+        category: capability
+        domain: compute
+    
+      - term: inference
+        abbr: inf
+        description: "Inference"
+        category: capability
+        domain: compute
+    
+      - term: object
+        abbr: obj
+        description: "Object"
+        category: capability
+        domain: storage
+    
+      - term: file
+        abbr: file
+        description: "File"
+        category: capability
+        domain: storage
+    
+      - term: archive
+        abbr: arch
+        description: "Archive"
+        category: capability
+        domain: storage
+    
+      - term: cache
+        abbr: cache
+        description: "Cache"
+        category: capability
+        domain: storage
+    
+      - term: policy
+        abbr: pol
+        description: "Policy"
+        category: capability
+        domain: governance
+    
+      - term: audit
+        abbr: audt
+        description: "Audit"
+        category: capability
+        domain: governance
+    
+      - term: compliance
+        abbr: cmpl
+        description: "Compliance"
+        category: capability
+        domain: governance
+    
+      - term: validation
+        abbr: valid
+        description: "Validation"
+        category: capability
+        domain: governance
+    
+      - term: enforcement
+        abbr: enf
+        description: "Enforcement"
+        category: capability
+        domain: governance
+    
+      - term: graph
+        abbr: graph
+        description: "Graph"
+        category: capability
+        domain: semantic
+    
+      - term: reasoning
+        abbr: semreas
+        description: "Reasoning"
+        category: capability
+        domain: semantic
+    
+      - term: ontology
+        abbr: onto
+        description: "Ontology"
+        category: capability
+        domain: semantic
+    
+      - term: mapping
+        abbr: map
+        description: "Mapping"
+        category: capability
+        domain: semantic
+    
+    ## Resource Abbreviations
+    resources:
+      - term: executor
+        abbr: exec
+        description: "Executor"
+        category: resource
+      
+      - term: scheduler
+        abbr: sched
+        description: "Scheduler"
+        category: resource
+      
+      - term: validator
+        abbr: valr
+        description: "Validator"
+        category: resource
+      
+      - term: generator
+        abbr: gen
+        description: "Generator"
+        category: resource
+      
+      - term: router
+        abbr: rtr
+        description: "Router"
+        category: resource
+      
+      - term: manager
+        abbr: mgr
+        description: "Manager"
+        category: resource
+      
+      - term: coordinator
+        abbr: coord
+        description: "Coordinator"
+        category: resource
+      
+      - term: processor
+        abbr: proc
+        description: "Processor"
+        category: resource
+      
+      - term: monitor
+        abbr: mon
+        description: "Monitor"
+        category: resource
+      
+      - term: analyzer
+        abbr: ana
+        description: "Analyzer"
+        category: resource
+      
+      - term: recognizer
+        abbr: rec
+        description: "Recognizer"
+        category: resource
+      
+      - term: detector
+        abbr: det
+        description: "Detector"
+        category: resource
+      
+      - term: planner
+        abbr: plnr
+        description: "Planner"
+        category: resource
+      
+      - term: behavior
+        abbr: beh
+        description: "Behavior"
+        category: resource
+      
+      - term: rules
+        abbr: rls
+        description: "Rules"
+        category: resource
+      
+      - term: actions
+        abbr: act
+        description: "Actions"
+        category: resource
+      
+      - term: documentation
+        abbr: doc
+        description: "Documentation"
+        category: resource
+      
+      - term: query
+        abbr: qry
+        description: "Query"
+        category: resource
+      
+      - term: migration
+        abbr: mig
+        description: "Migration"
+        category: resource
+      
+      - term: backup
+        abbr: bkp
+        description: "Backup"
+        category: resource
+    
+    ## Common Abbreviations
+    common:
+      - term: service
+        abbr: svc
+        description: "Service"
+        category: common
+      
+      - term: application
+        abbr: app
+        description: "Application"
+        category: common
+      
+      - term: platform
+        abbr: plat
+        description: "Platform"
+        category: common
+      
+      - term: deployment
+        abbr: dep
+        description: "Deployment"
+        category: common
+      
+      - term: configuration
+        abbr: cfg
+        description: "Configuration"
+        category: common
+      
+      - term: environment
+        abbr: env
+        description: "Environment"
+        category: common
+      
+      - term: identifier
+        abbr: id
+        description: "Identifier"
+        category: common
+      
+      - term: specification
+        abbr: spec
+        description: "Specification"
+        category: common
+      
+      - term: implementation
+        abbr: impl
+        description: "Implementation"
+        category: common
+      
+      - term: interface
+        abbr: intf
+        description: "Interface"
+        category: common
+      
+      - term: documentation
+        abbr: doc
+        description: "Documentation"
+        category: common
+      
+      - term: version
+        abbr: vrsn
+        description: "Version"
+        category: common
+      
+      - term: release
+        abbr: rel
+        description: "Release"
+        category: common
+      
+      - term: package
+        abbr: pkg
+        description: "Package"
+        category: common
+      
+      - term: library
+        abbr: lib
+        description: "Library"
+        category: common
+      
+      - term: framework
+        abbr: fw
+        description: "Framework"
+        category: common
+      
+      - term: component
+        abbr: cmpnt
+        description: "Component"
+        category: common
+      
+      - term: module
+        abbr: mod
+        description: "Module"
+        category: common
+      
+      - term: template
+        abbr: tpl
+        description: "Template"
+        category: common
+      
+      - term: example
+        abbr: ex
+        description: "Example"
+        category: common
+      
+      - term: test
+        abbr: tst
+        description: "Test"
+        category: common
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:governance:naming-governance:registry:abbreviation-registry.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/governance/naming-governance/registry/abbreviation-registry.yaml"
+  created_at: "2026-01-31T00:00:00Z"
+  updated_at: "2026-01-31T00:00:00Z"
+  total_abbreviations: 90
+  categories:
+    - domain
+    - capability
+    - resource
+    - common

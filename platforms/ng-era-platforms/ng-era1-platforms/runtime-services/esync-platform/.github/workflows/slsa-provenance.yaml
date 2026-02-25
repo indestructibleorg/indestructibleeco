@@ -1,0 +1,60 @@
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Charter Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+version: "1.0.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:esync-platform:.github:workflows:slsa-provenance.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/esync-platform/.github/workflows/slsa-provenance.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+name: SLSA Provenance
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+  actions: read
+
+jobs:
+  provenance:
+    name: Generate SLSA Provenance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+
+      - name: Build Binary
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+          go build -a -installsuffix cgo -o bin/syncd ./cmd/syncd
+
+      - name: Generate SLSA Provenance
+        uses: slsa-framework/slsa-github-generator/.github/actions/generic/generator@v2.0.0
+        with:
+          base64-input-artifacts: $(base64 -w0 bin/syncd)
+          output-name: provenance.intoto.jsonl
+
+      - name: Upload Provenance
+        uses: actions/upload-artifact@1eb3cb2b3e0f296241caca2a7ab8ed34950fe83f  # v4.0.0
+        with:
+          name: slsa-provenance
+          path: provenance.intoto.jsonl
+          retention-days: 90

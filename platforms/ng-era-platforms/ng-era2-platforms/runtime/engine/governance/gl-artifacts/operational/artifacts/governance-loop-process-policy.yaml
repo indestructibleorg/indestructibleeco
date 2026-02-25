@@ -1,0 +1,115 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: governance-loop-process-policy
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLGovernanceProcessPolicy
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:governance:gl-artifacts:operational:artifacts:governance-loop-process-policy.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/operational/artifacts/governance-loop-process-policy.yaml"
+  name: governance-loop-process-policy
+  version: "1.0.0"
+  created: "2026-01-21"
+  layer: "GL10-29"
+policy:
+  name: "Governance Loop Process Policy"
+  description: "Process policies for governance loop execution"
+  language:
+    en: "Governance Loop Process Policy"
+    zh: "治理循環流程政策"
+process_stages:
+  - stage_id: "STAGE-1"
+    name: "Task Reception"
+    name_zh: "任務接收"
+    gl_layer: "GL00-09"
+    entry_criteria:
+      - "Task definition exists"
+      - "Task scope defined"
+      - "Task priority assigned"
+    output_artifacts:
+      - "Task Registry"
+      - "Priority Queue"
+    semantic_boundary: "urn:machinenativeops:gl:stage:task-reception:1.0.0"
+  - stage_id: "STAGE-2"
+    name: "GL Layer Classification"
+    name_zh: "GL層級分類"
+    gl_layer: "GL10-29"
+    entry_criteria:
+      - "Task received"
+      - "Classification rules loaded"
+    output_artifacts:
+      - "Layer Assignment"
+      - "Execution Order"
+    semantic_boundary: "urn:machinenativeops:gl:stage:layer-classification:1.0.0"
+  - stage_id: "STAGE-3"
+    name: "Layered Execution"
+    name_zh: "分層執行"
+    gl_layer: "GL30-49"
+    entry_criteria:
+      - "Layer assigned"
+      - "Execution artifacts prepared"
+    output_artifacts:
+      - "Execution Log"
+      - "Results"
+    semantic_boundary: "urn:machinenativeops:gl:stage:layered-execution:1.0.0"
+  - stage_id: "STAGE-4"
+    name: "Validation Layer"
+    name_zh: "驗證層級"
+    gl_layer: "GL50-59"
+    entry_criteria:
+      - "Execution completed"
+      - "Validation rules defined"
+    output_artifacts:
+      - "Validation Report"
+      - "Evidence Chain"
+    semantic_boundary: "urn:machinenativeops:gl:stage:validation:1.0.0"
+  - stage_id: "STAGE-5"
+    name: "Semantic Sealing"
+    name_zh: "語意封存"
+    gl_layer: "GL90-99"
+    entry_criteria:
+      - "Validation passed"
+      - "Semantic integrity verified"
+    output_artifacts:
+      - "Sealed Artifacts"
+      - "Integrity Hash"
+    semantic_boundary: "urn:machinenativeops:gl:stage:semantic-sealing:1.0.0"
+classification_rules:
+  - rule_id: "CLASS-001"
+    pattern: "vision|strategy|charter|architecture|risk|compliance"
+    target_layer: "GL00-09"
+    description: "Strategic decision tasks → GL00-09"
+  - rule_id: "CLASS-002"
+    pattern: "policy|process|resource|quality|capability"
+    target_layer: "GL10-29"
+    description: "Operational management tasks → GL10-29"
+  - rule_id: "CLASS-003"
+    pattern: "template|schema|automation|config|script"
+    target_layer: "GL30-49"
+    description: "Execution implementation tasks → GL30-49"
+  - rule_id: "CLASS-004"
+    pattern: "monitoring|alerting|logging|tracing|dashboard"
+    target_layer: "GL50-59"
+    description: "Observability monitoring tasks → GL50-59"
+  - rule_id: "CLASS-005"
+    pattern: "feedback|optimization|ai|audit|innovation"
+    target_layer: "GL60-80"
+    description: "Feedback optimization tasks → GL60-80"
+  - rule_id: "CLASS-006"
+    pattern: "integration|stakeholder|auto-comment|external"
+    target_layer: "GL81-83"
+    description: "External integration tasks → GL81-83"
+  - rule_id: "CLASS-007"
+    pattern: "naming|semantic|specification|meta|standard"
+    target_layer: "GL90-99"
+    description: "Meta-specification tasks → GL90-99"
+enforcement:
+  mode: "STRICT"
+  blocking_on_failure: true
+  semantic_boundaries_enforced: true
+  traceability_enabled: true
+activation_status: "ACTIVE"

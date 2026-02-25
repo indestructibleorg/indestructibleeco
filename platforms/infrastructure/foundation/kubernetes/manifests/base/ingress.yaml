@@ -1,0 +1,66 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: kubernetes-ingress
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+#
+# GL Unified Architecture Governance Framework Activated
+# Kubernetes Base Ingress Manifest
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: machine-native-ops-ingress
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: machine-native-ops
+    app.kubernetes.io/app.kubernetes.io/component: ingress
+    governance.machinenativeops.io/charter-version: "2.0.0"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: machinenativeops.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: aep-engine-service
+                port:
+                  number: 80
+    - host: api.machinenativeops.io
+      http:
+        paths:
+          - path: /file-organizer
+            pathType: Prefix
+            backend:
+              service:
+                name: file-organizer-service
+                port:
+                  number: 80
+          - path: /instant
+            pathType: Prefix
+            backend:
+              service:
+                name: instant-service
+                port:
+                  number: 80
+          - path: /search
+            pathType: Prefix
+            backend:
+              service:
+                name: elasticsearch-search-service
+                port:
+                  number: 80
+          - path: /esync
+            pathType: Prefix
+            backend:
+              service:
+                name: esync-platform-service
+                port:
+                  number: 80

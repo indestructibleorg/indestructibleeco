@@ -1,0 +1,55 @@
+# @ECO-layer: GL60-80
+# @ECO-governed
+version: "1.0.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:governance:compliance:data:evolution:gl-evolution-data:upgrades:executed:29c4438b-1b2e-4cf0-b38b-f42dbacd480e.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/governance/compliance/data/evolution/gl-evolution-data/upgrades/executed/29c4438b-1b2e-4cf0-b38b-f42dbacd480e.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+actual_results:
+- change:
+    description: 增強失敗檢測規則
+    impact: medium
+    operation: add
+    rule: gl.validation.failure-detection-v2
+    trigger: failure_pattern_detected
+    type: rule_upgrade
+  status: executed
+  success: true
+  timestamp: '2026-02-01T11:30:39.149151'
+evolutionary_learnings:
+- applicability: similar_triggers
+  confidence: 0.8
+  evidence: upgrade:29c4438b-1b2e-4cf0-b38b-f42dbacd480e
+  pattern: failure_pattern_detected|critical_optimization_opportunity
+  reuse_guidelines: replicate_for_similar_upgrades
+  type: successful_upgrade
+execution_timestamp: '2026-02-01T11:30:39.149158'
+planned_changes:
+- description: 增強失敗檢測規則
+  impact: medium
+  operation: add
+  rule: gl.validation.failure-detection-v2
+  trigger: failure_pattern_detected
+  type: rule_upgrade
+success: true
+upgrade_id: 29c4438b-1b2e-4cf0-b38b-f42dbacd480e
+verification:
+  details:
+  - change:
+      description: 增強失敗檢測規則
+      impact: medium
+      operation: add
+      rule: gl.validation.failure-detection-v2
+      trigger: failure_pattern_detected
+      type: rule_upgrade
+    status: executed
+    success: true
+    timestamp: '2026-02-01T11:30:39.149151'
+  overall_success: true
+  success_rate: 1.0

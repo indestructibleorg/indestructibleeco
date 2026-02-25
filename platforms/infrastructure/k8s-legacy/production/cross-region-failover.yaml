@@ -1,0 +1,207 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: cross-region-failover
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Cross-Region Failover Automation Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:cross-region-failover.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/cross-region-failover.yaml"
+  name: cross-region-failover-config
+  namespace: production
+data:
+  failover-automation.yaml: |
+    # Cross-region failover automation
+    failoverAutomation:
+      enabled: true
+      
+      # Failover triggers
+      triggers:
+        - name: regional-outage
+          type: regional
+          enabled: true
+          conditions:
+            unhealthyZones: 2
+            unhealthyDuration: 5m
+            verificationChecks: 3
+          actions:
+            - type: redirect-traffic
+              targetRegion: us-west-2
+            - type: scale-up
+              targetRegion: us-west-2
+              replicas: 9
+            - type: promote-database
+              targetRegion: us-west-2
+          notification:
+            channels:
+              - slack
+              - pagerduty
+              - email
+            message: "Regional outage detected - initiating failover to us-west-2"
+        
+        - name: database-failure
+          type: database
+          enabled: true
+          conditions:
+            primaryUnhealthy: true
+            standbyHealthy: true
+            replicationLag: 10s
+          actions:
+            - type: promote-standby
+              targetRegion: us-west-2
+            - type: update-dns
+              newPrimary: us-west-2
+            - type: notify-applications
+          notification:
+            channels:
+              - slack
+              - pagerduty
+            message: "Database failure detected - promoting standby database"
+        
+        - name: performance-degradation
+          type: performance
+          enabled: true
+          conditions:
+            latencyThreshold: 1000ms
+            errorRateThreshold: 10
+            duration: 10m
+          actions:
+            - type: redistribute-traffic
+              primaryWeight: 40
+              drWeight: 60
+          notification:
+            channels:
+              - slack
+            message: "Performance degradation detected - redistributing traffic"
+        
+        - name: manual-failover
+          type: manual
+          enabled: true
+          requiresApproval: true
+          approvalTimeout: 30m
+          actions:
+            - type: redirect-traffic
+              targetRegion: us-west-2
+            - type: promote-database
+              targetRegion: us-west-2
+            - type: scale-up
+              targetRegion: us-west-2
+          notification:
+            channels:
+              - slack
+              - email
+            message: "Manual failover initiated by {user}"
+      
+      # Failover workflow
+      workflow:
+        steps:
+          - name: pre-failover-checks
+            actions:
+              - verify-target-region-health
+              - verify-database-replication-status
+              - verify-dns-health-checks
+              - verify-capacity-in-target
+            timeout: 2m
+            onFail: abort
+        
+          - name: initiate-failover
+            actions:
+              - scale-up-target-region
+              - promote-standby-database
+              - verify-database-promotion
+            timeout: 5m
+            onFail: rollback
+        
+          - name: update-dns
+            actions:
+              - update-dns-records
+              - verify-dns-propagation
+              - verify-health-checks
+            timeout: 10m
+            onFail: rollback
+        
+          - name: verify-failover
+            actions:
+              - verify-traffic-redirect
+              - verify-application-health
+              - verify-database-connectivity
+              - verify-critical-services
+            timeout: 5m
+            onFail: rollback
+        
+          - name: post-failover
+            actions:
+              - send-notifications
+              - update-monitoring
+              - create-incident-report
+              - schedule-failback-review
+            timeout: 2m
+        
+        rollback:
+          enabled: true
+          triggers:
+            - failover-failed
+            - verification-failed
+            - target-region-unhealthy
+          steps:
+            - revert-dns-changes
+            - demote-promoted-database
+            - scale-down-target-region
+            - verify-rollback
+      
+      # Failover cooldown
+      cooldown:
+        enabled: true
+        duration: 5m
+        maxFailoversPerHour: 1
+        maxFailoversPerDay: 3
+      
+      # Failback configuration
+      failback:
+        enabled: true
+        mode: manual
+        prerequisites:
+          - source-region-healthy: true
+          - minimum-duration: 4h
+          - manual-approval: true
+          - business-hours-only: false
+        notification:
+          before: 2h
+          channels:
+            - slack
+            - email
+        workflow:
+          steps:
+            - verify-source-region-health
+            - initiate-traffic-shift
+            - verify-source-readiness
+            - promote-source-database
+            - update-dns
+            - verify-failback
+      
+      # Monitoring and metrics
+      monitoring:
+        enabled: true
+        metrics:
+          failoverCount:
+            enabled: true
+            alerting:
+              threshold: 5
+              period: 24h
+          failoverDuration:
+            enabled: true
+            target: <300s
+          failbackDuration:
+            enabled: true
+            target: <600s
+          rto:
+            enabled: true
+            target: <4h
+          rpo:
+            enabled: true
+            target: <1h

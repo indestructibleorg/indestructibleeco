@@ -1,0 +1,69 @@
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: naming-governance
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: esyncnamingconvention
+  annotations:
+    description: "Enforces ESync platform naming convention for Kubernetes resources"
+spec:
+  crd:
+    spec:
+      names:
+        kind: ESyncNamingConvention
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            regex:
+              type: string
+            excludedNamespaces:
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package esyncnamingconvention
+        
+        violation[{"msg": msg}] {
+          input.review.kind.kind in ["Deployment", "Service", "Ingress", "ConfigMap", "Secret"]
+          not is_excluded_namespace(input.review.object.metadata.namespace)
+          name := input.review.object.metadata.name
+          pattern := input.parameters.regex
+          not re_match(pattern, name)
+          msg := sprintf("Resource name '%s' does not match naming pattern: %s", [name, pattern])
+        }
+        
+        violation[{"msg": msg}] {
+          input.review.kind.kind in ["Deployment", "Service", "Ingress", "ConfigMap", "Secret"]
+          not is_excluded_namespace(input.review.object.metadata.namespace)
+          not input.review.object.metadata.labels.environment
+          msg := "Resource must have 'environment' label"
+        }
+        
+        violation[{"msg": msg}] {
+          input.review.kind.kind in ["Deployment", "Service", "Ingress", "ConfigMap", "Secret"]
+          not is_excluded_namespace(input.review.object.metadata.namespace)
+          not input.review.object.metadata.labels.component
+          msg := "Resource must have 'component' label"
+        }
+        
+        violation[{"msg": msg}] {
+          input.review.kind.kind in ["Deployment", "Service", "Ingress", "ConfigMap", "Secret"]
+          not is_excluded_namespace(input.review.object.metadata.namespace)
+          not input.review.object.metadata.labels.version
+          msg := "Resource must have 'version' label"
+        }
+        
+        is_excluded_namespace(ns) {
+          ns in input.parameters.excludedNamespaces
+        }

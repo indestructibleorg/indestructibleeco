@@ -1,0 +1,163 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: .gl-manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# GL Governance Manifest - AEP Engine Web Application
+# GL Unified Architecture Governance Framework Activated
+
+gl-manifest:
+  version: "1.0.0"
+  schema: "gl-manifest/v1"
+  
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:aep-engine-web:.gl-manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/aep-engine-web/.gl-manifest.yaml"
+  name: "aep-engine-web"
+  description: "AEP Engine Governance & Audit Web Application - Zero Configuration Deployment"
+  version: "1.0.0"
+  created: "2026-01-26"
+  updated: "2026-01-26"
+  author: "MachineNativeOps"
+  license: "MIT"
+
+gl-governance:
+  layer: "ECO-70-PRESENTATION"
+  semantic-anchor: "ECO-70-PRESENTATION-WEB"
+  charter-activated: true
+  audit-compliant: true
+  
+  boundaries:
+    - type: "presentation"
+      scope: "web-application"
+      technology: "React + Vite + TypeScript"
+    - type: "deployment"
+      scope: "zero-configuration"
+      platforms:
+        - "Vercel"
+        - "Netlify"
+        - "GitHub Pages"
+
+  dependencies:
+    internal:
+      - path: "../aep-engine-app"
+        relationship: "sibling-presentation"
+        description: "Mobile application counterpart"
+    external:
+      - name: "react"
+        version: "^18.2.0"
+        purpose: "UI framework"
+      - name: "vite"
+        version: "^4.4.0"
+        purpose: "Build tool"
+      - name: "tailwindcss"
+        version: "^3.3.0"
+        purpose: "Styling"
+
+components:
+  screens:
+    - name: "HomeScreen"
+      path: "src/screens/HomeScreen.tsx"
+      description: "Dashboard with audit summary and event timeline"
+      gl-governed: true
+    - name: "AuditScreen"
+      path: "src/screens/AuditScreen.tsx"
+      description: "ETL Pipeline monitoring and execution"
+      gl-governed: true
+    - name: "ResultsScreen"
+      path: "src/screens/ResultsScreen.tsx"
+      description: "Governance issues classification and recommendations"
+      gl-governed: true
+    - name: "ReportScreen"
+      path: "src/screens/ReportScreen.tsx"
+      description: "Comprehensive statistics and export"
+      gl-governed: true
+    - name: "SettingsScreen"
+      path: "src/screens/SettingsScreen.tsx"
+      description: "Application configuration and preferences"
+      gl-governed: true
+
+  ui-components:
+    - name: "StatisticCard"
+      path: "src/components/StatisticCard.tsx"
+      gl-governed: true
+    - name: "EventCard"
+      path: "src/components/EventCard.tsx"
+      gl-governed: true
+    - name: "ProblemCard"
+      path: "src/components/ProblemCard.tsx"
+      gl-governed: true
+
+  hooks:
+    - name: "useAppState"
+      path: "src/hooks/useAppState.ts"
+      description: "Application state management"
+      gl-governed: true
+
+  data:
+    - name: "mock"
+      path: "src/data/mock.ts"
+      description: "Mock data for demonstration"
+      gl-governed: true
+
+features:
+  - id: "zero-config-deployment"
+    name: "Zero Configuration Deployment"
+    description: "Ready to deploy without additional setup"
+    status: "active"
+    
+  - id: "responsive-design"
+    name: "Responsive Design"
+    description: "Adapts to all devices (desktop, tablet, mobile)"
+    status: "active"
+    
+  - id: "dark-mode"
+    name: "Dark Mode Support"
+    description: "Built-in dark theme support"
+    status: "active"
+    
+  - id: "mock-data"
+    name: "Complete Mock Data"
+    description: "Full demonstration data without backend"
+    status: "active"
+
+deployment:
+  platforms:
+    vercel:
+      config: "vercel.json"
+      command: "vercel deploy"
+    netlify:
+      config: "netlify.toml"
+      command: "netlify deploy --prod --dir dist"
+    github-pages:
+      command: "npm run build && push dist/ to gh-pages"
+
+build:
+  tool: "vite"
+  output: "dist/"
+  scripts:
+    dev: "vite"
+    build: "vite build"
+    preview: "vite preview"
+    lint: "eslint src --ext .ts,.tsx"
+    type-check: "tsc --noEmit"
+
+quality:
+  linting: true
+  type-checking: true
+  testing: false  # To be implemented
+  
+browser-support:
+  - "Chrome/Edge (latest)"
+  - "Firefox (latest)"
+  - "Safari (latest)"
+  - "Mobile browsers (iOS Safari, Chrome Mobile)"
+
+# GL Unified Architecture Governance Framework Activated
+charter:
+  status: "activated"
+  timestamp: "2026-01-26T00:00:00Z"
+  signature: "ECO-70-PRESENTATION-WEB-CHARTER-ACTIVATED"

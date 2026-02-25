@@ -1,0 +1,359 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: prometheus-config
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: monitoring
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: prometheus
+    environment: production
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+      external_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        cluster: production
+        environment: production
+        region: us-east-1
+
+    scrape_configs:
+    - job_name: 'machine-native-ops'
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names:
+          - production
+      relabel_configs:
+      - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__meta_kubernetes_namespace]
+        action: replace
+        target_label: kubernetes_namespace
+      - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+
+    - job_name: 'istio-mesh'
+      kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+          - istio-system
+      relabel_configs:
+      - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__meta_kubernetes_service_name]
+        action: keep
+        regex: istio-telemetry
+      - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        target_label: __address__
+
+    - job_name: 'kubernetes-pods'
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:
+      - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        target_label: __address__
+
+    - job_name: 'kubernetes-nodes'
+      kubernetes_sd_configs:
+      - role: node
+      relabel_configs:
+      - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__address__]
+        regex: '(.*):10250'
+        replacement: '${1}:9100'
+        target_label: __address__
+
+    - job_name: 'kubernetes-services'
+      kubernetes_sd_configs:
+      - role: service
+      relabel_configs:
+      - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__meta_kubernetes_service_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        target_label: __address__
+
+  alerting:
+    alertmanagers:
+    - static_configs:
+      - targets:
+        - alertmanager:9093
+
+  rule_files:
+    - '/etc/prometheus/rules/*.yml'
+    - '/etc/prometheus/rules/*.yaml'
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-alerts
+  namespace: monitoring
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: prometheus
+    environment: production
+data:
+  alerts.yml: |
+    groups:
+    - name: machine-native-ops-health
+      interval: 30s
+      rules:
+      - alert: HighErrorRate
+        expr: |
+          rate(http_requests_total{job="machine-native-ops",status=~"5.."}[5m]) /
+          rate(http_requests_total{job="machine-native-ops"}[5m]) > 0.05
+        for: 5m
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          severity: critical
+          service: machine-native-ops
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} for {{ $labels.instance }}"
+
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95,
+            rate(http_request_duration_seconds_bucket{job="machine-native-ops"}[5m])
+          ) > 1
+        for: 5m
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          severity: warning
+          service: machine-native-ops
+        annotations:
+          summary: "High latency detected"
+          description: "P95 latency is {{ $value }}s for {{ $labels.instance }}"
+
+      - alert: HighMemoryUsage
+        expr: |
+          container_memory_usage_bytes{
+            namespace="production",
+            container="app"
+          } / container_spec_memory_limit_bytes{
+            namespace="production",
+            container="app"
+          } > 0.9
+        for: 5m
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          severity: warning
+          service: machine-native-ops
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value | humanizePercentage }} for {{ $labels.pod }}"
+
+      - alert: HighCPUUsage
+        expr: |
+          rate(container_cpu_usage_seconds_total{
+            namespace="production",
+            container="app"
+          }[5m]) > 0.9
+        for: 5m
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          severity: warning
+          service: machine-native-ops
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is {{ $value | humanizePercentage }} for {{ $labels.pod }}"
+
+      - alert: PodRestartTooOften
+        expr: |
+          increase(kube_pod_container_status_restarts_total{
+            namespace="production",
+            pod=~"machine-native-ops-.*"
+          }[1h]) > 5
+        for: 5m
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          severity: critical
+          service: machine-native-ops
+        annotations:
+          summary: "Pod restarting too often"
+          description: "Pod {{ $labels.pod }} has restarted {{ $value }} times in the last hour"
+
+      - alert: TooManyPodsNotReady
+        expr: |
+          sum(kube_pod_status_ready{
+            namespace="production",
+            condition="true"
+          }) != sum(kube_pod_status_ready{
+            namespace="production"
+          })
+        for: 5m
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          severity: critical
+          service: machine-native-ops
+        annotations:
+          summary: "Pods not ready"
+          description: "{{ $value }} pods in production namespace are not ready"
+
+      - alert: ReplicaCountMismatch
+        expr: |
+          count(kube_pod_status_phase{
+            namespace="production",
+            phase="Running"
+          }) < 3
+        for: 5m
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          severity: warning
+          service: machine-native-ops
+        annotations:
+          summary: "Insufficient replicas running"
+          description: "Only {{ $value }} replicas are running, expected at least 3"
+
+    - name: istio-metrics
+      interval: 30s
+      rules:
+      - alert: IstioHighErrorRate
+        expr: |
+          sum(rate(istio_requests_total{
+            destination_service_namespace="production",
+            response_code=~"5.."
+          }[5m])) /
+          sum(rate(istio_requests_total{
+            destination_service_namespace="production"
+          }[5m])) > 0.05
+        for: 5m
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          severity: critical
+          service: istio
+        annotations:
+          summary: "Istio high error rate"
+          description: "Error rate is {{ $value | humanizePercentage }}"
+
+      - alert: IstioHighLatency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(istio_request_duration_milliseconds_bucket{
+              destination_service_namespace="production"
+            }[5m])) by (le)
+          ) > 1000
+        for: 5m
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          severity: warning
+          service: istio
+        annotations:
+          summary: "Istio high latency"
+          description: "P95 latency is {{ $value }}ms"
+
+    - name: infrastructure-alerts
+      interval: 30s
+      rules:
+      - alert: NodeDiskSpaceLow
+        expr: |
+          (node_filesystem_avail_bytes{fstype!="tmpfs"} /
+           node_filesystem_size_bytes{fstype!="tmpfs"}) < 0.1
+        for: 5m
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          severity: warning
+          app.kubernetes.io/component: infrastructure
+        annotations:
+          summary: "Node disk space low"
+          description: "Disk space is {{ $value | humanizePercentage }} available on {{ $labels.instance }}"
+
+      - alert: NodeMemoryHigh
+        expr: |
+          (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) > 0.9
+        for: 5m
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          severity: critical
+          app.kubernetes.io/component: infrastructure
+        annotations:
+          summary: "Node memory high"
+          description: "Memory usage is {{ $value | humanizePercentage }} on {{ $labels.instance }}"

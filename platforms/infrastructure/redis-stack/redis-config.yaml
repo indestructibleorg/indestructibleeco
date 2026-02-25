@@ -1,0 +1,219 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: redis-config
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# =============================================================================
+# Redis Stack Configuration for Production
+# =============================================================================
+# This configuration file defines production-ready Redis Stack settings
+# for the Agent Memory & Cache system.
+#
+# GL Governance Markers
+# @gov-layer ECO-00-NAMESPACE
+# @gov-module infrastructure/redis-stack
+# @gov-semantic-anchor ECO-00-INFRA_REDIS_CONFIG
+# @gov-evidence-required false
+# GL Unified Architecture Governance Framework Activated
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Redis Configuration
+# -----------------------------------------------------------------------------
+version: "1.0.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:redis-stack:redis-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/redis-stack/redis-config.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+redis:
+  host: ${REDIS_HOST:-localhost}
+  port: ${REDIS_PORT:-6379}
+  db: ${REDIS_DB:-0}
+  username: ${REDIS_USERNAME:-}
+  password: ${REDIS_PASSWORD:-}
+  prefix: "memory:"
+  vector_dim: 1536
+  default_ttl: 86400
+
+  # Connection Pool Settings
+  pool:
+    max_connections: 50
+    min_connections: 5
+    connection_timeout: 10
+    socket_timeout: 10
+    socket_connect_timeout: 5
+    retry_on_timeout: true
+
+  # Retry Settings
+  retry:
+    max_retries: 3
+    strategy: "exponential_backoff"  # Options: exponential_backoff, linear_backoff, fixed_delay
+    delay: 0.1
+    max_delay: 10.0
+
+  # Circuit Breaker Settings
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 5
+    recovery_timeout: 60.0
+
+  # Health Check Settings
+  health_check:
+    enabled: true
+    interval: 30.0
+
+  # Performance Settings
+  performance:
+    enable_pipeline: true
+    pipeline_max_size: 100
+    batch_size: 100
+
+  # Monitoring Settings
+  monitoring:
+    enable_metrics: true
+    metrics_prefix: "redis_backend"
+
+# -----------------------------------------------------------------------------
+# Memory Configuration
+# -----------------------------------------------------------------------------
+memory:
+  # TTL Settings
+  ttl:
+    short_term_min: 3600      # 1 hour
+    short_term_max: 14400     # 4 hours
+    long_term_min: 86400      # 1 day
+    long_term_max: 2592000    # 30 days
+    vector_min: 604800        # 7 days
+    vector_max: 2592000       # 30 days
+
+  # Importance-based TTL Multipliers
+  importance:
+    low: 1.0
+    medium: 1.5
+    high: 2.0
+
+# -----------------------------------------------------------------------------
+# Vector Search Configuration
+# -----------------------------------------------------------------------------
+vector:
+  # Index Configuration
+  index:
+    algorithm: "FLAT"  # Options: FLAT, HNSW
+    distance_metric: "COSINE"  # Options: COSINE, L2, IP
+
+  # HNSW Configuration (if algorithm is HNSW)
+  hnsw:
+    m: 16
+    ef_construction: 200
+    ef_runtime: 10
+
+# -----------------------------------------------------------------------------
+# Cache Configuration
+# -----------------------------------------------------------------------------
+cache:
+  # Cache Settings
+  enabled: true
+  ttl:
+    default: 3600
+    min: 300
+    max: 604800
+
+  # Similarity Settings
+  similarity:
+    threshold: 0.85
+    algorithm: "cosine"
+
+  # Capacity Settings
+  capacity:
+    max_entries: 10000
+    eviction_policy: "lru"
+
+# -----------------------------------------------------------------------------
+# Compaction Configuration
+# -----------------------------------------------------------------------------
+compaction:
+  enabled: true
+  
+  # Context Window Settings
+  context:
+    max_tokens: 4000
+    summarization_threshold: 3000
+
+  # Eviction Settings
+  eviction:
+    ratio: 0.7
+
+  # Scheduling Settings
+  schedule:
+    auto_compact: true
+    compact_interval_hours: 6
+
+# -----------------------------------------------------------------------------
+# Observability Configuration
+# -----------------------------------------------------------------------------
+observability:
+  # Logging
+  logging:
+    level: "INFO"
+    format: "json"
+
+  # Metrics
+  metrics:
+    enabled: true
+    prefix: "agent_memory"
+
+  # Tracing
+  tracing:
+    enabled: true
+    sample_rate: 0.1
+
+# -----------------------------------------------------------------------------
+# Security Configuration
+# -----------------------------------------------------------------------------
+security:
+  # TLS Settings
+  tls:
+    enabled: false
+    cert_file: ""
+    key_file: ""
+    ca_file: ""
+
+  # Access Control
+  access_control:
+    enabled: true
+    default_policy: "deny"
+
+  # Rate Limiting
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 1000
+
+# -----------------------------------------------------------------------------
+# Deployment Configuration
+# -----------------------------------------------------------------------------
+deployment:
+  # Environment
+  environment: ${ENVIRONMENT:-development}
+
+  # Scaling
+  scaling:
+    min_replicas: 1
+    max_replicas: 10
+    target_cpu_utilization: 70
+
+  # Resource Limits
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "1000m"
+      memory: "2Gi"

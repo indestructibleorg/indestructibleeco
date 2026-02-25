@@ -1,0 +1,83 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: kubernetes-deployment-engine
+# @ECO-audit-trail: ../../../engine/governance/GL_SEMANTIC_ANCHOR.json
+#
+# GL Unified Architecture Governance Framework Activated
+# AEP Engine Deployment Manifest
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:kubernetes:manifests:systems:engine:deployment.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/kubernetes/manifests/systems/engine/deployment.yaml"
+  name: aep-engine
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: aep-engine
+    app.kubernetes.io/app.kubernetes.io/component: engine
+    app.kubernetes.io/part-of: machine-native-ops
+    governance.machinenativeops.io/charter-version: "2.0.0"
+    governance.machinenativeops.io/layer: "governance"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: aep-engine
+  template:
+    metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:kubernetes:manifests:systems:engine:deployment.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/kubernetes/manifests/systems/engine/deployment.yaml"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        app.kubernetes.io/name: aep-engine
+        app.kubernetes.io/app.kubernetes.io/component: engine
+        governance.machinenativeops.io/layer: "governance"
+    spec:
+      serviceAccountName: machine-native-ops-sa
+      containers:
+        - name: aep-engine
+          image: machinenativeops/aep-engine:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: GOVERNANCE_MODE
+              value: "strict"
+            - name: CONTINUE_ON_ERROR
+              value: "false"
+            - name: VALIDATION_REQUIRED
+              value: "true"
+            - name: AUDIT_TRAIL_REQUIRED
+              value: "true"
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5

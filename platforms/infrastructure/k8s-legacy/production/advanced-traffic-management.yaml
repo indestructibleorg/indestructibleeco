@@ -1,0 +1,286 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: advanced-traffic-management
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Advanced Traffic Management Policies
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:advanced-traffic-management.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/advanced-traffic-management.yaml"
+  name: machine-native-ops-advanced-traffic
+  namespace: production
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - machine-native-ops-gateway
+  http:
+  # Canary deployment with traffic splitting
+  - match:
+    - headers:
+        x-canary:
+          exact: "true"
+    route:
+    - destination:
+        host: machine-native-ops-service
+        subset: v2
+      weight: 100
+  # A/B testing with header-based routing
+  - match:
+    - headers:
+        x-user-group:
+          exact: "beta-testers"
+    route:
+    - destination:
+        host: machine-native-ops-service
+        subset: v2
+      weight: 100
+  # Gradual traffic shift
+  - route:
+    - destination:
+        host: machine-native-ops-service
+        subset: v1
+      weight: 90
+    - destination:
+        host: machine-native-ops-service
+        subset: v2
+      weight: 10
+    # Timeout configuration
+    timeout: 30s
+    # Retry policy
+    retries:
+      attempts: 3
+      perTryTimeout: 2s
+      retryOn: 5xx,gateway-error,connect-failure,refused-stream
+    # Fault injection for testing
+    fault:
+      delay:
+        percentage:
+          value: 0.1  # 0.1% of requests
+        fixedDelay: 100ms
+---
+# Destination Rule with advanced load balancing
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:advanced-traffic-management.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/advanced-traffic-management.yaml"
+  name: machine-native-ops-advanced-lb
+  namespace: production
+spec:
+  host: machine-native-ops-service
+  trafficPolicy:
+    # Load balancing strategy
+    loadBalancer:
+      simple: LEAST_CONN  # Least connection count
+      consistentHash:
+        httpHeaderName: x-user-id  # User-based sticky sessions
+    # Connection pool settings
+    connectionPool:
+      tcp:
+        maxConnections: 100
+        connectTimeout: 30s
+      http:
+        http1MaxPendingRequests: 50
+        http2MaxRequests: 100
+        maxRequestsPerConnection: 3
+        idleTimeout: 300s
+    # Outlier detection
+    outlierDetection:
+      consecutiveGatewayFailure: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+      minHealthPercent: 40
+  subsets:
+  - name: v1
+    labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+      version: v1
+  - name: v2
+    labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+      version: v2
+---
+# Session affinity configuration
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:advanced-traffic-management.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/advanced-traffic-management.yaml"
+  name: session-affinity
+  namespace: production
+spec:
+  host: machine-native-ops-service
+  trafficPolicy:
+    loadBalancer:
+      consistentHash:
+        httpHeaderName: x-session-id  # Session-based sticky sessions
+        ttl: 3600s  # Session affinity TTL: 1 hour
+---
+# Header manipulation
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:advanced-traffic-management.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/advanced-traffic-management.yaml"
+  name: header-manipulation
+  namespace: production
+spec:
+  hosts:
+  - "*"
+  http:
+  - route:
+    - destination:
+        host: machine-native-ops-service
+    # Add request headers
+    headers:
+      request:
+        add:
+          x-request-start: "%START_TIME%"
+          x-envoy-upstream-service-time: "%DURATION%"
+          x-forwarded-for: "%DOWNSTREAM_REMOTE_ADDRESS%"
+      response:
+        add:
+          x-server-time: "%RESPONSE_FLAGS%"
+        set:
+          x-powered-by: "MachineNativeOps"
+        remove:
+        - x-envoy-upstream-service-time
+---
+# Rate limiting per service
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:advanced-traffic-management.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/advanced-traffic-management.yaml"
+  name: rate-limiting
+  namespace: production
+spec:
+  hosts:
+  - "*"
+  http:
+  - match:
+    - uri:
+        prefix: "/api/"
+    route:
+    - destination:
+        host: machine-native-ops-service
+    fault:
+      abort:
+        percentage:
+          value: 0.5  # 0.5% rate limit
+        httpStatus: 429
+---
+# Shadow testing (mirroring traffic)
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:advanced-traffic-management.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/advanced-traffic-management.yaml"
+  name: shadow-testing
+  namespace: production
+spec:
+  hosts:
+  - "*"
+  http:
+  - route:
+    - destination:
+        host: machine-native-ops-service
+        subset: v1
+    mirror:
+      host: machine-native-ops-service
+      subset: v2
+    mirrorPercentage:
+      value: 10  # Mirror 10% of traffic to v2
+---
+# Traffic mirroring for load testing
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:advanced-traffic-management.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/advanced-traffic-management.yaml"
+  name: load-test-mirroring
+  namespace: production
+spec:
+  hosts:
+  - "*"
+  http:
+  - match:
+    - headers:
+        x-load-test:
+          exact: "true"
+    route:
+    - destination:
+        host: machine-native-ops-service
+        subset: v2
+    timeout: 60s
+---
+# Blue-Green deployment routing
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:advanced-traffic-management.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/advanced-traffic-management.yaml"
+  name: blue-green-deployment
+  namespace: production
+spec:
+  hosts:
+  - "*"
+  http:
+  - match:
+    - headers:
+        x-deployment-color:
+          exact: "green"
+    route:
+    - destination:
+        host: machine-native-ops-service
+        subset: green
+  - route:
+    - destination:
+        host: machine-native-ops-service
+        subset: blue
+---
+# Maintenance mode routing
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:advanced-traffic-management.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/advanced-traffic-management.yaml"
+  name: maintenance-mode
+  namespace: production
+spec:
+  hosts:
+  - "*"
+  http:
+  - match:
+    - headers:
+        x-maintenance-mode:
+          exact: "true"
+    directResponse:
+      status: 503
+      body:
+        string: "{&quot;error&quot;:&quot;Service under maintenance&quot;,&quot;message&quot;:&quot;Please try again later&quot;}"
+      headers:
+        content-type:
+          value: "application/json"
+        retry-after:
+          value: "3600"
+  - route:
+    - destination:
+        host: machine-native-ops-service

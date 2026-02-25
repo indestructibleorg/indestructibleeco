@@ -1,0 +1,1 @@
+{"event_id": "init-001", "event_type": "governance_initialized", "timestamp": "2026-02-03T16:42:30.713693+00:00", "source": "mnga-enforcement", "data": {"message": "Governance event stream initialized", "version": "1.0.0"}}

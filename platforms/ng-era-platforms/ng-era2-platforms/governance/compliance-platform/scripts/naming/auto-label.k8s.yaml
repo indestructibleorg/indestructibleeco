@@ -1,0 +1,257 @@
+# @ECO-governed
+# @ECO-layer: GL10-29
+# @ECO-semantic: auto-labeler-k8s
+# @ECO-audit-trail: ../../governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:governance:compliance-platform:scripts:naming:auto-label.k8s.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/governance/compliance-platform/scripts/naming/auto-label.k8s.yaml"
+  name: auto-labeler
+  namespace: monitoring
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: auto-labeler
+    version: "1.0.0"
+    environment: dev
+    managed-by: gl-platform
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: auto-labeler
+  
+  template:
+    metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:governance:compliance-platform:scripts:naming:auto-label.k8s.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/governance/compliance-platform/scripts/naming/auto-label.k8s.yaml"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        app.kubernetes.io/name: auto-labeler
+        version: "1.0.0"
+        environment: dev
+        managed-by: gl-platform
+    
+    spec:
+      serviceAccountName: auto-labeler
+      
+      containers:
+      - name: auto-labeler
+        image: ghcr.io/machinenativeops/auto-labeler:latest
+        imagePullPolicy: Always
+        
+        env:
+        - name: GITHUB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: github-secrets
+              key: token
+        
+        - name: PROMETHEUS_URL
+          value: "http://prometheus-operated.monitoring.svc:9090"
+        
+        - name: LOG_LEVEL
+          value: "info"
+        
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:governance:compliance-platform:scripts:naming:auto-label.k8s.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/governance/compliance-platform/scripts/naming/auto-label.k8s.yaml"
+  name: auto-labeler
+  namespace: monitoring
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:governance:compliance-platform:scripts:naming:auto-label.k8s.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/governance/compliance-platform/scripts/naming/auto-label.k8s.yaml"
+  name: auto-labeler
+  namespace: monitoring
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list", "watch", "create", "update"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:governance:compliance-platform:scripts:naming:auto-label.k8s.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/governance/compliance-platform/scripts/naming/auto-label.k8s.yaml"
+  name: auto-labeler
+  namespace: monitoring
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: auto-labeler
+subjects:
+- kind: ServiceAccount
+  name: auto-labeler
+  namespace: monitoring
+
+---
+# Example labels that will be automatically applied
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:governance:compliance-platform:scripts:naming:auto-label.k8s.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/governance/compliance-platform/scripts/naming/auto-label.k8s.yaml"
+  name: auto-labeler-labels
+  namespace: monitoring
+
+data:
+  # Standard labels for all resources
+  labels.yaml: |
+    app: "required"
+    version: "required"
+    environment: "required:dev|staging|prod"
+    managed-by: "gl-platform"
+    governance-level: "GL10-29"
+    
+  # Labels by resource type
+  deployment-labels.yaml: |
+    app: "required"
+    version: "required"
+    environment: "required:dev|staging|prod"
+    component: "optional"
+    tier: "optional"
+    track: "optional:stable|canary"
+    
+  service-labels.yaml: |
+    app: "required"
+    version: "required"
+    environment: "required:dev|staging|prod"
+    service-type: "optional:ClusterIP|NodePort|LoadBalancer"
+    
+  # Label enforcement rules
+  enforcement.yaml: |
+    strict-mode: true
+    required-labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+      - app
+      - version
+      - environment
+      - managed-by
+    label-values:
+      environment:
+        allowed: ["dev", "staging", "prod"]
+        default: "dev"
+      managed-by:
+        default: "gl-platform"
+      governance-level:
+        default: "GL10-29"
+
+---
+# Auto-labeler annotation templates
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:governance:compliance-platform:scripts:naming:auto-label.k8s.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/governance/compliance-platform/scripts/naming/auto-label.k8s.yaml"
+  name: auto-labeler-annotations
+  namespace: monitoring
+
+data:
+  annotations.yaml: |
+    # Governance annotations
+    "gl.governed": "true"
+    "gl.layer": "GL10-29"
+    "gl.semantic": "auto-generated"
+    "gl.audit-trail": "../../governance/GL_SEMANTIC_ANCHOR.json"
+    
+    # Security annotations
+    "security.scan.enabled": "true"
+    "security.scan.frequency": "daily"
+    
+    # Observability annotations
+    "observability.enabled": "true"
+    "observability.metrics.enabled": "true"
+    "observability.logs.enabled": "true"
+    "observability.traces.enabled": "true"
+    
+    # SLO annotations
+    "slo.target.availability": "99.9%"
+    "slo.target.latency": "500ms"
+
+---
+# Label naming conventions
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:governance:compliance-platform:scripts:naming:auto-label.k8s.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/governance/compliance-platform/scripts/naming/auto-label.k8s.yaml"
+  name: auto-labeler-naming
+  namespace: monitoring
+
+data:
+  naming-conventions.yaml: |
+    # Label key naming
+    label-key-pattern: "^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"
+    label-key-max-length: 63
+    
+    # Label value naming
+    label-value-pattern: "^[a-zA-Z0-9]([a-zA-Z0-9_.-]*[a-zA-Z0-9])?$"
+    label-value-max-length: 253
+    
+    # Reserved prefixes
+    reserved-prefixes:
+      - "kubernetes.io/"
+      - "k8s.io/"
+      - "gl."
+      - "cloud.google.com/"
+    
+    # Required labels for governance
+    governance-labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+      - "gl.governed"
+      - "gl.layer"
+      - "gl.semantic"
+      - "gl.audit-trail"
+    
+    # Label transformation rules
+    transformations:
+      - source: "app.kubernetes.io/name"
+        target: "app"
+      - source: "app.kubernetes.io/version"
+        target: "version"
+      - source: "environment"
+        target: "environment"

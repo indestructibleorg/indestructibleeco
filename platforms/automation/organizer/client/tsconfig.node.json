@@ -1,0 +1,30 @@
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gov-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gov-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gov-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+{
+  "compilerOptions": {
+    "composite": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "vite.config.ts"
+  ],
+  "_GL": {
+    "governed": true,
+    "layer": "application",
+    "semantic": "tsconfig.node",
+    "audit_trail": "../../engine/governance/GL_SEMANTIC_ANCHOR.json",
+    "charter": "GL Unified Architecture Governance Framework",
+    "version": "2.0.0"
+  }
+}

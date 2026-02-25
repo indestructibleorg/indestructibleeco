@@ -1,0 +1,27 @@
+# @ECO-governed
+# @ECO-layer: search
+# @ECO-semantic: policy
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Controlplane Policy
+# ECO-Layer: GL00-09 (Strategic)
+# Closure-Signal: policy
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:data-processing:search:controlplane:policy.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/data-processing/search/controlplane/policy.yaml"
+  name: controlplane-policy
+  version: "1.0.0"
+  layer: "GL00-09"
+
+policy-rules:
+  - rule: "immutable-governance"
+    description: "All governance artifacts must be immutable"
+    enforcement: "strict"
+  
+  - rule: "version-control-required"
+    description: "All changes must be tracked with version control"
+    enforcement: "strict"

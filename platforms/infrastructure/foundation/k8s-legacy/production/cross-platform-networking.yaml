@@ -1,0 +1,410 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: cross-platform-networking
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Cross-Platform Networking Configuration
+# Supports AWS VPC, GCP VPC, Azure VNet, and on-premise networking
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:cross-platform-networking.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/cross-platform-networking.yaml"
+  name: cross-platform-networking-config
+  namespace: production
+data:
+  # Network Topology Configuration
+  network-topology.yaml: |
+    networkTopology:
+      provider: ${NETWORK_PROVIDER:-aws}  # aws | gcp | azure | on-prem
+      
+      # AWS VPC Configuration
+      aws:
+        vpc:
+          cidr: ${VPC_CIDR:-10.0.0.0/16}
+          enableDnsSupport: true
+          enableDnsHostnames: true
+          instanceTenancy: default
+        
+        subnets:
+          public:
+            - cidr: ${PUBLIC_SUBNET_1:-10.0.1.0/24}
+              az: ${ZONE_1:-us-east-1a}
+              mapPublicIpOnLaunch: true
+            - cidr: ${PUBLIC_SUBNET_2:-10.0.2.0/24}
+              az: ${ZONE_2:-us-east-1b}
+              mapPublicIpOnLaunch: true
+            - cidr: ${PUBLIC_SUBNET_3:-10.0.3.0/24}
+              az: ${ZONE_3:-us-east-1c}
+              mapPublicIpOnLaunch: true
+          
+          private:
+            - cidr: ${PRIVATE_SUBNET_1:-10.0.11.0/24}
+              az: ${ZONE_1:-us-east-1a}
+              mapPublicIpOnLaunch: false
+            - cidr: ${PRIVATE_SUBNET_2:-10.0.12.0/24}
+              az: ${ZONE_2:-us-east-1b}
+              mapPublicIpOnLaunch: false
+            - cidr: ${PRIVATE_SUBNET_3:-10.0.13.0/24}
+              az: ${ZONE_3:-us-east-1c}
+              mapPublicIpOnLaunch: false
+          
+          database:
+            - cidr: ${DATABASE_SUBNET_1:-10.0.21.0/24}
+              az: ${ZONE_1:-us-east-1a}
+              mapPublicIpOnLaunch: false
+            - cidr: ${DATABASE_SUBNET_2:-10.0.22.0/24}
+              az: ${ZONE_2:-us-east-1b}
+              mapPublicIpOnLaunch: false
+            - cidr: ${DATABASE_SUBNET_3:-10.0.23.0/24}
+              az: ${ZONE_3:-us-east-1c}
+              mapPublicIpOnLaunch: false
+        
+        internetGateway:
+          enabled: true
+        
+        natGateway:
+          enabled: true
+          allocationIds:
+            - ${NAT_GATEWAY_1_EIP}
+            - ${NAT_GATEWAY_2_EIP}
+            - ${NAT_GATEWAY_3_EIP}
+        
+        routeTables:
+          public:
+            routes:
+              - destination: 0.0.0.0/0
+                gateway: internet-gateway
+          
+          private:
+            routes:
+              - destination: 0.0.0.0/0
+                gateway: nat-gateway
+        
+        securityGroups:
+          application:
+            ingress:
+              - port: 80
+                protocol: tcp
+                cidr: 0.0.0.0/0
+              - port: 443
+                protocol: tcp
+                cidr: 0.0.0.0/0
+              - port: 8080
+                protocol: tcp
+                cidr: ${VPC_CIDR:-10.0.0.0/16}
+            egress:
+              - port: all
+                protocol: all
+                cidr: 0.0.0.0/0
+          
+          database:
+            ingress:
+              - port: 5432
+                protocol: tcp
+                cidr: ${VPC_CIDR:-10.0.0.0/16}
+            egress:
+              - port: all
+                protocol: all
+                cidr: 0.0.0.0/0
+      
+      # Google Cloud VPC Configuration
+      gcp:
+        network:
+          name: ${GCP_NETWORK:-machine-native-ops-network}
+          autoCreateSubnetworks: false
+          routingMode: GLOBAL
+        
+        subnets:
+          - name: ${GCP_SUBNET_1:-machine-native-ops-subnet-1}
+            region: ${GCP_REGION_1:-us-east1}
+            cidr: ${GCP_SUBNET_1_CIDR:-10.1.0.0/24}
+            privateIpGoogleAccess: true
+            enableFlowLogs: true
+          - name: ${GCP_SUBNET_2:-machine-native-ops-subnet-2}
+            region: ${GCP_REGION_2:-us-central1}
+            cidr: ${GCP_SUBNET_2_CIDR:-10.1.1.0/24}
+            privateIpGoogleAccess: true
+            enableFlowLogs: true
+          - name: ${GCP_SUBNET_3:-machine-native-ops-subnet-3}
+            region: ${GCP_REGION_3:-us-west1}
+            cidr: ${GCP_SUBNET_3_CIDR:-10.1.2.0/24}
+            privateIpGoogleAccess: true
+            enableFlowLogs: true
+        
+        router:
+          name: ${GCP_ROUTER:-machine-native-ops-router}
+          region: ${GCP_REGION_1:-us-east1}
+          nat:
+            name: ${GCP_NAT:-machine-native-ops-nat}
+            natIpAllocateOption: AUTO_ONLY
+            sourceSubnetworkIpRangesToNat: ALL_SUBNETWORKS_ALL_IP_RANGES
+        
+        firewallRules:
+          allow-http:
+            direction: INGRESS
+            priority: 1000
+            allow:
+              - protocol: tcp
+                ports: ["80"]
+            sourceRanges: ["0.0.0.0/0"]
+          
+          allow-https:
+            direction: INGRESS
+            priority: 1000
+            allow:
+              - protocol: tcp
+                ports: ["443"]
+            sourceRanges: ["0.0.0.0/0"]
+          
+          allow-app.kubernetes.io/name: direction: INGRESS
+            priority: 1000
+            allow:
+              - protocol: tcp
+                ports: ["8080", "9090"]
+            sourceRanges: ["10.1.0.0/16"]
+          
+          allow-icmp:
+            direction: INGRESS
+            priority: 1000
+            allow:
+              - protocol: icmp
+            sourceRanges: ["10.1.0.0/16"]
+      
+      # Azure VNet Configuration
+      azure:
+        vnet:
+          name: ${AZURE_VNET:-machine-native-ops-vnet}
+          addressSpace: ${AZURE_VNET_CIDR:-10.2.0.0/16}
+          location: ${AZURE_LOCATION:-East US}
+        
+        subnets:
+          - name: ${AZURE_SUBNET_PUBLIC:-public-subnet}
+            addressPrefix: ${AZURE_PUBLIC_SUBNET_CIDR:-10.2.1.0/24}
+            delegations: []
+            serviceEndpoints:
+              - service: Microsoft.Storage
+          - name: ${AZURE_SUBNET_PRIVATE:-private-subnet}
+            addressPrefix: ${AZURE_PRIVATE_SUBNET_CIDR:-10.2.2.0/24}
+            delegations: []
+          - name: ${AZURE_SUBNET_DATABASE:-database-subnet}
+            addressPrefix: ${AZURE_DATABASE_SUBNET_CIDR:-10.2.3.0/24}
+            delegations:
+              - name: Microsoft.Sql/managedInstances
+                service: Microsoft.Sql
+                type: Microsoft.Sql/managedInstances
+        
+        networkSecurityGroups:
+          application:
+            securityRules:
+              - name: Allow-HTTP
+                priority: 100
+                direction: Inbound
+                access: Allow
+                protocol: Tcp
+                sourcePortRange: "*"
+                destinationPortRange: "80"
+                sourceAddressPrefix: "*"
+                destinationAddressPrefix: "*"
+              
+              - name: Allow-HTTPS
+                priority: 110
+                direction: Inbound
+                access: Allow
+                protocol: Tcp
+                sourcePortRange: "*"
+                destinationPortRange: "443"
+                sourceAddressPrefix: "*"
+                destinationAddressPrefix: "*"
+              
+              - name: Allow-App
+                priority: 120
+                direction: Inbound
+                access: Allow
+                protocol: Tcp
+                sourcePortRange: "*"
+                destinationPortRange: "8080,9090"
+                sourceAddressPrefix: "10.2.0.0/16"
+                destinationAddressPrefix: "*"
+  
+  # Service Discovery Configuration
+  service-discovery.yaml: |
+    serviceDiscovery:
+      # Kubernetes Service Discovery
+      kubernetes:
+        enabled: true
+        type: CoreDNS
+        domain: cluster.local
+        services:
+          - name: machine-native-ops
+            namespace: production
+            type: ClusterIP
+            ports:
+              - name: http
+                port: 8080
+                targetPort: 8080
+                protocol: TCP
+              - name: metrics
+                port: 9090
+                targetPort: 9090
+                protocol: TCP
+          - name: postgresql
+            namespace: production
+            type: ClusterIP
+            ports:
+              - name: postgresql
+                port: 5432
+                targetPort: 5432
+                protocol: TCP
+          - name: redis
+            namespace: production
+            type: ClusterIP
+            ports:
+              - name: redis
+                port: 6379
+                targetPort: 6379
+                protocol: TCP
+      
+      # AWS Cloud Map Service Discovery
+      aws:
+        enabled: ${AWS_CLOUDMAP_ENABLED:-false}
+        namespaceId: ${AWS_NAMESPACE_ID:-}
+        serviceId: ${AWS_SERVICE_ID:-}
+        dnsRecords:
+          - type: A
+            ttl: 300
+          - type: SRV
+            ttl: 300
+      
+      # Google Cloud Service Directory
+      gcp:
+        enabled: ${GCP_SERVICE_DIR_ENABLED:-false}
+        namespace: ${GCP_NAMESPACE:-}
+        service: ${GCP_SERVICE:-}
+        region: ${GCP_REGION:-}
+      
+      # Consul Service Discovery
+      consul:
+        enabled: ${CONSUL_ENABLED:-false}
+        address: ${CONSUL_ADDR:-consul:8500}
+        token: ${CONSUL_TOKEN:-}
+        services:
+          - name: machine-native-ops
+            port: 8080
+            check:
+              http: http://localhost:8080/health
+              interval: 10s
+              timeout: 5s
+            tags:
+              - production
+              - v1
+  
+  # Load Balancing Configuration
+  load-balancing.yaml: |
+    loadBalancing:
+      # AWS Load Balancer
+      aws:
+        applicationLoadBalancer:
+          enabled: ${AWS_ALB_ENABLED:-true}
+          name: ${AWS_ALB_NAME:-machine-native-ops-alb}
+          scheme: internet-facing
+          ipAddressType: ipv4
+          type: application
+          subnets: ${AWS_ALB_SUBNETS:-}
+          securityGroups: ${AWS_ALB_SECURITY_GROUPS:-}
+          listeners:
+            - port: 80
+              protocol: HTTP
+              defaultActions:
+                - type: forward
+                  targetGroup: ${TARGET_GROUP_ARN}
+            - port: 443
+              protocol: HTTPS
+              certificates:
+                - certificateArn: ${SSL_CERTIFICATE_ARN}
+              defaultActions:
+                - type: forward
+                  targetGroup: ${TARGET_GROUP_ARN}
+          targetGroups:
+            - name: machine-native-ops-tg
+              port: 8080
+              protocol: HTTP
+              healthCheck:
+                path: /health
+                interval: 30
+                timeout: 5
+                healthyThreshold: 3
+                unhealthyThreshold: 3
+                matcher:
+                  httpCode: 200
+        
+        networkLoadBalancer:
+          enabled: ${AWS_NLB_ENABLED:-false}
+          name: ${AWS_NLB_NAME:-machine-native-ops-nlb}
+          scheme: internet-facing
+          type: network
+          crossZoneLoadBalancing: true
+          listeners:
+            - port: 8080
+              protocol: TCP
+      
+      # Google Cloud Load Balancing
+      gcp:
+        globalLoadBalancer:
+          enabled: ${GCP_LB_ENABLED:-true}
+          name: ${GCP_LB_NAME:-machine-native-ops-lb}
+          ipAddress: ${GCP_LB_IP:-}
+          ports:
+            - port: 80
+              protocol: HTTP
+            - port: 443
+              protocol: HTTPS
+              sslCertificates:
+                - ${GCP_SSL_CERTIFICATE:-}
+          backendServices:
+            - name: machine-native-ops-backend
+              protocol: HTTP
+              portName: http
+              healthCheck:
+                checkIntervalSec: 30
+                timeoutSec: 5
+                healthyThreshold: 3
+                unhealthyThreshold: 3
+                httpHealthCheck:
+                  port: 8080
+                  requestPath: /health
+          urlMaps:
+            - name: machine-native-ops-urlmap
+              defaultService: machine-native-ops-backend
+      
+      # Azure Load Balancing
+      azure:
+        loadBalancer:
+          enabled: ${AZURE_LB_ENABLED:-true}
+          name: ${AZURE_LB_NAME:-machine-native-ops-lb}
+          sku: Standard
+          frontendIPConfigurations:
+            - name: frontend
+              publicIPAddress: ${AZURE_PUBLIC_IP:-}
+          probes:
+            - name: health-probe
+              protocol: Http
+              port: 8080
+              requestPath: /health
+              intervalInSeconds: 30
+              numberOfProbes: 3
+          loadBalancingRules:
+            - name: http-rule
+              frontendPort: 80
+              backendPort: 8080
+              protocol: Tcp
+              probe: health-probe
+            - name: https-rule
+              frontendPort: 443
+              backendPort: 8080
+              protocol: Tcp
+              probe: health-probe

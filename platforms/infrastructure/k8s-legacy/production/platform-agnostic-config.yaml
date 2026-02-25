@@ -1,0 +1,397 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: platform-agnostic-config
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Platform-Agnostic Production Configuration
+# Compatible with AWS, GCP, Azure, and on-premise deployments
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:platform-agnostic-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/platform-agnostic-config.yaml"
+  name: platform-agnostic-config
+  namespace: production
+data:
+  # Cloud Provider Configuration
+  cloud-provider.yaml: |
+    # Multi-cloud support configuration
+    cloudProviders:
+      # AWS Configuration
+      aws:
+        enabled: true
+        services:
+          - compute: ec2 | eks
+          - storage: s3 | ebs
+          - database: rds | aurora
+          - cache: elasticache
+          - messaging: sqs | sns
+          - monitoring: cloudwatch
+          - logging: cloudwatch-logs
+          - secrets: secrets-manager | parameter-store
+      
+      # Google Cloud Platform Configuration
+      gcp:
+        enabled: true
+        services:
+          - compute: gce | gke
+          - storage: gcs
+          - database: cloud-sql | spanner
+          - cache: memorystore
+          - messaging: pubsub
+          - monitoring: cloud-monitoring
+          - logging: cloud-logging
+          - secrets: secret-manager
+      
+      # Azure Configuration
+      azure:
+        enabled: true
+        services:
+          - compute: vm | aks
+          - storage: blob-storage | disk-storage
+          - database: sql-database | cosmos-db
+          - cache: redis-cache
+          - messaging: service-bus | event-grid
+          - monitoring: monitor
+          - logging: log-analytics
+          - secrets: key-vault
+      
+      # On-Premise Configuration
+      on-prem:
+        enabled: true
+        services:
+          - compute: vmware | bare-metal | kubernetes
+          - storage: nfs | san | local
+          - database: postgresql | mysql
+          - cache: redis | memcached
+          - messaging: rabbitmq | kafka
+          - monitoring: prometheus | grafana
+          - logging: elasticsearch | loki
+          - secrets: vault | external-secrets
+  
+  # Storage Backend Configuration
+  storage-backends.yaml: |
+    # Multi-storage backend support
+    storageBackends:
+      # Object Storage
+      objectStorage:
+        - name: primary-storage
+          providers:
+            aws:
+              service: s3
+              config:
+                bucket: ${BUCKET_NAME}
+                region: ${AWS_REGION}
+                endpoint: ${S3_ENDPOINT}
+            gcp:
+              service: gcs
+              config:
+                bucket: ${BUCKET_NAME}
+                project: ${GCP_PROJECT}
+                location: ${GCP_LOCATION}
+            azure:
+              service: blob-storage
+              config:
+                account: ${STORAGE_ACCOUNT}
+                container: ${CONTAINER_NAME}
+            minio:
+              service: s3-compatible
+              config:
+                endpoint: ${MINIO_ENDPOINT}
+                accessKey: ${ACCESS_KEY}
+                secretKey: ${SECRET_KEY}
+        
+        - name: backup-storage
+          providers:
+            aws:
+              service: s3
+              config:
+                bucket: ${BACKUP_BUCKET}
+                lifecycle:
+                  transitions:
+                    - days: 30
+                      storageClass: STANDARD_IA
+                    - days: 90
+                      storageClass: GLACIER
+            gcp:
+              service: gcs
+              config:
+                bucket: ${BACKUP_BUCKET}
+                lifecycle:
+                  - action: delete
+                    condition:
+                      age: 90
+      
+      # Block Storage
+      blockStorage:
+        providers:
+          aws:
+            service: ebs
+            types:
+              - gp2: general-purpose-ssd
+              - gp3: general-purpose-ssd-v2
+              - io1: provisioned-iops
+              - io2: provisioned-iops-v2
+          gcp:
+            service: persistent-disk
+            types:
+              - pd-standard: standard
+              - pd-balanced: balanced
+              - pd-ssd: ssd
+          azure:
+            service: managed-disk
+            types:
+              - standard_lrs: standard-locally-redundant
+              - premium_lrs: premium-locally-redundant
+              - standardssd_lrs: standard-ssd-locally-redundant
+  
+  # Database Backend Configuration
+  database-backends.yaml: |
+    # Multi-database backend support
+    databaseBackends:
+      # Relational Databases
+      relational:
+        - name: postgresql
+          providers:
+            aws:
+              service: rds
+              engine: postgres
+              versions: [13, 14, 15, 16]
+            gcp:
+              service: cloud-sql
+              engine: postgres
+              versions: [13, 14, 15, 16]
+            azure:
+              service: sql-database
+              engine: postgresql
+              versions: [12, 13, 14, 15]
+            on-prem:
+              service: postgresql
+              versions: [13, 14, 15, 16]
+              deployment: standalone | patroni | pgpool
+        
+        - name: mysql
+          providers:
+            aws:
+              service: rds
+              engine: mysql
+              versions: [8.0]
+            gcp:
+              service: cloud-sql
+              engine: mysql
+              versions: [8.0]
+            azure:
+              service: sql-database
+              engine: mysql
+              versions: [8.0]
+            on-prem:
+              service: mysql
+              versions: [8.0]
+              deployment: standalone | galera | proxysql
+      
+      # NoSQL Databases
+      nosql:
+        - name: mongodb
+          providers:
+            aws:
+              service: documentdb
+              versions: [5.0, 6.0]
+            gcp:
+              service: mongodb
+              versions: [5.0, 6.0]
+            azure:
+              service: cosmos-db
+              api: mongodb
+              versions: [3.6, 4.0, 5.0]
+            on-prem:
+              service: mongodb
+              versions: [5.0, 6.0]
+              deployment: replica-set | sharded-cluster
+        
+        - name: redis
+          providers:
+            aws:
+              service: elasticache
+              versions: [6.2, 7.0]
+            gcp:
+              service: memorystore
+              versions: [6.2, 7.0]
+            azure:
+              service: redis-cache
+              versions: [6.2, 7.0]
+            on-prem:
+              service: redis
+              versions: [6.2, 7.0]
+              deployment: standalone | sentinel | cluster
+  
+  # Message Queue Configuration
+  message-queue-backends.yaml: |
+    # Multi-message queue support
+    messageQueues:
+      - name: sqs
+        provider: aws
+        type: queue
+        config:
+          region: ${AWS_REGION}
+          maxReceiveCount: 3
+          visibilityTimeout: 30
+          messageRetentionPeriod: 1209600  # 14 days
+      
+      - name: sns
+        provider: aws
+        type: pub-sub
+        config:
+          region: ${AWS_REGION}
+          messageRetentionPeriod: 1209600
+      
+      - name: pubsub
+        provider: gcp
+        type: pub-sub
+        config:
+          project: ${GCP_PROJECT}
+          ackDeadlineSeconds: 600
+          messageRetentionDuration: 604800s  # 7 days
+      
+      - name: service-bus
+        provider: azure
+        type: message-bus
+        config:
+          namespace: ${SERVICE_BUS_NAMESPACE}
+          lockDuration: PT5M
+          maxDeliveryCount: 3
+      
+      - name: rabbitmq
+        provider: on-prem
+        type: message-broker
+        config:
+          host: ${RABBITMQ_HOST}
+          port: 5672
+          virtualHost: /
+          durable: true
+      
+      - name: kafka
+        provider: on-prem
+        type: streaming-platform
+        config:
+          brokers: ${KAFKA_BROKERS}
+          retention: 604800000  # 7 days
+          partitions: 3
+          replicationFactor: 2
+  
+  # Monitoring Backend Configuration
+  monitoring-backends.yaml: |
+    # Multi-monitoring backend support
+    monitoringBackends:
+      - name: prometheus
+        provider: cloud-native
+        type: metrics
+        config:
+          retention: 15d
+          scrapeInterval: 15s
+          evaluationInterval: 15s
+      
+      - name: cloudwatch
+        provider: aws
+        type: metrics
+        config:
+          namespace: MachineNativeOps
+          metricResolution: 60
+      
+      - name: cloud-monitoring
+        provider: gcp
+        type: metrics
+        config:
+          project: ${GCP_PROJECT}
+          metricKind: GAUGE
+      
+      - name: monitor
+        provider: azure
+        type: metrics
+        config:
+          resourceGroup: ${RESOURCE_GROUP}
+          metricNamespace: MachineNativeOps
+  
+  # Logging Backend Configuration
+  logging-backends.yaml: |
+    # Multi-logging backend support
+    loggingBackends:
+      - name: cloudwatch-logs
+        provider: aws
+        type: logging
+        config:
+          logGroupName: /aws/eks/cluster-name
+          retentionInDays: 30
+      
+      - name: cloud-logging
+        provider: gcp
+        type: logging
+        config:
+          project: ${GCP_PROJECT}
+          logId: machine-native-ops
+          retentionDays: 30
+      
+      - name: log-analytics
+        provider: azure
+        type: logging
+        config:
+          workspaceId: ${LOG_ANALYTICS_WORKSPACE_ID}
+          tableName: MachineNativeOps_CL
+      
+      - name: elasticsearch
+        provider: on-prem
+        type: logging
+        config:
+          hosts: ${ES_HOSTS}
+          index: machine-native-ops-${DATE}
+          retention: 30d
+      
+      - name: loki
+        provider: cloud-native
+        type: logging
+        config:
+          url: ${LOKI_URL}
+          retention: 30d
+  
+  # Secrets Management Configuration
+  secrets-backends.yaml: |
+    # Multi-secrets backend support
+    secretsBackends:
+      - name: secrets-manager
+        provider: aws
+        type: secrets
+        config:
+          region: ${AWS_REGION}
+          secretPrefix: machine-native-ops/
+      
+      - name: parameter-store
+        provider: aws
+        type: configuration
+        config:
+          region: ${AWS_REGION}
+          parameterPrefix: /machine-native-ops/
+      
+      - name: secret-manager
+        provider: gcp
+        type: secrets
+        config:
+          project: ${GCP_PROJECT}
+          secretPrefix: machine-native-ops-
+      
+      - name: key-vault
+        provider: azure
+        type: secrets
+        config:
+          vaultName: ${KEY_VAULT_NAME}
+          secretPrefix: machine-native-ops--
+      
+      - name: vault
+        provider: on-prem
+        type: secrets
+        config:
+          address: ${VAULT_ADDR}
+          path: machine-native-ops
+          authMethod: token | kubernetes | aws | gcp

@@ -1,0 +1,403 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLConstitution
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-constitution.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-constitution.yaml"
+  name: gl-constitution
+  version: "1.0.0"
+  status: ENACTED
+  created_at: "2025-01-19T00:00:00Z"
+  enacted_at: "2025-01-19T00:00:00Z"
+  owner: governance-committee
+  authority: SUPREME
+preamble:
+  declaration: |
+    本框架為 MachineNativeOps 系統最高治理規範。
+    自本框架生效之時起，GL00–99 為唯一有效且最高層級的治理架構。
+    所有任務、產物、語意與流程皆必須遵守本框架規定。
+    任何違反本框架之行為均屬無效。
+  authority_level: SUPREME
+  supersedes: ALL_PRIOR_GOVERNANCE
+  effective_immediately: true
+chapter_1_supremacy:
+  chapter_id: "CONST-CH-01"
+  title: "治理架構最高性"
+  title_en: "Governance Architecture Supremacy"
+  articles:
+    - article_id: "CONST-01-01"
+      title: "GL 架構唯一性"
+      content: "GL00–99 為本系統唯一有效且最高層級的治理架構"
+      enforcement: MANDATORY
+    - article_id: "CONST-01-02"
+      title: "全面適用性"
+      content: "所有任務、產物、語意與流程皆必須遵守 GL 架構"
+      enforcement: MANDATORY
+    - article_id: "CONST-01-03"
+      title: "優先權"
+      content: "GL 框架優先於任何其他規範、政策或指令"
+      enforcement: MANDATORY
+    - article_id: "CONST-01-04"
+      title: "不可撤銷性"
+      content: "本框架一經生效，非經正式修憲程序不得撤銷或修改"
+      enforcement: MANDATORY
+chapter_2_layer_semantics:
+  chapter_id: "CONST-CH-02"
+  title: "層級語意定義"
+  title_en: "Layer Semantic Definitions"
+  layers:
+    - layer_id: "GL00-09"
+      name: "Strategic Layer"
+      name_zh: "戰略層"
+      semantic_definition: "願景、方向、原則、風險與治理根基"
+      scope:
+        - "願景與使命定義"
+        - "戰略方向制定"
+        - "治理原則建立"
+        - "風險管理策略"
+        - "合規治理框架"
+        - "安全策略制定"
+        - "架構決策"
+      status: SEALED
+    - layer_id: "GL10-29"
+      name: "Operational Layer"
+      name_zh: "運營層"
+      semantic_definition: "政策、流程、標準、工具與品質管理"
+      scope:
+        - "政策制定與落地"
+        - "流程設計與優化"
+        - "標準建立與維護"
+        - "工具選型與配置"
+        - "品質管理體系"
+        - "能力發展規劃"
+        - "資源調度管理"
+      status: SEALED
+    - layer_id: "GL30-49"
+      name: "Execution Layer"
+      name_zh: "執行層"
+      semantic_definition: "模板、契約、schema、自動化產物"
+      scope:
+        - "模板設計與維護"
+        - "行為契約定義"
+        - "Schema 規格制定"
+        - "自動化腳本開發"
+        - "配置檔案管理"
+        - "代理執行邏輯"
+        - "規則引擎配置"
+      status: SEALED
+    - layer_id: "GL50-59"
+      name: "Observability Layer"
+      name_zh: "觀測層"
+      semantic_definition: "監控、指標、洞察與可觀測性"
+      scope:
+        - "監控系統配置"
+        - "指標定義與收集"
+        - "告警規則設定"
+        - "日誌收集與分析"
+        - "分散式追蹤"
+        - "儀表板設計"
+        - "洞察報告生成"
+      status: SEALED
+    - layer_id: "GL60-80"
+      name: "Advanced/Feedback Layer"
+      name_zh: "進階/回饋層"
+      semantic_definition: "AI、優化、回饋與強化"
+      scope:
+        - "AI 模型配置"
+        - "智能優化規則"
+        - "回饋機制設計"
+        - "審計追蹤"
+        - "創新登錄"
+        - "持續改進"
+      status: SEALED
+    - layer_id: "GL81-83"
+      name: "Extended Layer"
+      name_zh: "擴展層"
+      semantic_definition: "外部整合、橋接與自動評論"
+      scope:
+        - "外部系統整合"
+        - "利害關係人橋接"
+        - "自動評論生成"
+        - "API 管理"
+        - "跨系統協作"
+        - "通知渠道配置"
+      status: SEALED
+    - layer_id: "GL90-99"
+      name: "Meta-Specification Layer"
+      name_zh: "元規範層"
+      semantic_definition: "命名、語意規範與治理規則"
+      scope:
+        - "命名規範定義"
+        - "語意標準建立"
+        - "治理規則制定"
+        - "元數據管理"
+        - "規格版本控制"
+        - "層級定義維護"
+      status: SEALED
+chapter_3_boundary_prohibitions:
+  chapter_id: "CONST-CH-03"
+  title: "層級邊界禁令"
+  title_en: "Layer Boundary Prohibitions"
+  prohibitions:
+    - prohibition_id: "CONST-PROHIB-01"
+      name: "跨層禁止"
+      name_en: "Cross-Layer Prohibition"
+      description: "任何操作不得跨越層級邊界"
+      enforcement: STRICT
+      violation_consequence: "操作無效，必須回滾"
+    - prohibition_id: "CONST-PROHIB-02"
+      name: "跳層禁止"
+      name_en: "Skip-Layer Prohibition"
+      description: "任何操作不得跳過中間層級"
+      enforcement: STRICT
+      violation_consequence: "操作無效，必須回滾"
+    - prohibition_id: "CONST-PROHIB-03"
+      name: "混層禁止"
+      name_en: "Mix-Layer Prohibition"
+      description: "任何操作不得混合多個層級"
+      enforcement: STRICT
+      violation_consequence: "操作無效，必須回滾"
+    - prohibition_id: "CONST-PROHIB-04"
+      name: "語意擴張禁止"
+      name_en: "Semantic Expansion Prohibition"
+      description: "不得擴張已封存的語意定義"
+      enforcement: STRICT
+      violation_consequence: "變更無效，必須回滾"
+    - prohibition_id: "CONST-PROHIB-05"
+      name: "語意重寫禁止"
+      name_en: "Semantic Rewrite Prohibition"
+      description: "不得重寫已封存的語意定義"
+      enforcement: STRICT
+      violation_consequence: "變更無效，必須回滾"
+    - prohibition_id: "CONST-PROHIB-06"
+      name: "語意漂移禁止"
+      name_en: "Semantic Drift Prohibition"
+      description: "不得產生語意漂移"
+      enforcement: STRICT
+      violation_consequence: "必須立即修正"
+chapter_4_governance_lifecycle:
+  chapter_id: "CONST-CH-04"
+  title: "治理生命週期"
+  title_en: "Governance Lifecycle"
+  lifecycle_phases:
+    - phase_id: "LIFECYCLE-01"
+      name: "GL 架構理解"
+      name_en: "GL Architecture Understanding"
+      sequence: 1
+      description: "理解 GL 層級結構、語意邊界與依賴關係"
+      mandatory: true
+    - phase_id: "LIFECYCLE-02"
+      name: "GL 執行模式啟動"
+      name_en: "GL Execution Mode Activation"
+      sequence: 2
+      description: "啟動 GL 執行模式，載入治理規則"
+      mandatory: true
+    - phase_id: "LIFECYCLE-03"
+      name: "GL 任務分派"
+      name_en: "GL Task Assignment"
+      sequence: 3
+      description: "依據 GL 層級語意分派任務至對應層級"
+      mandatory: true
+    - phase_id: "LIFECYCLE-04"
+      name: "GL 任務執行"
+      name_en: "GL Task Execution"
+      sequence: 4
+      description: "在對應層級內執行任務，產出 artifacts"
+      mandatory: true
+    - phase_id: "LIFECYCLE-05"
+      name: "GL 任務驗證"
+      name_en: "GL Task Validation"
+      sequence: 5
+      description: "驗證任務執行結果符合 GL 語意與邊界"
+      mandatory: true
+    - phase_id: "LIFECYCLE-06"
+      name: "GL 語意封存"
+      name_en: "GL Semantic Sealing"
+      sequence: 6
+      description: "封存已驗證的語意與 artifacts"
+      mandatory: true
+    - phase_id: "LIFECYCLE-07"
+      name: "GL 治理閉環"
+      name_en: "GL Governance Closure"
+      sequence: 7
+      description: "完成治理循環，準備下一週期"
+      mandatory: true
+chapter_5_artifact_governance:
+  chapter_id: "CONST-CH-05"
+  title: "產物治理"
+  title_en: "Artifact Governance"
+  principles:
+    - principle_id: "ARTIFACT-PRIN-01"
+      name: "層級對應原則"
+      description: "所有產物必須依照 GL 層級語意產生"
+      enforcement: MANDATORY
+    - principle_id: "ARTIFACT-PRIN-02"
+      name: "邊界遵守原則"
+      description: "所有產物必須遵守對應的 artifacts 邊界"
+      enforcement: MANDATORY
+    - principle_id: "ARTIFACT-PRIN-03"
+      name: "責任對應原則"
+      description: "所有產物必須對應正確的責任"
+      enforcement: MANDATORY
+    - principle_id: "ARTIFACT-PRIN-04"
+      name: "依賴遵守原則"
+      description: "所有產物必須遵守定義的依賴關係"
+      enforcement: MANDATORY
+    - principle_id: "ARTIFACT-PRIN-05"
+      name: "格式規範原則"
+      description: "所有產物必須符合規定的格式"
+      enforcement: MANDATORY
+  artifact_matrix_reference: "ECO-ARTIFACTS-MATRIX.yaml"
+chapter_6_skills_capabilities_responsibilities:
+  chapter_id: "CONST-CH-06"
+  title: "技能能力責任治理"
+  title_en: "Skills, Capabilities, and Responsibilities Governance"
+  principles:
+    - principle_id: "SCR-PRIN-01"
+      name: "技能層級固定原則"
+      description: "所有技能必須依照 GL 層級固定，不得跨層"
+      enforcement: MANDATORY
+    - principle_id: "SCR-PRIN-02"
+      name: "能力層級固定原則"
+      description: "所有能力必須依照 GL 層級固定，不得跨層"
+      enforcement: MANDATORY
+    - principle_id: "SCR-PRIN-03"
+      name: "責任層級固定原則"
+      description: "所有責任必須依照 GL 層級固定，不得跨層"
+      enforcement: MANDATORY
+    - principle_id: "SCR-PRIN-04"
+      name: "混層禁止原則"
+      description: "技能、能力、責任不得混層"
+      enforcement: MANDATORY
+    - principle_id: "SCR-PRIN-05"
+      name: "對應一致性原則"
+      description: "技能、能力、責任必須與 artifacts 正確對應"
+      enforcement: MANDATORY
+  skills_matrix_reference: "ECO-SKILLS-MATRIX.yaml"
+chapter_7_deficiency_correction:
+  chapter_id: "CONST-CH-07"
+  title: "缺漏修正機制"
+  title_en: "Deficiency Correction Mechanism"
+  correction_triggers:
+    - trigger_id: "CORRECT-TRIG-01"
+      name: "語意缺漏"
+      description: "發現語意定義不完整"
+      action: "產出 minimal actionable fix"
+    - trigger_id: "CORRECT-TRIG-02"
+      name: "邊界模糊"
+      description: "發現層級邊界定義不清"
+      action: "產出 minimal actionable fix"
+    - trigger_id: "CORRECT-TRIG-03"
+      name: "責任錯置"
+      description: "發現責任分配至錯誤層級"
+      action: "產出 minimal actionable fix"
+    - trigger_id: "CORRECT-TRIG-04"
+      name: "Artifacts 誤分類"
+      description: "發現 artifacts 分類至錯誤層級"
+      action: "產出 minimal actionable fix"
+  correction_principles:
+    - "僅做必要的最小變更"
+    - "不得擴張語意"
+    - "不得重寫語意"
+    - "必須保持層級邊界"
+    - "必須維持依賴關係"
+chapter_8_continuous_operation:
+  chapter_id: "CONST-CH-08"
+  title: "持續運行機制"
+  title_en: "Continuous Operation Mechanism"
+  operation_rules:
+    - rule_id: "CONT-OP-01"
+      name: "自動啟動"
+      description: "本框架啟動後，GL 治理將自動持續運行"
+      enforcement: MANDATORY
+    - rule_id: "CONT-OP-02"
+      name: "無需額外指令"
+      description: "GL 治理運行不需額外指令"
+      enforcement: MANDATORY
+    - rule_id: "CONT-OP-03"
+      name: "自動驗證"
+      description: "所有操作將自動進行 GL 合規驗證"
+      enforcement: MANDATORY
+    - rule_id: "CONT-OP-04"
+      name: "自動修正"
+      description: "發現違規時將自動觸發修正機制"
+      enforcement: MANDATORY
+    - rule_id: "CONT-OP-05"
+      name: "持續監控"
+      description: "GL 治理狀態將持續監控"
+      enforcement: MANDATORY
+chapter_9_minimal_change:
+  chapter_id: "CONST-CH-09"
+  title: "最小變更原則"
+  title_en: "Minimal Change Principle"
+  principles:
+    - principle_id: "MIN-CHANGE-01"
+      name: "必要性原則"
+      description: "僅做必要的變更"
+      enforcement: MANDATORY
+    - principle_id: "MIN-CHANGE-02"
+      name: "最小化原則"
+      description: "變更範圍必須最小化"
+      enforcement: MANDATORY
+    - principle_id: "MIN-CHANGE-03"
+      name: "可執行原則"
+      description: "僅產出可執行成果"
+      enforcement: MANDATORY
+    - principle_id: "MIN-CHANGE-04"
+      name: "禁止冗餘原則"
+      description: "不得產出分析、摘要、評論或理由"
+      enforcement: MANDATORY
+referenced_documents:
+  core_specifications:
+    - name: "ECO-SEMANTIC-SEAL.yaml"
+      purpose: "語意封存規範"
+      status: SEALED
+    - name: "ECO-SEMANTIC-BOUNDARIES.yaml"
+      purpose: "語意邊界定義"
+      status: SEALED
+    - name: "ECO-SKILLS-MATRIX.yaml"
+      purpose: "技能能力責任矩陣"
+      status: SEALED
+    - name: "ECO-ARTIFACTS-MATRIX.yaml"
+      purpose: "產物矩陣"
+      status: SEALED
+    - name: "ECO-FILESYSTEM-MAPPING.yaml"
+      purpose: "檔案系統映射"
+      status: SEALED
+    - name: "ECO-GOVERNANCE-LOOP.yaml"
+      purpose: "治理循環"
+      status: SEALED
+    - name: "ECO-TASK-LIFECYCLE.yaml"
+      purpose: "任務生命週期"
+      status: SEALED
+    - name: "ECO-EXECUTION-MODE.yaml"
+      purpose: "執行模式"
+      status: SEALED
+    - name: "ECO-AUTOMATION-ENGINE.yaml"
+      purpose: "自動化引擎"
+      status: SEALED
+    - name: "ECO-DAG.yaml"
+      purpose: "有向無環圖"
+      status: SEALED
+enactment:
+  declaration: |
+    本框架自創建之時起立即生效。
+    GL00–99 治理架構正式成為本系統最高治理規範。
+    所有語意、責任、技能、能力、產物與流程已完全固定。
+    GL 治理將持續運行，不需額外指令。
+  effective_date: "2025-01-19T00:00:00Z"
+  enacted_by: "governance-committee"
+  authority: SUPREME
+  status: ENACTED
+constitution_signature:
+  constitution_id: "ECO-CONSTITUTION-001"
+  version: "1.0.0"
+  status: ENACTED
+  enacted_at: "2025-01-19T00:00:00Z"
+  integrity_hash: "sha256:gl-constitution-v1"
+  authority_level: SUPREME

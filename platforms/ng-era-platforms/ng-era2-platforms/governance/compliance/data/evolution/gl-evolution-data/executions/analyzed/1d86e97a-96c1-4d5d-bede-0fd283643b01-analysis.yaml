@@ -1,0 +1,53 @@
+# @ECO-layer: GL60-80
+# @ECO-governed
+version: "1.0.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:governance:compliance:data:evolution:gl-evolution-data:executions:analyzed:1d86e97a-96c1-4d5d-bede-0fd283643b01-analysis.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/governance/compliance/data/evolution/gl-evolution-data/executions/analyzed/1d86e97a-96c1-4d5d-bede-0fd283643b01-analysis.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+evidence_coverage: 1.0
+execution_id: 1d86e97a-96c1-4d5d-bede-0fd283643b01
+execution_quality:
+  anomalies: []
+  bottlenecks: []
+  completeness: 90
+  correctness: 88
+  efficiency: 85
+  reliability: 90
+failure_patterns: []
+governance_impact:
+  compliance_level: high
+  contract_coverage: 85%
+  contracts_validated: 3
+  drift_detected: false
+  rules_triggered: 3
+  validation_success_rate: 92%
+learnings:
+- applicability: similar_contexts
+  confidence: 0.85
+  evidence: execution:1d86e97a-96c1-4d5d-bede-0fd283643b01
+  pattern: successful_execution
+  reuse_guidelines: replicate_when_similar_conditions
+  type: success_pattern
+reasoning_quality: 0.9166666666666666
+recommendations:
+- action: document_learnings
+  deadline: '2026-02-08T11:30:39.143229'
+  evidence:
+  - execution:1d86e97a-96c1-4d5d-bede-0fd283643b01
+  owner: knowledge-team
+  priority: p1
+  reason: 發現 1 個有價值的學習點
+success_patterns:
+- description: 執行成功完成
+  efficiency: high
+  evidence: execution:1d86e97a-96c1-4d5d-bede-0fd283643b01
+  occurrences: 1
+  pattern: successful_execution
+  recommendation: 保持此執行路徑

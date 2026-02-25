@@ -1,0 +1,356 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: resilience-policies
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:resilience-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/resilience-policies.yaml"
+  name: resilience-policies
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: resilience
+    environment: production
+data:
+  resilience-policies.yaml: |
+    version: "1.0"
+    
+    # Retry Policies
+    retry_policies:
+      default:
+        enabled: true
+        max_attempts: 3
+        initial_interval: 1000ms
+        max_interval: 10000ms
+        multiplier: 2.0
+        randomization_factor: 0.1
+        
+      api_requests:
+        enabled: true
+        max_attempts: 3
+        initial_interval: 500ms
+        max_interval: 5000ms
+        multiplier: 2.0
+        retryable_status_codes: [408, 429, 500, 502, 503, 504]
+        backoff_strategy: "exponential"
+        
+      database_queries:
+        enabled: true
+        max_attempts: 2
+        initial_interval: 100ms
+        max_interval: 1000ms
+        multiplier: 1.5
+        retryable_exceptions:
+          - "ConnectionTimeout"
+          - "OperationTimeout"
+          - "TransientError"
+        
+      cache_operations:
+        enabled: true
+        max_attempts: 2
+        initial_interval: 50ms
+        max_interval: 500ms
+        multiplier: 1.5
+        retryable_exceptions:
+          - "CacheMiss"
+          - "Timeout"
+        
+      external_api_calls:
+        enabled: true
+        max_attempts: 5
+        initial_interval: 1000ms
+        max_interval: 30000ms
+        multiplier: 2.0
+        retryable_status_codes: [408, 429, 500, 502, 503, 504]
+        backoff_strategy: "exponential_with_jitter"
+    
+    # Circuit Breakers
+    circuit_breakers:
+      default:
+        enabled: true
+        failure_threshold: 5
+        success_threshold: 2
+        timeout: 60000ms
+        reset_timeout: 300000ms
+        half_open_max_calls: 3
+        monitoring_period: 10000ms
+        
+      api_service:
+        enabled: true
+        failure_threshold: 10
+        success_threshold: 3
+        timeout: 30000ms
+        reset_timeout: 120000ms
+        half_open_max_calls: 5
+        monitoring_period: 60000ms
+        
+      database_service:
+        enabled: true
+        failure_threshold: 5
+        success_threshold: 2
+        timeout: 5000ms
+        reset_timeout: 60000ms
+        half_open_max_calls: 3
+        monitoring_period: 10000ms
+        
+      cache_service:
+        enabled: true
+        failure_threshold: 15
+        success_threshold: 5
+        timeout: 1000ms
+        reset_timeout: 30000ms
+        half_open_max_calls: 10
+        monitoring_period: 5000ms
+        
+      external_service_a:
+        enabled: true
+        failure_threshold: 3
+        success_threshold: 1
+        timeout: 10000ms
+        reset_timeout: 180000ms
+        half_open_max_calls: 2
+        monitoring_period: 30000ms
+    
+    # Rate Limiting
+    rate_limiting:
+      enabled: true
+      default_policy:
+        enabled: true
+        requests_per_second: 100
+        burst: 200
+        algorithm: "token_bucket"
+        
+      api_endpoints:
+        /health:
+          requests_per_second: 1000
+          burst: 2000
+          algorithm: "leaky_bucket"
+        
+        /api/v1/data:
+          requests_per_second: 100
+          burst: 200
+          algorithm: "token_bucket"
+        
+        /api/v1/metrics:
+          requests_per_second: 50
+          burst: 100
+          algorithm: "token_bucket"
+        
+        /api/v1/admin:
+          requests_per_second: 10
+          burst: 20
+          algorithm: "sliding_window"
+          window_size: 60s
+        
+      user_based:
+        enabled: true
+        default_limit: 100
+        default_burst: 200
+        tier_limits:
+          free:
+            requests_per_second: 10
+            burst: 20
+          standard:
+            requests_per_second: 50
+            burst: 100
+          premium:
+            requests_per_second: 200
+            burst: 400
+      
+      ip_based:
+        enabled: true
+        default_limit: 100
+        default_burst: 200
+        whitelist:
+          - "10.0.0.0/8"
+          - "172.16.0.0/12"
+          - "192.168.0.0/16"
+        blacklist:
+          - "192.0.2.0/24"
+          - "198.51.100.0/24"
+    
+    # Request Queuing
+    request_queuing:
+      enabled: true
+      default_queue:
+        max_size: 1000
+        max_wait_time: 30000ms
+        timeout: 60000ms
+        
+      api_queue:
+        max_size: 5000
+        max_wait_time: 60000ms
+        timeout: 120000ms
+        priority_levels: 3
+        
+      background_tasks:
+        max_size: 10000
+        max_wait_time: 300000ms
+        timeout: 600000ms
+        priority_levels: 5
+        
+      queue_strategy: "priority"
+      rejection_policy: "oldest"
+    
+    # Throttling
+    throttling:
+      enabled: true
+      adaptive:
+        enabled: true
+        metrics:
+          - cpu_usage
+          - memory_usage
+          - request_latency
+          - error_rate
+        
+        thresholds:
+          cpu_usage:
+            warning: 0.70
+            critical: 0.85
+            action: "reduce_rate"
+          
+          memory_usage:
+            warning: 0.80
+            critical: 0.90
+            action: "reduce_rate"
+          
+          request_latency:
+            warning: 300ms
+            critical: 500ms
+            action: "reduce_rate"
+          
+          error_rate:
+            warning: 0.02
+            critical: 0.05
+            action: "reduce_rate"
+        
+        actions:
+          reduce_rate:
+            factor: 0.5
+            min_requests_per_second: 10
+          reject_new:
+            message: "Service under heavy load, please try again later"
+          enable_degraded_mode:
+            enabled: true
+            timeout: 60000ms
+    
+    # Graceful Degradation
+    graceful_degradation:
+      enabled: true
+      levels:
+        normal:
+          features:
+            - "full_api"
+            - "real_time_updates"
+            - "advanced_analytics"
+            - "background_processing"
+        
+        degraded:
+          trigger_conditions:
+            - cpu_usage > 0.80
+            - memory_usage > 0.85
+            - error_rate > 0.05
+          features:
+            - "basic_api"
+            - "cached_responses"
+            - "essential_analytics"
+          disabled_features:
+            - "real_time_updates"
+            - "background_processing"
+        
+        critical:
+          trigger_conditions:
+            cpu_usage > 0.90
+            memory_usage > 0.95
+            error_rate > 0.10
+          features:
+            - "read_only_api"
+            - "cached_responses"
+          disabled_features:
+            - "write_operations"
+            - "advanced_analytics"
+            - "real_time_updates"
+            - "background_processing"
+        
+        emergency:
+          trigger_conditions:
+            system_failure: true
+          features:
+            - "maintenance_page"
+          disabled_features:
+            - "api_access"
+            - "write_operations"
+            - "read_operations"
+        
+      auto_degradation: true
+      manual_override: true
+      notification: true
+    
+    # Fallback Mechanisms
+    fallback_mechanisms:
+      cache_fallback:
+        enabled: true
+        primary: "redis_cluster"
+        fallback: "local_cache"
+        fallback_to_default: true
+        default_ttl: 300s
+        
+      database_fallback:
+        enabled: true
+        primary: "postgres_primary"
+        fallback: "postgres_replica"
+        fallback_to_cache: true
+        read_only_mode: true
+        
+      api_fallback:
+        enabled: true
+        primary: "main_api"
+        fallback: "cached_api"
+        fallback_to_default_response: true
+        default_response_timeout: 1000ms
+        
+      service_discovery_fallback:
+        enabled: true
+        primary: "kubernetes_dns"
+        fallback: "static_endpoints"
+        fallback_to_hardcoded: true
+        
+      configuration_fallback:
+        enabled: true
+        primary: "config_server"
+        fallback: "local_config"
+        fallback_to_defaults: true
+    
+    # Bulkhead Pattern
+    bulkhead:
+      enabled: true
+      policies:
+        api_operations:
+          max_concurrent_calls: 100
+          max_wait_time: 5000ms
+          timeout: 30000ms
+        
+        database_operations:
+          max_concurrent_calls: 50
+          max_wait_time: 10000ms
+          timeout: 30000ms
+        
+        cache_operations:
+          max_concurrent_calls: 200
+          max_wait_time: 1000ms
+          timeout: 5000ms
+        
+        external_api_calls:
+          max_concurrent_calls: 20
+          max_wait_time: 30000ms
+          timeout: 60000ms
+      
+      queue_full_policy: "reject"
+      rejection_message: "Service is busy, please try again later"

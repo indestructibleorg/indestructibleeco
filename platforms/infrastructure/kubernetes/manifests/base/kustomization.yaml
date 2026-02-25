@@ -1,0 +1,28 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: kubernetes-kustomization-base
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+#
+# GL Unified Architecture Governance Framework Activated
+# Kubernetes Base Kustomization
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: platform-03
+
+commonLabels:
+  app.kubernetes.io/part-of: machine-native-ops
+  governance.machinenativeops.io/charter-version: "2.0.0"
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secret.yaml
+  - serviceaccount.yaml
+  - networkpolicy.yaml
+  - limitrange.yaml
+  - resourcequota.yaml
+  - ingress.yaml
+  - hpa.yaml
+  - poddisruptionbudget.yaml

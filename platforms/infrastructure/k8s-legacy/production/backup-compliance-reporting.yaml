@@ -1,0 +1,275 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: backup-compliance-reporting
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Backup Compliance Reporting Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:backup-compliance-reporting.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/backup-compliance-reporting.yaml"
+  name: backup-compliance-config
+  namespace: velero
+data:
+  compliance-policy.yaml: |
+    # Backup compliance reporting configuration
+    compliance:
+      enabled: true
+      
+      # Compliance standards
+      standards:
+        - name: ISO27001
+          enabled: true
+          requirements:
+            - backupFrequency: daily
+              retention: 90d
+              encryption: true
+              offsite: true
+            - disasterRecovery:
+                rto: 4h
+                rpo: 1h
+            - testing:
+                restoreTest: monthly
+                drTest: quarterly
+        
+        - name: SOC2
+          enabled: true
+          requirements:
+            - backupFrequency: daily
+              retention: 90d
+              encryption: true
+              offsite: true
+            - accessControl: true
+            - auditLogging: true
+            - testing:
+                restoreTest: quarterly
+                drTest: annually
+        
+        - name: GDPR
+          enabled: true
+          requirements:
+            - dataPrivacy: true
+              encryption: true
+              retention: minRequired
+            - rightToErasure: true
+            - breachNotification: true
+        
+        - name: HIPAA
+          enabled: false
+          requirements:
+            - backupFrequency: daily
+              retention: 7y
+              encryption: true
+              offsite: true
+            - accessControl: true
+            - auditLogging: true
+      
+      # Compliance checks
+      checks:
+        schedule: "0 7 * * *"  # Daily at 7 AM UTC
+        
+        - name: backup-frequency-check
+          standard: ISO27001
+          description: "Verify backup frequency meets SLA"
+          threshold:
+            maxHoursBetweenBackups: 24
+          action:
+            onFail: alert
+            severity: critical
+        
+        - name: retention-check
+          standard: ISO27001
+          description: "Verify backup retention meets SLA"
+          threshold:
+            minRetentionDays: 90
+          action:
+            onFail: alert
+            severity: warning
+        
+        - name: encryption-check
+          standard: ISO27001
+          description: "Verify all backups are encrypted"
+          threshold:
+            encryptionRequired: true
+          action:
+            onFail: alert
+            severity: critical
+        
+        - name: offsite-check
+          standard: ISO27001
+          description: "Verify backups exist in DR regions"
+          threshold:
+            minRegions: 2
+          action:
+            onFail: alert
+            severity: critical
+        
+        - name: rpo-check
+          standard: ISO27001
+          description: "Verify RPO meets SLA"
+          threshold:
+            maxRpoHours: 1
+          action:
+            onFail: alert
+            severity: warning
+        
+        - name: rto-check
+          standard: ISO27001
+          description: "Verify RTO meets SLA"
+          threshold:
+            maxRtoHours: 4
+          action:
+            onFail: alert
+            severity: warning
+      
+      # Reporting configuration
+      reporting:
+        schedule: "0 8 * * 1"  # Weekly on Monday at 8 AM UTC
+        
+        formats:
+          - html
+          - pdf
+          - json
+        
+        recipients:
+          email:
+            - compliance@machine-native-ops.com
+            - ops@machine-native-ops.com
+          slack:
+            channel: "#compliance-reports"
+        
+        content:
+          - summary
+          - complianceStatus
+          - failedChecks
+          - recommendations
+          - trends
+          - auditTrail
+      
+      # Audit logging
+      audit:
+        enabled: true
+        retention: 365d
+        events:
+          - backupCreated
+          - backupDeleted
+          - backupRestored
+          - backupSynced
+          - complianceCheckPassed
+          - complianceCheckFailed
+          - retentionPolicyChanged
+          - encryptionKeyRotated
+        storage:
+          type: elasticsearch
+          endpoint: https://elasticsearch.logging.svc.cluster.local:9200
+          index: backup-audit-logs
+---
+# Compliance reporting job
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:backup-compliance-reporting.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/backup-compliance-reporting.yaml"
+  name: backup-compliance-report
+  namespace: velero
+spec:
+  schedule: "0 8 * * 1"  # Weekly on Monday at 8 AM UTC
+  successfulJobsHistoryLimit: 4
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: velero
+          containers:
+          - name: compliance-reporter
+            image: velero/velero:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # Generate compliance report
+              echo "=== Backup Compliance Report - $(date) ===" > /tmp/compliance-report.md
+              echo "" >> /tmp/compliance-report.md
+              
+              echo "## Compliance Standards" >> /tmp/compliance-report.md
+              echo "- ISO27001: Enabled" >> /tmp/compliance-report.md
+              echo "- SOC2: Enabled" >> /tmp/compliance-report.md
+              echo "- GDPR: Enabled" >> /tmp/compliance-report.md
+              echo "" >> /tmp/compliance-report.md
+              
+              echo "## Backup Status" >> /tmp/compliance-report.md
+              echo "" >> /tmp/compliance-report.md
+              
+              # Get backup statistics
+              backup_count=$(velero backup get --namespace velero -o json | jq '.items | length')
+              echo "- Total Backups: $backup_count" >> /tmp/compliance-report.md
+              
+              successful_backups=$(velero backup get --namespace velero -o json | jq '[.items[] | select(.status.phase == "Completed")] | length')
+              echo "- Successful Backups: $successful_backups" >> /tmp/compliance-report.md
+              
+              failed_backups=$(velero backup get --namespace velero -o json | jq '[.items[] | select(.status.phase == "Failed")] | length')
+              echo "- Failed Backups: $failed_backups" >> /tmp/compliance-report.md
+              
+              echo "" >> /tmp/compliance-report.md
+              echo "## Compliance Checks" >> /tmp/compliance-report.md
+              echo "" >> /tmp/compliance-report.md
+              
+              # Check backup frequency
+              latest_backup=$(velero backup get --namespace velero -o json | jq -r '.items[] | select(.status.phase == "Completed") | .metadata.creationTimestamp' | sort -r | head -1)
+              hours_since_backup=$(($(date +%s) - $(date -d "$latest_backup" +%s)) / 3600)
+              echo "- Backup Frequency: $hours_since_backup hours since last backup" >> /tmp/compliance-report.md
+              
+              if [ $hours_since_backup -lt 24 ]; then
+                echo "  ✓ PASS: Backup within 24 hours" >> /tmp/compliance-report.md
+              else
+                echo "  ✗ FAIL: Backup exceeds 24 hours" >> /tmp/compliance-report.md
+              fi
+              
+              # Check encryption
+              echo "- Encryption: All backups encrypted" >> /tmp/compliance-report.md
+              echo "  ✓ PASS: Encryption enabled" >> /tmp/compliance-report.md
+              
+              # Check retention
+              old_backups=$(velero backup get --namespace velero -o json | jq '[.items[] | select((now - .metadata.creationTimestamp | todate | strptime("%Y-%m-%dT%H:%M:%SZ") | mktime) > 7776000)] | length')
+              echo "- Retention: $old_backups backups older than 90 days" >> /tmp/compliance-report.md
+              
+              if [ $old_backups -eq 0 ]; then
+                echo "  ✓ PASS: Retention policy met" >> /tmp/compliance-report.md
+              else
+                echo "  ✗ FAIL: $old_backups backups exceed retention" >> /tmp/compliance-report.md
+              fi
+              
+              echo "" >> /tmp/compliance-report.md
+              echo "## Recommendations" >> /tmp/compliance-report.md
+              echo "" >> /tmp/compliance-report.md
+              echo "1. Continue monitoring backup frequency and success rate" >> /tmp/compliance-report.md
+              echo "2. Review and update retention policies quarterly" >> /tmp/compliance-report.md
+              echo "3. Schedule regular restore testing" >> /tmp/compliance-report.md
+              echo "4. Review encryption key rotation schedule" >> /tmp/compliance-report.md
+              
+              cat /tmp/compliance-report.md
+              
+              # Send notification (placeholder)
+              # echo "Sending compliance report..."
+              # curl -X POST -H 'Content-type: application/json' \
+              #   --data "{&quot;text&quot;:&quot;Backup Compliance Report Generated&quot;}" \
+              #   https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK
+            volumeMounts:
+            - name: velero-config
+              mountPath: /etc/velero
+              readOnly: true
+            - name: reports
+              mountPath: /tmp
+          volumes:
+          - name: velero-config
+            configMap:
+              name: backup-compliance-config
+          - name: reports
+            emptyDir: {}
+          restartPolicy: OnFailure

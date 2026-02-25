@@ -1,0 +1,150 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: change-request.schema
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+---
+version: "1.0.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:schemas:change-request.schema.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/schemas/change-request.schema.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+$schema: "http://json-schema.org/draft-07/schema#"
+title: "Change Request Schema"
+description: "Schema for governance change requests"
+type: object
+required:
+  - change_id
+  - type
+  - requester
+  - title
+  - risk_level
+properties:
+  change_id:
+    type: string
+    description: "Unique change identifier"
+    pattern: "^CHG-\\d{4}-\\d{3}$"
+  
+  type:
+    type: string
+    description: "Type of change"
+    enum:
+      - "standard"
+      - "normal"
+      - "emergency"
+  
+  requester:
+    type: string
+    description: "User or team requesting the change"
+    pattern: "^[a-z0-9-]+@[a-z0-9-]+\\.[a-z]{2,}$|^[a-z0-9-]+$"
+  
+  title:
+    type: string
+    description: "Brief title of the change"
+    minLength: 10
+    maxLength: 200
+  
+  description:
+    type: string
+    description: "Detailed description of the change"
+    minLength: 50
+  
+  risk_level:
+    type: string
+    enum: ["critical", "high", "medium", "low"]
+  
+  impact_assessment:
+    type: object
+    properties:
+      services_affected:
+        type: array
+        items:
+          type: string
+      
+      downtime_expected:
+        type: string
+      
+      data_impact:
+        type: string
+        enum: ["none", "low", "medium", "high"]
+  
+  approval:
+    type: object
+    properties:
+      method:
+        type: string
+        enum: ["auto", "cab", "manager"]
+      
+      status:
+        type: string
+        enum: ["pending", "approved", "rejected", "conditional"]
+      
+      approvers:
+        type: array
+        items:
+          type: string
+  
+  implementation_plan:
+    type: object
+    properties:
+      steps:
+        type: array
+        items:
+          type: object
+          required:
+            - step_number
+            - description
+            - owner
+          properties:
+            step_number:
+              type: integer
+            description:
+              type: string
+            owner:
+              type: string
+            estimated_duration:
+              type: string
+      
+      start_time:
+        type: string
+        format: "date-time"
+      
+      end_time:
+        type: string
+        format: "date-time"
+  
+  rollback_plan:
+    type: object
+    properties:
+      steps:
+        type: array
+        items:
+          type: string
+      
+      automated:
+        type: boolean
+        default: false
+  
+  metrics:
+    type: object
+    properties:
+      kpi:
+        type: array
+        items:
+          type: string
+      
+      audit:
+        type: object
+        properties:
+          log_enabled:
+            type: boolean
+          reviewer:
+            type: string

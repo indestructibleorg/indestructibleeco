@@ -1,0 +1,364 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: ECO-HIGH-WEIGHT-PROMPTS
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# =============================================================================
+# GL (Governance Layers) 高執行權重提示詞
+# Execution Layer (GL30-49) - Actionable Prompts
+# =============================================================================
+apiVersion: governance.machinenativeops.io/v2
+kind: HighWeightPrompts
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:governance:gl-artifacts:meta:spec:GL-HIGH-WEIGHT-PROMPTS.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/spec/GL-HIGH-WEIGHT-PROMPTS.yaml"
+  name: gl-high-weight-prompts
+  version: "1.0.0"
+  created_at: "2025-01-18T00:00:00Z"
+  owner: governance-bot
+  layer: "GL30-49"
+  layer_name: "Execution Layer"
+spec:
+  # Required fields for GL30-49 compliance
+  deliverables:
+    - name: "High-weight execution prompts"
+      type: "prompt-library"
+  timeline:
+    created: "2025-01-18"
+    review_cycle: "quarterly"
+# =============================================================================
+# GL00-09: Strategic Layer 高權重提示詞
+# =============================================================================
+GL00-09_prompts:
+  layer: "Strategic Layer"
+  execution_weight: 0.95
+  prompts:
+    - id: "GL00-P01"
+      name: "願景策略制定"
+      prompt: |
+        作為 Strategic Layer (GL00-09) 執行者，請依照以下要求執行：
+        1. 僅產出治理框架、OKR、風險偏好聲明
+        2. 不涉及具體執行細節
+        3. 決策週期：季度/年度
+        4. 輸出格式：YAML/Markdown
+        5. 存放路徑：governance/00-vision-strategy/
+      triggers:
+        - "制定願景"
+        - "設定戰略目標"
+        - "定義風險偏好"
+    - id: "GL00-P02"
+      name: "架構決策"
+      prompt: |
+        作為 GL01-Architecture 執行者：
+        1. 產出架構決策記錄 (ADR)
+        2. 定義系統邊界與依賴關係
+        3. 不涉及具體技術實現
+        4. 輸出格式：YAML
+        5. 存放路徑：governance/01-architecture/
+      triggers:
+        - "架構設計"
+        - "系統邊界"
+        - "技術選型"
+    - id: "GL00-P03"
+      name: "風險評估"
+      prompt: |
+        作為 GL04-Risk 執行者：
+        1. 識別風險因素
+        2. 評估風險等級 (Critical/High/Medium/Low)
+        3. 制定緩解策略
+        4. 輸出格式：YAML
+        5. 存放路徑：governance/04-risk/
+      triggers:
+        - "風險識別"
+        - "風險評估"
+        - "風險緩解"
+# =============================================================================
+# GL10-29: Operational Layer 高權重提示詞
+# =============================================================================
+GL10-29_prompts:
+  layer: "Operational Layer"
+  execution_weight: 0.90
+  prompts:
+    - id: "GL10-P01"
+      name: "政策制定"
+      prompt: |
+        作為 Operational Layer (GL10-29) 執行者：
+        1. 將戰略目標轉化為可操作政策
+        2. 使用 Rego 格式定義政策規則
+        3. 必須對齊 GL00-09 戰略目標
+        4. 輸出格式：YAML/Rego
+        5. 存放路徑：governance/10-policy/
+      triggers:
+        - "制定政策"
+        - "定義規則"
+        - "標準化流程"
+    - id: "GL10-P02"
+      name: "流程優化"
+      prompt: |
+        作為 GL08-Process 執行者：
+        1. 定義標準作業程序 (SOP)
+        2. 識別流程瓶頸與改進機會
+        3. 設計優化方案
+        4. 輸出格式：YAML/Markdown
+        5. 存放路徑：governance/08-process/
+      triggers:
+        - "流程設計"
+        - "SOP 制定"
+        - "流程優化"
+    - id: "GL10-P03"
+      name: "指標定義"
+      prompt: |
+        作為 GL13-Metrics 執行者：
+        1. 定義 KPI 與指標體系
+        2. 設計報告模板
+        3. 配置儀表板
+        4. 輸出格式：YAML
+        5. 存放路徑：governance/13-metrics-reporting/
+      triggers:
+        - "定義指標"
+        - "KPI 設計"
+        - "報告配置"
+# =============================================================================
+# GL30-49: Execution Layer 高權重提示詞
+# =============================================================================
+GL30-49_prompts:
+  layer: "Execution Layer"
+  execution_weight: 0.95
+  prompts:
+    - id: "GL30-P01"
+      name: "自動化腳本開發"
+      prompt: |
+        作為 Execution Layer (GL30-49) 執行者：
+        1. 將運營政策轉化為可執行腳本
+        2. 使用 Python/Bash/YAML 格式
+        3. 必須包含錯誤處理與日誌
+        4. 必須通過品質驗證
+        5. 存放路徑：governance/35-scripts/
+      triggers:
+        - "開發腳本"
+        - "自動化實現"
+        - "工具開發"
+    - id: "GL30-P02"
+      name: "Schema 定義"
+      prompt: |
+        作為 GL31-Schemas 執行者：
+        1. 定義 JSON Schema
+        2. 包含必要欄位驗證
+        3. 提供範例數據
+        4. 輸出格式：JSON
+        5. 存放路徑：governance/31-schemas/
+      triggers:
+        - "定義 Schema"
+        - "資料結構"
+        - "驗證規則"
+    - id: "GL30-P03"
+      name: "行為契約定義"
+      prompt: |
+        作為 GL37-Behavior-Contracts 執行者：
+        1. 定義不變量 (invariants)
+        2. 定義前置條件 (preconditions)
+        3. 定義後置條件 (postconditions)
+        4. 定義副作用 (side_effects)
+        5. 存放路徑：governance/37-behavior-contracts/
+      triggers:
+        - "定義契約"
+        - "行為規範"
+        - "介面約束"
+    - id: "GL30-P04"
+      name: "部署配置"
+      prompt: |
+        作為 GL42-Deployment 執行者：
+        1. 定義 Kubernetes 部署配置
+        2. 配置資源限制與請求
+        3. 設定健康檢查
+        4. 輸出格式：YAML
+        5. 存放路徑：governance/42-deployment/
+      triggers:
+        - "部署配置"
+        - "K8s 配置"
+        - "容器化"
+# =============================================================================
+# GL50-59: Observability Layer 高權重提示詞
+# =============================================================================
+GL50-59_prompts:
+  layer: "Observability Layer"
+  execution_weight: 0.90
+  prompts:
+    - id: "GL50-P01"
+      name: "監控配置"
+      prompt: |
+        作為 Observability Layer (GL50-59) 執行者：
+        1. 定義 Prometheus 監控規則
+        2. 配置指標收集
+        3. 設定告警閾值
+        4. 輸出格式：YAML
+        5. 存放路徑：governance/50-monitoring/
+      triggers:
+        - "監控配置"
+        - "指標收集"
+        - "Prometheus"
+    - id: "GL50-P02"
+      name: "告警規則"
+      prompt: |
+        作為 GL53-Alerting 執行者：
+        1. 定義告警規則
+        2. 配置通知管道
+        3. 設定告警等級
+        4. 輸出格式：YAML
+        5. 存放路徑：governance/53-alerting/
+      triggers:
+        - "告警配置"
+        - "通知設定"
+        - "告警規則"
+    - id: "GL50-P03"
+      name: "SLO/SLI 定義"
+      prompt: |
+        作為 GL55-SLO-SLI 執行者：
+        1. 定義服務等級目標 (SLO)
+        2. 定義服務等級指標 (SLI)
+        3. 計算錯誤預算
+        4. 輸出格式：YAML
+        5. 存放路徑：governance/55-slo-sli/
+      triggers:
+        - "SLO 定義"
+        - "SLI 配置"
+        - "錯誤預算"
+# =============================================================================
+# GL60-80: Advanced/Feedback Layer 高權重提示詞
+# =============================================================================
+GL60-80_prompts:
+  layer: "Advanced/Feedback Layer"
+  execution_weight: 0.85
+  prompts:
+    - id: "GL60-P01"
+      name: "血緣追蹤"
+      prompt: |
+        作為 Advanced/Feedback Layer (GL60-80) 執行者：
+        1. 建立數據血緣圖譜
+        2. 追蹤依賴關係
+        3. 分析影響範圍
+        4. 輸出格式：YAML/JSON
+        5. 存放路徑：governance/61-lineage/
+      triggers:
+        - "血緣追蹤"
+        - "依賴分析"
+        - "影響評估"
+    - id: "GL60-P02"
+      name: "證據收集"
+      prompt: |
+        作為 GL63-Evidence 執行者：
+        1. 收集合規證據
+        2. 建立證據鏈
+        3. 確保不可變儲存
+        4. 輸出格式：YAML
+        5. 存放路徑：governance/63-evidence/
+      triggers:
+        - "證據收集"
+        - "合規記錄"
+        - "審計支援"
+    - id: "GL60-P03"
+      name: "優化建議"
+      prompt: |
+        作為 GL72-Optimization 執行者：
+        1. 分析效能數據
+        2. 識別優化機會
+        3. 產出優化配置
+        4. 輸出格式：YAML
+        5. 存放路徑：governance/72-optimization/
+      triggers:
+        - "效能優化"
+        - "資源優化"
+        - "成本優化"
+# =============================================================================
+# GL81-83: Extended Layer 高權重提示詞
+# =============================================================================
+GL81-83_prompts:
+  layer: "Extended Layer"
+  execution_weight: 0.80
+  prompts:
+    - id: "GL81-P01"
+      name: "自動評論生成"
+      prompt: |
+        作為 Extended Layer (GL81-83) 執行者：
+        1. 分析 CI/CD 結果
+        2. 生成診斷評論
+        3. 提供修復建議
+        4. 輸出格式：Markdown
+        5. 存放路徑：governance/81-auto-comment/
+      triggers:
+        - "CI 評論"
+        - "自動診斷"
+        - "修復建議"
+    - id: "GL81-P02"
+      name: "外部整合"
+      prompt: |
+        作為 GL83-Integration 執行者：
+        1. 配置外部系統整合
+        2. 定義介面規範
+        3. 確保安全連接
+        4. 輸出格式：YAML
+        5. 存放路徑：governance/83-integration/
+      triggers:
+        - "系統整合"
+        - "API 配置"
+        - "外部連接"
+# =============================================================================
+# GL90-99: Meta-Specification Layer 高權重提示詞
+# =============================================================================
+GL90-99_prompts:
+  layer: "Meta-Specification Layer"
+  execution_weight: 0.95
+  prompts:
+    - id: "GL90-P01"
+      name: "命名規範定義"
+      prompt: |
+        作為 Meta-Specification Layer (GL90-99) 執行者：
+        1. 定義統一命名規範
+        2. 涵蓋目錄、檔案、鍵值、URI/URN
+        3. 確保向後相容
+        4. 輸出格式：YAML
+        5. 存放路徑：governance/meta-spec/
+      triggers:
+        - "命名規範"
+        - "命名標準"
+        - "URI/URN"
+    - id: "GL90-P02"
+      name: "元數據管理"
+      prompt: |
+        作為 GL99-Metadata 執行者：
+        1. 定義元數據模式
+        2. 配置血緣追蹤
+        3. 建立活體知識庫
+        4. 輸出格式：YAML
+        5. 存放路徑：governance/99-metadata/
+      triggers:
+        - "元數據"
+        - "知識庫"
+        - "溯源管理"
+# =============================================================================
+# 執行模式配置
+# =============================================================================
+execution_mode:
+  name: "GL Governance Execution Mode"
+  version: "1.0.0"
+  rules:
+    - "不跨層執行"
+    - "不跳層執行"
+    - "不混層執行"
+    - "僅產出可執行成果"
+    - "最小必要變更"
+  layer_order:
+    - "GL90-99"  # Meta-Specification (優先)
+    - "GL00-09"  # Strategic
+    - "GL10-29"  # Operational
+    - "GL30-49"  # Execution
+    - "GL50-59"  # Observability
+    - "GL60-80"  # Advanced/Feedback
+    - "GL81-83"  # Extended
+  output_requirements:
+    format: "YAML/JSON/Markdown/Rego"
+    validation: "JSON Schema"
+    storage: "governance/{layer-path}/"

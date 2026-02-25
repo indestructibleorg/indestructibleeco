@@ -1,0 +1,81 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLBackwardReconciliationMechanism
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:backward-reconciliation-mechanism.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/backward-reconciliation-mechanism.yaml"
+  name: backward-reconciliation-mechanism
+  version: "1.0.0"
+  created: "2026-01-21"
+  layer: "GL60-80"
+reconciliation_system:
+  name: "Backward Reconciliation Mechanism"
+  description: "Rigid adjustment mechanism for governance loop"
+reconciliation_strategies:
+  - strategy_id: "STRAT-1"
+    name: "Semantic Maximization"
+    name_zh: "語意極大化"
+    trigger: "Semantic conflict detected"
+    actions:
+      - "Trace decision back to source"
+      - "Apply maximum semantic alignment"
+      - "Update semantic boundaries"
+    priority: "CRITICAL"
+    semantic_boundary: "urn:machinenativeops:gl:recon:semantic-max:1.0.0"
+  - strategy_id: "STRAT-2"
+    name: "Governance Violation"
+    name_zh: "治理違規"
+    trigger: "Governance rule violation detected"
+    actions:
+      - "Trace violation to origin"
+      - "Apply corrective measures"
+      - "Update governance policies"
+    priority: "CRITICAL"
+    semantic_boundary: "urn:machinenativeops:gl:recon:governance-violation:1.0.0"
+  - strategy_id: "STRAT-3"
+    name: "Semantic Conflict"
+    name_zh: "語意衝突"
+    trigger: "Semantic boundary conflict detected"
+    actions:
+      - "Identify conflicting boundaries"
+      - "Apply resolution strategy"
+      - "Update semantic mappings"
+    priority: "HIGH"
+    semantic_boundary: "urn:machinenativeops:gl:recon:semantic-conflict:1.0.0"
+  - strategy_id: "STRAT-4"
+    name: "Validation Failure"
+    name_zh: "驗證失敗"
+    trigger: "Validation check failure"
+    actions:
+      - "Trace failure to source"
+      - "Apply fixes"
+      - "Re-run validation"
+    priority: "HIGH"
+    semantic_boundary: "urn:machinenativeops:gl:recon:validation-failure:1.0.0"
+traceback_mechanisms:
+  - mechanism_id: "TRACE-1"
+    name: "Decision Traceback"
+    description: "Trace decisions back to their origin"
+    capability: "Full decision history"
+  - mechanism_id: "TRACE-2"
+    name: "Semantic Root Traceback"
+    description: "Trace semantic root changes"
+    capability: "Semantic root version history"
+priority_queue:
+  enabled: true
+  capacity: "10K"
+  processing_order: "Priority-based"
+  metrics:
+    average_wait_time: "< 10s"
+    max_wait_time: "< 30s"
+    throughput: "1000 events/sec"
+integration_points:
+  - "GL50-59: Validation Failures"
+  - "GL30-49: Execution Feedback"
+  - "GL90-99: Semantic Root Updates"
+activation_status: "ACTIVE"

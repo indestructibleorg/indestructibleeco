@@ -1,0 +1,165 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1alpha1
+kind: NamingPolicy
+metadata:
+  name: api-naming-standard
+  description: "RESTful API 端点和资源的命名规范"
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    category: "api"
+    team: "backend"
+  annotations:
+    version: "v1.0.0"
+    lastReviewed: "2025-12-17"
+
+spec:
+  # API 端点命名规范
+  pattern: "/api/v{{ .version }}/{{ .resource }}"
+
+  schemaRef: "schemas/api-naming.schema.yaml"
+
+  validation:
+    description: |
+      API 命名规范：
+      - 使用复数名词表示资源集合
+      - 使用小写字母和连字符
+      - 版本号使用 v1, v2 等格式
+      - RESTful 设计原则
+
+  rules:
+    # 资源命名规则
+    resourceNaming:
+      - rule: "使用复数名词"
+        valid: ["/api/v1/users", "/api/v1/orders", "/api/v1/products"]
+        invalid: ["/api/v1/user", "/api/v1/order"]
+
+      - rule: "使用小写和连字符"
+        valid: ["/api/v1/user-profiles", "/api/v1/shopping-carts"]
+        invalid: ["/api/v1/UserProfiles", "/api/v1/shopping_carts"]
+
+      - rule: "避免动词"
+        valid: ["/api/v1/users", "POST /api/v1/orders"]
+        invalid: ["/api/v1/get-users", "/api/v1/create-order"]
+        exception: "特殊操作可使用动词，如 /api/v1/users/:id/activate"
+
+    # HTTP 方法规范
+    httpMethods:
+      - method: "GET"
+        usage: "获取资源"
+        examples:
+          - "GET /api/v1/users - 获取用户列表"
+          - "GET /api/v1/users/:id - 获取特定用户"
+
+      - method: "POST"
+        usage: "创建资源"
+        examples:
+          - "POST /api/v1/users - 创建新用户"
+
+      - method: "PUT"
+        usage: "完全更新资源"
+        examples:
+          - "PUT /api/v1/users/:id - 完全更新用户"
+
+      - method: "PATCH"
+        usage: "部分更新资源"
+        examples:
+          - "PATCH /api/v1/users/:id - 部分更新用户"
+
+      - method: "DELETE"
+        usage: "删除资源"
+        examples:
+          - "DELETE /api/v1/users/:id - 删除用户"
+
+    # 版本管理
+    versioning:
+      strategy: "URL path versioning"
+      pattern: "/api/v{major}/"
+      deprecationPolicy: "支持 N-1 版本，提前 6 个月通知"
+      examples:
+        - "/api/v1/users"
+        - "/api/v2/users"
+
+    # 查询参数规范
+    queryParameters:
+      naming: "camelCase"
+      examples:
+        pagination:
+          - "?page=1&pageSize=20"
+          - "?limit=20&offset=0"
+        filtering:
+          - "?status=active&role=admin"
+          - "?createdAfter=2025-01-01"
+        sorting:
+          - "?sort=createdAt&order=desc"
+          - "?sortBy=name&direction=asc"
+        searching:
+          - "?q=search+term"
+          - "?search=keyword"
+
+  examples:
+    valid:
+      - endpoint: "GET /api/v1/users"
+        description: "获取用户列表"
+
+      - endpoint: "GET /api/v1/users/:id"
+        description: "获取特定用户"
+
+      - endpoint: "POST /api/v1/users"
+        description: "创建新用户"
+
+      - endpoint: "PUT /api/v1/users/:id"
+        description: "完全更新用户"
+
+      - endpoint: "DELETE /api/v1/users/:id"
+        description: "删除用户"
+
+      - endpoint: "POST /api/v1/users/:id/activate"
+        description: "激活用户（特殊操作）"
+
+      - endpoint: "GET /api/v1/orders?status=pending&sort=createdAt"
+        description: "获取待处理订单，按创建时间排序"
+
+    invalid:
+      - endpoint: "GET /api/v1/getUsers"
+        reason: "使用了动词，应使用 HTTP 方法表达动作"
+        fix: "GET /api/v1/users"
+
+      - endpoint: "GET /api/v1/user/:id"
+        reason: "使用单数名词"
+        fix: "GET /api/v1/users/:id"
+
+      - endpoint: "GET /api/v1/UserProfiles"
+        reason: "使用大写字母"
+        fix: "GET /api/v1/user-profiles"
+
+      - endpoint: "POST /api/v1/create_user"
+        reason: "使用动词和下划线"
+        fix: "POST /api/v1/users"
+
+  enforcement:
+    level: "warning"
+    scope:
+      - "backend-services"
+      - "api-gateway"
+    tools:
+      - "openapi-linter"
+      - "api-spec-validator"
+
+  metadata:
+    version: "v1.0.0"
+    owner: "backend-team"
+    reviewDate: "2025-12-17"
+    nextReviewDate: "2026-06-17"
+
+  references:
+    - title: "RESTful API Design Best Practices"
+      url: "https://restfulapi.net/"
+    - title: "Microsoft REST API Guidelines"
+      url: "https://github.com/microsoft/api-guidelines"
+    - title: "Google API Design Guide"
+      url: "https://cloud.google.com/apis/design"

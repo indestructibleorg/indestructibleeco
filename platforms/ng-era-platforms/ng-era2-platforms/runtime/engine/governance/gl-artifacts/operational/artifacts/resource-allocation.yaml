@@ -1,0 +1,350 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: resource-allocation
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# =============================================================================
+# GL10-29 Operational Layer - Resource Allocation
+# MachineNativeOps Governance Artifact
+# =============================================================================
+apiVersion: governance.machinenativeops.io/v2
+kind: ResourceAllocation
+metadata:
+  name: machinenativeops-resource-allocation-2025
+  version: "1.0.0"
+  created_at: "2025-01-18T00:00:00Z"
+  updated_at: "2025-01-18T00:00:00Z"
+  owner: operations-team
+  layer: "GL10-29"
+  tags:
+    - operational
+    - resources
+    - allocation
+  annotations:
+    governance.machinenativeops.io/fiscal-year: "FY2025"
+    governance.machinenativeops.io/approval-status: "approved"
+spec:
+  # Required fields for GL10-29 compliance
+  objectives:
+    - "支援GL架構完善"
+    - "支援CI/CD整合"
+  resources:
+    total_budget: 2000000
+    currency: "USD"
+  timeline:
+    fiscal_year: "FY2025"
+    start: "2025-01-01"
+    end: "2025-12-31"
+  allocation:
+    fiscal_year: "FY2025"
+    total_budget: 2000000
+    currency: "USD"
+  budget_allocation:
+    by_layer:
+      - layer_id: "GL00-09"
+        layer_name: "Strategic Layer"
+        allocation: 100000
+        percentage: 5
+        justification: "戰略規劃與治理委員會運作"
+      - layer_id: "GL10-29"
+        layer_name: "Operational Layer"
+        allocation: 400000
+        percentage: 20
+        justification: "運營管理、流程優化與資源調度"
+      - layer_id: "GL30-49"
+        layer_name: "Execution Layer"
+        allocation: 800000
+        percentage: 40
+        justification: "產品開發、技術實現與交付"
+      - layer_id: "GL50-59"
+        layer_name: "Observability Layer"
+        allocation: 300000
+        percentage: 15
+        justification: "監控系統、審計追蹤與報告"
+      - layer_id: "GL60-80"
+        layer_name: "Advanced/Feedback Layer"
+        allocation: 200000
+        percentage: 10
+        justification: "數據分析、優化與回饋機制"
+      - layer_id: "GL81-83"
+        layer_name: "Extended Layer"
+        allocation: 100000
+        percentage: 5
+        justification: "創新探索與外部合作"
+      - layer_id: "GL90-99"
+        layer_name: "Meta-Specification Layer"
+        allocation: 100000
+        percentage: 5
+        justification: "標準制定與規格管理"
+    by_category:
+      - category: "人力資源"
+        allocation: 1400000
+        percentage: 70
+        breakdown:
+          - item: "薪資與福利"
+            amount: 1200000
+          - item: "招聘費用"
+            amount: 100000
+          - item: "培訓發展"
+            amount: 100000
+      - category: "基礎設施"
+        allocation: 300000
+        percentage: 15
+        breakdown:
+          - item: "雲端服務"
+            amount: 200000
+          - item: "開發工具"
+            amount: 50000
+          - item: "安全工具"
+            amount: 50000
+      - category: "運營支出"
+        allocation: 200000
+        percentage: 10
+        breakdown:
+          - item: "軟體授權"
+            amount: 100000
+          - item: "專業服務"
+            amount: 50000
+          - item: "差旅費用"
+            amount: 50000
+      - category: "預備金"
+        allocation: 100000
+        percentage: 5
+        breakdown:
+          - item: "應急預備"
+            amount: 50000
+          - item: "機會投資"
+            amount: 50000
+  headcount_allocation:
+    total_headcount: 50
+    by_layer:
+      - layer_id: "GL00-09"
+        headcount: 3
+        roles:
+          - role: "Chief Governance Officer"
+            count: 1
+            level: "executive"
+          - role: "Strategy Analyst"
+            count: 2
+            level: "senior"
+      - layer_id: "GL10-29"
+        headcount: 8
+        roles:
+          - role: "Operations Director"
+            count: 1
+            level: "director"
+          - role: "Operations Manager"
+            count: 2
+            level: "manager"
+          - role: "Process Engineer"
+            count: 3
+            level: "senior"
+          - role: "Resource Coordinator"
+            count: 2
+            level: "standard"
+      - layer_id: "GL30-49"
+        headcount: 25
+        roles:
+          - role: "Engineering Manager"
+            count: 2
+            level: "manager"
+          - role: "Senior Engineer"
+            count: 8
+            level: "senior"
+          - role: "Software Engineer"
+            count: 10
+            level: "standard"
+          - role: "QA Engineer"
+            count: 3
+            level: "standard"
+          - role: "Technical Writer"
+            count: 2
+            level: "standard"
+      - layer_id: "GL50-59"
+        headcount: 6
+        roles:
+          - role: "Observability Lead"
+            count: 1
+            level: "senior"
+          - role: "SRE Engineer"
+            count: 3
+            level: "senior"
+          - role: "Compliance Analyst"
+            count: 2
+            level: "standard"
+      - layer_id: "GL60-80"
+        headcount: 4
+        roles:
+          - role: "Data Scientist"
+            count: 2
+            level: "senior"
+          - role: "ML Engineer"
+            count: 2
+            level: "senior"
+      - layer_id: "GL81-83"
+        headcount: 2
+        roles:
+          - role: "Innovation Lead"
+            count: 1
+            level: "senior"
+          - role: "Partnership Manager"
+            count: 1
+            level: "standard"
+      - layer_id: "GL90-99"
+        headcount: 2
+        roles:
+          - role: "Standards Architect"
+            count: 1
+            level: "principal"
+          - role: "Governance Engineer"
+            count: 1
+            level: "senior"
+  infrastructure_allocation:
+    compute:
+      - provider: "AWS"
+        service: "EC2"
+        allocation:
+          - environment: "production"
+            instances: 20
+            type: "m5.xlarge"
+          - environment: "staging"
+            instances: 10
+            type: "m5.large"
+          - environment: "development"
+            instances: 15
+            type: "t3.medium"
+    storage:
+      - provider: "AWS"
+        service: "S3"
+        allocation:
+          - bucket: "governance-artifacts"
+            capacity: "500GB"
+            tier: "standard"
+          - bucket: "audit-logs"
+            capacity: "1TB"
+            tier: "infrequent-access"
+          - bucket: "backups"
+            capacity: "2TB"
+            tier: "glacier"
+    database:
+      - provider: "AWS"
+        service: "RDS"
+        allocation:
+          - instance: "governance-db"
+            type: "db.r5.large"
+            storage: "500GB"
+          - instance: "metrics-db"
+            type: "db.r5.xlarge"
+            storage: "1TB"
+    networking:
+      - provider: "AWS"
+        service: "VPC"
+        allocation:
+          - vpc: "production-vpc"
+            cidr: "10.0.0.0/16"
+          - vpc: "staging-vpc"
+            cidr: "10.1.0.0/16"
+  tool_allocation:
+    development:
+      - tool: "GitHub Enterprise"
+        licenses: 60
+        cost_per_license: 21
+        annual_cost: 15120
+      - tool: "JetBrains All Products"
+        licenses: 30
+        cost_per_license: 649
+        annual_cost: 19470
+      - tool: "Figma"
+        licenses: 10
+        cost_per_license: 180
+        annual_cost: 1800
+    operations:
+      - tool: "Datadog"
+        tier: "enterprise"
+        hosts: 50
+        annual_cost: 60000
+      - tool: "PagerDuty"
+        licenses: 20
+        cost_per_license: 29
+        annual_cost: 6960
+      - tool: "Slack"
+        licenses: 60
+        cost_per_license: 15
+        annual_cost: 10800
+    security:
+      - tool: "Snyk"
+        tier: "team"
+        developers: 30
+        annual_cost: 12000
+      - tool: "HashiCorp Vault"
+        tier: "enterprise"
+        annual_cost: 25000
+  allocation_rules:
+    approval_thresholds:
+      - amount_range: "0-10000"
+        approver: "team_lead"
+      - amount_range: "10001-50000"
+        approver: "department_head"
+      - amount_range: "50001-200000"
+        approver: "operations_director"
+      - amount_range: "200001+"
+        approver: "governance_committee"
+    reallocation_policy:
+      - rule: "跨層級調撥需經運營總監批准"
+        threshold: 10000
+      - rule: "季度內調撥不得超過原預算20%"
+        threshold_percentage: 20
+      - rule: "緊急調撥需48小時內補辦審批"
+        emergency: true
+    tracking_requirements:
+      - requirement: "月度預算執行報告"
+        frequency: "monthly"
+        owner: "finance_team"
+      - requirement: "季度資源利用分析"
+        frequency: "quarterly"
+        owner: "operations_team"
+      - requirement: "年度預算審計"
+        frequency: "annual"
+        owner: "audit_team"
+  utilization_targets:
+    budget:
+      - quarter: "Q1"
+        target_utilization: 25
+        actual_utilization: 0
+        variance: 0
+      - quarter: "Q2"
+        target_utilization: 50
+        actual_utilization: 0
+        variance: 0
+      - quarter: "Q3"
+        target_utilization: 75
+        actual_utilization: 0
+        variance: 0
+      - quarter: "Q4"
+        target_utilization: 95
+        actual_utilization: 0
+        variance: 0
+    headcount:
+      target_fill_rate: 95
+      current_fill_rate: 85
+      open_positions: 8
+    infrastructure:
+      target_utilization: 70
+      current_utilization: 55
+      optimization_opportunities:
+        - "右調整開發環境實例大小"
+        - "實施自動擴縮容"
+        - "優化儲存層級配置"
+status:
+  phase: "active"
+  approved_by: "governance-committee"
+  approved_at: "2025-01-10T00:00:00Z"
+  last_review: "2025-01-18T00:00:00Z"
+  next_review: "2025-04-01T00:00:00Z"
+  change_history:
+    - version: "1.0.0"
+      date: "2025-01-18"
+      author: "operations-team"
+      changes: "Initial resource allocation for FY2025"

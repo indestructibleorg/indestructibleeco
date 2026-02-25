@@ -1,0 +1,27 @@
+ngera3namespace_governance:
+  version: "3.0"
+  categories:
+    intent_level:
+      - NG60100
+      - NG60200
+      - NG60300
+      - NG60400
+      - NG60500
+      - NG60600
+      - NG60700
+      - NG60800
+      - NG60900
+      - NG61000
+    semantic_level:
+      - NG70100
+      - NG70200
+      - NG70300
+      - NG70400
+    autonomy_level:
+      - NG80100
+      - NG80300
+      - NG80400
+  validation_rules:
+    - "all Era-3 namespaces must capture intent and semantic anchors"
+    - "all namespaces must provide reasoning traceability"
+    - "all namespaces must be mappable back to Era-2 service/data constructs"

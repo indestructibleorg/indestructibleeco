@@ -1,0 +1,237 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: performance-benchmark-job
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:performance-benchmark-job.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/performance-benchmark-job.yaml"
+  name: performance-benchmark-smoke
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: performance-benchmark
+    test-type: smoke
+    environment: production
+spec:
+  schedule: "*/5 * * * *"  # Every 5 minutes
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: k6
+            image: grafana/k6:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Starting smoke test at $(date)"
+              k6 run --out json=/results/smoke-test.json /tests/health-check.js
+              echo "Smoke test completed at $(date)"
+            volumeMounts:
+            - name: k6-tests
+              mountPath: /tests
+            - name: results
+              mountPath: /results
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 500m
+                memory: 256Mi
+          volumes:
+          - name: k6-tests
+            configMap:
+              name: k6-tests
+              items:
+              - key: health-check.js
+                path: health-check.js
+          - name: results
+            emptyDir: {}
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:performance-benchmark-job.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/performance-benchmark-job.yaml"
+  name: performance-benchmark-load
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: performance-benchmark
+    test-type: load
+    environment: production
+spec:
+  schedule: "0 * * * *"  # Every hour
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: k6
+            image: grafana/k6:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Starting load test at $(date)"
+              k6 run --out json=/results/load-test.json /tests/api-load-test.js
+              echo "Load test completed at $(date)"
+            volumeMounts:
+            - name: k6-tests
+              mountPath: /tests
+            - name: results
+              mountPath: /results
+            resources:
+              requests:
+                cpu: 200m
+                memory: 256Mi
+              limits:
+                cpu: 1000m
+                memory: 512Mi
+          volumes:
+          - name: k6-tests
+            configMap:
+              name: k6-tests
+              items:
+              - key: api-load-test.js
+                path: api-load-test.js
+          - name: results
+            emptyDir: {}
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:performance-benchmark-job.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/performance-benchmark-job.yaml"
+  name: performance-benchmark-stress
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: performance-benchmark
+    test-type: stress
+    environment: production
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM UTC
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: k6
+            image: grafana/k6:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Starting stress test at $(date)"
+              k6 run --out json=/results/stress-test.json /tests/stress-test.js
+              echo "Stress test completed at $(date)"
+            volumeMounts:
+            - name: k6-tests
+              mountPath: /tests
+            - name: results
+              mountPath: /results
+            resources:
+              requests:
+                cpu: 500m
+                memory: 512Mi
+              limits:
+                cpu: 2000m
+                memory: 1Gi
+          volumes:
+          - name: k6-tests
+            configMap:
+              name: k6-tests
+              items:
+              - key: stress-test.js
+                path: stress-test.js
+          - name: results
+            emptyDir: {}
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:performance-benchmark-job.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/performance-benchmark-job.yaml"
+  name: performance-benchmark-endurance
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: performance-benchmark
+    test-type: endurance
+    environment: production
+spec:
+  schedule: "0 0 * * 0"  # Weekly on Sunday at midnight UTC
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: k6
+            image: grafana/k6:latest
+            command:
+            - /bin/sh
+            - -c
+              - |
+                echo "Starting endurance test at $(date)"
+                k6 run --out json=/results/endurance-test.json /tests/memory-leak-test.js
+                echo "Endurance test completed at $(date)"
+            volumeMounts:
+            - name: k6-tests
+              mountPath: /tests
+            - name: results
+              mountPath: /results
+            resources:
+              requests:
+                cpu: 200m
+                memory: 256Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+          volumes:
+          - name: k6-tests
+            configMap:
+              name: k6-tests
+              items:
+              - key: memory-leak-test.js
+                path: memory-leak-test.js
+          - name: results
+            emptyDir: {}

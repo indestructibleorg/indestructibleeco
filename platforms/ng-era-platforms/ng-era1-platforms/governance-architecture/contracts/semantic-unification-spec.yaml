@@ -1,0 +1,499 @@
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-platform-ecosystem/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-platform-ecosystem/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-platform-ecosystem/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: gl-runtime.io/v1.0.0
+kind: UnificationSpecification
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:contracts:semantic-unification-spec.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/contracts/semantic-unification-spec.yaml"
+  name: semantic-unification-spec
+  version: v1.0.0
+  description: "GL Semantic Unification Specification - 語意統一規範"
+  namespace: gl-platform-ecosystem
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    unification.level: L1
+    unification.type: semantic
+    governance.layer: constitutional
+spec:
+  ## Semantic Taxonomy System
+  semantic-taxonomy:
+    version: v1.0.0
+    description: "定義所有 domain、capability、resource、label 的語意分類"
+    
+    ## Domain Semantics
+    domains:
+      - domain_id: runtime
+        abbr: rt
+        description: "運行時環境與執行引擎"
+        semantics:
+          - "execution"
+          - "orchestration"
+          - "coordination"
+          - "state-management"
+      
+      - domain_id: quantum
+        abbr: qm
+        description: "量子計算與模擬"
+        semantics:
+          - "quantum-computation"
+          - "superposition"
+          - "entanglement"
+          - "quantum-gates"
+      
+      - domain_id: api
+        abbr: api
+        description: "API 與服務接口"
+        semantics:
+          - "interface-definition"
+          - "schema-validation"
+          - "protocol-communication"
+          - "contract-enforcement"
+      
+      - domain_id: agent
+        abbr: ag
+        description: "AI 智能體與自主代理"
+        semantics:
+          - "autonomous-execution"
+          - "decision-making"
+          - "behavior-modeling"
+          - "agent-communication"
+      
+      - domain_id: multimodal
+        abbr: mm
+        description: "多模態處理（文本、圖像、音頻）"
+        semantics:
+          - "text-processing"
+          - "image-analysis"
+          - "audio-processing"
+          - "cross-modal-fusion"
+      
+      - domain_id: database
+        abbr: db
+        description: "數據庫與數據存儲"
+        semantics:
+          - "data-persistence"
+          - "query-execution"
+          - "transaction-management"
+          - "data-consistency"
+      
+      - domain_id: compute
+        abbr: cp
+        description: "計算與處理能力"
+        semantics:
+          - "computation"
+          - "processing"
+          - "calculation"
+          - "resource-allocation"
+      
+      - domain_id: storage
+        abbr: st
+        description: "存儲與資產管理"
+        semantics:
+          - "object-storage"
+          - "file-system"
+          - "blob-storage"
+          - "archive-management"
+      
+      - domain_id: governance
+        abbr: gov
+        description: "治理與合規"
+        semantics:
+          - "policy-enforcement"
+          - "compliance-validation"
+          - "audit-trail"
+          - "governance-automation"
+      
+      - domain_id: semantic
+        abbr: sem
+        description: "語意圖與知識表示"
+        semantics:
+          - "semantic-representation"
+          - "knowledge-graph"
+          - "semantic-reasoning"
+          - "ontology-management"
+    
+    ## Capability Semantics
+    capabilities:
+      - capability_id: dag
+        domain: runtime
+        abbr: dag
+        description: "DAG（有向無環圖）執行引擎"
+        semantics:
+          - "directed-acyclic-graph"
+          - "workflow-execution"
+          - "dependency-resolution"
+          - "task-orchestration"
+      
+      - capability_id: schema
+        domain: api
+        abbr: sch
+        description: "API schema 定義與驗證"
+        semantics:
+          - "schema-definition"
+          - "type-validation"
+          - "contract-specification"
+          - "interface-documentation"
+      
+      - capability_id: max
+        domain: agent
+        abbr: max
+        description: "Max 智能體核心行為"
+        semantics:
+          - "core-agent-behavior"
+          - "multi-step-reasoning"
+          - "planning-strategy"
+          - "fallback-mechanism"
+      
+      - capability_id: vision
+        domain: multimodal
+        abbr: vis
+        description: "視覺處理與圖像分析"
+        semantics:
+          - "image-recognition"
+          - "visual-reasoning"
+          - "object-detection"
+          - "image-understanding"
+      
+      - capability_id: shard
+        domain: database
+        abbr: shd
+        description: "數據庫分片與分區"
+        semantics:
+          - "data-sharding"
+          - "horizontal-scaling"
+          - "partition-strategy"
+          - "load-distribution"
+      
+      - capability_id: compute
+        domain: quantum
+        abbr: comp
+        description: "量子計算執行"
+        semantics:
+          - "quantum-circuit"
+          - "quantum-algorithm"
+          - "quantum-simulation"
+          - "quantum-optimization"
+    
+    ## Resource Semantics
+    resources:
+      - resource_id: executor
+        description: "執行器實例"
+        semantics:
+          - "execution-context"
+          - "runtime-handler"
+          - "process-manager"
+      
+      - resource_id: generator
+        description: "生成器實例"
+        semantics:
+          - "content-creation"
+          - "code-generation"
+          - "schema-generation"
+      
+      - resource_id: router
+        description: "路由器實例"
+        semantics:
+          - "request-routing"
+          - "traffic-distribution"
+          - "service-discovery"
+      
+      - resource_id: manager
+        description: "管理器實例"
+        semantics:
+          - "resource-management"
+          - "lifecycle-control"
+          - "coordination-handler"
+      
+      - resource_id: validator
+        description: "驗證器實例"
+        semantics:
+          - "validation-logic"
+          - "compliance-check"
+          - "rule-evaluation"
+      
+      - resource_id: processor
+        description: "處理器實例"
+        semantics:
+          - "data-processing"
+          - "transformation-logic"
+          - "computation-handler"
+      
+      - resource_id: monitor
+        description: "監控器實例"
+        semantics:
+          - "health-check"
+          - "metrics-collection"
+          - "performance-tracking"
+      
+      - resource_id: analyzer
+        description: "分析器實例"
+        semantics:
+          - "data-analysis"
+          - "pattern-recognition"
+          - "insight-extraction"
+    
+    ## Label Semantics
+    labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+      - label_id: baseline.component
+        description: "基線組件標籤"
+        semantics:
+          - "component-identification"
+          - "baseline-membership"
+          - "governance-scope"
+      
+      - label_id: policy.level
+        description: "策略等級標籤"
+        semantics:
+          - "policy-hierarchy"
+          - "enforcement-priority"
+          - "governance-level"
+      
+      - label_id: semantic.type
+        description: "語意類型標籤"
+        semantics:
+          - "semantic-classification"
+          - "knowledge-domain"
+          - "ontology-category"
+      
+      - label_id: capability.scope
+        description: "能力範圍標籤"
+        semantics:
+          - "functionality-boundary"
+          - "service-capability"
+          - "feature-set"
+      
+      - label_id: dependency.type
+        description: "依賴類型標籤"
+        semantics:
+          - "dependency-classification"
+          - "coupling-level"
+          - "integration-type"
+      
+      - label_id: execution.mode
+        description: "執行模式標籤"
+        semantics:
+          - "execution-strategy"
+          - "runtime-configuration"
+          - "processing-mode"
+      
+      - label_id: data.sensitivity
+        description: "數據敏感度標籤"
+        semantics:
+          - "data-classification"
+          - "security-level"
+          - "privacy-category"
+      
+      - label_id: audit.level
+        description: "審計等級標籤"
+        semantics:
+          - "audit-trail-depth"
+          - "logging-verbosity"
+          - "compliance-requirement"
+  
+  ## Semantic Mapping System
+  semantic-mapping:
+    version: v1.0.0
+    description: "定義內部命名與外部呈現的映射關係"
+    
+    mappings:
+      ## Internal → UI Mapping
+      internal-to-ui:
+        - internal: "gl.runtime.dag"
+          ui: "Runtime DAG Engine"
+          description: "運行時 DAG 執行引擎"
+        
+        - internal: "gl.api.schema"
+          ui: "API Schema Service"
+          description: "API schema 定義服務"
+        
+        - internal: "gl.agent.max"
+          ui: "Max AI Agent"
+          description: "Max 智能體"
+        
+        - internal: "gl.multimodal.vision"
+          ui: "Vision Processing"
+          description: "視覺處理服務"
+      
+      ## Platform → API Mapping
+      platform-to-api:
+        - platform: "gl-runtime-dag-platform"
+          api: "/gl/runtime/dag/*"
+          description: "Runtime DAG API endpoints"
+        
+        - platform: "gl-api-schema-platform"
+          api: "/gl/api/schema/*"
+          description: "API Schema endpoints"
+        
+        - platform: "gl-agent-max-platform"
+          api: "/gl/agent/max/*"
+          description: "Max Agent endpoints"
+      
+      ## Component → Functional Mapping
+      component-to-functional:
+        - component: "gl-runtime-dag-executor"
+          functional: "DAG execution and task orchestration"
+          description: "DAG 執行與任務編排"
+        
+        - component: "gl-api-schema-validator"
+          functional: "API schema validation and type checking"
+          description: "API schema 驗證與類型檢查"
+        
+        - component: "gl-agent-max-planner"
+          functional: "Multi-step reasoning and planning"
+          description: "多步驟推理與規劃"
+  
+  ## Semantic Validation System
+  semantic-validation:
+    version: v1.0.0
+    description: "語意驗證規則與檢查"
+    
+    validation-rules:
+      ## Semantic Conflict Detection
+      conflict-detection:
+        enabled: true
+        rules:
+          - rule_id: SEM-CONFLICT-001
+            name: "No Semantic Overlap"
+            description: "檢測語意重疊與衝突"
+            severity: HIGH
+            check: "semantic.overlap == false"
+        
+          - rule_id: SEM-CONFLICT-002
+            name: "No Semantic Ambiguity"
+            description: "檢測語意歧義"
+            severity: MEDIUM
+            check: "semantic.ambiguity == false"
+      
+      ## Semantic Duplicate Detection
+      duplicate-detection:
+        enabled: true
+        rules:
+          - rule_id: SEM-DUP-001
+            name: "No Duplicate Semantics"
+            description: "檢測重複語意定義"
+            severity: HIGH
+            check: "semantic.uniqueness == true"
+      
+      ## Semantic Inconsistency Detection
+      inconsistency-detection:
+        enabled: true
+        rules:
+          - rule_id: SEM-INC-001
+            name: "Semantic Consistency Check"
+            description: "檢測語意不一致"
+            severity: HIGH
+            check: "semantic.consistency == true"
+      
+      ## Semantic Completeness Detection
+      completeness-detection:
+        enabled: true
+        rules:
+          - rule_id: SEM-COMP-001
+            name: "Complete Semantic Definition"
+            description: "檢測語意定義完整性"
+            severity: MEDIUM
+            check: "semantic.required_fields present"
+  
+  ## Semantic Graph Integration
+  semantic-graph:
+    version: v1.0.0
+    description: "語意圖集成規範"
+    
+    graph-schema:
+      nodes:
+        - type: domain
+          properties:
+            - domain_id
+            - abbr
+            - description
+            - semantics[]
+        
+        - type: capability
+          properties:
+            - capability_id
+            - domain
+            - abbr
+            - description
+            - semantics[]
+        
+        - type: resource
+          properties:
+            - resource_id
+            - description
+            - semantics[]
+        
+        - type: label
+          properties:
+            - label_id
+            - description
+            - semantics[]
+      
+      edges:
+        - type: domain-capability
+          from: domain
+          to: capability
+          properties:
+            - belongs-to
+        
+        - type: capability-resource
+          from: capability
+          to: resource
+          properties:
+            - implements
+        
+        - type: resource-label
+          from: resource
+          to: label
+          properties:
+            - labeled-with
+  
+  ## Comment Naming Convention
+  comment-naming:
+    version: v1.0.0
+    description: "註解命名規範"
+    
+    tag-format: "gl:<domain>:<capability>:<tag>"
+    block-format: "gl-block:<domain>:<capability>:<block_name>"
+    key-format: "gl.key.<domain>.<capability>.<semantic_key>"
+    
+    examples:
+      tag:
+        - "gl:runtime:dag:description"
+        - "gl:api:schema:field"
+        - "gl:agent:max:behavior"
+        - "gl:governance:policy:rule"
+        - "gl:semantic:node:explain"
+      
+      block:
+        - "gl-block:runtime:dag:validation"
+        - "gl-block:agent:max:planning"
+        - "gl-block:governance:policy:enforcement"
+      
+      key:
+        - "gl.key.runtime.dag.node_type"
+        - "gl.key.api.schema.field_type"
+        - "gl.key.agent.max.intent"
+        - "gl.key.governance.policy.level"
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:contracts:semantic-unification-spec.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/contracts/semantic-unification-spec.yaml"
+  created_at: "2026-01-31T00:00:00Z"
+  updated_at: "2026-01-31T00:00:00Z"
+  governance_level: CONSTITUTIONAL
+  enforcement: MANDATORY
+  compatibility:
+    - v1.0.0

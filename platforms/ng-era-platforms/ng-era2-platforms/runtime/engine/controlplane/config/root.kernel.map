@@ -1,0 +1,380 @@
+# ⚙️ Root 核心模組/函式庫對應
+# MachineNativeOps Root Layer Kernel Mapping
+# Version: 1.0.0
+# Last Modified: 2025-12-20T22:00:00Z
+
+# =============================================================================
+# MachineNativeOps Kernel Module Mapping Configuration
+# =============================================================================
+# This file defines the mapping between logical kernel module names and their
+# physical kernel module files. It ensures consistent kernel module access
+# across different system configurations and provides abstraction for kernel
+# module management.
+# =============================================================================
+
+# === 核心模組對應格式說明 ===
+# 格式: logical_name:module_file:module_type:load_order:dependencies:description
+# logical_name: 邏輯模組名稱
+# module_file: 實體模組檔案路徑
+# module_type: 模組類型 (builtin, loadable, virtual)
+# load_order: 載入順序
+# dependencies: 依賴模組
+# description: 模組描述
+
+# === 系統核心模組 (System Core Modules) ===
+
+# 核心基礎模組
+kernel_core:kernel:builtin:1::Core kernel module
+kernel_memory:mm:builtin:2::Memory management module
+kernel_process:sched:builtin:3::Process scheduling module
+kernel_vfs:vfs:builtin:4:kernel_memory:Virtual filesystem module
+kernel_network:net:builtin:5::Network core module
+kernel_ipc:ipc:builtin:6::Inter-process communication module
+kernel_security:security:builtin:7::Security framework module
+kernel_audit:audit:builtin:8:kernel_security:Audit subsystem module
+
+# === 檔案系統模組 (Filesystem Modules) ===
+
+# 基本檔案系統
+fs_ext4:ext4:loadable:10:kernel_vfs:EXT4 filesystem module
+fs_xfs:xfs:loadable:10:kernel_vfs:XFS filesystem module
+fs_btrfs:btrfs:loadable:10:kernel_vfs:Btrfs filesystem module
+fs_proc:proc:loadable:11:kernel_vfs:PROC filesystem module
+fs_sysfs:sysfs:loadable:11:kernel_vfs:SYSFS filesystem module
+fs_tmpfs:tmpfs:loadable:11:kernel_vfs:TMPFS filesystem module
+fs_devtmpfs:devtmpfs:loadable:11:kernel_vfs:DEVTMPFS filesystem module
+
+# 網路檔案系統
+fs_nfs:nfs:loadable:15:fs_ext4,kernel_network:NFS filesystem module
+fs_nfs4:nfs4:loadable:15:fs_nfs:NFS4 filesystem module
+fs_cifs:cifs:loadable:15:kernel_network:CIFS/SMB filesystem module
+fs_smbfs:smbfs:loadable:15:kernel_network:SMB filesystem module
+fs_nfsd:nfsd:loadable:16:fs_nfs:NFS server module
+
+# === 網路模組 (Network Modules) ===
+
+# 網路核心
+net_core:net_core:loadable:20:kernel_network:Network core module
+net_socket:socket:loadable:21:net_core:Socket interface module
+net_inet:inet:loadable:22:net_socket:Internet protocol module
+net_ipv4:ipv4:loadable:23:net_inet:IPv4 protocol module
+net_ipv6:ipv6:loadable:23:net_inet:IPv6 protocol module
+net_tcp:tcp:loadable:24:net_ipv4:TCP protocol module
+net_udp:udp:loadable:24:net_ipv4:UDP protocol module
+
+# 網路設備驅動
+net_ethernet:ethernet:loadable:25:net_core:Ethernet driver module
+net_e1000:e1000:loadable:26:net_ethernet:Intel E1000 driver
+net_e1000e:e1000e:loadable:26:net_ethernet:Intel E1000E driver
+net_igb:igb:loadable:26:net_ethernet:Intel IGB driver
+net_igc:igc:loadable:26:net_ethernet:Intel IGC driver
+net_r8169:r8169:loadable:26:net_ethernet:Realtek RTL8169 driver
+net_vmxnet3:vmxnet3:loadable:26:net_ethernet:VMware VMXNET3 driver
+
+# 無線網路
+net_cfg80211:cfg80211:loadable:27:net_core:Wireless configuration module
+net_mac80211:mac80211:loadable:28:net_cfg80211:Wireless MAC module
+net_iwlwifi:iwlwifi:loadable:29:net_mac80211:Intel WiFi driver
+net_brcmfmac:brcmfmac:loadable:29:net_mac80211:Broadcom WiFi driver
+net_rt2800usb:rt2800usb:loadable:29:net_mac80211:Ralink USB WiFi driver
+
+# === 儲存模組 (Storage Modules) ===
+
+# 儲存核心
+storage_core:scsi_mod:loadable:30:kernel_vfs:SCSI core module
+storage_ata:libata:loadable:31:storage_core:ATA core module
+storage_scsi:scsi_mod:loadable:31:storage_core:SCSI module
+storage_ide:ide_core:loadable:31:storage_core:IDE core module
+
+# 磁碟驅動
+storage_sd:sd_mod:loadable:32:storage_scsi:SCSI disk driver
+storage_sr:sr_mod:loadable:32:storage_scsi:SCSI CD-ROM driver
+storage_hd:hd:loadable:32:storage_ide:IDE disk driver
+storage_nvme:nvme:loadable:32:storage_core:NVMe driver
+storage_virtio:virtio_blk:loadable:32:storage_core:VirtIO block driver
+
+# RAID 模組
+storage_md:md:loadable:33:storage_core:Software RAID module
+storage_md_raid0:raid0:loadable:34:storage_md:RAID0 module
+storage_md_raid1:raid1:loadable:34:storage_md:RAID1 module
+storage_md_raid5:raid5:loadable:34:storage_md:RAID5 module
+storage_md_raid10:raid10:loadable:34:storage_md:RAID10 module
+
+# LVM 模組
+storage_dm:dm_mod:loadable:35:storage_core:Device mapper module
+storage_dm_mirror:dm_mirror:loadable:36:storage_dm:Device mapper mirror
+storage_dm_snapshot:dm_snapshot:loadable:36:storage_dm:Device mapper snapshot
+storage_dm_multipath:dm_multipath:loadable:36:storage_dm:Device mapper multipath
+
+# === 安全模組 (Security Modules) ===
+
+# 安全框架
+security_selinux:selinux:loadable:40:kernel_security:SELinux module
+security_apparmor:apparmor:loadable:40:kernel_security:AppArmor module
+security_tomoyo:tomoyo:loadable:40:kernel_security:TOMOYO module
+security_smack:smack:loadable:40:kernel_security:SMACK module
+security_yama:yama:loadable:41:kernel_security:Yama module
+
+# 加密模組
+crypto_core:crypto_algapi:loadable:45:kernel_security:Crypto algorithm API
+crypto_hash:crypto_hash:loadable:46:crypto_core:Hash algorithms
+crypto_cipher:crypto_cipher:loadable:46:crypto_core:Cipher algorithms
+crypto_aead:crypto_aead:loadable:46:crypto_core:AEAD algorithms
+crypto_rng:crypto_rng:loadable:46:crypto_core:Random number generation
+crypto_api:crypto_user:loadable:47:crypto_core:User-space crypto API
+
+# 具體加密演算法
+crypto_aes:aes_generic:loadable:50:crypto_cipher:AES algorithm
+crypto_sha256:sha256_generic:loadable:50:crypto_hash:SHA-256 algorithm
+crypto_sha512:sha512_generic:loadable:50:crypto_hash:SHA-512 algorithm
+crypto_rsa:rsa_generic:loadable:50:crypto_cipher:RSA algorithm
+crypto_ecdsa:ecdsa_generic:loadable:50:crypto_cipher:ECDSA algorithm
+
+# === 虛擬化模組 (Virtualization Modules) ===
+
+# KVM 虛擬化
+virt_kvm:kvm:loadable:55:kernel_vmm:KVM kernel module
+virt_kvm_intel:kvm_intel:loadable:56:virt_kvm:KVM Intel support
+virt_kvm_amd:kvm_amd:loadable:56:virt_kvm:KVM AMD support
+
+# VirtIO 驅動
+virt_blk:virtio_blk:loadable:57:virt_kvm:VirtIO block device
+virt_net:virtio_net:loadable:57:virt_kvm:VirtIO network device
+virt_balloon:virtio_balloon:loadable:57:virt_kvm:VirtIO balloon driver
+virt_console:virtio_console:loadable:57:virt_kvm:VirtIO console driver
+virt_input:virtio_input:loadable:57:virt_kvm:VirtIO input driver
+
+# 容器相關
+container_overlayfs:overlay:loadable:60:kernel_vfs:Overlay filesystem for containers
+container namespaces:namespace:loadable:61:kernel_process:Namespace support
+container_cgroups:cgroup:loadable:62:kernel_process:Control groups
+container_userns:user:loadable:62:container_namespaces:User namespace
+
+# === 硬體模組 (Hardware Modules) ===
+
+# USB 模組
+usb_core:usbcore:loadable:65:kernel_vfs:USB core module
+usb_storage:usb_storage:loadable:66:usb_core:USB storage driver
+usb_hid:usbhid:loadable:66:usb_core:USB HID driver
+usb_serial:usbserial:loadable:66:usb_core:USB serial driver
+usb_xhci:xhci_hcd:loadable:67:usb_core:USB XHCI driver
+usb_ehci:ehci_hcd:loadable:67:usb_core:USB EHCI driver
+
+# GPU 模組
+gpu_nvidia:nvidia:loadable:70:kernel_vmm:NVIDIA GPU driver
+gpu_amd:amdgpu:loadable:70:kernel_vmm:AMD GPU driver
+gpu_intel:i915:loadable:70:kernel_vmm:Intel GPU driver
+gpu_vesa:vesa:loadable:71:kernel_vmm:VESA framebuffer driver
+gpu_fb:fbdev:loadable:71:gpu_vesa:Framebuffer driver
+
+# 音頻模組
+audio_core:snd:loadable:75:kernel_vfs:Sound core module
+audio_pcm:snd_pcm:loadable:76:audio_core:PCM audio module
+audio_mixer:snd_mixer:loadable:76:audio_core:Mixer module
+audio_intel:snd_hda_intel:loadable:77:audio_pcm:Intel HDA audio
+audio_alsa:snd_alsa:loadable:77:audio_core:ALSA sound system
+
+# === 監控模組 (Monitoring Modules) ===
+
+# 效能監控
+perf_core:perf:loadable:80:kernel_vfs:Performance monitoring
+perf_events:perf_event:loadable:81:perf_core:Performance events
+perf_trace:ftrace:loadable:82:perf_core:Function tracing
+perf_kprobe:kprobe:loadable:82:perf_core:Kernel probes
+perf_uprobe:uprobe:loadable:82:perf_core:User probes
+
+# 系統監控
+monitor_kmsg:kmsg:loadable:85:kernel_vfs:Kernel message buffer
+monitor_sysrq:sysrq:loadable:85:kernel_core:System request key
+monitor_thermal:thermal:loadable:86:kernel_core:Thermal monitoring
+monitor_acpi:acpi:loadable:86:kernel_core:ACPI support
+
+# === 機器學習模組 (Machine Learning Modules) ===
+
+# AI 加速器
+ml_core:ai_core:loadable:90:kernel_vmm:AI core module
+ml_intel:intel_ai:loadable:91:ml_core:Intel AI accelerator
+ml_nvidia:nvidia_ai:loadable:91:ml_core:NVIDIA AI accelerator
+ml_amd:amd_ai:loadable:91:ml_core:AMD AI accelerator
+
+# 機器學習框架
+ml_tensorflow:tensorflow:loadable:95:ml_core:TensorFlow kernel module
+ml_pytorch:pytorch:loadable:95:ml_core:PyTorch kernel module
+ml_onnx:onnx:loadable:95:ml_core:ONNX kernel module
+
+# === MachineNativeOps 專用模組 (MachineNativeOps Specific Modules) ===
+
+# 核心功能模組
+mno_core:machinenativenops_core:loadable:100:kernel_core:MachineNativeOps core module
+mno_config:machinenativenops_config:loadable:101:mno_core:Configuration management module
+mno_governance:machinenativenops_governance:loadable:101:mno_core:Governance module
+mno_trust:machinenativenops_trust:loadable:101:mno_core:Trust management module
+mno_provenance:machinenativenops_provenance:loadable:101:mno_core:Provenance tracking module
+mno_integrity:machinenativenops_integrity:loadable:101:mno_core:Integrity validation module
+mno_execution:machinenativenops_execution:loadable:101:mno_core:Execution engine module
+
+# 安全模組
+mno_crypto:machinenativenops_crypto:loadable:102:mno_trust:Cryptography module
+mno_hsm:machinenativenops_hsm:loadable:102:mno_crypto:HSM interface module
+mno_tpm:machinenativenops_tpm:loadable:102:mno_crypto:TPM interface module
+mno_seal:machinenativenops_seal:loadable:103:mno_crypto:Data sealing module
+
+# 監控模組
+mno_monitor:machinenativenops_monitor:loadable:104:mno_core:Monitoring module
+mno_metrics:machinenativenops_metrics:loadable:105:mno_monitor:Metrics collection module
+mno_alert:machinenativenops_alert:loadable:105:mno_monitor:Alerting module
+mno_trace:machinenativenops_trace:loadable:105:mno_monitor:Distributed tracing module
+
+# === MachineNativeOps 函式庫對應 (MachineNativeOps Library Mappings) ===
+
+# 核心函式庫
+lib_core:libmachinenativenops_core.so:1::Core library
+lib_config:libmachinenativenops_config.so:2:lib_core:Configuration library
+lib_governance:libmachinenativenops_governance.so:2:lib_core:Governance library
+lib_trust:libmachinenativenops_trust.so:2:lib_core:Trust library
+lib_provenance:libmachinenativenops_provenance.so:2:lib_core:Provenance library
+lib_integrity:libmachinenativenops_integrity.so:2:lib_core:Integrity library
+lib_execution:libmachinenativenops_execution.so:2:lib_core:Execution library
+
+# 安全函式庫
+lib_crypto:libmachinenativenops_crypto.so:3:lib_core:Cryptography library
+lib_hsm:libmachinenativenops_hsm.so:4:lib_crypto:HSM library
+lib_tpm:libmachinenativenops_tpm.so:4:lib_crypto:TPM library
+lib_ssl:libmachinenativenops_ssl.so:4:lib_crypto:SSL/TLS library
+lib_ssh:libmachinenativenops_ssh.so:4:lib_crypto:SSH library
+
+# 工具函式庫
+lib_utils:libmachinenativenops_utils.so:5:lib_core:Utility library
+lib_logging:libmachinenativenops_logging.so:6:lib_utils:Logging library
+lib_monitoring:libmachinenativenops_monitoring.so:6:lib_utils:Monitoring library
+lib_networking:libmachinenativenops_networking.so:6:lib_utils:Networking library
+lib_storage:libmachinenativenops_storage.so:6:lib_utils:Storage library
+
+# === 模組群組定義 (Module Group Definitions) ===
+
+# 系統核心群組
+[core_modules]
+members=kernel_core,kernel_memory,kernel_process,kernel_vfs,kernel_network,kernel_ipc,kernel_security
+description=Core kernel modules required for basic operation
+load_order=1-10
+
+# 檔案系統群組
+[filesystem_modules]
+members=fs_ext4,fs_xfs,fs_btrfs,fs_proc,fs_sysfs,fs_tmpfs,fs_devtmpfs,fs_nfs,fs_cifs
+description=Filesystem modules for storage and network filesystems
+load_order=10-20
+
+# 網路模組群組
+[network_modules]
+members=net_core,net_socket,net_inet,net_ipv4,net_ipv6,net_tcp,net_udp,net_ethernet,net_e1000
+description=Network modules for connectivity and communication
+load_order=20-30
+
+# 安全模組群組
+[security_modules]
+members=security_selinux,security_apparmor,crypto_core,crypto_hash,crypto_cipher,crypto_aes,crypto_sha256
+description=Security modules for system protection and cryptography
+load_order=40-60
+
+# 虛擬化模組群組
+[virtualization_modules]
+members=virt_kvm,virt_kvm_intel,virt_blk,virt_net,container_overlayfs,container_namespaces
+description=Virtualization and container modules
+load_order=55-65
+
+# MachineNativeOps 模組群組
+[machinenativenops_modules]
+members=mno_core,mno_config,mno_governance,mno_trust,mno_provenance,mno_integrity,mno_execution
+description=MachineNativeOps specific modules
+load_order=100-110
+
+# === 模組載入策略 (Module Loading Strategies) ===
+
+# 自動載入策略
+[auto_load]
+modules=kernel_core,fs_ext4,net_ipv4,net_tcp,security_apparmor
+strategy=on_demand
+priority=high
+
+# 手動載入策略
+[manual_load]
+modules=virt_kvm,container_overlayfs,mno_crypto,mno_hsm
+strategy=manual
+priority=medium
+
+# 條件載入策略
+[conditional_load]
+modules=net_wifi,usb_storage,audio_intel
+strategy=on_hardware_detection
+priority=low
+
+# === 模組依賴解析 (Module Dependency Resolution) ===
+
+# 依賴樹
+[dependency_tree]
+kernel_core->kernel_memory->kernel_process->kernel_vfs
+kernel_vfs->fs_ext4->fs_nfs
+kernel_vfs->net_core->net_socket->net_inet->net_ipv4->net_tcp
+kernel_security->security_selinux->crypto_core->crypto_hash->crypto_cipher
+kernel_vmm->virt_kvm->virt_kvm_intel->virt_blk
+kernel_vfs->container_overlayfs->container_namespaces->container_cgroups
+kernel_vfs->mno_core->mno_config->mno_governance->mno_trust
+mno_trust->mno_crypto->mno_hsm->mno_tpm
+
+# 循環依賴檢測
+[circular_dependency_check]
+check_enabled=true
+resolution_strategy=error
+fallback_strategy=manual_resolution
+
+# === 模組版本管理 (Module Version Management) ===
+
+# 版本相容性
+[version_compatibility]
+kernel_core:>=5.4.0
+fs_ext4:>=1.0.0
+net_ipv4:>=2.0.0
+security_apparmor:>=2.13.0
+virt_kvm:>=5.0.0
+mno_core:>=1.0.0
+
+# 版本升級策略
+[upgrade_strategy]
+automatic_minor_upgrades=true
+automatic_patch_upgrades=true
+major_upgrade_manual=true
+rollback_enabled=true
+
+# === 模組監控 (Module Monitoring) ===
+
+# 監控指標
+[monitoring_metrics]
+module_load_time=timing
+module_memory_usage=memory
+module_cpu_usage=cpu
+module_error_rate=error_rate
+module_dependency_status=status
+
+# 健康檢查
+[health_checks]
+load_success_check=true
+dependency_check=true
+performance_check=true
+security_check=true
+integrity_check=true
+
+# === 模組故障轉移 (Module Failover) ===
+
+# 故障檢測
+[failure_detection]
+timeout_threshold=30s
+error_threshold=3
+performance_threshold=80%
+health_check_interval=10s
+
+# 轉移策略
+[failover_strategy]
+automatic_failover=true
+graceful_degradation=true
+fallback_modules=true
+notification_enabled=true

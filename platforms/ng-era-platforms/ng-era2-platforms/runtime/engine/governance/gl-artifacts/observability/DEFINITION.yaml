@@ -1,0 +1,94 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: DEFINITION
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLLayerDefinition
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:governance:gl-artifacts:observability:DEFINITION.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/observability/DEFINITION.yaml"
+  layer_id: GL50-59
+  name: Observability Layer
+  version: "1.0.0"
+spec:
+  range: "50-59"
+  description: "Monitoring, alerting, insights"
+  dimensions:
+    - "50-monitoring"
+    - "51-alerting"
+    - "52-logging"
+    - "53-tracing"
+    - "54-dashboards"
+    - "55-insights"
+  planned_dimensions:
+    - id: "50-monitoring"
+      purpose: "System monitoring and telemetry"
+      planned_artifacts:
+        - "monitoring-config.yaml"
+        - "metrics-collectors.yaml"
+      planned_functions:
+        - "collect_metrics"
+        - "aggregate_data"
+    - id: "51-alerting"
+      purpose: "Alert management and notification"
+      planned_artifacts:
+        - "alert-rules.yaml"
+        - "notification-channels.yaml"
+      planned_functions:
+        - "trigger_alert"
+        - "route_notification"
+    - id: "52-logging"
+      purpose: "Centralized logging"
+      planned_artifacts:
+        - "log-config.yaml"
+        - "log-aggregation.yaml"
+      planned_functions:
+        - "collect_logs"
+        - "query_logs"
+    - id: "53-tracing"
+      purpose: "Distributed tracing"
+      planned_artifacts:
+        - "trace-config.yaml"
+      planned_functions:
+        - "start_trace"
+        - "end_trace"
+    - id: "54-insights"
+      purpose: "Operational insights and analytics"
+      planned_artifacts:
+        - "insights-config.yaml"
+        - "analytics-queries.yaml"
+      planned_functions:
+        - "generate_insights"
+        - "analyze_patterns"
+    - id: "55-dashboards"
+      purpose: "Visualization dashboards"
+      planned_artifacts:
+        - "dashboard-definitions.yaml"
+      planned_functions:
+        - "render_dashboard"
+        - "export_report"
+  interfaces:
+    input:
+      - "execution_reports"
+      - "automation_logs"
+      - "system_metrics"
+    output:
+      - "alerts"
+      - "insights"
+      - "dashboards"
+  dependencies:
+    upstream:
+      - "GL30-49"
+    downstream:
+      - "GL60-80"
+  validation:
+    semantic_boundary: "Observability - monitoring, alerting, insights (placeholder for future expansion)"
+    no_conflicts: true
+    no_duplicates: true
+    clear_boundaries: true
+  status: "planned"
+  note: "Layer structure defined, dimensions to be implemented in future iterations"

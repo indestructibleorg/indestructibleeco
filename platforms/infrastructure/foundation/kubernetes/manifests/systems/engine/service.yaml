@@ -1,0 +1,36 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: kubernetes-service-engine
+# @ECO-audit-trail: ../../../engine/governance/GL_SEMANTIC_ANCHOR.json
+#
+# GL Unified Architecture Governance Framework Activated
+# AEP Engine Service Manifest
+
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:kubernetes:manifests:systems:engine:service.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/kubernetes/manifests/systems/engine/service.yaml"
+  name: aep-engine-service
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: aep-engine
+    app.kubernetes.io/app.kubernetes.io/component: engine
+    app.kubernetes.io/part-of: machine-native-ops
+    governance.machinenativeops.io/charter-version: "2.0.0"
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: metrics
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: aep-engine

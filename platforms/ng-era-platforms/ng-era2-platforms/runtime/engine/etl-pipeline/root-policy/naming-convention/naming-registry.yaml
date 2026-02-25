@@ -1,0 +1,169 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: naming-registry
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# ETL Pipeline Naming Convention Registry
+# ECO-Layer: GL90-99 (Meta - Naming Convention)
+# Closure-Signal: naming, schema
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:etl-pipeline:root-policy:naming-convention:naming-registry.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/root-policy/naming-convention/naming-registry.yaml"
+  registry-name: etl-naming-registry
+  version: "1.0.0"
+  layer: "GL90-99"
+  last-updated: "2024-01-01T00:00:00Z"
+  responsible: "governance-committee"
+
+naming-rules:
+  directories:
+    pattern: "^[a-z0-9-]+$"
+    case: "kebab-case"
+    max-length: "64"
+    examples:
+      valid: ["etl-pipeline", "data-source", "sync-service"]
+      invalid: ["ETLPipeline", "data_source", "Data Source"]
+  
+  files:
+    pattern: "^[a-z0-9-_.]+$"
+    case: "kebab-case or snake_case"
+    max-length: "128"
+    examples:
+      valid: ["pipeline-config.yaml", "extract_data.py", "sync-service.sh"]
+      invalid: ["PipelineConfig.yaml", "extractData.py", "SyncService.sh"]
+  
+  database-tables:
+    pattern: "^[a-z][a-z0-9_]*$"
+    case: "snake_case"
+    max-length: "63"
+    examples:
+      valid: ["user_analytics", "sync_status", "pipeline_logs"]
+      invalid: ["UserAnalytics", "sync-status", "PipelineLogs"]
+  
+  database-columns:
+    pattern: "^[a-z][a-z0-9_]*$"
+    case: "snake_case"
+    max-length: "63"
+    examples:
+      valid: ["user_id", "created_at", "sync_status"]
+      invalid: ["userId", "CreatedAt", "SyncStatus"]
+  
+  api-endpoints:
+    pattern: /[a-z0-9-\/]+$/
+    case: "kebab-case"
+    examples:
+      valid: ["/api/v1/extract", "/api/v1/sync/start", "/api/v1/pipeline/status"]
+      invalid: ["/api/v1/extractData", "/api/v1/sync/start", "/API/v1/Pipeline/Status"]
+
+reserved-words:
+  directories:
+    - "tmp"
+    - "temp"
+    - "backup"
+    - "old"
+    - "legacy"
+    - "misc"
+    - "test"
+    - "logs"
+    - "cache"
+  
+  files:
+    extensions:
+      - ".tmp"
+      - ".bak"
+      - ".swp"
+      - ".swo"
+      - ".log"
+      - ".DS_Store"
+      - "Thumbs.db"
+      - ".pyc"
+      - "__pycache__"
+      - ".zip"
+      - ".tar.gz"
+
+naming-conventions-by-app.kubernetes.io/component: extraction:
+    connectors:
+      pattern: "^[a-z]+-connector$"
+      examples: ["postgres-connector", "api-connector", "log-connector"]
+    
+    extractors:
+      pattern: "^[a-z]+-extractor$"
+      examples: ["user-extractor", "event-extractor", "transaction-extractor"]
+  
+  transformation:
+    transformers:
+      pattern: "^[a-z]+-transformer$"
+      examples: ["data-cleaner", "schema-normalizer", "business-rule-applier"]
+    
+    validators:
+      pattern: "^[a-z]+-validator$"
+      examples: ["quality-validator", "schema-validator", "business-validator"]
+  
+  loading:
+    loaders:
+      pattern: "^[a-z]+-loader$"
+      examples: ["warehouse-loader", "datalake-loader", "stream-loader"]
+  
+  synchronization:
+    sync-strategies:
+      pattern: "^[a-z]+-sync$"
+      examples: ["real-time-sync", "scheduled-sync", "batch-sync"]
+    
+    conflict-resolvers:
+      pattern: "^[a-z]+-resolver$"
+      examples: ["last-write-resolver", "merge-resolver", "custom-resolver"]
+
+file-type-restrictions:
+  allowed:
+    - ".yaml"
+    - ".yml"
+    - ".json"
+    - ".md"
+    - ".py"
+    - ".sh"
+    - ".sql"
+    - ".txt"
+    - ".toml"
+  
+  forbidden:
+    - ".tmp"
+    - ".bak"
+    - ".swp"
+    - ".swo"
+    - ".log"
+    - ".DS_Store"
+    - "Thumbs.db"
+    - ".old"
+    - ".legacy"
+
+closure-signals:
+  required-files:
+    - "README.md"
+    - "manifest.yaml"
+    - "policy.yaml"
+  
+  evidence-files:
+    - "evidence-chain.json"
+    - "audit-log.yaml"
+    - "validation-report.yaml"
+
+validation-rules:
+  - rule: "kebab-case-directories"
+    check: "directories must use kebab-case"
+    enforcement: "strict"
+  
+  - rule: "snake-case-identifiers"
+    check: "database identifiers must use snake_case"
+    enforcement: "strict"
+  
+  - rule: "no-reserved-words"
+    check: "must not use reserved words"
+    enforcement: "strict"
+  
+  - rule: "closure-signals-required"
+    check: "must include required closure signal files"
+    enforcement: "strict"

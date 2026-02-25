@@ -1,0 +1,379 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: universal-deployment
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Universal Deployment Configuration
+# Supports Kubernetes, Docker Compose, Nomad, and Bare Metal
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:universal-deployment.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/universal-deployment.yaml"
+  name: universal-deployment-config
+  namespace: production
+data:
+  # Kubernetes Deployment Configuration
+  kubernetes.yaml: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:universal-deployment.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/universal-deployment.yaml"
+      name: machine-native-ops
+      namespace: production
+    spec:
+      replicas: ${REPLICAS:-3}
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: machine-native-ops
+      strategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+      template:
+        metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:universal-deployment.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/universal-deployment.yaml"
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            app.kubernetes.io/name: machine-native-ops
+            version: ${VERSION:-latest}
+        spec:
+          serviceAccountName: machine-native-ops
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            fsGroup: 1000
+          containers:
+          - name: app
+            image: ${IMAGE_REGISTRY}/machine-native-ops:${VERSION:-latest}
+            imagePullPolicy: IfNotPresent
+            ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 9090
+              name: metrics
+              protocol: TCP
+            env:
+            - name: ENVIRONMENT
+              value: "production"
+            - name: LOG_LEVEL
+              value: "${LOG_LEVEL:-info}"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: database-credentials
+                  key: url
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: redis-credentials
+                  key: url
+            resources:
+              requests:
+                memory: "256Mi"
+                cpu: "100m"
+              limits:
+                memory: "512Mi"
+                cpu: "500m"
+            livenessProbe:
+              httpGet:
+                path: /health
+                port: http
+              initialDelaySeconds: 30
+              periodSeconds: 10
+              timeoutSeconds: 5
+              failureThreshold: 3
+            readinessProbe:
+              httpGet:
+                path: /ready
+                port: http
+              initialDelaySeconds: 10
+              periodSeconds: 5
+              timeoutSeconds: 3
+              failureThreshold: 3
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                - ALL
+            volumeMounts:
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+          volumes:
+          - name: config
+            configMap:
+              name: app-config
+          - name: tmp
+            emptyDir: {}
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 100
+                podAffinityTerm:
+                  labelSelector:
+                    matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                      - machine-native-ops
+                  topologyKey: kubernetes.io/hostname
+  
+  # Docker Compose Configuration
+  docker-compose.yaml: |
+    version: '3.8'
+    
+    services:
+      machine-native-ops:
+        image: ${IMAGE_REGISTRY}/machine-native-ops:${VERSION:-latest}
+        container_name: machine-native-ops
+        ports:
+          - "8080:8080"
+          - "9090:9090"
+        environment:
+          - ENVIRONMENT=production
+          - LOG_LEVEL=${LOG_LEVEL:-info}
+          - DATABASE_URL=${DATABASE_URL}
+          - REDIS_URL=${REDIS_URL}
+          - STORAGE_BACKEND=${STORAGE_BACKEND:-s3}
+          - S3_BUCKET=${S3_BUCKET}
+          - S3_REGION=${S3_REGION}
+        volumes:
+          - ./config:/etc/config:ro
+          - /tmp:/tmp
+        networks:
+          - app-network
+        deploy:
+          replicas: ${REPLICAS:-3}
+          resources:
+            limits:
+              cpus: '0.5'
+              memory: 512M
+            reservations:
+              cpus: '0.1'
+              memory: 256M
+          restart_policy:
+            condition: on-failure
+            delay: 5s
+            max_attempts: 3
+            window: 120s
+        healthcheck:
+          test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+          interval: 30s
+          timeout: 10s
+          retries: 3
+          start_period: 40s
+        logging:
+          driver: "json-file"
+          options:
+            max-size: "10m"
+            max-file: "3"
+    
+      postgresql:
+        image: postgres:15-alpine
+        container_name: postgresql
+        environment:
+          - POSTGRES_DB=${POSTGRES_DB}
+          - POSTGRES_USER=${POSTGRES_USER}
+          - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+        volumes:
+          - postgresql-data:/var/lib/postgresql/data
+        networks:
+          - app-network
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+    
+      redis:
+        image: redis:7-alpine
+        container_name: redis
+        command: redis-server --appendonly yes
+        volumes:
+          - redis-data:/data
+        networks:
+          - app-network
+        healthcheck:
+          test: ["CMD", "redis-cli", "ping"]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+    
+      nginx:
+        image: nginx:alpine
+        container_name: nginx
+        ports:
+          - "80:80"
+          - "443:443"
+        volumes:
+          - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+          - ./nginx/ssl:/etc/nginx/ssl:ro
+        depends_on:
+          - machine-native-ops
+        networks:
+          - app-network
+        restart: unless-stopped
+    
+    volumes:
+      postgresql-data:
+      redis-data:
+    
+    networks:
+      app-network:
+        driver: bridge
+  
+  # Nomad Job Configuration
+  nomad.yaml: |
+    job "machine-native-ops" {
+      datacenters = ["dc1"]
+      type = "service"
+      
+      update {
+        max_parallel = 1
+        min_healthy_time = "30s"
+        healthy_deadline = "5m"
+        progress_deadline = "10m"
+        auto_revert = false
+        auto_promote = true
+        canary = 1
+      }
+      
+      group "app" {
+        count = ${REPLICAS:-3}
+        
+        network {
+          port "http" {
+            static = 8080
+          }
+          port "metrics" {
+            static = 9090
+          }
+        }
+        
+        task "machine-native-ops" {
+          driver = "docker"
+          
+          config {
+            image = "${IMAGE_REGISTRY}/machine-native-ops:${VERSION:-latest}"
+            ports = ["http", "metrics"]
+          }
+          
+          env {
+            ENVIRONMENT = "production"
+            LOG_LEVEL = "${LOG_LEVEL:-info}"
+            DATABASE_URL = "${DATABASE_URL}"
+            REDIS_URL = "${REDIS_URL}"
+          }
+          
+          resources {
+            cpu    = 500
+            memory = 512
+          }
+          
+          service {
+            name = "machine-native-ops"
+            port = "http"
+            tags = ["production"]
+            check {
+              type     = "http"
+              path     = "/health"
+              interval = "10s"
+              timeout  = "5s"
+              check_restart {
+                limit = 3
+                grace = "90s"
+                ignore_warnings = false
+              }
+            }
+          }
+        }
+      }
+    }
+  
+  # Bare Metal / Systemd Service Configuration
+  systemd.yaml: |
+    [Unit]
+    Description=MachineNativeOps Application
+    After=network.target postgresql.service redis.service
+    Requires=network.target
+    
+    [Service]
+    Type=simple
+    User=machine-native-ops
+    Group=machine-native-ops
+    WorkingDirectory=/opt/machine-native-ops
+    ExecStart=/opt/machine-native-ops/bin/machine-native-ops \
+      --config /etc/machine-native-ops/config.yaml \
+      --log-level ${LOG_LEVEL:-info} \
+      --port 8080 \
+      --metrics-port 9090
+    
+    Environment="ENVIRONMENT=production"
+    Environment="LOG_LEVEL=${LOG_LEVEL:-info}"
+    Environment="DATABASE_URL=${DATABASE_URL}"
+    Environment="REDIS_URL=${REDIS_URL}"
+    
+    Restart=always
+    RestartSec=10
+    StartLimitInterval=60
+    StartLimitBurst=3
+    
+    # Security settings
+    NoNewPrivileges=true
+    PrivateTmp=true
+    ProtectSystem=strict
+    ProtectHome=true
+    ReadOnlyDirectories=/
+    ReadWritePaths=/var/log/machine-native-ops /tmp
+    
+    # Resource limits
+    LimitNOFILE=65536
+    LimitNPROC=4096
+    
+    # Logging
+    StandardOutput=journal
+    StandardError=journal
+    SyslogIdentifier=machine-native-ops
+    
+    [Install]
+    WantedBy=multi-user.target
+  
+  # Helm Chart Configuration
+  helm.yaml: |
+    apiVersion: v2
+    name: machine-native-ops
+    description: A Helm chart for MachineNativeOps
+    type: application
+    version: 1.0.0
+    appVersion: "1.0.0"
+    
+    dependencies:
+      - name: postgresql
+        version: ~12.0.0
+        repository: https://charts.bitnami.com/bitnami
+        condition: postgresql.enabled
+      
+      - name: redis
+        version: ~17.0.0
+        repository: https://charts.bitnami.com/bitnami
+        condition: redis.enabled
+      
+      - name: ingress-nginx
+        version: ~4.0.0
+        repository: https://kubernetes.github.io/ingress-nginx
+        condition: ingress-nginx.enabled

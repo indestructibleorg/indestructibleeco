@@ -1,0 +1,333 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: values
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Default values for machine-native-ops
+# This is a YAML-formatted file.
+
+version: "1.0.0"
+metadata:
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+global:
+  # Project and environment settings
+  project: machine-native-ops
+  environment: production
+  
+  # Image settings
+  image:
+    repository: ghcr.io/machinenativeops/machine-native-ops
+    pullPolicy: IfNotPresent
+    tag: ""
+  
+  # Common labels
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+  
+  # Common annotations
+  annotations: {}
+
+replicaCount: 3
+
+image:
+  repository: ghcr.io/machinenativeops/machine-native-ops-core
+  pullPolicy: IfNotPresent
+  tag: "1.0.0"
+
+imagePullSecrets: []
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  privileged: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+  annotations: {}
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  hosts:
+    - host: machinenativeops.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: machine-native-ops-tls
+      hosts:
+        - machinenativeops.com
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 4Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+nodeSelector:
+  nodeType: worker
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - machine-native-ops
+          topologyKey: kubernetes.io/hostname
+
+# Database configuration
+postgresql:
+  enabled: true
+  auth:
+    database: machineops
+    username: machineops
+    password: change-me-in-production
+  primary:
+    resources:
+      requests:
+        memory: 1Gi
+        cpu: 500m
+      limits:
+        memory: 4Gi
+        cpu: 2000m
+    persistence:
+      enabled: true
+      size: 100Gi
+      storageClass: fast-ssd
+
+# Redis configuration
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    password: change-me-in-production
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 1Gi
+      cpu: 500m
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: standard
+
+# Monitoring configuration
+monitoring:
+  enabled: true
+  prometheus:
+    enabled: true
+    retention: 15d
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 250m
+      limits:
+        memory: 2Gi
+        cpu: 1000m
+    persistence:
+      enabled: true
+      size: 50Gi
+      storageClass: fast-ssd
+  
+  grafana:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 1Gi
+        cpu: 500m
+    persistence:
+      enabled: true
+      size: 10Gi
+      storageClass: fast-ssd
+  
+  alertmanager:
+    enabled: true
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 50m
+      limits:
+        memory: 512Mi
+        cpu: 250m
+    persistence:
+      enabled: true
+      size: 5Gi
+      storageClass: fast-ssd
+
+# Logging configuration
+logging:
+  enabled: true
+  elasticsearch:
+    enabled: true
+    replicas: 3
+    resources:
+      requests:
+        memory: 2Gi
+        cpu: 1000m
+      limits:
+        memory: 4Gi
+        cpu: 2000m
+    persistence:
+      enabled: true
+      size: 100Gi
+      storageClass: standard
+  
+  kibana:
+    enabled: true
+    resources:
+      requests:
+        memory: 1Gi
+        cpu: 500m
+      limits:
+        memory: 2Gi
+        cpu: 1000m
+  
+  logstash:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 250m
+      limits:
+        memory: 2Gi
+        cpu: 1000m
+
+# Tracing configuration
+tracing:
+  enabled: true
+  jaeger:
+    enabled: true
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 1Gi
+        cpu: 500m
+
+# Security configuration
+security:
+  enabled: true
+  secretsManager:
+    enabled: true
+    rotationInterval: 30d
+  encryption:
+    enabled: true
+    keySize: 256
+
+# Backup configuration
+backup:
+  enabled: true
+  schedule: "0 2 * * *"
+  retentionDays: 90
+  storage:
+    enabled: true
+    provider: s3
+    bucket: machine-native-ops-backups
+
+# Configurations
+config:
+  logLevel: INFO
+  debugMode: false
+  maxWorkers: 4
+  timeoutSeconds: 30
+  retryCount: 3
+  connectionPoolSize: 10
+
+# Secrets
+secrets:
+  databaseUrl: postgresql://machineops:change-me@postgres:5432/machineops
+  redisUrl: redis://:change-me@redis:6379/0
+  encryptionKey: change-me-32-byte-encryption-key
+  signingKey: change-me-64-byte-signing-key-1234567890123456
+  apiSecretKey: change-me-api-secret-key-min-32-chars
+
+# Network policies
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: machine-native-ops
+      ports:
+        - port: 8080
+          protocol: TCP
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: machine-native-ops
+      ports:
+        - port: 5432
+          protocol: TCP
+        - port: 6379
+          protocol: TCP
+
+# Service monitors
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  scrapeTimeout: 10s
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    release: prometheus

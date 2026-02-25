@@ -1,0 +1,854 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# =============================================================================
+# GL30-49 Execution Layer - API Design Specification
+# MachineNativeOps Governance Artifact
+# =============================================================================
+apiVersion: governance.machinenativeops.io/v2
+kind: APISpecification
+metadata:
+  name: api-design-specification
+  version: "1.0.0"
+  created_at: "2026-01-27T00:00:00Z"
+  updated_at: "2026-01-27T00:00:00Z"
+  owner: engineering-team
+  layer: "GL30-49"
+  tags:
+    - api
+    - rest
+    - design
+    - specification
+    - contracts
+  annotations:
+    governance.machinenativeops.io/initiative: "INIT-2026-Q1-001"
+    governance.machinenativeops.io/priority: "P0"
+    governance.machinenativeops.io/scope: "api-layer"
+spec:
+  # Required fields for GL30-49 compliance
+  title: "API設計規範"
+  title_en: "API Design Specification"
+  
+  description: |
+    本規範定義了MachineNativeOps項目的API設計標準、最佳實踐與實施指南。
+    作為前後端開發的核心契約，確保API的一致性、可維護性與可擴展性。
+  
+  description_en: |
+    This specification defines the API design standards, best practices, 
+    and implementation guidelines for the MachineNativeOps project. 
+    As the core contract for frontend-backend development, it ensures 
+    API consistency, maintainability, and scalability.
+  
+  # API Design Principles
+  design_principles:
+    - id: "API-PRIN-001"
+      title: "RESTful資源導向 (RESTful Resource-Oriented)"
+      description: "API以資源為中心，使用HTTP方法表達操作意圖"
+      examples:
+        - "GET /api/v1/users - 獲取用戶列表"
+        - "POST /api/v1/users - 創建新用戶"
+        - "PUT /api/v1/users/{id} - 更新用戶"
+        - "DELETE /api/v1/users/{id} - 刪除用戶"
+    
+    - id: "API-PRIN-002"
+      title: "一致性優先 (Consistency First)"
+      description: "所有API端點遵循相同的命名、響應格式與錯誤處理模式"
+      guidelines:
+        - "使用小寫字母與連字符 (kebab-case) 命名資源"
+        - "統一的響應結構"
+        - "一致的錯誤格式"
+    
+    - id: "API-PRIN-003"
+      title: "版本化管理 (Versioned Management)"
+      description: "API必須進行版本化，確保向後兼容"
+      strategy: "URI版本化 (/api/v1/, /api/v2/)"
+    
+    - id: "API-PRIN-004"
+      title: "安全優先 (Security First)"
+      description: "所有API必須實施適當的身份驗證、授權與數據保護"
+      requirements:
+        - "HTTPS強制使用"
+        - "JWT或OAuth 2.0認證"
+        - "輸入驗證與清理"
+        - "Rate limiting"
+    
+    - id: "API-PRIN-005"
+      title: "文檔驅動 (Documentation-Driven)"
+      description: "API必須有完整的OpenAPI規格文檔"
+      format: "OpenAPI 3.0+"
+  
+  # URL Structure and Naming Conventions
+  url_structure:
+    base_url:
+      development: "https://dev-api.machinenativeops.io"
+      staging: "https://staging-api.machinenativeops.io"
+      production: "https://api.machinenativeops.io"
+    
+    pattern: "{base_url}/api/{version}/{resource}"
+    
+    versioning:
+      format: "v{major}"
+      examples:
+        - "/api/v1/users"
+        - "/api/v2/users"
+      rules:
+        - "主版本號增加時表示破壞性變更"
+        - "次版本號變更應向後兼容"
+    
+    resource_naming:
+      rules:
+        - rule: "使用複數名詞"
+          correct: "/api/v1/users"
+          incorrect: "/api/v1/user"
+        
+        - rule: "使用小寫字母"
+          correct: "/api/v1/products"
+          incorrect: "/api/v1/Products"
+        
+        - rule: "使用連字符分隔多單詞"
+          correct: "/api/v1/user-profiles"
+          incorrect: "/api/v1/user_profiles, /api/v1/userProfiles"
+        
+        - rule: "巢狀資源使用層級結構"
+          correct: "/api/v1/users/{userId}/orders"
+          incorrect: "/api/v1/user-orders"
+          note: "層級不應超過3層"
+        
+        - rule: "集合操作使用動詞"
+          correct: "/api/v1/users/search"
+          incorrect: "/api/v1/search-users"
+          note: "僅在無法用RESTful方法表達時使用"
+    
+    query_parameters:
+      filtering:
+        pattern: "?{field}={value}"
+        examples:
+          - "/api/v1/users?status=active"
+          - "/api/v1/products?category=electronics&price_min=100"
+      
+      sorting:
+        pattern: "?sort={field}:{order}"
+        examples:
+          - "/api/v1/users?sort=created_at:desc"
+          - "/api/v1/products?sort=price:asc,name:asc"
+      
+      pagination:
+        pattern: "?page={number}&per_page={count}"
+        defaults:
+          page: 1
+          per_page: 20
+          max_per_page: 100
+        examples:
+          - "/api/v1/users?page=1&per_page=20"
+      
+      field_selection:
+        pattern: "?fields={field1},{field2}"
+        examples:
+          - "/api/v1/users?fields=id,name,email"
+  
+  # HTTP Methods
+  http_methods:
+    - method: "GET"
+      purpose: "獲取資源"
+      idempotent: true
+      safe: true
+      request_body: false
+      examples:
+        - endpoint: "GET /api/v1/users"
+          description: "獲取用戶列表"
+        - endpoint: "GET /api/v1/users/{id}"
+          description: "獲取特定用戶"
+    
+    - method: "POST"
+      purpose: "創建資源"
+      idempotent: false
+      safe: false
+      request_body: true
+      examples:
+        - endpoint: "POST /api/v1/users"
+          description: "創建新用戶"
+          status_code: 201
+    
+    - method: "PUT"
+      purpose: "完全更新資源"
+      idempotent: true
+      safe: false
+      request_body: true
+      examples:
+        - endpoint: "PUT /api/v1/users/{id}"
+          description: "完全更新用戶資料"
+          status_code: 200
+    
+    - method: "PATCH"
+      purpose: "部分更新資源"
+      idempotent: true
+      safe: false
+      request_body: true
+      examples:
+        - endpoint: "PATCH /api/v1/users/{id}"
+          description: "部分更新用戶資料"
+          status_code: 200
+    
+    - method: "DELETE"
+      purpose: "刪除資源"
+      idempotent: true
+      safe: false
+      request_body: false
+      examples:
+        - endpoint: "DELETE /api/v1/users/{id}"
+          description: "刪除用戶"
+          status_code: 204
+  
+  # Request/Response Format
+  request_format:
+    content_type: "application/json"
+    charset: "utf-8"
+    
+    headers:
+      required:
+        - name: "Content-Type"
+          value: "application/json"
+        - name: "Authorization"
+          value: "Bearer {token}"
+      
+      optional:
+        - name: "Accept-Language"
+          value: "zh-TW, en-US"
+          description: "客戶端偏好語言"
+        - name: "X-Request-ID"
+          value: "uuid"
+          description: "請求追蹤ID"
+    
+    body_structure:
+      example: |
+        {
+          "name": "John Doe",
+          "email": "john@example.com",
+          "role": "admin"
+        }
+      
+      validation_rules:
+        - "所有欄位使用camelCase命名"
+        - "日期使用ISO 8601格式 (YYYY-MM-DDTHH:mm:ssZ)"
+        - "布林值使用true/false"
+        - "數字不使用字符串包裝"
+  
+  response_format:
+    content_type: "application/json"
+    charset: "utf-8"
+    
+    success_response:
+      single_resource:
+        structure: |
+          {
+            "data": {
+              "id": "123",
+              "name": "John Doe",
+              "email": "john@example.com",
+              "createdAt": "2026-01-27T10:00:00Z",
+              "updatedAt": "2026-01-27T10:00:00Z"
+            }
+          }
+      
+      collection:
+        structure: |
+          {
+            "data": [
+              {
+                "id": "123",
+                "name": "John Doe"
+              }
+            ],
+            "meta": {
+              "total": 100,
+              "page": 1,
+              "perPage": 20,
+              "totalPages": 5
+            },
+            "links": {
+              "self": "/api/v1/users?page=1",
+              "next": "/api/v1/users?page=2",
+              "prev": null,
+              "first": "/api/v1/users?page=1",
+              "last": "/api/v1/users?page=5"
+            }
+          }
+    
+    error_response:
+      structure: |
+        {
+          "error": {
+            "code": "VALIDATION_ERROR",
+            "message": "Validation failed",
+            "details": [
+              {
+                "field": "email",
+                "message": "Email is required",
+                "code": "REQUIRED"
+              }
+            ],
+            "requestId": "req-uuid-123",
+            "timestamp": "2026-01-27T10:00:00Z"
+          }
+        }
+      
+      error_codes:
+        - code: "VALIDATION_ERROR"
+          description: "請求數據驗證失敗"
+          http_status: 400
+        - code: "UNAUTHORIZED"
+          description: "未授權或Token無效"
+          http_status: 401
+        - code: "FORBIDDEN"
+          description: "權限不足"
+          http_status: 403
+        - code: "NOT_FOUND"
+          description: "資源不存在"
+          http_status: 404
+        - code: "CONFLICT"
+          description: "資源衝突 (如唯一性約束)"
+          http_status: 409
+        - code: "RATE_LIMIT_EXCEEDED"
+          description: "請求頻率超過限制"
+          http_status: 429
+        - code: "INTERNAL_ERROR"
+          description: "服務器內部錯誤"
+          http_status: 500
+        - code: "SERVICE_UNAVAILABLE"
+          description: "服務暫時不可用"
+          http_status: 503
+  
+  # HTTP Status Codes
+  status_codes:
+    success:
+      - code: 200
+        name: "OK"
+        usage: "GET, PUT, PATCH請求成功"
+      - code: 201
+        name: "Created"
+        usage: "POST創建資源成功"
+        response_headers:
+          - "Location: /api/v1/users/{id}"
+      - code: 204
+        name: "No Content"
+        usage: "DELETE成功，無響應體"
+    
+    client_error:
+      - code: 400
+        name: "Bad Request"
+        usage: "請求參數錯誤或驗證失敗"
+      - code: 401
+        name: "Unauthorized"
+        usage: "未提供認證信息或認證失敗"
+      - code: 403
+        name: "Forbidden"
+        usage: "已認證但權限不足"
+      - code: 404
+        name: "Not Found"
+        usage: "資源不存在"
+      - code: 409
+        name: "Conflict"
+        usage: "資源衝突 (如重複創建)"
+      - code: 422
+        name: "Unprocessable Entity"
+        usage: "語法正確但語義錯誤"
+      - code: 429
+        name: "Too Many Requests"
+        usage: "超過速率限制"
+    
+    server_error:
+      - code: 500
+        name: "Internal Server Error"
+        usage: "服務器內部錯誤"
+      - code: 502
+        name: "Bad Gateway"
+        usage: "上游服務錯誤"
+      - code: 503
+        name: "Service Unavailable"
+        usage: "服務暫時不可用"
+      - code: 504
+        name: "Gateway Timeout"
+        usage: "上游服務超時"
+  
+  # Authentication & Authorization
+  authentication:
+    method: "JWT (JSON Web Tokens)"
+    
+    header_format:
+      name: "Authorization"
+      value: "Bearer {token}"
+    
+    token_structure:
+      header:
+        alg: "HS256"
+        typ: "JWT"
+      
+      payload:
+        iss: "machinenativeops-api"
+        sub: "user-id"
+        aud: "machinenativeops-app"
+        exp: "expiration-timestamp"
+        iat: "issued-at-timestamp"
+        roles: ["admin", "user"]
+      
+      signature: "HMACSHA256(base64UrlEncode(header) + '.' + base64UrlEncode(payload), secret)"
+    
+    token_lifecycle:
+      access_token_ttl: "15 minutes"
+      refresh_token_ttl: "7 days"
+      refresh_endpoint: "/api/v1/auth/refresh"
+    
+    endpoints:
+      - endpoint: "POST /api/v1/auth/login"
+        description: "用戶登入"
+        request:
+          email: "user@example.com"
+          password: "password"
+        response:
+          accessToken: "jwt-token"
+          refreshToken: "refresh-token"
+          expiresIn: 900
+      
+      - endpoint: "POST /api/v1/auth/logout"
+        description: "用戶登出"
+        response:
+          message: "Logged out successfully"
+      
+      - endpoint: "POST /api/v1/auth/refresh"
+        description: "刷新訪問令牌"
+        request:
+          refreshToken: "refresh-token"
+        response:
+          accessToken: "new-jwt-token"
+          expiresIn: 900
+  
+  authorization:
+    model: "RBAC (Role-Based Access Control)"
+    
+    roles:
+      - role: "admin"
+        description: "系統管理員"
+        permissions:
+          - "users:*"
+          - "roles:*"
+          - "system:*"
+      
+      - role: "user"
+        description: "一般用戶"
+        permissions:
+          - "users:read:self"
+          - "users:update:self"
+          - "data:read"
+          - "data:create"
+      
+      - role: "readonly"
+        description: "只讀用戶"
+        permissions:
+          - "users:read:self"
+          - "data:read"
+    
+    permission_format: "{resource}:{action}:{scope}"
+    
+    enforcement:
+      - "在API Gateway層級進行角色驗證"
+      - "在應用層級進行細粒度權限檢查"
+      - "資源擁有者可訪問自己的資源"
+  
+  # Validation
+  validation:
+    request_validation:
+      - "使用JSON Schema驗證請求體"
+      - "驗證路徑參數與查詢參數"
+      - "強制執行必填欄位"
+      - "驗證數據類型與格式"
+      - "檢查欄位長度與範圍"
+    
+    business_validation:
+      - "檢查業務規則 (如唯一性約束)"
+      - "驗證資源關聯性"
+      - "檢查操作權限"
+    
+    sanitization:
+      - "清理HTML標籤防止XSS"
+      - "參數化查詢防止SQL注入"
+      - "限制檔案上傳大小與類型"
+  
+  # Rate Limiting
+  rate_limiting:
+    strategy: "Token Bucket Algorithm"
+    
+    limits:
+      - tier: "anonymous"
+        requests_per_minute: 10
+        requests_per_hour: 100
+      
+      - tier: "authenticated"
+        requests_per_minute: 60
+        requests_per_hour: 1000
+      
+      - tier: "premium"
+        requests_per_minute: 300
+        requests_per_hour: 10000
+    
+    headers:
+      - "X-RateLimit-Limit: 60"
+      - "X-RateLimit-Remaining: 45"
+      - "X-RateLimit-Reset: 1643276400"
+    
+    exceeded_response:
+      status_code: 429
+      body: |
+        {
+          "error": {
+            "code": "RATE_LIMIT_EXCEEDED",
+            "message": "Too many requests. Please try again later.",
+            "retryAfter": 60
+          }
+        }
+  
+  # Caching
+  caching:
+    strategies:
+      - type: "ETags"
+        description: "基於內容哈希的緩存驗證"
+        headers:
+          request: "If-None-Match: {etag}"
+          response: "ETag: {etag}"
+        status_code: 304
+      
+      - type: "Last-Modified"
+        description: "基於時間的緩存驗證"
+        headers:
+          request: "If-Modified-Since: {date}"
+          response: "Last-Modified: {date}"
+        status_code: 304
+      
+      - type: "Cache-Control"
+        description: "緩存策略指示"
+        examples:
+          - "Cache-Control: public, max-age=3600"
+          - "Cache-Control: private, no-cache"
+          - "Cache-Control: no-store"
+    
+    cache_policies:
+      static_resources:
+        policy: "Cache-Control: public, max-age=31536000, immutable"
+      
+      dynamic_resources:
+        policy: "Cache-Control: private, max-age=300, must-revalidate"
+      
+      sensitive_data:
+        policy: "Cache-Control: no-store"
+  
+  # Pagination
+  pagination:
+    method: "Offset-based (default)"
+    
+    parameters:
+      - name: "page"
+        type: "integer"
+        default: 1
+        min: 1
+      
+      - name: "per_page"
+        type: "integer"
+        default: 20
+        min: 1
+        max: 100
+    
+    response_meta:
+      total: "總記錄數"
+      page: "當前頁碼"
+      perPage: "每頁記錄數"
+      totalPages: "總頁數"
+    
+    response_links:
+      self: "當前頁連結"
+      first: "第一頁連結"
+      last: "最後一頁連結"
+      prev: "上一頁連結 (如有)"
+      next: "下一頁連結 (如有)"
+    
+    cursor_based:
+      description: "用於大數據集或實時數據"
+      parameters:
+        - name: "cursor"
+          type: "string"
+          description: "Base64編碼的游標"
+        - name: "limit"
+          type: "integer"
+          default: 20
+      response:
+        nextCursor: "下一頁游標"
+        hasMore: "是否有更多數據"
+  
+  # Error Handling
+  error_handling:
+    principles:
+      - "提供明確的錯誤訊息"
+      - "包含錯誤代碼供程式化處理"
+      - "不洩露敏感系統信息"
+      - "記錄錯誤以供調試"
+    
+    error_response_structure:
+      code: "機器可讀的錯誤代碼"
+      message: "人類可讀的錯誤訊息"
+      details: "詳細錯誤信息 (可選)"
+      requestId: "請求追蹤ID"
+      timestamp: "錯誤發生時間"
+    
+    validation_errors:
+      format: |
+        {
+          "error": {
+            "code": "VALIDATION_ERROR",
+            "message": "Validation failed",
+            "details": [
+              {
+                "field": "email",
+                "message": "Invalid email format",
+                "code": "INVALID_FORMAT",
+                "value": "invalid-email"
+              }
+            ]
+          }
+        }
+  
+  # API Documentation
+  documentation:
+    format: "OpenAPI 3.0"
+    
+    tools:
+      - "Swagger UI (Interactive Documentation)"
+      - "ReDoc (Clean API Reference)"
+      - "Postman Collection"
+    
+    required_sections:
+      - "API概述與認證"
+      - "所有端點的詳細說明"
+      - "請求/響應範例"
+      - "錯誤代碼列表"
+      - "變更日誌"
+    
+    best_practices:
+      - "每個端點包含詳細描述"
+      - "提供完整的請求/響應範例"
+      - "文檔與代碼保持同步"
+      - "包含常見使用案例"
+  
+  # Testing
+  testing:
+    contract_testing:
+      tool: "Pact"
+      description: "確保API契約在前後端一致"
+      workflow:
+        - "前端生成契約 (Consumer Contract)"
+        - "後端驗證契約 (Provider Verification)"
+        - "CI/CD自動執行契約測試"
+    
+    integration_testing:
+      tools: ["Postman", "REST Client", "pytest"]
+      coverage:
+        - "所有端點的CRUD操作"
+        - "認證與授權流程"
+        - "錯誤處理場景"
+        - "邊界條件測試"
+    
+    load_testing:
+      tools: ["k6", "Artillery", "JMeter"]
+      scenarios:
+        - "正常負載測試"
+        - "壓力測試 (找出系統極限)"
+        - "峰值測試 (突發流量)"
+        - "浸泡測試 (長時間運行)"
+  
+  # Monitoring & Logging
+  monitoring:
+    metrics:
+      - "請求數量 (by endpoint, status code)"
+      - "響應時間 (p50, p95, p99)"
+      - "錯誤率 (by error code)"
+      - "活躍連接數"
+    
+    logging:
+      format: "Structured JSON Logging"
+      
+      log_levels:
+        - "ERROR: 錯誤事件"
+        - "WARN: 警告事件"
+        - "INFO: 重要信息事件"
+        - "DEBUG: 調試信息"
+      
+      required_fields:
+        - "timestamp"
+        - "level"
+        - "requestId"
+        - "userId (if authenticated)"
+        - "endpoint"
+        - "method"
+        - "statusCode"
+        - "duration"
+        - "message"
+      
+      sensitive_data:
+        - "不記錄密碼或Token"
+        - "遮蔽敏感個人信息"
+        - "使用requestId關聯日誌"
+  
+  # Deprecation Policy
+  deprecation:
+    process:
+      - step: 1
+        action: "公告棄用 (至少提前6個月)"
+        communication: "文檔、API響應頭、郵件通知"
+      
+      - step: 2
+        action: "添加棄用警告"
+        headers:
+          - "Deprecation: true"
+          - "Sunset: 2026-12-31"
+          - "Link: <https://api.example.com/docs/migration>; rel=\"deprecation\""
+      
+      - step: 3
+        action: "監控舊版本使用情況"
+        metrics: "追蹤舊API端點的調用量"
+      
+      - step: 4
+        action: "停用舊版本"
+        response:
+          status: 410
+          message: "This API version has been sunset. Please migrate to v2."
+    
+    migration_support:
+      - "提供詳細的遷移指南"
+      - "提供遷移工具或腳本 (如適用)"
+      - "支持並行運行新舊版本"
+      - "提供技術支援"
+  
+  # OpenAPI Template
+  openapi_template:
+    example: |
+      openapi: 3.0.3
+      info:
+        title: MachineNativeOps API
+        version: 1.0.0
+        description: API for MachineNativeOps platform
+        contact:
+          name: API Support
+          email: api-support@machinenativeops.io
+      servers:
+        - url: https://api.machinenativeops.io/api/v1
+          description: Production
+        - url: https://staging-api.machinenativeops.io/api/v1
+          description: Staging
+      paths:
+        /users:
+          get:
+            summary: List users
+            operationId: listUsers
+            tags:
+              - Users
+            parameters:
+              - name: page
+                in: query
+                schema:
+                  type: integer
+                  default: 1
+              - name: per_page
+                in: query
+                schema:
+                  type: integer
+                  default: 20
+            responses:
+              '200':
+                description: Successful response
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        data:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/User'
+                        meta:
+                          $ref: '#/components/schemas/PaginationMeta'
+          post:
+            summary: Create user
+            operationId: createUser
+            tags:
+              - Users
+            requestBody:
+              required: true
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/CreateUserRequest'
+            responses:
+              '201':
+                description: User created
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        data:
+                          $ref: '#/components/schemas/User'
+      components:
+        schemas:
+          User:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              email:
+                type: string
+                format: email
+              createdAt:
+                type: string
+                format: date-time
+          CreateUserRequest:
+            type: object
+            required:
+              - name
+              - email
+            properties:
+              name:
+                type: string
+              email:
+                type: string
+                format: email
+          PaginationMeta:
+            type: object
+            properties:
+              total:
+                type: integer
+              page:
+                type: integer
+              perPage:
+                type: integer
+              totalPages:
+                type: integer
+        securitySchemes:
+          BearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+      security:
+        - BearerAuth: []
+
+status:
+  phase: "active"
+  approved_by: "engineering-team"
+  approved_at: "2026-01-27T00:00:00Z"
+  last_review: "2026-01-27T00:00:00Z"
+  next_review: "2026-07-27T00:00:00Z"
+  change_history:
+    - version: "1.0.0"
+      date: "2026-01-27"
+      author: "engineering-team"
+      changes: "Initial API design specification"

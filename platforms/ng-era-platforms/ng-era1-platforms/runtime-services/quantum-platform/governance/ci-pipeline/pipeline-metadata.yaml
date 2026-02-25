@@ -1,0 +1,177 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governance-core
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL90_99-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: pipeline.machinenativeops.io/v1
+kind: PipelineMetadata
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:ci-pipeline:pipeline-metadata.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/ci-pipeline/pipeline-metadata.yaml"
+  name: gl-quantum-pipeline-metadata
+  namespace: ci-cd
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-ci
+spec:
+  pipeline:
+    id: gl-quantum-pipeline-v1
+    name: GL Quantum Architecture Platform CI Pipeline
+    version: "1.0.0"
+    description: "Complete CI pipeline for GL Quantum Architecture Platform"
+    author: "GL Quantum Platform Team"
+    created: "2024-01-30T00:00:00Z"
+    
+  trigger:
+    type: ["push", "pull_request", "schedule"]
+    events:
+      - push:
+          branches: ["main", "develop", "feature/*"]
+      - pull_request:
+          branches: ["main", "develop"]
+      - schedule:
+          cron: "0 0 * * *"  # Daily
+          
+  stages:
+    - id: stage-001
+      name: validation
+      description: "Validate changes and metadata"
+      duration: "5m"
+      dependencies: []
+      
+    - id: stage-002
+      name: security-scan
+      description: "Security scanning and vulnerability detection"
+      duration: "10m"
+      dependencies: ["stage-001"]
+      
+    - id: stage-003
+      name: build
+      description: "Build artifacts and generate SBOM"
+      duration: "15m"
+      dependencies: ["stage-002"]
+      
+    - id: stage-004
+      name: test
+      description: "Run tests and generate evidence"
+      duration: "20m"
+      dependencies: ["stage-003"]
+      
+    - id: stage-005
+      name: governance
+      description: "Governance validation and compliance checks"
+      duration: "10m"
+      dependencies: ["stage-004"]
+      
+    - id: stage-006
+      name: deploy
+      description: "Deploy artifacts to staging"
+      duration: "15m"
+      dependencies: ["stage-005"]
+      
+    - id: stage-007
+      name: verification
+      description: "Post-deployment verification and evidence collection"
+      duration: "5m"
+      dependencies: ["stage-006"]
+      
+  evidence_output:
+    enabled: true
+    format: json
+    path: artifacts/evidence/
+    include:
+      - test-results
+      - security-scans
+      - sbom
+      - governance-reports
+      - deployment-logs
+      - verification-results
+      
+  audit_log:
+    enabled: true
+    format: json
+    path: artifacts/audit/
+    retention: 365d
+    include:
+      - timestamp
+      - stage_id
+      - job_id
+      - step_id
+      - status
+      - duration
+      - artifacts
+      - evidence
+      - who
+      - why
+      - how
+      - exit_code
+      - error_message
+      
+  fail_action:
+    enabled: true
+    on_failure:
+      - notify-team
+      - create-ticket
+      - rollback-if-deployed
+      - generate-report
+      
+    rollback:
+      enabled: true
+      timeout: 10m
+      strategy: git-revert
+      confirmation: required
+      
+  notifications:
+    enabled: true
+    channels:
+      - type: slack
+        webhook: ${{ secrets.SLACK_WEBHOOK }}
+        on:
+          - failure
+          - success
+          - warning
+          
+      - type: email
+        recipients: ["platform-team@machinenativeops.com"]
+        on:
+          - failure
+          
+  security:
+    sbom:
+      enabled: true
+      tools:
+        - syft
+        - trivy
+        
+    signing:
+      enabled: true
+      tool: cosign
+      key: ${{ secrets.COSIGN_PRIVATE_KEY }}
+      
+    provenance:
+      enabled: true
+      slsa_level: 3
+      
+  compliance:
+    naming:
+      enabled: true
+      tools:
+        - conftest
+        - kyverno
+        - gatekeeper
+        
+    governance:
+      enabled: true
+      policies:
+        - naming-governance
+        - security-governance
+        - supply-chain-governance

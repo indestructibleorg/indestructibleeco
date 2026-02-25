@@ -1,0 +1,459 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: cross-platform-monitoring
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Cross-Platform Monitoring Configuration
+# Supports Prometheus, CloudWatch, Cloud Monitoring, Azure Monitor, and OpenTelemetry
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:cross-platform-monitoring.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/cross-platform-monitoring.yaml"
+  name: cross-platform-monitoring-config
+  namespace: production
+data:
+  # OpenTelemetry Configuration (Universal)
+  opentelemetry.yaml: |
+    receivers:
+      # Application Metrics
+      prometheus:
+        config:
+          scrape_configs:
+            - job_name: 'machine-native-ops'
+              scrape_interval: 15s
+              metrics_path: /metrics
+              static_configs:
+                - targets: ['localhost:9090']
+      
+      # Application Logs
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+      
+      # Application Traces
+      jaeger:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:14250
+          thrift_http:
+            endpoint: 0.0.0.0:14268
+          thrift_compact:
+            endpoint: 0.0.0.0:6831
+    
+    processors:
+      batch:
+        timeout: 5s
+        send_batch_size: 10000
+      memory_limiter:
+        limit_mib: 512
+        spike_limit_mib: 100
+        check_interval: 5s
+      attributes:
+        actions:
+          - key: environment
+            value: production
+            action: upsert
+          - key: service.name
+            value: machine-native-ops
+            action: upsert
+    
+    exporters:
+      # Prometheus Exporter
+      prometheusremotewrite:
+        endpoint: ${PROMETHEUS_REMOTE_WRITE_URL}
+        headers:
+          X-Prometheus-Remote-Write-Version: "0.1.0"
+      
+      # AWS CloudWatch Exporter
+      awscwlogs:
+        log_group_name: /machine-native-ops/production
+        log_stream_name: {instance}
+        region: ${AWS_REGION:-us-east-1}
+        log_retention: 30
+      
+      # Google Cloud Monitoring Exporter
+      googlecloud:
+        project: ${GCP_PROJECT}
+        log:
+          resource:
+            type: k8s_container
+        metric:
+          resource:
+            type: k8s_container
+      
+      # Azure Monitor Exporter
+      azuremonitor:
+        instrumentation_key: ${AZURE_APP_INSIGHTS_KEY}
+        max_batch_size: 1000
+        max_batch_interval: 10s
+      
+      # Jaeger Exporter
+      jaeger:
+        endpoint: ${JAEGER_ENDPOINT:-http://jaeger-collector:14250}
+        tls:
+          insecure: true
+      
+      # Loki Exporter
+      loki:
+        endpoint: ${LOKI_ENDPOINT:-http://loki:3100/loki/api/v1/push}
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          environment: production
+          service: machine-native-ops
+      
+      # Elasticsearch Exporter
+      elasticsearch:
+        endpoints: [${ES_ENDPOINT:-http://elasticsearch:9200}]
+        index: machine-native-ops-${date:2006-01-02}
+        flush_interval: 1s
+    
+    service:
+      pipelines:
+        # Metrics Pipeline
+        metrics:
+          receivers: [prometheus]
+          processors: [batch, memory_limiter]
+          exporters: [prometheusremotewrite, googlecloud, azuremonitor]
+        
+        # Logs Pipeline
+        logs:
+          receivers: [otlp]
+          processors: [batch, memory_limiter, attributes]
+          exporters: [awscwlogs, googlecloud, loki, elasticsearch]
+        
+        # Traces Pipeline
+        traces:
+          receivers: [jaeger, otlp]
+          processors: [batch, memory_limiter, attributes]
+          exporters: [jaeger, googlecloud, azuremonitor]
+  
+  # Prometheus Configuration
+  prometheus.yaml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+      external_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        cluster: ${CLUSTER_NAME}
+        environment: production
+    
+    scrape_configs:
+      - job_name: 'machine-native-ops'
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names:
+                - production
+        relabel_configs:
+          - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__meta_kubernetes_pod_label_app]
+            action: keep
+            regex: machine-native-ops
+          - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__meta_kubernetes_pod_name]
+            target_label: pod
+          - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__meta_kubernetes_namespace]
+            target_label: namespace
+          - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__meta_kubernetes_pod_node_name]
+            target_label: node
+      
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__meta_kubernetes_pod_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+          - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__
+          - action: labelmap
+            regex: __meta_kubernetes_pod_label_(.+)
+          - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__meta_kubernetes_namespace]
+            action: replace
+            target_label: namespace
+          - source_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: pod
+    
+    remote_write:
+      - url: ${PROMETHEUS_REMOTE_WRITE_URL}
+        queue_config:
+          capacity: 10000
+          max_shards: 50
+          min_shards: 1
+          max_samples_per_send: 5000
+          batch_send_deadline: 5s
+          min_backoff: 30ms
+          max_backoff: 100ms
+  
+  # CloudWatch Configuration
+  cloudwatch.yaml: |
+    cloudwatch:
+      enabled: ${CLOUDWATCH_ENABLED:-false}
+      region: ${AWS_REGION:-us-east-1}
+      namespace: MachineNativeOps/Production
+      
+      metrics:
+        # Application Metrics
+        - name: RequestCount
+          unit: Count
+          statistics: [Sum, SampleCount]
+          dimensions:
+            - name: Service
+              value: machine-native-ops
+        
+        - name: RequestLatency
+          unit: Milliseconds
+          statistics: [Average, Minimum, Maximum, p95, p99]
+          dimensions:
+            - name: Service
+              value: machine-native-ops
+            - name: Operation
+              value: ${OPERATION}
+        
+        - name: ErrorRate
+          unit: Percent
+          statistics: [Average]
+          dimensions:
+            - name: Service
+              value: machine-native-ops
+        
+        - name: ActiveConnections
+          unit: Count
+          statistics: [Average, Maximum]
+          dimensions:
+            - name: Service
+              value: machine-native-ops
+            - name: Type
+              value: database
+        
+        # Infrastructure Metrics
+        - name: CPUUtilization
+          unit: Percent
+          statistics: [Average, Maximum]
+          dimensions:
+            - name: Service
+              value: machine-native-ops
+        
+        - name: MemoryUtilization
+          unit: Percent
+          statistics: [Average, Maximum]
+          dimensions:
+            - name: Service
+              value: machine-native-ops
+        
+        - name: DiskIOPS
+          unit: Count/Second
+          statistics: [Average]
+          dimensions:
+            - name: Service
+              value: machine-native-ops
+      
+      logs:
+        logGroup: /aws/eks/${CLUSTER_NAME}/machine-native-ops
+        logStreamPrefix: application
+        retentionInDays: 30
+  
+  # Google Cloud Monitoring Configuration
+  gcp-monitoring.yaml: |
+    gcp-monitoring:
+      enabled: ${GCP_MONITORING_ENABLED:-false}
+      project: ${GCP_PROJECT}
+      
+      metrics:
+        # Custom Metrics
+        - name: custom.googleapis.com/machine-native-ops/request_count
+          type: GAUGE
+          metricKind: CUMULATIVE
+          valueType: INT64
+          unit: 1
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            - name: operation
+              type: STRING
+            - name: status
+              type: STRING
+        
+        - name: custom.googleapis.com/machine-native-ops/request_latency
+          type: GAUGE
+          metricKind: GAUGE
+          valueType: DOUBLE
+          unit: ms
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            - name: operation
+              type: STRING
+            - name: percentile
+              type: STRING
+        
+        - name: custom.googleapis.com/machine-native-ops/error_rate
+          type: GAUGE
+          metricKind: GAUGE
+          valueType: DOUBLE
+          unit: 1
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            - name: error_type
+              type: STRING
+      
+      logs:
+        logId: machine-native-ops-production
+        resource:
+          type: k8s_container
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            cluster_name: ${CLUSTER_NAME}
+            location: ${GCP_ZONE}
+            namespace_name: production
+            pod_name: ${POD_NAME}
+            container_name: machine-native-ops
+  
+  # Azure Monitor Configuration
+  azure-monitor.yaml: |
+    azure-monitor:
+      enabled: ${AZURE_MONITOR_ENABLED:-false}
+      instrumentationKey: ${AZURE_APP_INSIGHTS_KEY}
+      resourceGroup: ${RESOURCE_GROUP}
+      subscriptionId: ${SUBSCRIPTION_ID}
+      
+      metrics:
+        # Application Metrics
+        - name: requests/count
+          aggregation: [count, avg, sum]
+        
+        - name: requests/duration
+          aggregation: [avg, min, max]
+        
+        - name: exceptions/count
+          aggregation: [count, sum]
+        
+        - name: performanceCounters/availableMemory
+          aggregation: [avg, min, max]
+        
+        - name: performanceCounters/processCpuPercentage
+          aggregation: [avg, min, max]
+      
+      logs:
+        logType: ApplicationInsights
+        samplingPercentage: 100
+  
+  # Grafana Dashboards (Universal)
+  grafana-dashboards.yaml: |
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:cross-platform-monitoring.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/cross-platform-monitoring.yaml"
+      name: grafana-dashboards
+      namespace: monitoring
+    data:
+      machine-native-ops-dashboard.json: |
+        {
+          "dashboard": {
+            "title": "MachineNativeOps - Cross-Platform Monitoring",
+            "panels": [
+              {
+                "title": "Request Rate",
+                "targets": [
+                  {
+                    "expr": "sum(rate(http_requests_total{service=&quot;machine-native-ops&quot;}[5m]))",
+                    "legendFormat": "{{method}} {{path}}"
+                  }
+                ],
+                "type": "graph"
+              },
+              {
+                "title": "Request Latency",
+                "targets": [
+                  {
+                    "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service=&quot;machine-native-ops&quot;}[5m])) by (le))",
+                    "legendFormat": "P95"
+                  },
+                  {
+                    "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{service=&quot;machine-native-ops&quot;}[5m])) by (le))",
+                    "legendFormat": "P99"
+                  }
+                ],
+                "type": "graph"
+              },
+              {
+                "title": "Error Rate",
+                "targets": [
+                  {
+                    "expr": "sum(rate(http_requests_total{service=&quot;machine-native-ops&quot;,status=~&quot;5..&quot;}[5m])) / sum(rate(http_requests_total{service=&quot;machine-native-ops&quot;}[5m])) * 100",
+                    "legendFormat": "Error Rate %"
+                  }
+                ],
+                "type": "gauge"
+              },
+              {
+                "title": "Active Connections",
+                "targets": [
+                  {
+                    "expr": "active_connections{service=&quot;machine-native-ops&quot;}",
+                    "legendFormat": "{{type}}"
+                  }
+                ],
+                "type": "graph"
+              },
+              {
+                "title": "CPU Utilization",
+                "targets": [
+                  {
+                    "expr": "rate(process_cpu_seconds_total{service=&quot;machine-native-ops&quot;}[5m]) * 100",
+                    "legendFormat": "CPU %"
+                  }
+                ],
+                "type": "graph"
+              },
+              {
+                "title": "Memory Utilization",
+                "targets": [
+                  {
+                    "expr": "process_resident_memory_bytes{service=&quot;machine-native-ops&quot;} / 1024 / 1024",
+                    "legendFormat": "Memory MB"
+                  }
+                ],
+                "type": "graph"
+              }
+            ]
+          }
+        }

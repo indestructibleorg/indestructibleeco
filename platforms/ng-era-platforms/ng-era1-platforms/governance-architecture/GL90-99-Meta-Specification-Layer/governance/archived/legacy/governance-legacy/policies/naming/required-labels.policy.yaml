@@ -1,0 +1,495 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# Required Labels Policy
+# 定義所有資源必須具備的標籤
+# 此文件應從 canonical/machine-spec.yaml 派生
+
+apiVersion: governance.machinenativeops.io/v1alpha1
+kind: LabelPolicy
+metadata:
+  name: required-labels-policy
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    category: naming
+    module: canonical-naming
+    enforcement: strict
+  annotations:
+    source: "canonical/machine-spec.yaml"
+    generated: "false"  # 未來應標記為 true（從 machine-spec codegen）
+    description: "強制要求的標籤策略"
+
+spec:
+  # 應用範圍
+  scope:
+    resourceTypes:
+      - "Namespace"
+      - "Deployment"
+      - "StatefulSet"
+      - "DaemonSet"
+      - "Service"
+      - "Ingress"
+      - "ConfigMap"
+      - "Secret"
+      - "PersistentVolumeClaim"
+      - "HorizontalPodAutoscaler"
+
+  # 必需標籤定義
+  required_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    # 標籤 1: environment (環境標識)
+    - key: "environment"
+      description: "部署環境標識（dev/test/staging/prod/learn）"
+      validation:
+        type: "allow_list"
+        allowed_values:
+          - "dev"
+          - "test"
+          - "staging"
+          - "prod"
+          - "learn"
+        regex: "^(dev|test|staging|prod|learn)$"
+      severity: "critical"
+      required_for:
+        - "Namespace"
+        - "Deployment"
+        - "StatefulSet"
+        - "DaemonSet"
+        - "Service"
+      exemptions:
+        - "kube-system"
+        - "kube-public"
+        - "kube-node-lease"
+        - "default"
+      error_message: "缺少必需標籤 'environment' 或值不合法"
+      remediation: |
+        添加標籤:
+          environment: dev|test|staging|prod|learn
+
+    # 標籤 2: tenant (租戶標識)
+    - key: "tenant"
+      description: "租戶標識，用於資源隔離和成本分配"
+      validation:
+        type: "regex"
+        regex: "^[a-z0-9-]{2,32}$"
+      severity: "critical"
+      required_for:
+        - "Namespace"
+      exemptions:
+        - "kube-system"
+        - "kube-public"
+        - "kube-node-lease"
+        - "default"
+      error_message: "缺少必需標籤 'tenant' 或格式不正確"
+      remediation: |
+        添加標籤:
+          tenant: <your-tenant-name>
+        格式要求: 2-32 字符，小寫字母、數字和破折號
+
+    # 標籤 3: app.kubernetes.io/name (應用名稱)
+    - key: "app.kubernetes.io/name"
+      description: "應用名稱（Kubernetes 推薦標籤）"
+      validation:
+        type: "regex"
+        regex: "^[a-z0-9-]{2,63}$"
+      severity: "high"
+      required_for:
+        - "Deployment"
+        - "StatefulSet"
+        - "DaemonSet"
+        - "Service"
+      error_message: "缺少推薦標籤 'app.kubernetes.io/name'"
+      remediation: |
+        添加標籤:
+          app.kubernetes.io/name: <app-name>
+
+    # 標籤 4: app.kubernetes.io/managed-by (管理工具)
+    - key: "app.kubernetes.io/managed-by"
+      description: "管理此資源的工具（helm/kubectl/terraform/argocd/flux）"
+      validation:
+        type: "allow_list"
+        allowed_values:
+          - "helm"
+          - "kubectl"
+          - "terraform"
+          - "argocd"
+          - "flux"
+          - "kustomize"
+        regex: "^(helm|kubectl|terraform|argocd|flux|kustomize)$"
+      severity: "medium"
+      required_for:
+        - "Namespace"
+        - "Deployment"
+        - "StatefulSet"
+        - "Service"
+      error_message: "缺少推薦標籤 'app.kubernetes.io/managed-by'"
+      remediation: |
+        添加標籤:
+          app.kubernetes.io/managed-by: helm|kubectl|terraform|argocd|flux
+
+    # 標籤 5: team (負責團隊)
+    - key: "team"
+      description: "負責此資源的團隊"
+      validation:
+        type: "regex"
+        regex: "^[a-z0-9-]{2,32}$"
+      severity: "medium"
+      required_for:
+        - "Namespace"
+        - "Deployment"
+        - "StatefulSet"
+      error_message: "缺少推薦標籤 'team'"
+      remediation: |
+        添加標籤:
+          team: <team-name>
+
+    # 標籤 6: app.kubernetes.io/version (應用版本)
+    - key: "app.kubernetes.io/version"
+      description: "應用版本（建議使用語義版本）"
+      validation:
+        type: "regex"
+        regex: "^v?[0-9]+\\.[0-9]+\\.[0-9]+(-[a-z0-9-]+)?$"
+      severity: "low"
+      required_for:
+        - "Deployment"
+        - "StatefulSet"
+      optional: true
+      error_message: "標籤 'app.kubernetes.io/version' 格式不正確"
+      remediation: |
+        添加標籤:
+          app.kubernetes.io/version: v1.2.3
+
+    # 標籤 7: app.kubernetes.io/component (應用組件)
+    - key: "app.kubernetes.io/component"
+      description: "應用組件類型（frontend/backend/database/cache）"
+      validation:
+        type: "allow_list"
+        allowed_values:
+          - "frontend"
+          - "backend"
+          - "api"
+          - "database"
+          - "cache"
+          - "queue"
+          - "worker"
+          - "scheduler"
+        regex: "^(frontend|backend|api|database|cache|queue|worker|scheduler)$"
+      severity: "low"
+      required_for:
+        - "Deployment"
+        - "StatefulSet"
+      optional: true
+      error_message: "標籤 'app.kubernetes.io/component' 值不在允許列表中"
+      remediation: |
+        添加標籤:
+          app.kubernetes.io/app.kubernetes.io/component: frontend|backend|database|...
+
+  # 推薦標籤（非必需）
+  recommended_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    - key: "cost-center"
+      description: "成本中心代碼"
+      validation:
+        type: "regex"
+        regex: "^CC-[0-9]{4}$"
+      example: "CC-1234"
+
+    - key: "owner"
+      description: "資源擁有者（郵箱）"
+      validation:
+        type: "regex"
+        regex: "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$"
+      example: "team@example.com"
+
+    - key: "project"
+      description: "所屬項目"
+      validation:
+        type: "regex"
+        regex: "^[a-z0-9-]{2,32}$"
+      example: "ecommerce-platform"
+
+  # 驗證規則
+  validation_rules:
+    # 規則 1: Namespace 必需標籤
+    - id: "LABEL-001"
+      name: "Namespace Required Labels"
+      resource_type: "Namespace"
+      severity: "critical"
+      required_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        - "environment"
+        - "tenant"
+      error_message: "Namespace 缺少必需標籤"
+
+    # 規則 2: Deployment 必需標籤
+    - id: "LABEL-002"
+      name: "Deployment Required Labels"
+      resource_type: "Deployment"
+      severity: "high"
+      required_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        - "environment"
+        - "app.kubernetes.io/name"
+        - "app.kubernetes.io/managed-by"
+      error_message: "Deployment 缺少必需標籤"
+
+    # 規則 3: Service 必需標籤
+    - id: "LABEL-003"
+      name: "Service Required Labels"
+      resource_type: "Service"
+      severity: "high"
+      required_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        - "environment"
+        - "app.kubernetes.io/name"
+      error_message: "Service 缺少必需標籤"
+
+    # 規則 4: 標籤值驗證
+    - id: "LABEL-004"
+      name: "Label Value Validation"
+      resource_type: "all"
+      severity: "high"
+      description: "驗證標籤值符合規定格式"
+
+  # 標籤繼承規則
+  inheritance:
+    enabled: true
+    description: "子資源自動繼承父資源的特定標籤"
+    rules:
+      # Namespace → Deployment/Service
+      - from: "Namespace"
+        to: ["Deployment", "StatefulSet", "DaemonSet", "Service", "Ingress"]
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "environment"
+          - "tenant"
+          - "team"
+
+      # Deployment → Pod
+      - from: "Deployment"
+        to: ["Pod"]
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "environment"
+          - "app.kubernetes.io/name"
+          - "app.kubernetes.io/version"
+
+  # 自動標注（可選功能）
+  auto_labeling:
+    enabled: false
+    description: "自動為資源添加標籤"
+    rules:
+      # 基於 Namespace 自動添加環境標籤
+      - condition: "namespace matches 'team-.*-prod'"
+        add_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          environment: "prod"
+
+      - condition: "namespace matches 'team-.*-staging'"
+        add_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          environment: "staging"
+
+      - condition: "namespace matches 'team-.*-dev'"
+        add_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          environment: "dev"
+
+  # 強制執行
+  enforcement:
+    mode: "enforce"  # enforce | warn | advisory
+
+    # 按嚴重性級別強制
+    by_severity:
+      critical:
+        action: "deny"
+        notify: true
+      high:
+        action: "warn"
+        notify: true
+      medium:
+        action: "log"
+        notify: false
+      low:
+        action: "log"
+        notify: false
+
+    # 按環境強制
+    by_environment:
+      production:
+        enforce_critical: true
+        enforce_high: true
+        enforce_medium: true
+      staging:
+        enforce_critical: true
+        enforce_high: true
+        enforce_medium: false
+      dev:
+        enforce_critical: false
+        enforce_high: false
+        enforce_medium: false
+
+  # 工具集成
+  tooling:
+    # Gatekeeper
+    gatekeeper:
+      enabled: true
+      constraint_template: "policies/gatekeeper/required-labels-constraint.yaml"
+
+    # Conftest
+    conftest:
+      enabled: true
+      policy_file: "templates/conftest/labels.rego"
+
+    # Kyverno (可選)
+    kyverno:
+      enabled: false
+      policy_file: "policies/kyverno/label-policy.yaml"
+
+  # 報告和通知
+  reporting:
+    slack:
+      enabled: true
+      channel: "#label-violations"
+      notify_on: ["critical", "high"]
+
+    prometheus:
+      enabled: true
+      metrics:
+        - name: "label_compliance_rate"
+          type: "gauge"
+          description: "標籤合規率"
+        - name: "missing_labels_count"
+          type: "counter"
+          description: "缺少標籤的資源數量"
+
+  # 審計
+  audit:
+    enabled: true
+    log_level: "info"
+    retention: "90d"
+    fields:
+      - "timestamp"
+      - "resource_type"
+      - "resource_name"
+      - "namespace"
+      - "missing_labels"
+      - "invalid_labels"
+      - "severity"
+
+# 使用示例
+examples:
+  # 示例 1: 合規的 Namespace
+  - description: "合規的 Namespace"
+    resource:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "team-frontend-prod"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          environment: "prod"
+          tenant: "platform-team"
+          team: "frontend-team"
+          app.kubernetes.io/managed-by: "helm"
+    expected: "PASS"
+
+  # 示例 2: 缺少環境標籤
+  - description: "缺少 environment 標籤"
+    resource:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "team-frontend-prod"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          tenant: "platform-team"
+    expected: "FAIL"
+    violation: "LABEL-001"
+
+  # 示例 3: 環境標籤值錯誤
+  - description: "environment 標籤值不合法"
+    resource:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "team-frontend-prod"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          environment: "production"  # 應該是 'prod'
+          tenant: "platform-team"
+    expected: "FAIL"
+    violation: "environment label value invalid"
+
+  # 示例 4: 合規的 Deployment
+  - description: "合規的 Deployment"
+    resource:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: "frontend-api"
+        namespace: "team-frontend-prod"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          environment: "prod"
+          app.kubernetes.io/name: "frontend-api"
+          app.kubernetes.io/managed-by: "helm"
+          app.kubernetes.io/version: "v1.2.3"
+          team: "frontend-team"
+      spec:
+        replicas: 3
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: frontend-api
+    expected: "PASS"
+
+  # 示例 5: 豁免資源
+  - description: "系統命名空間豁免"
+    resource:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "kube-system"
+    expected: "PASS"
+    reason: "系統命名空間在豁免列表中"
+
+# 測試命令
+testing:
+  commands:
+    # Conftest 測試
+    - description: "驗證標籤合規性"
+      command: "conftest test manifests/ --policy templates/conftest/labels.rego"
+
+    # Kubectl 檢查
+    - description: "查找缺少 environment 標籤的 Namespace"
+      command: "kubectl get namespaces -o json | jq '.items[] | select(.metadata.labels.environment == null) | .metadata.name'"
+
+    # Python 驗證工具
+    - description: "批量檢查標籤合規性"
+      command: "python tools/governance/python/check_required_labels.sh --all-namespaces"
+
+# 維護信息
+maintenance:
+  version: "v1.0"
+  last_updated: "2025-01-15"
+  next_review: "2025-04-15"
+  owner: "Platform Engineering Team"
+  contact: "governance-team@example.com"
+  changelog: "canonical/CHANGELOG.md"

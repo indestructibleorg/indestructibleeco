@@ -1,0 +1,118 @@
+# @ECO-governed
+# @ECO-layer: GL90-95 (Integration Layer)
+# @ECO-semantic: slack-webhook-configuration
+# @ECO-charter-version: 5.0.0
+# @ECO-audit-trail: Created for GL Platform v5.0 deployment
+
+apiVersion: integrations.machinenativeops.io/v1
+kind: SlackIntegration
+metadata:
+  name: gl-platform-slack
+  namespace: gl-platform
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: gl-platform
+    app.kubernetes.io/component: slack-integration
+    tier: notifications
+  annotations:
+    governance.machinenativeops.io/charter: "GL Unified Architecture Governance Framework v5.0"
+    governance.machinenativeops.io/layer: "Integration"
+    governance.machinenativeops.io/version: "5.0.0"
+
+spec:
+  enabled: true
+  slack:
+    workspace: "your-workpace"
+    webhookUrl: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+    channel: "#gl-platform-alerts"
+    username: "GL Platform Bot"
+    iconEmoji: ":robot_face:"
+  
+  alertRouting:
+    priorityLevels:
+      P0:
+        channel: "#gl-platform-critical"
+        mention: ["@oncall-sre", "@platform-leads"]
+        notifyOn: ["alert", "resolution"]
+        retryPolicy:
+          maxRetries: 5
+          intervalSeconds: 300
+      
+      P1:
+        channel: "#gl-platform-high"
+        mention: ["@oncall-sre"]
+        notifyOn: ["alert", "resolution", "escalation"]
+        retryPolicy:
+          maxRetries: 3
+          intervalSeconds: 600
+      
+      P2:
+        channel: "#gl-platform-medium"
+        mention: []
+        notifyOn: ["alert", "resolution"]
+        retryPolicy:
+          maxRetries: 2
+          intervalSeconds: 1800
+      
+      P3:
+        channel: "#gl-platform-low"
+        mention: []
+        notifyOn: ["resolution"]
+        retryPolicy:
+          maxRetries: 1
+          intervalSeconds: 3600
+  
+  messageTemplates:
+    alert: |
+      :rotating_light: *{{ .Priority }} Alert - {{ .AlertName }}*
+      
+      *Severity*: {{ .Severity }}
+      *Status*: {{ .Status }}
+      *Environment*: {{ .Environment }}
+      
+      *Description*:
+      {{ .Description }}
+      
+      *Details*:
+      {{ range .Details }}• {{ . }}
+      {{ end }}
+      
+      *Timestamp*: {{ .Timestamp }}
+      *Runbook*: {{ .RunbookURL }}
+      
+      _Action Required: {{ .ActionRequired }}_
+    
+    resolution: |
+      :white_check_mark: *{{ .AlertName }} Resolved*
+      
+      *Resolution Time*: {{ .ResolutionDuration }}
+      *Resolved By*: {{ .ResolvedBy }}
+      
+      *Summary*:
+      {{ .ResolutionSummary }}
+    
+    escalation: |
+      :bangbang: *{{ .AlertName }} Escalated to {{ .EscalationLevel }}*
+      
+      *Original Severity*: {{ .OriginalSeverity }}
+      *Current Severity*: {{ .CurrentSeverity }}
+      *Escalation Reason*:
+      {{ .EscalationReason }}
+      
+      :link: *View Alert*: {{ .AlertURL }}
+  
+  rateLimiting:
+    maxMessagesPerMinute: 30
+    burstSize: 50
+    backoffStrategy: "exponential"
+  
+  security:
+    enableWebhookValidation: true
+    allowedIPRanges:
+      - "10.0.0.0/8"
+      - "172.16.0.0/12"
+      - "192.168.0.0/16"
+    tlsConfig:
+      insecureSkipVerify: false
+      minVersion: "TLS1.2"

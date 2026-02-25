@@ -1,0 +1,73 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLArchitectureIndex
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-index.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-index.yaml"
+  name: gl-architecture-index
+  version: "1.0.0"
+  created: "2026-01-18"
+spec:
+  base_path: "governance/gl-architecture"
+  core_files:
+    - name: "GL Layer Definitions"
+      path: "GL_LAYERS.yaml"
+      type: "definition"
+    - name: "Quick Reference"
+      path: "GL_QUICKREF.md"
+      type: "documentation"
+    - name: "Layer Mapping"
+      path: "GL_MAPPING.csv"
+      type: "mapping"
+    - name: "Semantic Stabilization Status"
+      path: "GL_SEMANTIC_STABILIZATION.yaml"
+      type: "status"
+    - name: "README"
+      path: "README.md"
+      type: "documentation"
+  extensions:
+    - layer: "GL00-09"
+      name: "Strategic Layer"
+      path: "gl-extended/GL00-09-strategic"
+    - layer: "GL10-29"
+      name: "Operational Layer"
+      path: "gl-extended/GL10-29-operational"
+    - layer: "GL30-49"
+      name: "Execution Layer"
+      path: "gl-extended/GL30-49-execution"
+    - layer: "GL50-59"
+      name: "Observability Layer"
+      path: "gl-extended/GL50-59-observability"
+    - layer: "GL60-80"
+      name: "Advanced/Feedback Layer"
+      path: "gl-extended/GL60-80-advanced"
+    - layer: "GL81-83"
+      name: "Extended Layer"
+      path: "gl-extended/GL81-83-extended"
+    - layer: "GL90-99"
+      name: "Meta-Specification Layer"
+      path: "gl-extended/GL90-99-meta"
+  templates:
+    - name: "Layer Template"
+      path: "templates/layer-template.yaml"
+    - name: "Dimension Template"
+      path: "templates/dimension-template.yaml"
+  integrations:
+    - name: "Workspace Integration"
+      path: "integrations/workspace-integration.yaml"
+      target: "workspace"
+    - name: "Controlplane Integration"
+      path: "integrations/controlplane-integration.yaml"
+      target: "controlplane"
+    - name: "Tools Integration"
+      path: "integrations/tools-integration.yaml"
+      target: "tools"
+  references:
+    governance_manifest: "../../governance-manifest.yaml"
+    source_dimensions: "../../workspace/src/governance/"
+    consolidation_summary: "../../archive/CONSOLIDATION_2026-01-18_SUMMARY.md"

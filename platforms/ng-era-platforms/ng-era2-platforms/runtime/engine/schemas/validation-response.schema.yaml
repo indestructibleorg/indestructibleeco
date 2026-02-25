@@ -1,0 +1,92 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: validation-response.schema
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+---
+$schema: "http://json-schema.org/draft-07/schema#"
+title: "Naming Validation Response"
+description: "Response schema for naming validation results"
+type: object
+required:
+  - valid
+  - resource_name
+  - timestamp
+properties:
+  valid:
+    type: boolean
+    description: "Whether the name is valid"
+  
+  resource_name:
+    type: string
+    description: "The name that was validated"
+  
+  timestamp:
+    type: string
+    format: "date-time"
+    description: "When the validation was performed"
+  
+  policy_matched:
+    type: object
+    description: "Policy that matched the name"
+    properties:
+      policy_id:
+        type: string
+      policy_name:
+        type: string
+      pattern:
+        type: string
+  
+  violations:
+    type: array
+    description: "List of violations found"
+    items:
+      type: object
+      required:
+        - severity
+        - code
+        - message
+      properties:
+        severity:
+          type: string
+          enum: ["critical", "high", "medium", "low", "info"]
+        
+        code:
+          type: string
+          description: "Machine-readable error code"
+        
+        message:
+          type: string
+          description: "Human-readable error message"
+        
+        suggestion:
+          type: string
+          description: "Suggested fix"
+        
+        rule_reference:
+          type: string
+          description: "Reference to the violated rule"
+  
+  suggestions:
+    type: array
+    description: "Suggested valid names"
+    items:
+      type: string
+  
+  metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:schemas:validation-response.schema.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/schemas/validation-response.schema.yaml"
+    type: object
+    description: "Additional validation metadata"
+    properties:
+      validator_version:
+        type: string
+      
+      policy_version:
+        type: string
+      
+      execution_time_ms:
+        type: number

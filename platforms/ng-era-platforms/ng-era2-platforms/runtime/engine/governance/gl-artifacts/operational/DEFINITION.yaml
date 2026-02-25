@@ -1,0 +1,101 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: DEFINITION
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLLayerDefinition
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:governance:gl-artifacts:operational:DEFINITION.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/operational/DEFINITION.yaml"
+  layer_id: GL10-29
+  name: Operational Layer
+  version: "1.0.0"
+spec:
+  range: "10-29"
+  description: "Policy, culture, metrics, improvement, quality"
+  dimensions:
+    - id: "10-policy"
+      purpose: "Define and enforce governance policies"
+      artifacts:
+        - "naming-governance-policy.yaml"
+        - "naming-validation-automations.yaml"
+        - "naming-alert-rules.yaml"
+        - "naming-observability-dashboard.yaml"
+        - "naming-security-policy.yaml"
+      functions:
+        - "validate_naming"
+        - "check_compliance"
+        - "generate_alerts"
+        - "check_security_requirements"
+    - id: "11-tools-systems"
+      purpose: "Manage operational tools and systems"
+    - id: "12-culture-capability"
+      purpose: "Build organizational culture and capabilities"
+      artifacts:
+        - "naming-training-map.yaml"
+      functions:
+        - "get_training_plan"
+        - "assign_roles"
+    - id: "13-metrics-reporting"
+      purpose: "Define metrics and reporting mechanisms"
+      artifacts:
+        - "naming-metrics-kpi.yaml"
+      functions:
+        - "calculate_kpi"
+        - "generate_reports"
+    - id: "14-improvement"
+      purpose: "Drive continuous improvement initiatives"
+      artifacts:
+        - "naming-pdca-cycle.yaml"
+        - "naming-improvement-log.yaml"
+      functions:
+        - "execute_pdca_cycle"
+        - "log_improvement"
+    - id: "15-economic"
+      purpose: "Manage economic and financial aspects"
+    - id: "16-psychological"
+      purpose: "Address psychological and behavioral factors"
+    - id: "17-sociological"
+      purpose: "Manage sociological and organizational dynamics"
+    - id: "18-complex-system"
+      purpose: "Handle complex system interactions"
+    - id: "19-evolutionary"
+      purpose: "Enable evolutionary adaptation"
+    - id: "20-intent"
+      purpose: "Capture and manage intent"
+    - id: "21-ecological"
+      purpose: "Ensure ecological sustainability"
+    - id: "22-aesthetic"
+      purpose: "Maintain aesthetic standards"
+    - id: "23-policies"
+      purpose: "Extended policy management"
+    - id: "24-registry"
+      purpose: "Maintain operational registries"
+    - id: "25-principles"
+      purpose: "Define operational principles"
+    - id: "28-tests"
+      purpose: "Operational testing frameworks"
+    - id: "29-docs"
+      purpose: "Operational documentation"
+  interfaces:
+    input:
+      - "strategic_plans"
+      - "governance_policies"
+    output:
+      - "operational_procedures"
+      - "quality_metrics"
+      - "training_materials"
+  dependencies:
+    upstream:
+      - "GL00-09"
+    downstream:
+      - "GL30-49"
+  validation:
+    semantic_boundary: "Operational governance - policies, culture, metrics, improvement, quality"
+    no_conflicts: true
+    no_duplicates: true
+    clear_boundaries: true

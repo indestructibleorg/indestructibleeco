@@ -1,0 +1,309 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: naming-governance
+# @ECO-audit-trail: gl-platform-ecosystem/governance/audit-trails/GL90_99-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-platform-ecosystem/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-platform-ecosystem/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: gl-runtime.io/v1.0.0
+kind: CapabilityRegistry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:governance:naming-governance:registry:capability-registry.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/governance/naming-governance/registry/capability-registry.yaml"
+  name: capability-registry
+  version: v1.0.0
+  description: "GL Capability Registry - 定義所有可用的 capability"
+  namespace: gl-platform-ecosystem
+spec:
+  capabilities:
+    ## Runtime Capabilities
+    - capability_id: dag
+      domain: runtime
+      abbr: dag
+      name: "DAG"
+      description: "DAG（有向無環圖）執行引擎"
+      semantics:
+        - "directed-acyclic-graph"
+        - "workflow-execution"
+        - "dependency-resolution"
+        - "task-orchestration"
+      resources:
+        - executor
+        - validator
+        - scheduler
+        - monitor
+      status: ACTIVE
+    
+    - capability_id: workflow
+      domain: runtime
+      abbr: wf
+      name: "Workflow"
+      description: "工作流執行引擎"
+      semantics:
+        - "workflow-execution"
+        - "process-automation"
+        - "task-sequencing"
+      status: ACTIVE
+    
+    - capability_id: executor
+      domain: runtime
+      abbr: exec
+      name: "Executor"
+      description: "任務執行器"
+      semantics:
+        - "task-execution"
+        - "process-management"
+        - "resource-allocation"
+      status: ACTIVE
+    
+    ## Quantum Capabilities
+    - capability_id: compute
+      domain: quantum
+      abbr: comp
+      name: "Compute"
+      description: "量子計算執行"
+      semantics:
+        - "quantum-circuit"
+        - "quantum-algorithm"
+        - "quantum-simulation"
+        - "quantum-optimization"
+      status: ACTIVE
+    
+    - capability_id: simulation
+      domain: quantum
+      abbr: sim
+      name: "Simulation"
+      description: "量子模擬"
+      semantics:
+        - "quantum-simulation"
+        - "state-evolution"
+        - "gate-simulation"
+      status: ACTIVE
+    
+    ## API Capabilities
+    - capability_id: schema
+      domain: api
+      abbr: sch
+      name: "Schema"
+      description: "API schema 定義與驗證"
+      semantics:
+        - "schema-definition"
+        - "type-validation"
+        - "contract-specification"
+        - "interface-documentation"
+      resources:
+        - validator
+        - generator
+        - documentation
+      status: ACTIVE
+    
+    - capability_id: gateway
+      domain: api
+      abbr: gw
+      name: "Gateway"
+      description: "API 网关"
+      semantics:
+        - "request-routing"
+        - "load-balancing"
+        - "rate-limiting"
+      status: ACTIVE
+    
+    ## Agent Capabilities
+    - capability_id: max
+      domain: agent
+      abbr: max
+      name: "Max"
+      description: "Max 智能體核心行為"
+      semantics:
+        - "core-agent-behavior"
+        - "multi-step-reasoning"
+        - "planning-strategy"
+        - "fallback-mechanism"
+      resources:
+        - behavior
+        - rules
+        - actions
+        - planner
+      status: ACTIVE
+    
+    - capability_id: planning
+      domain: agent
+      abbr: plan
+      name: "Planning"
+      description: "智能體規劃能力"
+      semantics:
+        - "task-planning"
+        - "goal-decomposition"
+        - "strategy-generation"
+      status: ACTIVE
+    
+    ## Multimodal Capabilities
+    - capability_id: vision
+      domain: multimodal
+      abbr: vis
+      name: "Vision"
+      description: "視覺處理與圖像分析"
+      semantics:
+        - "image-recognition"
+        - "visual-reasoning"
+        - "object-detection"
+        - "image-understanding"
+      resources:
+        - recognizer
+        - detector
+        - analyzer
+      status: ACTIVE
+    
+    - capability_id: text
+      domain: multimodal
+      abbr: txt
+      name: "Text"
+      description: "文本處理"
+      semantics:
+        - "text-analysis"
+        - "nlp-processing"
+        - "text-generation"
+      status: ACTIVE
+    
+    - capability_id: audio
+      domain: multimodal
+      abbr: aud
+      name: "Audio"
+      description: "音頻處理"
+      semantics:
+        - "speech-recognition"
+        - "audio-analysis"
+        - "audio-generation"
+      status: ACTIVE
+    
+    ## Database Capabilities
+    - capability_id: shard
+      domain: database
+      abbr: shd
+      name: "Shard"
+      description: "數據庫分片與分區"
+      semantics:
+        - "data-sharding"
+        - "horizontal-scaling"
+        - "partition-strategy"
+        - "load-distribution"
+      resources:
+        - manager
+        - coordinator
+      status: ACTIVE
+    
+    - capability_id: replication
+      domain: database
+      abbr: repl
+      name: "Replication"
+      description: "數據複製"
+      semantics:
+        - "data-replication"
+        - "synchronization"
+        - "high-availability"
+      status: ACTIVE
+    
+    ## Compute Capabilities
+    - capability_id: batch
+      domain: compute
+      abbr: batch
+      name: "Batch"
+      description: "批處理計算"
+      semantics:
+        - "batch-processing"
+        - "job-scheduling"
+        - "parallel-execution"
+      status: ACTIVE
+    
+    - capability_id: stream
+      domain: compute
+      abbr: str
+      name: "Stream"
+      description: "流處理計算"
+      semantics:
+        - "stream-processing"
+        - "real-time-computation"
+        - "event-handling"
+      status: ACTIVE
+    
+    ## Storage Capabilities
+    - capability_id: object
+      domain: storage
+      abbr: obj
+      name: "Object"
+      description: "對象存儲"
+      semantics:
+        - "object-storage"
+        - "blob-management"
+        - "file-retrieval"
+      status: ACTIVE
+    
+    - capability_id: cache
+      domain: storage
+      abbr: cache
+      name: "Cache"
+      description: "緩存存儲"
+      semantics:
+        - "data-caching"
+        - "fast-access"
+        - "temporary-storage"
+      status: ACTIVE
+    
+    ## Governance Capabilities
+    - capability_id: policy
+      domain: governance
+      abbr: pol
+      name: "Policy"
+      description: "治理策略"
+      semantics:
+        - "policy-definition"
+        - "rule-enforcement"
+        - "compliance-check"
+      status: ACTIVE
+    
+    - capability_id: audit
+      domain: governance
+      abbr: aud
+      name: "Audit"
+      description: "審計追蹤"
+      semantics:
+        - "audit-trail"
+        - "logging"
+        - "compliance-reporting"
+      status: ACTIVE
+    
+    ## Semantic Capabilities
+    - capability_id: graph
+      domain: semantic
+      abbr: graph
+      name: "Graph"
+      description: "語意圖"
+      semantics:
+        - "knowledge-graph"
+        - "semantic-network"
+        - "graph-traversal"
+      status: ACTIVE
+    
+    - capability_id: ontology
+      domain: semantic
+      abbr: onto
+      name: "Ontology"
+      description: "本體管理"
+      semantics:
+        - "ontology-definition"
+        - "semantic-taxonomy"
+        - "knowledge-representation"
+      status: ACTIVE
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:governance:naming-governance:registry:capability-registry.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/governance/naming-governance/registry/capability-registry.yaml"
+  created_at: "2026-01-31T00:00:00Z"
+  updated_at: "2026-01-31T00:00:00Z"
+  total_capabilities: 22
+  active_capabilities: 22

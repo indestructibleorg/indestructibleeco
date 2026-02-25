@@ -1,0 +1,71 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLGovernanceLoopVision
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:bi-direction-governance-loop-vision.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/bi-direction-governance-loop-vision.yaml"
+  name: bi-direction-governance-loop-vision
+  version: "1.0.0"
+  created: "2026-01-21"
+  layer: "GL00-09"
+vision:
+  name: "Bi-Directional Governance Loop"
+  description: "Complete 5-stage governance closed-loop with bi-directional feedback"
+  language:
+    en: "Bi-Directional Governance Loop Vision"
+    zh: "雙向治理循環願景"
+core_phases:
+  - phase_id: "INPUT"
+    name: "Input Stage"
+    name_zh: "輸入階段"
+    description: "Receive governance tasks and requirements"
+    semantic_boundary: "urn:machinenativeops:gl:phase:input:1.0.0"
+    traceability: true
+  - phase_id: "PARSING"
+    name: "Parsing Stage"
+    name_zh: "解析階段"
+    description: "Analyze and classify governance requirements"
+    semantic_boundary: "urn:machinenativeops:gl:phase:parsing:1.0.0"
+    traceability: true
+  - phase_id: "GOVERNANCE"
+    name: "Governance Stage"
+    name_zh: "治理階段"
+    description: "Execute governance policies and rules"
+    semantic_boundary: "urn:machinenativeops:gl:phase:governance:1.0.0"
+    traceability: true
+  - phase_id: "FEEDBACK"
+    name: "Feedback Stage"
+    name_zh: "回饋階段"
+    description: "Collect and analyze feedback from execution"
+    semantic_boundary: "urn:machinenativeops:gl:phase:feedback:1.0.0"
+    traceability: true
+  - phase_id: "RE-GOVERNANCE"
+    name: "Re-Governance Stage"
+    name_zh: "再治理階段"
+    description: "Apply improvements and continue the loop"
+    semantic_boundary: "urn:machinenativeops:gl:phase:re-governance:1.0.0"
+    traceability: true
+performance_metrics:
+  governance_closure_rate: "100%"
+  semantic_consistency: "99.9%"
+  validation_accuracy: "99.3%"
+  cycle_time: "< 5s"
+  feedback_integration: "100%"
+capabilities:
+  - "Complete 5-stage governance closed-loop"
+  - "Semantic boundaries for each phase"
+  - "Full traceability across all stages"
+  - "Bi-directional feedback mechanisms"
+  - "Automated governance enforcement"
+integration_points:
+  - "GL10-29: Process Policy"
+  - "GL30-49: Forward Expansion"
+  - "GL50-59: Validation Rules"
+  - "GL60-80: Backward Reconciliation"
+  - "GL90-99: Semantic Root Management"
+activation_status: "ACTIVE"

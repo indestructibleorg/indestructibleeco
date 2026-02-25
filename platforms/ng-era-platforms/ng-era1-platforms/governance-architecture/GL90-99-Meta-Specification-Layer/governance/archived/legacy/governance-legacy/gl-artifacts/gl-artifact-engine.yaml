@@ -1,0 +1,547 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLArtifactEngine
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-artifact-engine.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-artifact-engine.yaml"
+  name: gl-artifact-engine
+  version: "1.0.0"
+  status: ACTIVE
+  created_at: "2025-01-19T00:00:00Z"
+  activated_at: "2025-01-19T00:00:00Z"
+  owner: governance-committee
+engine_activation:
+  status: ACTIVE
+  mode: AUTONOMOUS
+  continuous_loop: true
+  requires_manual_trigger: false
+  governed_by: "ECO-CONSTITUTION.yaml"
+engine_capabilities:
+  # =========================================================================
+  # CAP-01: GL Layer Classification - 自動判斷任務所屬 GL 層級
+  # =========================================================================
+  CAP-01:
+    capability_id: "ENGINE-CAP-01"
+    name: "GL Layer Classification"
+    name_zh: "GL 層級分類"
+    status: ACTIVE
+    classification_rules:
+      - rule_id: "CLASS-RULE-01"
+        keywords: ["vision", "mission", "strategy", "charter", "architecture", "risk", "compliance", "security", "governance", "principle"]
+        target_layer: "GL00-09"
+        layer_name: "Strategic Layer"
+      - rule_id: "CLASS-RULE-02"
+        keywords: ["policy", "process", "standard", "tool", "quality", "capability", "resource", "culture", "metrics", "improvement", "planning"]
+        target_layer: "GL10-29"
+        layer_name: "Operational Layer"
+      - rule_id: "CLASS-RULE-03"
+        keywords: ["template", "contract", "schema", "automation", "config", "script", "agent", "rule", "module", "behavior"]
+        target_layer: "GL30-49"
+        layer_name: "Execution Layer"
+      - rule_id: "CLASS-RULE-04"
+        keywords: ["monitoring", "metrics", "alerting", "logging", "tracing", "dashboard", "insight", "observability"]
+        target_layer: "GL50-59"
+        layer_name: "Observability Layer"
+      - rule_id: "CLASS-RULE-05"
+        keywords: ["ai", "ml", "optimization", "feedback", "audit", "innovation", "improvement", "analysis", "pattern"]
+        target_layer: "GL60-80"
+        layer_name: "Advanced/Feedback Layer"
+      - rule_id: "CLASS-RULE-06"
+        keywords: ["integration", "external", "stakeholder", "bridge", "auto-comment", "api", "webhook", "notification"]
+        target_layer: "GL81-83"
+        layer_name: "Extended Layer"
+      - rule_id: "CLASS-RULE-07"
+        keywords: ["naming", "semantic", "specification", "meta", "standard", "convention", "governance", "layer-definition"]
+        target_layer: "GL90-99"
+        layer_name: "Meta-Specification Layer"
+    classification_process:
+      - step: 1
+        action: "Extract task keywords"
+      - step: 2
+        action: "Match keywords to classification rules"
+      - step: 3
+        action: "Determine target GL layer"
+      - step: 4
+        action: "Validate layer assignment"
+      - step: 5
+        action: "Output layer classification result"
+  # =========================================================================
+  # CAP-02: Artifact Type Selection - 自動選擇正確的 artifacts 類型
+  # =========================================================================
+  CAP-02:
+    capability_id: "ENGINE-CAP-02"
+    name: "Artifact Type Selection"
+    name_zh: "Artifact 類型選擇"
+    status: ACTIVE
+    artifact_type_mapping:
+      GL00-09:
+        allowed_types:
+          - type: "vision-statement"
+            triggers: ["vision", "mission", "values"]
+          - type: "governance-charter"
+            triggers: ["charter", "governance", "authority"]
+          - type: "strategic-objectives"
+            triggers: ["objectives", "okr", "goals", "strategy"]
+          - type: "architecture-decision-record"
+            triggers: ["architecture", "decision", "adr", "design"]
+          - type: "risk-assessment"
+            triggers: ["risk", "threat", "vulnerability"]
+          - type: "compliance-policy"
+            triggers: ["compliance", "regulation", "legal"]
+          - type: "security-policy"
+            triggers: ["security", "access", "protection"]
+      GL10-29:
+        allowed_types:
+          - type: "policy-document"
+            triggers: ["policy", "guideline", "rule"]
+          - type: "process-definition"
+            triggers: ["process", "workflow", "procedure"]
+          - type: "operational-plan"
+            triggers: ["plan", "schedule", "milestone"]
+          - type: "resource-allocation"
+            triggers: ["resource", "budget", "allocation"]
+          - type: "capability-matrix"
+            triggers: ["capability", "skill", "competency"]
+          - type: "quality-standard"
+            triggers: ["quality", "standard", "acceptance"]
+          - type: "tool-configuration"
+            triggers: ["tool", "tooling", "configuration"]
+      GL30-49:
+        allowed_types:
+          - type: "template-file"
+            triggers: ["template", "boilerplate", "scaffold"]
+          - type: "schema-definition"
+            triggers: ["schema", "structure", "validation"]
+          - type: "automation-script"
+            triggers: ["automation", "script", "pipeline"]
+          - type: "config-file"
+            triggers: ["config", "configuration", "settings"]
+          - type: "behavior-contract"
+            triggers: ["contract", "interface", "api"]
+          - type: "rule-definition"
+            triggers: ["rule", "engine", "logic"]
+      GL50-59:
+        allowed_types:
+          - type: "monitoring-config"
+            triggers: ["monitoring", "probe", "health"]
+          - type: "metric-definition"
+            triggers: ["metric", "kpi", "indicator"]
+          - type: "alert-rule"
+            triggers: ["alert", "alarm", "notification"]
+          - type: "logging-config"
+            triggers: ["logging", "log", "audit-log"]
+          - type: "tracing-config"
+            triggers: ["tracing", "trace", "span"]
+          - type: "dashboard-definition"
+            triggers: ["dashboard", "visualization", "panel"]
+          - type: "insight-report"
+            triggers: ["insight", "report", "analysis"]
+      GL60-80:
+        allowed_types:
+          - type: "ai-model-config"
+            triggers: ["ai", "ml", "model"]
+          - type: "optimization-rule"
+            triggers: ["optimization", "tuning", "performance"]
+          - type: "feedback-mechanism"
+            triggers: ["feedback", "loop", "cycle"]
+          - type: "audit-trail"
+            triggers: ["audit", "trail", "history"]
+          - type: "innovation-registry"
+            triggers: ["innovation", "experiment", "poc"]
+          - type: "improvement-plan"
+            triggers: ["improvement", "kaizen", "enhancement"]
+      GL81-83:
+        allowed_types:
+          - type: "integration-config"
+            triggers: ["integration", "connector", "adapter"]
+          - type: "auto-comment-rule"
+            triggers: ["auto-comment", "documentation", "annotation"]
+          - type: "stakeholder-bridge"
+            triggers: ["stakeholder", "communication", "bridge"]
+          - type: "external-integration-config"
+            triggers: ["external", "third-party", "vendor"]
+          - type: "webhook-config"
+            triggers: ["webhook", "callback", "event"]
+          - type: "notification-channel"
+            triggers: ["notification", "channel", "alert-channel"]
+      GL90-99:
+        allowed_types:
+          - type: "naming-convention"
+            triggers: ["naming", "convention", "nomenclature"]
+          - type: "semantic-definition"
+            triggers: ["semantic", "meaning", "definition"]
+          - type: "governance-spec"
+            triggers: ["governance", "specification", "rule"]
+          - type: "metadata-schema"
+            triggers: ["metadata", "meta", "schema"]
+          - type: "governance-standards"
+            triggers: ["standard", "baseline", "benchmark"]
+          - type: "layer-definition"
+            triggers: ["layer", "tier", "level"]
+    selection_process:
+      - step: 1
+        action: "Receive layer classification"
+      - step: 2
+        action: "Extract artifact triggers from task"
+      - step: 3
+        action: "Match triggers to artifact types"
+      - step: 4
+        action: "Select most appropriate artifact type"
+      - step: 5
+        action: "Validate artifact type against layer boundary"
+  # =========================================================================
+  # CAP-03: Artifact Generation - 自動生成對應層級的 artifacts
+  # =========================================================================
+  CAP-03:
+    capability_id: "ENGINE-CAP-03"
+    name: "Artifact Generation"
+    name_zh: "Artifact 生成"
+    status: ACTIVE
+    generation_templates:
+      standard_artifact_structure:
+        apiVersion: "governance.machinenativeops.io/v1"
+        kind: "{artifact_type}"
+        metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-artifact-engine.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-artifact-engine.yaml"
+          name: "{artifact_name}"
+          version: "1.0.0"
+          gl_layer: "{gl_layer}"
+          status: "DRAFT"
+          created_at: "{timestamp}"
+          owner: "{owner}"
+        spec:
+          purpose: "{purpose}"
+          boundary:
+            semantic_scope: "{semantic_scope}"
+            layer_constraint: "{gl_layer} ONLY"
+          content: "{content}"
+        validation:
+          status: "PENDING"
+    generation_process:
+      - step: 1
+        action: "Load artifact template"
+      - step: 2
+        action: "Populate metadata fields"
+      - step: 3
+        action: "Apply layer-specific constraints"
+      - step: 4
+        action: "Generate artifact content"
+      - step: 5
+        action: "Apply boundary validation"
+      - step: 6
+        action: "Output generated artifact"
+    output_formats:
+      - format: "yaml"
+        extension: ".yaml"
+        primary: true
+      - format: "json"
+        extension: ".json"
+        primary: false
+      - format: "markdown"
+        extension: ".md"
+        primary: false
+  # =========================================================================
+  # CAP-04: Validation Layer - 自動驗證 artifacts 正確性
+  # =========================================================================
+  CAP-04:
+    capability_id: "ENGINE-CAP-04"
+    name: "Validation Layer"
+    name_zh: "驗證層"
+    status: ACTIVE
+    validation_rules:
+      - rule_id: "VAL-RULE-01"
+        name: "Layer Boundary Validation"
+        description: "驗證 artifact 是否在正確層級"
+        enforcement: STRICT
+      - rule_id: "VAL-RULE-02"
+        name: "Artifact Type Validation"
+        description: "驗證 artifact 類型是否符合層級允許類型"
+        enforcement: STRICT
+      - rule_id: "VAL-RULE-03"
+        name: "Semantic Scope Validation"
+        description: "驗證 artifact 語意是否在允許範圍內"
+        enforcement: STRICT
+      - rule_id: "VAL-RULE-04"
+        name: "Dependency Validation"
+        description: "驗證 artifact 依賴關係是否正確"
+        enforcement: STRICT
+      - rule_id: "VAL-RULE-05"
+        name: "Format Validation"
+        description: "驗證 artifact 格式是否正確"
+        enforcement: STRICT
+      - rule_id: "VAL-RULE-06"
+        name: "Cross-Layer Prohibition"
+        description: "驗證 artifact 不跨層"
+        enforcement: STRICT
+      - rule_id: "VAL-RULE-07"
+        name: "Skip-Layer Prohibition"
+        description: "驗證 artifact 不跳層"
+        enforcement: STRICT
+      - rule_id: "VAL-RULE-08"
+        name: "Mix-Layer Prohibition"
+        description: "驗證 artifact 不混層"
+        enforcement: STRICT
+      - rule_id: "VAL-RULE-09"
+        name: "Semantic Drift Detection"
+        description: "檢測語意漂移"
+        enforcement: STRICT
+    validation_process:
+      - step: 1
+        action: "Load generated artifact"
+      - step: 2
+        action: "Apply all validation rules"
+      - step: 3
+        action: "Collect validation results"
+      - step: 4
+        action: "Determine pass/fail status"
+      - step: 5
+        action: "Output validation report"
+    validation_outcomes:
+      - outcome: "PASS"
+        action: "Proceed to semantic sealing"
+      - outcome: "FAIL"
+        action: "Trigger correction mechanism"
+  # =========================================================================
+  # CAP-05: Semantic Sealing - 自動執行語意封存
+  # =========================================================================
+  CAP-05:
+    capability_id: "ENGINE-CAP-05"
+    name: "Semantic Sealing"
+    name_zh: "語意封存"
+    status: ACTIVE
+    sealing_rules:
+      - rule_id: "SEAL-RULE-01"
+        name: "Validation Prerequisite"
+        description: "必須通過所有驗證才能封存"
+        enforcement: MANDATORY
+      - rule_id: "SEAL-RULE-02"
+        name: "Immutability"
+        description: "封存後不可修改"
+        enforcement: MANDATORY
+      - rule_id: "SEAL-RULE-03"
+        name: "Version Lock"
+        description: "封存後版本鎖定"
+        enforcement: MANDATORY
+      - rule_id: "SEAL-RULE-04"
+        name: "Integrity Hash"
+        description: "生成完整性雜湊"
+        enforcement: MANDATORY
+    sealing_process:
+      - step: 1
+        action: "Verify validation passed"
+      - step: 2
+        action: "Update artifact status to SEALED"
+      - step: 3
+        action: "Lock artifact version"
+      - step: 4
+        action: "Generate integrity hash"
+      - step: 5
+        action: "Record sealing timestamp"
+      - step: 6
+        action: "Output sealed artifact"
+    seal_metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-artifact-engine.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-artifact-engine.yaml"
+      status: "SEALED"
+      immutable: true
+      sealed_at: "{timestamp}"
+      integrity_hash: "sha256:{hash}"
+  # =========================================================================
+  # CAP-06: Feedback Integration - 自動整合回饋
+  # =========================================================================
+  CAP-06:
+    capability_id: "ENGINE-CAP-06"
+    name: "Feedback Integration"
+    name_zh: "回饋整合"
+    status: ACTIVE
+    feedback_sources:
+      - source_id: "FB-SRC-01"
+        name: "Validation Feedback"
+        layer: "GL50-59"
+        type: "validation_result"
+      - source_id: "FB-SRC-02"
+        name: "Execution Feedback"
+        layer: "GL30-49"
+        type: "execution_result"
+      - source_id: "FB-SRC-03"
+        name: "Optimization Feedback"
+        layer: "GL60-80"
+        type: "optimization_suggestion"
+      - source_id: "FB-SRC-04"
+        name: "Integration Feedback"
+        layer: "GL81-83"
+        type: "integration_status"
+    feedback_process:
+      - step: 1
+        action: "Collect feedback from all sources"
+      - step: 2
+        action: "Categorize feedback by type"
+      - step: 3
+        action: "Analyze feedback for actionable items"
+      - step: 4
+        action: "Generate correction recommendations"
+      - step: 5
+        action: "Apply minimal actionable fixes"
+      - step: 6
+        action: "Update artifact if needed"
+    feedback_actions:
+      - action: "ACCEPT"
+        description: "接受回饋並應用"
+      - action: "DEFER"
+        description: "延遲處理"
+      - action: "REJECT"
+        description: "拒絕回饋（需理由）"
+  # =========================================================================
+  # CAP-07: Continuous Artifact Loop - 自動進入下一輪
+  # =========================================================================
+  CAP-07:
+    capability_id: "ENGINE-CAP-07"
+    name: "Continuous Artifact Loop"
+    name_zh: "持續產物循環"
+    status: ACTIVE
+    loop_phases:
+      - phase_id: "LOOP-01"
+        name: "Task Intake"
+        description: "接收新任務"
+        next_phase: "LOOP-02"
+      - phase_id: "LOOP-02"
+        name: "Layer Classification"
+        description: "分類至 GL 層級"
+        capability_ref: "ENGINE-CAP-01"
+        next_phase: "LOOP-03"
+      - phase_id: "LOOP-03"
+        name: "Artifact Type Selection"
+        description: "選擇 artifact 類型"
+        capability_ref: "ENGINE-CAP-02"
+        next_phase: "LOOP-04"
+      - phase_id: "LOOP-04"
+        name: "Artifact Generation"
+        description: "生成 artifact"
+        capability_ref: "ENGINE-CAP-03"
+        next_phase: "LOOP-05"
+      - phase_id: "LOOP-05"
+        name: "Validation"
+        description: "驗證 artifact"
+        capability_ref: "ENGINE-CAP-04"
+        next_phase: "LOOP-06"
+        conditional_next:
+          on_fail: "LOOP-08"
+      - phase_id: "LOOP-06"
+        name: "Semantic Sealing"
+        description: "封存 artifact"
+        capability_ref: "ENGINE-CAP-05"
+        next_phase: "LOOP-07"
+      - phase_id: "LOOP-07"
+        name: "Feedback Integration"
+        description: "整合回饋"
+        capability_ref: "ENGINE-CAP-06"
+        next_phase: "LOOP-01"
+      - phase_id: "LOOP-08"
+        name: "Correction"
+        description: "修正錯誤"
+        next_phase: "LOOP-04"
+    loop_control:
+      auto_continue: true
+      requires_manual_trigger: false
+      max_correction_attempts: 3
+      on_max_attempts_exceeded: "ESCALATE"
+engine_constraints:
+  boundary_constraints:
+    - constraint_id: "CONST-01"
+      name: "Cross-Layer Prohibition"
+      description: "不得跨層"
+      enforcement: STRICT
+    - constraint_id: "CONST-02"
+      name: "Skip-Layer Prohibition"
+      description: "不得跳層"
+      enforcement: STRICT
+    - constraint_id: "CONST-03"
+      name: "Mix-Layer Prohibition"
+      description: "不得混層"
+      enforcement: STRICT
+    - constraint_id: "CONST-04"
+      name: "Semantic Expansion Prohibition"
+      description: "不得擴張語意"
+      enforcement: STRICT
+    - constraint_id: "CONST-05"
+      name: "Semantic Rewrite Prohibition"
+      description: "不得重寫語意"
+      enforcement: STRICT
+    - constraint_id: "CONST-06"
+      name: "Semantic Drift Prohibition"
+      description: "不得產生語意漂移"
+      enforcement: STRICT
+  output_constraints:
+    - constraint_id: "OUTPUT-01"
+      name: "Actionable Output Only"
+      description: "僅產出可執行成果"
+      enforcement: STRICT
+    - constraint_id: "OUTPUT-02"
+      name: "No Analysis"
+      description: "不得產生分析"
+      enforcement: STRICT
+    - constraint_id: "OUTPUT-03"
+      name: "No Commentary"
+      description: "不得產生評論"
+      enforcement: STRICT
+    - constraint_id: "OUTPUT-04"
+      name: "No Summary"
+      description: "不得產生摘要"
+      enforcement: STRICT
+    - constraint_id: "OUTPUT-05"
+      name: "No Rationale"
+      description: "不得產生理由"
+      enforcement: STRICT
+    - constraint_id: "OUTPUT-06"
+      name: "Minimal Change"
+      description: "僅做必要的最小變更"
+      enforcement: STRICT
+deficiency_correction:
+  triggers:
+    - trigger_id: "DEFECT-01"
+      name: "Artifact Deficiency"
+      description: "Artifact 存在缺漏"
+      action: "Generate minimal actionable fix"
+    - trigger_id: "DEFECT-02"
+      name: "Layer Misclassification"
+      description: "Artifact 錯層"
+      action: "Reclassify and regenerate"
+    - trigger_id: "DEFECT-03"
+      name: "Semantic Drift"
+      description: "語意漂移"
+      action: "Correct semantic alignment"
+    - trigger_id: "DEFECT-04"
+      name: "Type Misclassification"
+      description: "類型分類錯誤"
+      action: "Reclassify artifact type"
+  correction_process:
+    - step: 1
+      action: "Detect deficiency"
+    - step: 2
+      action: "Classify deficiency type"
+    - step: 3
+      action: "Generate minimal fix"
+    - step: 4
+      action: "Apply fix"
+    - step: 5
+      action: "Re-validate"
+engine_status:
+  current_state: ACTIVE
+  mode: AUTONOMOUS
+  continuous_loop: ENABLED
+  governance_closure: ACTIVE
+  requires_manual_trigger: false
+engine_signature:
+  engine_id: "ECO-ARTIFACT-ENGINE-001"
+  version: "1.0.0"
+  status: ACTIVE
+  activated_at: "2025-01-19T00:00:00Z"
+  integrity_hash: "sha256:gl-artifact-engine-v1"

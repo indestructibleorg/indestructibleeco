@@ -1,0 +1,128 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: root.naming-policy
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Root 層命名規範政策
+# 版本: 1.0.0
+# 範圍: root/ 治理層
+
+version: 1
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:controlplane:config:root.naming-policy.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.naming-policy.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+scope: root/
+enforcement: strict
+
+# 核心原則
+principles:
+  - "治理層檔案必須可預測、可驗證"
+  - "禁止大寫、空白、特殊字元"
+  - "所有治理檔採用 root.<category>.yaml 格式"
+
+# 允許的檔案模式
+rules:
+  root_governance_files:
+    description: "根層治理配置檔必須採 root.<category> 命名格式"
+    allow:
+      - "^root\\.config\\.yaml$"
+      - "^root\\.governance\\.yaml$"
+      - "^root\\.modules\\.yaml$"
+      - "^root\\.super-execution\\.yaml$"
+      - "^root\\.trust\\.yaml$"
+      - "^root\\.provenance\\.yaml$"
+      - "^root\\.integrity\\.yaml$"
+      - "^root\\.bootstrap\\.yaml$"
+      - "^root\\.naming-policy\\.yaml$"
+      - "^root\\.devices\\.map$"
+      - "^root\\.fs\\.map$"
+      - "^root\\.kernel\\.map$"
+      - "^root\\.env\\.sh$"
+      - "^gates\\.map\\.yaml$"
+    examples:
+      valid:
+        - "root.config.yaml"
+        - "root.modules.yaml"
+        - "root.devices.map"
+      invalid:
+        - "Root.Config.yaml" # 大寫
+        - "config.yml" # 缺少 root. 前綴
+        - "root config.yaml" # 空白
+  
+  root_subdirectories:
+    description: "允許的根層子目錄（FHS 標準 + 初始化）"
+    allow:
+      - "^init\\.d/.*$"
+      - "^bin/.*$"
+      - "^sbin/.*$"
+      - "^etc/.*$"
+      - "^lib/.*$"
+      - "^var/.*$"
+      - "^usr/.*$"
+      - "^home/.*$"
+      - "^tmp/.*$"
+      - "^opt/.*$"
+      - "^srv/.*$"
+    examples:
+      valid:
+        - "init.d/00-init.sh"
+        - "bin/custom-command"
+        - "etc/app.conf"
+      invalid:
+        - "Init.d/script.sh" # 大寫
+        - "custom/run.sh" # 未授權的目錄
+
+  deny_patterns:
+    description: "絕對禁止的模式"
+    deny:
+      - pattern: "[A-Z]"
+        reason: "禁止大寫字母"
+      - pattern: "\\s"
+        reason: "禁止空白字元"
+      - pattern: "[^a-z0-9./_-]"
+        reason: "只允許小寫英數、點、斜線、連字號"
+      - pattern: "\\.yml$"
+        reason: "統一使用 .yaml（不用 .yml）"
+
+# 違規處理
+enforcement_actions:
+  on_violation:
+    - "GitHub Actions 自動阻擋 PR"
+    - "在 PR 中標註具體違規項目"
+    - "要求修正後重新提交"
+  
+  escalation:
+    first_violation: "警告並要求修正"
+    second_violation: "暫停提交權限 24 小時"
+    repeated_violations: "取消協作權限"
+
+# 擴充機制
+extension_policy:
+  how_to_add_new_category:
+    - "在本檔案 rules.root_governance_files.allow 中新增模式"
+    - "提交 PR 並說明新增理由"
+    - "經治理委員會審核通過後生效"
+  
+  backward_compatibility:
+    - "新增規則不得破壞現有檔案"
+    - "若需重命名現有檔案，必須提供遷移計畫"
+
+# 驗證工具
+validation:
+  automated: ".github/workflows/gate-root-naming.yml"
+  manual: "root/VALIDATION_CHECKLIST.md"
+
+# 版本歷史
+changelog:
+  - version: "1.0.0"
+    date: "2025-12-20"
+    changes: "初始版本，建立 root/ 命名規範基礎"

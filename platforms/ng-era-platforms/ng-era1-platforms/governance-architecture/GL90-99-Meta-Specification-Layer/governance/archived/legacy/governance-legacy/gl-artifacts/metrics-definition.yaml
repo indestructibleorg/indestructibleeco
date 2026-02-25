@@ -1,0 +1,452 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# =============================================================================
+# GL50-59 Observability Layer - Metrics Definition
+# MachineNativeOps Governance Artifact
+# =============================================================================
+apiVersion: governance.machinenativeops.io/v2
+kind: MetricsDefinition
+metadata:
+  name: gl-governance-metrics
+  version: "1.0.0"
+  created_at: "2025-01-18T00:00:00Z"
+  updated_at: "2025-01-18T00:00:00Z"
+  owner: observability-team
+  layer: "GL50-59"
+  tags:
+    - observability
+    - metrics
+    - monitoring
+  annotations:
+    governance.machinenativeops.io/prometheus-compatible: "true"
+    governance.machinenativeops.io/grafana-dashboard: "gl-governance"
+spec:
+  # Required fields for GL50-59 compliance
+  metrics:
+    - name: "gl_layer_health_score"
+      type: "gauge"
+      description: "GL層級健康分數"
+    - name: "gl_artifact_count"
+      type: "gauge"
+      description: "Artifact數量"
+    - name: "gl_compliance_rate"
+      type: "gauge"
+      description: "合規率"
+  thresholds:
+    health_critical: 50
+    health_warning: 70
+    compliance_critical: 70
+    compliance_warning: 85
+  metrics_catalog:
+    # =========================================================================
+    # GL層級健康指標
+    # =========================================================================
+    layer_health:
+      - metric_id: "gl_layer_health_score"
+        name: "GL Layer Health Score"
+        name_zh: "GL層級健康分數"
+        description: "各GL層級的整體健康分數 (0-100)"
+        type: "gauge"
+        unit: "score"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "layer_id"
+          - "layer_name"
+        thresholds:
+          critical: 50
+          warning: 70
+          healthy: 85
+        collection_interval: "5m"
+        retention: "90d"
+      - metric_id: "gl_layer_artifact_count"
+        name: "GL Layer Artifact Count"
+        name_zh: "GL層級Artifact數量"
+        description: "各GL層級的Artifact總數"
+        type: "gauge"
+        unit: "count"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "layer_id"
+          - "artifact_kind"
+          - "status"
+        collection_interval: "1h"
+        retention: "365d"
+      - metric_id: "gl_layer_compliance_rate"
+        name: "GL Layer Compliance Rate"
+        name_zh: "GL層級合規率"
+        description: "各GL層級的合規率百分比"
+        type: "gauge"
+        unit: "percentage"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "layer_id"
+          - "compliance_type"
+        thresholds:
+          critical: 70
+          warning: 85
+          healthy: 95
+        collection_interval: "1h"
+        retention: "365d"
+    # =========================================================================
+    # Artifact指標
+    # =========================================================================
+    artifact_metrics:
+      - metric_id: "gl_artifact_total"
+        name: "GL Artifact Total"
+        name_zh: "GL Artifact總數"
+        description: "所有GL Artifact的總數"
+        type: "gauge"
+        unit: "count"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "layer_id"
+          - "kind"
+          - "owner"
+          - "status"
+        collection_interval: "1h"
+        retention: "365d"
+      - metric_id: "gl_artifact_age_days"
+        name: "GL Artifact Age"
+        name_zh: "GL Artifact年齡"
+        description: "Artifact自創建以來的天數"
+        type: "gauge"
+        unit: "days"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "layer_id"
+          - "artifact_name"
+          - "kind"
+        thresholds:
+          warning: 90
+          critical: 180
+        collection_interval: "1d"
+        retention: "365d"
+      - metric_id: "gl_artifact_update_frequency"
+        name: "GL Artifact Update Frequency"
+        name_zh: "GL Artifact更新頻率"
+        description: "Artifact的更新頻率（次/月）"
+        type: "gauge"
+        unit: "updates_per_month"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "layer_id"
+          - "artifact_name"
+        collection_interval: "1d"
+        retention: "365d"
+      - metric_id: "gl_artifact_validation_errors"
+        name: "GL Artifact Validation Errors"
+        name_zh: "GL Artifact驗證錯誤"
+        description: "Artifact驗證錯誤數量"
+        type: "counter"
+        unit: "count"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "layer_id"
+          - "artifact_name"
+          - "error_type"
+          - "severity"
+        collection_interval: "5m"
+        retention: "90d"
+    # =========================================================================
+    # 工作流程指標
+    # =========================================================================
+    workflow_metrics:
+      - metric_id: "gl_workflow_execution_total"
+        name: "GL Workflow Execution Total"
+        name_zh: "GL工作流程執行總數"
+        description: "工作流程執行的總次數"
+        type: "counter"
+        unit: "count"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "workflow_name"
+          - "status"
+          - "trigger_type"
+        collection_interval: "1m"
+        retention: "90d"
+      - metric_id: "gl_workflow_duration_seconds"
+        name: "GL Workflow Duration"
+        name_zh: "GL工作流程執行時間"
+        description: "工作流程執行所需時間"
+        type: "histogram"
+        unit: "seconds"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "workflow_name"
+          - "status"
+        buckets: [10, 30, 60, 120, 300, 600, 1800]
+        collection_interval: "1m"
+        retention: "90d"
+      - metric_id: "gl_workflow_success_rate"
+        name: "GL Workflow Success Rate"
+        name_zh: "GL工作流程成功率"
+        description: "工作流程執行成功率"
+        type: "gauge"
+        unit: "percentage"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "workflow_name"
+        thresholds:
+          critical: 80
+          warning: 90
+          healthy: 98
+        collection_interval: "5m"
+        retention: "90d"
+    # =========================================================================
+    # 合規指標
+    # =========================================================================
+    compliance_metrics:
+      - metric_id: "gl_compliance_check_total"
+        name: "GL Compliance Check Total"
+        name_zh: "GL合規檢查總數"
+        description: "合規檢查執行的總次數"
+        type: "counter"
+        unit: "count"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "check_type"
+          - "result"
+          - "layer_id"
+        collection_interval: "5m"
+        retention: "365d"
+      - metric_id: "gl_compliance_violations"
+        name: "GL Compliance Violations"
+        name_zh: "GL合規違規數"
+        description: "合規違規的數量"
+        type: "gauge"
+        unit: "count"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "layer_id"
+          - "violation_type"
+          - "severity"
+        thresholds:
+          warning: 5
+          critical: 10
+        collection_interval: "1h"
+        retention: "365d"
+      - metric_id: "gl_policy_coverage"
+        name: "GL Policy Coverage"
+        name_zh: "GL政策覆蓋率"
+        description: "政策覆蓋的Artifact百分比"
+        type: "gauge"
+        unit: "percentage"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "layer_id"
+          - "policy_type"
+        thresholds:
+          critical: 70
+          warning: 85
+          healthy: 95
+        collection_interval: "1d"
+        retention: "365d"
+    # =========================================================================
+    # 審計指標
+    # =========================================================================
+    audit_metrics:
+      - metric_id: "gl_audit_events_total"
+        name: "GL Audit Events Total"
+        name_zh: "GL審計事件總數"
+        description: "審計事件的總數"
+        type: "counter"
+        unit: "count"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "event_type"
+          - "layer_id"
+          - "actor"
+          - "result"
+        collection_interval: "1m"
+        retention: "365d"
+      - metric_id: "gl_audit_findings"
+        name: "GL Audit Findings"
+        name_zh: "GL審計發現"
+        description: "審計發現的數量"
+        type: "gauge"
+        unit: "count"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "finding_type"
+          - "severity"
+          - "status"
+        collection_interval: "1d"
+        retention: "365d"
+    # =========================================================================
+    # 效能指標
+    # =========================================================================
+    performance_metrics:
+      - metric_id: "gl_validation_duration_seconds"
+        name: "GL Validation Duration"
+        name_zh: "GL驗證執行時間"
+        description: "Artifact驗證所需時間"
+        type: "histogram"
+        unit: "seconds"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "validation_type"
+          - "layer_id"
+        buckets: [0.1, 0.5, 1, 2, 5, 10, 30]
+        collection_interval: "1m"
+        retention: "30d"
+      - metric_id: "gl_report_generation_duration_seconds"
+        name: "GL Report Generation Duration"
+        name_zh: "GL報告生成時間"
+        description: "報告生成所需時間"
+        type: "histogram"
+        unit: "seconds"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          - "report_type"
+          - "format"
+        buckets: [1, 5, 10, 30, 60, 120, 300]
+        collection_interval: "1m"
+        retention: "30d"
+  # ===========================================================================
+  # 聚合指標
+  # ===========================================================================
+  aggregations:
+    - name: "gl_overall_health_score"
+      description: "整體GL治理健康分數"
+      formula: "avg(gl_layer_health_score)"
+      interval: "5m"
+    - name: "gl_overall_compliance_rate"
+      description: "整體合規率"
+      formula: "avg(gl_layer_compliance_rate)"
+      interval: "1h"
+    - name: "gl_artifact_freshness_score"
+      description: "Artifact新鮮度分數"
+      formula: "100 - (avg(gl_artifact_age_days) / 365 * 100)"
+      interval: "1d"
+  # ===========================================================================
+  # 告警規則
+  # ===========================================================================
+  alert_rules:
+    - alert_id: "GL_HEALTH_CRITICAL"
+      name: "GL Layer Health Critical"
+      description: "GL層級健康分數低於臨界值"
+      condition: "gl_layer_health_score < 50"
+      severity: "critical"
+      for: "5m"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        team: "governance"
+      annotations:
+        summary: "GL層級 {{ $labels.layer_id }} 健康分數過低"
+        description: "當前分數: {{ $value }}, 臨界值: 50"
+    - alert_id: "GL_COMPLIANCE_WARNING"
+      name: "GL Compliance Rate Warning"
+      description: "GL層級合規率低於警告值"
+      condition: "gl_layer_compliance_rate < 85"
+      severity: "warning"
+      for: "15m"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        team: "governance"
+      annotations:
+        summary: "GL層級 {{ $labels.layer_id }} 合規率偏低"
+        description: "當前合規率: {{ $value }}%, 警告值: 85%"
+    - alert_id: "GL_WORKFLOW_FAILURE"
+      name: "GL Workflow Failure Rate High"
+      description: "工作流程失敗率過高"
+      condition: "gl_workflow_success_rate < 90"
+      severity: "warning"
+      for: "10m"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        team: "platform"
+      annotations:
+        summary: "工作流程 {{ $labels.workflow_name }} 成功率偏低"
+        description: "當前成功率: {{ $value }}%, 警告值: 90%"
+    - alert_id: "GL_ARTIFACT_STALE"
+      name: "GL Artifact Stale"
+      description: "Artifact超過180天未更新"
+      condition: "gl_artifact_age_days > 180"
+      severity: "warning"
+      for: "1d"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        team: "governance"
+      annotations:
+        summary: "Artifact {{ $labels.artifact_name }} 已過期"
+        description: "Artifact已 {{ $value }} 天未更新"
+  # ===========================================================================
+  # 儀表板配置
+  # ===========================================================================
+  dashboards:
+    - dashboard_id: "gl-governance-overview"
+      name: "GL Governance Overview"
+      name_zh: "GL治理總覽"
+      description: "GL治理體系整體狀態儀表板"
+      panels:
+        - title: "整體健康分數"
+          type: "gauge"
+          metric: "gl_overall_health_score"
+        - title: "層級健康狀態"
+          type: "heatmap"
+          metric: "gl_layer_health_score"
+        - title: "Artifact統計"
+          type: "stat"
+          metric: "gl_artifact_total"
+        - title: "合規率趨勢"
+          type: "timeseries"
+          metric: "gl_layer_compliance_rate"
+        - title: "工作流程執行"
+          type: "timeseries"
+          metric: "gl_workflow_execution_total"
+        - title: "違規數量"
+          type: "stat"
+          metric: "gl_compliance_violations"
+    - dashboard_id: "gl-layer-detail"
+      name: "GL Layer Detail"
+      name_zh: "GL層級詳情"
+      description: "單一GL層級詳細狀態儀表板"
+      variables:
+        - name: "layer_id"
+          type: "query"
+          query: "label_values(gl_layer_health_score, layer_id)"
+      panels:
+        - title: "層級健康分數"
+          type: "gauge"
+          metric: "gl_layer_health_score{layer_id=&quot;$layer_id&quot;}"
+        - title: "Artifact分布"
+          type: "piechart"
+          metric: "gl_artifact_total{layer_id=&quot;$layer_id&quot;}"
+        - title: "驗證錯誤"
+          type: "timeseries"
+          metric: "gl_artifact_validation_errors{layer_id=&quot;$layer_id&quot;}"
+status:
+  phase: "active"
+  approved_by: "observability-lead"
+  approved_at: "2025-01-18T00:00:00Z"
+  last_review: "2025-01-18T00:00:00Z"
+  next_review: "2025-04-18T00:00:00Z"
+  change_history:
+    - version: "1.0.0"
+      date: "2025-01-18"
+      author: "observability-team"
+      changes: "Initial metrics definition"

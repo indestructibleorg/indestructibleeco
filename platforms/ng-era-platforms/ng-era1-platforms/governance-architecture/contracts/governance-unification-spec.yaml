@@ -1,0 +1,805 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governance-core
+# @ECO-audit-trail: gl-platform-ecosystem/governance/audit-trails/GL90_99-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-platform-ecosystem/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-platform-ecosystem/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: gl-runtime.io/v1.0.0
+kind: UnificationSpecification
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:contracts:governance-unification-spec.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/contracts/governance-unification-spec.yaml"
+  name: governance-unification-spec
+  version: v1.0.0
+  description: "GL Governance Unification Specification - 治理統一規範"
+  namespace: gl-platform-ecosystem
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    unification.level: L1
+    unification.type: governance
+    governance.layer: constitutional
+spec:
+  ## Governance Events System
+  governance-events:
+    version: v1.0.0
+    description: "治理事件統一定義"
+    
+    event-format: "gl.event.<domain>.<capability>.<action>"
+    
+    event-categories:
+      ## Naming Events
+      naming:
+        - event_id: gl.event.naming.violation
+          description: "命名違規事件"
+          severity: HIGH
+          schema:
+            - violation_id
+            - violation_type
+            - resource_id
+            - detected_at
+            - detected_by
+            - rule_id
+        
+        - event_id: gl.event.naming.fix
+          description: "命名修復事件"
+          severity: INFO
+          schema:
+            - fix_id
+            - original_name
+            - fixed_name
+            - fix_strategy
+            - fixed_at
+            - fixed_by
+        
+        - event_id: gl.event.naming.suggestion
+          description: "命名建議事件"
+          severity: LOW
+          schema:
+            - suggestion_id
+            - current_name
+            - suggested_name
+            - reason
+            - suggested_at
+      
+      ## Contract Events
+      contract:
+        - event_id: gl.event.contract.update
+          description: "契約更新事件"
+          severity: MEDIUM
+          schema:
+            - contract_id
+            - version
+            - update_type
+            - updated_at
+            - updated_by
+            - changes[]
+        
+        - event_id: gl.event.contract.validation
+          description: "契約驗證事件"
+          severity: MEDIUM
+          schema:
+            - contract_id
+            - validation_result
+            - violations[]
+            - validated_at
+        
+        - event_id: gl.event.contract.approval
+          description: "契約審批事件"
+          severity: HIGH
+          schema:
+            - contract_id
+            - approval_status
+            - approved_by
+            - approved_at
+            - comments
+      
+      ## Semantic Events
+      semantic:
+        - event_id: gl.event.semantic.change
+          description: "語意變更事件"
+          severity: MEDIUM
+          schema:
+            - semantic_id
+            - change_type
+            - old_semantic
+            - new_semantic
+            - changed_at
+        
+        - event_id: gl.event.semantic.conflict
+          description: "語意衝突事件"
+          severity: HIGH
+          schema:
+            - conflict_id
+            - conflicting_semantics[]
+            - conflict_type
+            - detected_at
+      
+      ## Platform Events
+      platform:
+        - event_id: gl.event.platform.register
+          description: "平台註冊事件"
+          severity: HIGH
+          schema:
+            - platform_id
+            - platform_type
+            - version
+            - registered_at
+            - registered_by
+        
+        - event_id: gl.event.platform.deregister
+          description: "平台註銷事件"
+          severity: HIGH
+          schema:
+            - platform_id
+            - deregistered_at
+            - deregistered_by
+            - reason
+      
+      ## Exception Events
+      exception:
+        - event_id: gl.event.exception.request
+          description: "例外申請事件"
+          severity: MEDIUM
+          schema:
+            - exception_id
+            - exception_type
+            - requested_by
+            - reason
+            - requested_at
+        
+        - event_id: gl.event.exception.approval
+          description: "例外審批事件"
+          severity: HIGH
+          schema:
+            - exception_id
+            - approval_status
+            - approved_by
+            - approved_at
+            - conditions
+  
+  ## Governance API System
+  governance-apis:
+    version: v1.0.0
+    description: "治理 API 統一定義"
+    
+    api-base: "/gl/governance"
+    
+    endpoints:
+      ## Naming Governance APIs
+      naming:
+        - path: "/gl/governance/naming/validate"
+          method: POST
+          description: "驗證命名是否符合規範"
+          request:
+            - resource_type
+            - resource_name
+            - domain
+            - capability
+          response:
+            - valid (boolean)
+            - violations[]
+            - suggestions[]
+        
+        - path: "/gl/governance/naming/fix"
+          method: POST
+          description: "修復命名違規"
+          request:
+            - resource_type
+            - current_name
+            - fix_strategy
+            - dry_run (boolean)
+          response:
+            - fixed_name
+            - changes[]
+            - affected_files[]
+        
+        - path: "/gl/governance/naming/audit"
+          method: GET
+          description: "獲取命名審計報告"
+          parameters:
+            - scope (platform|project|file)
+            - from_date
+            - to_date
+          response:
+            - audit_summary
+            - violations[]
+            - fixes[]
+            - compliance_score
+        
+        - path: "/gl/governance/naming/exception"
+          method: POST
+          description: "申請命名例外"
+          request:
+            - resource_name
+            - violation_type
+            - reason
+            - expiration_date
+          response:
+            - exception_id
+            - status
+            - approved_by
+            - conditions
+        
+        - path: "/gl/governance/naming/status"
+          method: GET
+          description: "獲取命名治理狀態"
+          response:
+            - total_resources
+            - compliant_resources
+            - non_compliant_resources
+            - compliance_percentage
+            - last_audit_at
+      
+      ## Semantic Governance APIs
+      semantic:
+        - path: "/gl/governance/semantic/validate"
+          method: POST
+          description: "驗證語意定義"
+          request:
+            - semantic_type
+            - semantic_definition
+          response:
+            - valid (boolean)
+            - conflicts[]
+            - inconsistencies[]
+        
+        - path: "/gl/governance/semantic/graph"
+          method: GET
+          description: "獲取語意圖"
+          parameters:
+            - domain
+            - capability
+            - depth
+          response:
+            - nodes[]
+            - edges[]
+            - metadata
+        
+        - path: "/gl/governance/semantic/search"
+          method: GET
+          description: "搜索語意定義"
+          parameters:
+            - query
+            - semantic_type
+          response:
+            - results[]
+            - total
+      
+      ## Contract Governance APIs
+      contract:
+        - path: "/gl/governance/contract/validate"
+          method: POST
+          description: "驗證契約"
+          request:
+            - contract_id
+            - contract_type
+            - contract_content
+          response:
+            - valid (boolean)
+            - violations[]
+            - dependencies[]
+        
+        - path: "/gl/governance/contract/approve"
+          method: POST
+          description: "審批契約"
+          request:
+            - contract_id
+            - approval_status
+            - comments
+          response:
+            - approval_id
+            - status
+            - approved_at
+        
+        - path: "/gl/governance/contract/list"
+          method: GET
+          description: "列出所有契約"
+          parameters:
+            - contract_type
+            - status
+            - version
+          response:
+            - contracts[]
+            - total
+      
+      ## Platform Governance APIs
+      platform:
+        - path: "/gl/governance/platform/register"
+          method: POST
+          description: "註冊新平台"
+          request:
+            - platform_id
+            - platform_type
+            - version
+            - capabilities[]
+          response:
+            - registration_id
+            - status
+            - registered_at
+        
+        - path: "/gl/governance/platform/validate"
+          method: POST
+          description: "驗證平台"
+          request:
+            - platform_id
+            - validation_scope
+          response:
+            - valid (boolean)
+            - violations[]
+            - compliance_score
+        
+        - path: "/gl/governance/platform/audit"
+          method: GET
+          description: "獲取平台審計報告"
+          parameters:
+            - platform_id
+            - from_date
+            - to_date
+          response:
+            - audit_summary
+            - events[]
+            - compliance_score
+  
+  ## Governance Data Model
+  governance-model:
+    version: v1.0.0
+    description: "治理數據模型定義"
+    
+    models:
+      ## Naming Violation Model
+      naming-violation:
+        fields:
+          - name: violation_id
+            type: string
+            required: true
+            description: "違規唯一標識"
+          
+          - name: violation_type
+            type: enum
+            required: true
+            values:
+              - NAMING_FORMAT
+              - NAMING_CONVENTION
+              - SEMANTIC_CONFLICT
+              - DUPLICATE_NAME
+              - PATH_VIOLATION
+            description: "違規類型"
+          
+          - name: resource_type
+            type: string
+            required: true
+            description: "資源類型（platform, service, file, directory, etc.）"
+          
+          - name: resource_name
+            type: string
+            required: true
+            description: "違規的資源名稱"
+          
+          - name: resource_path
+            type: string
+            required: true
+            description: "資源路徑"
+          
+          - name: rule_id
+            type: string
+            required: true
+            description: "違反的規則 ID"
+          
+          - name: severity
+            type: enum
+            required: true
+            values:
+              - HIGH
+              - MEDIUM
+              - LOW
+            description: "嚴重程度"
+          
+          - name: description
+            type: string
+            required: true
+            description: "違規描述"
+          
+          - name: suggestions[]
+            type: string
+            required: false
+            description: "修復建議"
+          
+          - name: detected_at
+            type: timestamp
+            required: true
+            description: "檢測時間"
+          
+          - name: detected_by
+            type: string
+            required: true
+            description: "檢測工具或服務"
+          
+          - name: status
+            type: enum
+            required: true
+            values:
+              - OPEN
+              - IN_PROGRESS
+              - FIXED
+              - WAIVED
+              - IGNORED
+            description: "違規狀態"
+          
+          - name: fixed_at
+            type: timestamp
+            required: false
+            description: "修復時間"
+          
+          - name: fixed_by
+            type: string
+            required: false
+            description: "修復者"
+      
+      ## Naming Fix Model
+      naming-fix:
+        fields:
+          - name: fix_id
+            type: string
+            required: true
+            description: "修復唯一標識"
+          
+          - name: violation_id
+            type: string
+            required: true
+            description: "關聯的違規 ID"
+          
+          - name: original_name
+            type: string
+            required: true
+            description: "原始名稱"
+          
+          - name: fixed_name
+            type: string
+            required: true
+            description: "修復後名稱"
+          
+          - name: fix_strategy
+            type: enum
+            required: true
+            values:
+              - AUTOMATIC
+              - SEMI_AUTOMATIC
+              - MANUAL
+            description: "修復策略"
+          
+          - name: changes[]
+            type: object
+            required: true
+            description: "變更詳情"
+            fields:
+              - file_path
+              - line_number
+              - old_value
+              - new_value
+          
+          - name: affected_files[]
+            type: string
+            required: true
+            description: "受影響的文件列表"
+          
+          - name: fixed_at
+            type: timestamp
+            required: true
+            description: "修復時間"
+          
+          - name: fixed_by
+            type: string
+            required: true
+            description: "修復者或工具"
+          
+          - name: verified
+            type: boolean
+            required: false
+            description: "是否已驗證"
+          
+          - name: verified_at
+            type: timestamp
+            required: false
+            description: "驗證時間"
+      
+      ## Naming Suggestion Model
+      naming-suggestion:
+        fields:
+          - name: suggestion_id
+            type: string
+            required: true
+            description: "建議唯一標識"
+          
+          - name: resource_type
+            type: string
+            required: true
+            description: "資源類型"
+          
+          - name: current_name
+            type: string
+            required: true
+            description: "當前名稱"
+          
+          - name: suggested_name
+            type: string
+            required: true
+            description: "建議名稱"
+          
+          - name: reason
+            type: string
+            required: true
+            description: "建議原因"
+          
+          - name: confidence
+            type: number
+            required: false
+            description: "建議置信度（0-1）"
+          
+          - name: suggested_at
+            type: timestamp
+            required: true
+            description: "建議時間"
+          
+          - name: suggested_by
+            type: string
+            required: true
+            description: "建議來源（tool, rule, ai）"
+          
+          - name: applied
+            type: boolean
+            required: false
+            description: "是否已應用"
+          
+          - name: applied_at
+            type: timestamp
+            required: false
+            description: "應用時間"
+      
+      ## Naming Exception Model
+      naming-exception:
+        fields:
+          - name: exception_id
+            type: string
+            required: true
+            description: "例外唯一標識"
+          
+          - name: resource_name
+            type: string
+            required: true
+            description: "資源名稱"
+          
+          - name: resource_type
+            type: string
+            required: true
+            description: "資源類型"
+          
+          - name: violation_type
+            type: enum
+            required: true
+            values:
+              - NAMING_FORMAT
+              - NAMING_CONVENTION
+              - SEMANTIC_CONFLICT
+              - DUPLICATE_NAME
+            description: "違規類型"
+          
+          - name: reason
+            type: string
+            required: true
+            description: "例外原因"
+          
+          - name: expiration_date
+            type: timestamp
+            required: false
+            description: "過期日期"
+          
+          - name: conditions[]
+            type: string
+            required: false
+            description: "例外條件"
+          
+          - name: status
+            type: enum
+            required: true
+            values:
+              - PENDING
+              - APPROVED
+              - REJECTED
+              - EXPIRED
+            description: "例外狀態"
+          
+          - name: requested_by
+            type: string
+            required: true
+            description: "申請人"
+          
+          - name: requested_at
+            type: timestamp
+            required: true
+            description: "申請時間"
+          
+          - name: approved_by
+            type: string
+            required: false
+            description: "審批人"
+          
+          - name: approved_at
+            type: timestamp
+            required: false
+            description: "審批時間"
+          
+          - name: comments
+            type: string
+            required: false
+            description: "審批意見"
+      
+      ## Compliance Score Model
+      compliance-score:
+        fields:
+          - name: score_id
+            type: string
+            required: true
+            description: "評分唯一標識"
+          
+          - name: scope
+            type: enum
+            required: true
+            values:
+              - PLATFORM
+              - PROJECT
+              - FILE
+            description: "評分範圍"
+          
+          - name: scope_id
+            type: string
+            required: true
+            description: "範圍標識（platform_id, project_path, file_path）"
+          
+          - name: total_score
+            type: number
+            required: true
+            description: "總分（0-100）"
+          
+          - name: naming_score
+            type: number
+            required: true
+            description: "命名合規分數"
+          
+          - name: semantic_score
+            type: number
+            required: true
+            description: "語意合規分數"
+          
+          - name: structural_score
+            type: number
+            required: true
+            description: "結構合規分數"
+          
+          - name: governance_score
+            type: number
+            required: true
+            description: "治理合規分數"
+          
+          - name: total_resources
+            type: number
+            required: true
+            description: "總資源數"
+          
+          - name: compliant_resources
+            type: number
+            required: true
+            description: "合規資源數"
+          
+          - name: non_compliant_resources
+            type: number
+            required: true
+            description: "不合規資源數"
+          
+          - name: compliance_percentage
+            type: number
+            required: true
+            description: "合規百分比"
+          
+          - name: calculated_at
+            type: timestamp
+            required: true
+            description: "計算時間"
+          
+          - name: violations_summary[]
+            type: object
+            required: false
+            description: "違規摘要"
+            fields:
+              - violation_type
+              - count
+              - severity
+  
+  ## Governance Enforcement Levels
+  enforcement-levels:
+    version: v1.0.0
+    description: "治理執行等級定義"
+    
+    levels:
+      - level: L0
+        name: "DISABLED"
+        description: "治理禁用"
+        enforcement: NONE
+        auto_fix: false
+        block_deployment: false
+      
+      - level: L1
+        name: "MONITORING"
+        description: "僅監控，不阻擋"
+        enforcement: PASSIVE
+        auto_fix: false
+        block_deployment: false
+        actions:
+          - "記錄違規"
+          - "發送通知"
+          - "生成報告"
+      
+      - level: L2
+        name: "ADVISORY"
+        description: "建議修復"
+        enforcement: SOFT
+        auto_fix: false
+        block_deployment: false
+        actions:
+          - "記錄違規"
+          - "發送警告"
+          - "提供修復建議"
+          - "要求人工確認"
+      
+      - level: L3
+        name: "STRICT"
+        description: "嚴格執行"
+        enforcement: HARD
+        auto_fix: true
+        block_deployment: false
+        actions:
+          - "記錄違規"
+          - "阻止操作"
+          - "自動修復（可選）"
+          - "要求立即修復"
+      
+      - level: L4
+        name: "CRITICAL"
+        description: "關鍵執行"
+        enforcement: BLOCKING
+        auto_fix: false
+        block_deployment: true
+        actions:
+          - "記錄違規"
+          - "阻止所有操作"
+          - "阻止部署"
+          - "要求立即審批"
+      
+      - level: L5
+        name: "CONSTITUTIONAL"
+        description: "憲法級"
+        enforcement: ABSOLUTE
+        auto_fix: false
+        block_deployment: true
+        actions:
+          - "記錄違規"
+          - "阻止所有操作"
+          - "阻止部署"
+          - "觸發緊急審批"
+          - "升級到高級治理層"
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:contracts:governance-unification-spec.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/contracts/governance-unification-spec.yaml"
+  created_at: "2026-01-31T00:00:00Z"
+  updated_at: "2026-01-31T00:00:00Z"
+  governance_level: CONSTITUTIONAL
+  enforcement: MANDATORY
+  compatibility:
+    - v1.0.0

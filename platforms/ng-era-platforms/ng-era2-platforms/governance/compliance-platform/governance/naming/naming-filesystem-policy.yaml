@@ -1,0 +1,79 @@
+# @ECO-governed
+# @ECO-layer: GL60-80
+# @ECO-semantic: naming-filesystem-policy
+#
+# Filesystem naming policy exemptions and normalization guardrails.
+naming_policy:
+  filesystem_only:
+    exempt_exact:
+      - README
+      - README.md
+      - README.rst
+      - README.txt
+      - CHANGELOG
+      - CHANGELOG.md
+      - CHANGES
+      - HISTORY.md
+      - LICENSE
+      - LICENSE.md
+      - LICENSE.txt
+      - NOTICE
+      - NOTICE.txt
+      - CONTRIBUTING.md
+      - CODE_OF_CONDUCT.md
+      - CODE-OF-CONDUCT.md
+      - SECURITY.md
+      - SUPPORT.md
+      - GOVERNANCE.md
+      - MAINTAINERS
+      - AUTHORS
+      - COPYRIGHT
+      - .gitignore
+      - .gitattributes
+      - .gitmodules
+      - .gitkeep
+      - .editorconfig
+      - Dockerfile
+      - docker-compose.yml
+      - docker-compose.yaml
+      - Makefile
+      - CMakeLists.txt
+      - Gemfile
+      - Rakefile
+      - go.mod
+      - go.sum
+      - package.json
+      - package-lock.json
+      - pnpm-lock.yaml
+      - yarn.lock
+      - poetry.lock
+      - Pipfile
+      - Pipfile.lock
+      - requirements.txt
+      - requirements-dev.txt
+      - Cargo.toml
+      - Cargo.lock
+      - composer.json
+      - composer.lock
+    exempt_root_exact:
+      - README.md
+      - LICENSE
+      - CHANGELOG.md
+      - NOTICE
+    normalize:
+      lowercase: true
+      replace_spaces_with: "-"
+      collapse_separators: true
+      allowed_chars_regex: "^[a-z0-9._-]+$"
+    deny:
+      windows_reserved_names: true
+      forbid_trailing_dot_or_space: true
+      forbid_chars:
+        - ":"
+        - "*"
+        - "?"
+        - "<"
+        - ">"
+        - "|"
+        - "\\"
+        - "/"

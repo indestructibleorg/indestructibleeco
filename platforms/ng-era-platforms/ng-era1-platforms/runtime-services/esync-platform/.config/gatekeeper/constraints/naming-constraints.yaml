@@ -1,0 +1,35 @@
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: naming-governance
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: ESyncNamingConvention
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:esync-platform:.config:gatekeeper:constraints:naming-constraints.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/esync-platform/.config/gatekeeper/constraints/naming-constraints.yaml"
+  name: esync-naming-convention
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups: ["apps"]
+        kinds: ["Deployment"]
+      - apiGroups: [""]
+        kinds: ["Service", "ConfigMap", "Secret"]
+      - apiGroups: ["networking.k8s.io"]
+        kinds: ["Ingress"]
+    excludedNamespaces: ["kube-system", "gatekeeper-system"]
+  parameters:
+    regex: "^(dev|staging|prod)-[a-z0-9-]+-(deploy|svc|ing|cm|secret)-v\\d+\\.\\d+\\.\\d+(-[A-Za-z0-9]+)?$"
+    excludedNamespaces:
+      - kube-system
+      - gatekeeper-system
+      - cert-manager
+      - monitoring

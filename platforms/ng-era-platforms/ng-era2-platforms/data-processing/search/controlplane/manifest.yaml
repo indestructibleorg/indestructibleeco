@@ -1,0 +1,22 @@
+# @ECO-governed
+# @ECO-layer: search
+# @ECO-semantic: manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Controlplane Manifest
+# ECO-Layer: GL00-09 (Strategic)
+# Closure-Signal: manifest
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:data-processing:search:controlplane:manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/data-processing/search/controlplane/manifest.yaml"
+  name: controlplane-manifest
+  version: "1.0.0"
+  layer: "GL00-09"
+  description: "Controlplane manifest for search system"
+
+artifacts:
+  - policy.yaml

@@ -1,0 +1,286 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: config-artifact
+# @ECO-audit-trail: ../../engine/governance/gl-artifacts/meta/semantic/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-platform-ecosystem/governance/engine/governance/gl-artifacts/meta/semantic/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-platform-ecosystem/governance/engine/governance/gl-artifacts/meta/naming-charter/gl-unified-naming-charter.yaml
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: gl-naming-governance-alerts
+  namespace: gl-monitoring
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: gl-governance
+    app.kubernetes.io/app.kubernetes.io/component: alerting
+    gl.governance.level: "3"
+spec:
+  groups:
+    - name: gl.naming.compliance
+      interval: 60s
+      rules:
+        - alert: NamingComplianceRateLow
+          expr: |
+            (
+              sum(gl_resource_naming_compliant) / 
+              sum(gl_resource_naming_total)
+            ) * 100 < 95
+          for: 5m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            governance: naming
+            sla: NCR
+          annotations:
+            summary: "Naming compliance rate below SLA target"
+            description: "Current compliance rate {{ $value }}% is below 95% SLA target"
+            runbook_url: "https://docs.gl.io/governance/naming/runbook"
+
+        - alert: NamingViolationsHigh
+          expr: |
+            sum(increase(gl_naming_violations_total[1h])) > 10
+          for: 10m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: critical
+            governance: naming
+            sla: VFC
+          annotations:
+            summary: "High number of naming violations detected"
+            description: "{{ $value }} naming violations in the last hour"
+
+        - alert: AutoFixFailureRate
+          expr: |
+            (
+              sum(gl_autofix_failures_total) /
+              sum(gl_autofix_attempts_total)
+            ) * 100 > 20
+          for: 15m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            governance: autofix
+          annotations:
+            summary: "Auto-fix failure rate exceeds threshold"
+            description: "Auto-fix failure rate is {{ $value }}%"
+
+        - alert: GovernanceAuditMissing
+          expr: |
+            time() - gl_last_governance_audit_timestamp > 86400
+          for: 1h
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            governance: audit
+          annotations:
+            summary: "Governance audit not run in 24 hours"
+            description: "Last audit was {{ $value | humanizeDuration }} ago"
+
+    - name: gl.supply.chain
+      interval: 120s
+      rules:
+        - alert: SBOMGenerationFailed
+          expr: |
+            gl_sbom_generation_status == 0
+          for: 5m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: critical
+            governance: supply-chain
+            slsa: level3
+          annotations:
+            summary: "SBOM generation failed"
+            description: "SBOM generation has failed for {{ $labels.repository }}"
+
+        - alert: CriticalVulnerabilityFound
+          expr: |
+            gl_vulnerability_critical_count > 0
+          for: 0m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: critical
+            governance: security
+          annotations:
+            summary: "Critical vulnerability detected"
+            description: "{{ $value }} critical vulnerabilities found"
+
+        - alert: ProvenanceSigningFailed
+          expr: |
+            gl_provenance_signing_status == 0
+          for: 5m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            governance: supply-chain
+          annotations:
+            summary: "Provenance signing failed"
+            description: "SLSA provenance signing has failed"
+
+    - name: gl.cluster.security
+      interval: 300s
+      rules:
+        - alert: KubeBenchFailure
+          expr: |
+            gl_kubebench_failures_total > 0
+          for: 10m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            governance: security
+            scan: cis
+          annotations:
+            summary: "CIS benchmark failures detected"
+            description: "{{ $value }} CIS benchmark failures"
+
+        - alert: CheckovPolicyViolation
+          expr: |
+            gl_checkov_violations_total > 5
+          for: 5m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            governance: iac
+          annotations:
+            summary: "IaC policy violations detected"
+            description: "{{ $value }} Checkov policy violations"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gl-grafana-dashboards
+  namespace: gl-monitoring
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    grafana_dashboard: "1"
+data:
+  gl-governance-overview.json: |
+    {
+      "dashboard": {
+        "title": "GL Governance Overview",
+        "uid": "gl-governance-main",
+        "tags": ["governance", "naming", "compliance"],
+        "timezone": "browser",
+        "panels": [
+          {
+            "title": "Naming Compliance Rate",
+            "type": "gauge",
+            "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0},
+            "targets": [
+              {
+                "expr": "(sum(gl_resource_naming_compliant) / sum(gl_resource_naming_total)) * 100",
+                "legendFormat": "Compliance %"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "thresholds": {
+                  "steps": [
+                    {"color": "red", "value": 0},
+                    {"color": "yellow", "value": 80},
+                    {"color": "green", "value": 95}
+                  ]
+                },
+                "unit": "percent",
+                "max": 100
+              }
+            }
+          },
+          {
+            "title": "Naming Violations Over Time",
+            "type": "timeseries",
+            "gridPos": {"h": 8, "w": 12, "x": 6, "y": 0},
+            "targets": [
+              {
+                "expr": "sum(increase(gl_naming_violations_total[1h]))",
+                "legendFormat": "Violations/hour"
+              }
+            ]
+          },
+          {
+            "title": "Auto-Fix Success Rate",
+            "type": "stat",
+            "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+            "targets": [
+              {
+                "expr": "(1 - (sum(gl_autofix_failures_total) / sum(gl_autofix_attempts_total))) * 100",
+                "legendFormat": "Success Rate"
+              }
+            ]
+          },
+          {
+            "title": "Supply Chain Health",
+            "type": "table",
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+            "targets": [
+              {
+                "expr": "gl_sbom_generation_status",
+                "legendFormat": "SBOM Status"
+              },
+              {
+                "expr": "gl_vulnerability_critical_count",
+                "legendFormat": "Critical CVEs"
+              },
+              {
+                "expr": "gl_provenance_signing_status",
+                "legendFormat": "Provenance"
+              }
+            ]
+          },
+          {
+            "title": "Governance SLA Metrics",
+            "type": "table",
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+            "targets": [
+              {
+                "expr": "gl_sla_ncr_current",
+                "legendFormat": "NCR (Naming Compliance Rate)"
+              },
+              {
+                "expr": "gl_sla_vfc_current",
+                "legendFormat": "VFC (Violation Fix Count)"
+              },
+              {
+                "expr": "gl_sla_mfr_current",
+                "legendFormat": "MFR (Manual Fix Rate)"
+              },
+              {
+                "expr": "gl_sla_ars_current",
+                "legendFormat": "ARS (Auto-Repair Success)"
+              }
+            ]
+          }
+        ],
+        "templating": {
+          "list": [
+            {
+              "name": "environment",
+              "type": "query",
+              "query": "label_values(gl_resource_naming_total, environment)",
+              "multi": true,
+              "includeAll": true
+            },
+            {
+              "name": "namespace",
+              "type": "query",
+              "query": "label_values(gl_resource_naming_total, namespace)",
+              "multi": true,
+              "includeAll": true
+            }
+          ]
+        }
+      }
+    }

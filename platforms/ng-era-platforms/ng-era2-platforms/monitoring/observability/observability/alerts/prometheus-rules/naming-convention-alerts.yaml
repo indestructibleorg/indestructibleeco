@@ -1,0 +1,205 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: naming-convention-alerts
+  namespace: monitoring
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: prometheus-operator
+    app.kubernetes.io/component: rules
+    # @ECO-governed
+    # @ECO-layer: GL50-59
+    # @ECO-semantic: naming-alerts
+    # @ECO-audit-trail: ../../../../governance/GL_SEMANTIC_ANCHOR.json
+
+spec:
+  groups:
+    - name: naming_convention.alerts
+      rules:
+        # P0: Critical - High number of violations
+        - alert: NamingViolationsHigh
+          expr: |
+            naming_violations_total > 10
+          for: 5m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: critical
+            priority: P0
+            category: governance
+            # @ECO-governed
+            # @ECO-layer: GL50-59
+          annotations:
+            summary: "High number of naming convention violations detected"
+            description: >
+              Repository {{ $labels.repo }} on branch {{ $labels.branch }} has {{ $value }} naming violations.
+              This exceeds the threshold of 10 violations.
+            runbook_url: "https://docs.machinenativeops.io/runbooks/naming-violations"
+            dashboard_url: "https://grafana.machinenativeops.io/d/naming-compliance"
+
+        # P1: Warning - Medium number of violations
+        - alert: NamingViolationsMedium
+          expr: |
+            naming_violations_total > 5 and naming_violations_total <= 10
+          for: 15m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            priority: P1
+            category: governance
+            # @ECO-governed
+            # @ECO-layer: GL50-59
+          annotations:
+            summary: "Medium number of naming convention violations detected"
+            description: >
+              Repository {{ $labels.repo }} on branch {{ $labels.branch }} has {{ $value }} naming violations.
+              This is approaching the critical threshold.
+
+        # P2: Info - Low number of violations
+        - alert: NamingViolationsDetected
+          expr: |
+            naming_violations_total > 0 and naming_violations_total <= 5
+          for: 30m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: info
+            priority: P2
+            category: governance
+            # @ECO-governed
+            # @ECO-layer: GL50-59
+          annotations:
+            summary: "Naming convention violations detected"
+            description: >
+              Repository {{ $labels.repo }} on branch {{ $labels.branch }} has {{ $value }} naming violation(s).
+              Please review and fix.
+
+        # P3: Info - Low compliance rate
+        - alert: NamingComplianceLow
+          expr: |
+            naming_compliance_rate < 95
+          for: 1h
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            priority: P3
+            category: governance
+            # @ECO-governed
+            # @ECO-layer: GL50-59
+          annotations:
+            summary: "Naming compliance rate below target"
+            description: >
+              Repository {{ $labels.repo }} on branch {{ $labels.branch }} has {{ $value }}% compliance rate.
+              Target is 95% or higher.
+
+        # P0: Critical - Compliance rate very low
+        - alert: NamingComplianceCritical
+          expr: |
+            naming_compliance_rate < 80
+          for: 5m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: critical
+            priority: P0
+            category: governance
+            # @ECO-governed
+            # @ECO-layer: GL50-59
+          annotations:
+            summary: "Critical naming compliance rate detected"
+            description: >
+              Repository {{ $labels.repo }} on branch {{ $labels.branch }} has {{ $value }}% compliance rate.
+              This is critically low and requires immediate attention.
+
+        # Auto-fix success rate monitoring
+        - alert: AutoFixSuccessRateLow
+          expr: |
+            auto_fix_success_total / (auto_fix_success_total + auto_fix_failure_total) < 0.9
+          for: 1h
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            priority: P2
+            category: automation
+            # @ECO-governed
+            # @ECO-layer: GL50-59
+          annotations:
+            summary: "Auto-fix success rate below 90%"
+            description: >
+              Auto-fix operations have a success rate of {{ $value | humanizePercentage }}.
+              Review auto-fix logs for failures.
+
+        # Pending PRs with violations
+        - alert: ViolatingPRsPending
+          expr: |
+            pull_requests_with_violations > 5
+          for: 1h
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            priority: P2
+            category: governance
+            # @ECO-governed
+            # @ECO-layer: GL50-59
+          annotations:
+            summary: "Multiple PRs with naming violations pending"
+            description: >
+              There are {{ $value }} pull requests with naming violations that have been pending for over 1 hour.
+              Please review and merge or reject them.
+
+    - name: naming_sla.metrics
+      rules:
+        # Record SLA metrics
+        - record: naming_sla:violations_fixed_24h
+          expr: |
+            increase(naming_violations_fixed_total[24h])
+
+        - record: naming_sla:compliance_rate_1h
+          expr: |
+            avg_over_time(naming_compliance_rate[1h])
+
+        - record: naming_sla:auto_fix_latency
+          expr: |
+            histogram_quantile(0.95, auto_fix_duration_seconds)
+
+        # SLA Breach alerts
+        - alert: NamingSLAViolationFixTime
+          expr: |
+            naming_sla:auto_fix_latency > 300
+          for: 10m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            priority: P2
+            category: sla
+            # @ECO-governed
+            # @ECO-layer: GL50-59
+          annotations:
+            summary: "Auto-fix latency exceeds SLA"
+            description: >
+              95th percentile auto-fix duration is {{ $value | humanizeDuration }}.
+              SLA target is 5 minutes (300 seconds).
+
+        - alert: NamingSLAComplianceNotMet
+          expr: |
+            naming_sla:compliance_rate_1h < 99
+          for: 15m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: critical
+            priority: P1
+            category: sla
+            # @ECO-governed
+            # @ECO-layer: GL50-59
+          annotations:
+            summary: "Naming compliance SLA not met"
+            description: >
+              Average compliance over the last hour is {{ $value | humanizePercentage }}.
+              SLA target is 99% or higher.

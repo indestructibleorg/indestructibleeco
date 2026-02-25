@@ -1,0 +1,196 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1alpha1
+kind: NamingPolicy
+metadata:
+  name: pipeline-naming-standard
+  description: "CI/CD Pipeline 命名规范"
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    category: "cicd"
+    team: "platform"
+  annotations:
+    version: "v1.0.0"
+    lastReviewed: "2025-12-17"
+
+spec:
+  # Pipeline 命名模式
+  pattern: "{{ .repository }}-{{ .action }}-{{ .target }}"
+
+  schemaRef: "schemas/pipeline-naming.schema.yaml"
+
+  validation:
+    description: |
+      Pipeline 命名规范：
+      - 格式: {repository}-{action}-{target}
+      - 使用小写字母和连字符
+      - action: build, test, deploy, release
+      - target: dev, staging, prod, all
+
+  components:
+    repository:
+      description: "代码仓库名称"
+      pattern: "^[a-z0-9-]+$"
+      examples:
+        - "payment-service"
+        - "user-api"
+        - "order-processor"
+
+    action:
+      description: "Pipeline 动作"
+      enum:
+        - "build"      # 构建
+        - "test"       # 测试
+        - "deploy"     # 部署
+        - "release"    # 发布
+        - "rollback"   # 回滚
+        - "validate"   # 验证
+        - "security"   # 安全扫描
+
+    target:
+      description: "目标环境或范围"
+      enum:
+        - "dev"
+        - "staging"
+        - "prod"
+        - "all"
+
+  examples:
+    valid:
+      - name: "payment-service-build-all"
+        description: "支付服务构建（所有环境）"
+        components:
+          repository: "payment-service"
+          action: "build"
+          target: "all"
+
+      - name: "user-api-test-all"
+        description: "用户 API 测试"
+        components:
+          repository: "user-api"
+          action: "test"
+          target: "all"
+
+      - name: "order-processor-deploy-prod"
+        description: "订单处理器生产部署"
+        components:
+          repository: "order-processor"
+          action: "deploy"
+          target: "prod"
+
+      - name: "payment-service-security-all"
+        description: "支付服务安全扫描"
+        components:
+          repository: "payment-service"
+          action: "security"
+          target: "all"
+
+      - name: "user-api-rollback-prod"
+        description: "用户 API 生产回滚"
+        components:
+          repository: "user-api"
+          action: "rollback"
+          target: "prod"
+
+    invalid:
+      - name: "PaymentService-Build-All"
+        reason: "使用大写字母"
+        fix: "payment-service-build-all"
+
+      - name: "payment_service_build_all"
+        reason: "使用下划线分隔符"
+        fix: "payment-service-build-all"
+
+      - name: "payment-service-build-production"
+        reason: "环境名应使用缩写 'prod' 而非 'production'"
+        fix: "payment-service-build-prod"
+
+      - name: "build-payment-service"
+        reason: "组件顺序错误，应该是 repository-action-target"
+        fix: "payment-service-build-all"
+
+  # 阶段命名规范
+  stageNaming:
+    description: "Pipeline 内部阶段的命名规范"
+    pattern: "{{ .order }}-{{ .stageName }}"
+    examples:
+      - "01-checkout"
+      - "02-build"
+      - "03-unit-test"
+      - "04-integration-test"
+      - "05-security-scan"
+      - "06-docker-build"
+      - "07-push-registry"
+      - "08-deploy"
+      - "09-smoke-test"
+      - "10-notify"
+
+  # 工作流触发器命名
+  triggerNaming:
+    push:
+      description: "推送触发"
+      examples:
+        - "on-push-main"
+        - "on-push-develop"
+        - "on-push-release"
+
+    pullRequest:
+      description: "PR 触发"
+      examples:
+        - "on-pr-main"
+        - "on-pr-develop"
+
+    schedule:
+      description: "定时触发"
+      examples:
+        - "on-schedule-nightly"
+        - "on-schedule-weekly"
+
+    manual:
+      description: "手动触发"
+      examples:
+        - "on-manual-deploy"
+        - "on-manual-rollback"
+
+  # 环境变量命名
+  environmentVariables:
+    pattern: "UPPER_SNAKE_CASE"
+    examples:
+      - "DATABASE_URL"
+      - "API_KEY"
+      - "DEPLOY_TARGET"
+      - "BUILD_NUMBER"
+      - "GIT_COMMIT_SHA"
+
+  # 秘密变量命名
+  secrets:
+    pattern: "UPPER_SNAKE_CASE with prefix"
+    prefix: "SECRET_"
+    examples:
+      - "SECRET_API_KEY"
+      - "SECRET_DATABASE_PASSWORD"
+      - "SECRET_SSH_KEY"
+
+  enforcement:
+    level: "error"
+    scope:
+      - "github-actions"
+      - "gitlab-ci"
+      - "jenkins"
+    autoReject: true
+
+  metadata:
+    version: "v1.0.0"
+    owner: "platform-team"
+    reviewDate: "2025-12-17"
+    nextReviewDate: "2026-06-17"
+
+  references:
+    - title: "GitHub Actions Documentation"
+      url: "https://docs.github.com/en/actions"
+    - title: "GitLab CI/CD Documentation"
+      url: "https://docs.gitlab.com/ee/ci/"

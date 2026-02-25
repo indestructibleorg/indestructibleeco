@@ -1,0 +1,78 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: kubernetes-deployment-file-organizer
+# @ECO-audit-trail: ../../../engine/governance/GL_SEMANTIC_ANCHOR.json
+#
+# GL Unified Architecture Governance Framework Activated
+# File Organizer System Deployment Manifest
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:kubernetes:manifests:systems:file-organizer-system:deployment.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/kubernetes/manifests/systems/file-organizer-system/deployment.yaml"
+  name: file-organizer-system
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: file-organizer-system
+    app.kubernetes.io/app.kubernetes.io/component: application
+    app.kubernetes.io/part-of: machine-native-ops
+    governance.machinenativeops.io/charter-version: "2.0.0"
+    governance.machinenativeops.io/layer: "application"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: file-organizer-system
+  template:
+    metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:kubernetes:manifests:systems:file-organizer-system:deployment.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/kubernetes/manifests/systems/file-organizer-system/deployment.yaml"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        app.kubernetes.io/name: file-organizer-system
+        app.kubernetes.io/app.kubernetes.io/component: application
+        governance.machinenativeops.io/layer: "application"
+    spec:
+      serviceAccountName: machine-native-ops-sa
+      containers:
+        - name: file-organizer
+          image: machinenativeops/file-organizer-system:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 3001
+              protocol: TCP
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: GOVERNANCE_MODE
+              value: "strict"
+            - name: CONTINUE_ON_ERROR
+              value: "false"
+            - name: VALIDATION_REQUIRED
+              value: "true"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5

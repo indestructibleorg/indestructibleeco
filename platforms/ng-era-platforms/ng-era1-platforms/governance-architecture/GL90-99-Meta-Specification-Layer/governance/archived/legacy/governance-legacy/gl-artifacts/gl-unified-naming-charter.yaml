@@ -1,0 +1,481 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# =============================================================================
+# GL Unified Naming Charter (GL 統一命名框架)
+# MachineNativeOps Governance Layers Unified Naming Standard
+# Version: 1.0.0
+# Layer: GL90-99 (Meta-Specification Layer)
+# Status: DRAFT
+# =============================================================================
+apiVersion: governance.machinenativeops.io/v2
+kind: GLUnifiedNamingCharter
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-unified-naming-charter.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-unified-naming-charter.yaml"
+  name: gl-unified-naming-charter
+  version: "1.0.0"
+  created_at: "2025-01-21T00:00:00Z"
+  owner: governance-committee
+  layer: "GL90-99"
+  layer_name: "Meta-Specification Layer"
+  description: |
+    GL 統一命名框架定義了 MachineNativeOps 系統中所有命名規範的最高標準。
+    本框架涵蓋三層命名架構、命名格式、語意索引整合與治理機制。
+spec:
+  # ===========================================================================
+  # 第一章：命名原則
+  # ===========================================================================
+  naming_principles:
+    chapter_id: "CHARTER-CH-01"
+    title: "命名原則"
+    title_en: "Naming Principles"
+    principles:
+      - principle_id: "NP-001"
+        name: "consistency"
+        name_zh: "一致性"
+        description: |
+          所有命名必須在不同層級、模組、語言與工具間保持風格與語意的一致，
+          避免因個人習慣或歷史遺留造成認知斷裂與維護困難。
+        enforcement: MANDATORY
+      - principle_id: "NP-002"
+        name: "readability"
+        name_zh: "可讀性"
+        description: |
+          命名能夠直觀反映其語意與用途，降低新進人員或跨團隊協作的學習曲線。
+          命名應避免縮寫、隱晦詞彙與語意不明的代碼。
+        enforcement: MANDATORY
+      - principle_id: "NP-003"
+        name: "predictability"
+        name_zh: "可預測性"
+        description: |
+          命名規則具備高度規律性，使開發者能夠根據既有模式推測新模組、
+          變數或檔案的命名方式，提升搜尋、導航與自動化工具的效率。
+        enforcement: MANDATORY
+      - principle_id: "NP-004"
+        name: "semantic_orientation"
+        name_zh: "語意導向"
+        description: |
+          命名不僅僅是識別符號，更是語意索引與知識圖譜的節點。
+          每一個命名都應能被語意 DAG 或語意索引系統引用、查詢與追蹤。
+        enforcement: MANDATORY
+  # ===========================================================================
+  # 第二章：三層命名架構
+  # ===========================================================================
+  three_layer_architecture:
+    chapter_id: "CHARTER-CH-02"
+    title: "三層命名架構"
+    title_en: "Three-Layer Naming Architecture"
+    layers:
+      # -----------------------------------------------------------------------
+      # Layer 1: Taxonomy Root Layer (語意分類根層)
+      # -----------------------------------------------------------------------
+      - layer_id: "TAXONOMY"
+        name: "Taxonomy Root Layer"
+        name_zh: "語意分類根層"
+        description: "GL 架構的語意分類基礎，類似於知識圖譜的根節點"
+        categories:
+          - category_id: "governance"
+            name_zh: "治理"
+            gl_mapping: "GL00-09"
+          - category_id: "operations"
+            name_zh: "運營"
+            gl_mapping: "GL10-29"
+          - category_id: "execution"
+            name_zh: "執行"
+            gl_mapping: "GL30-49"
+          - category_id: "observability"
+            name_zh: "觀測"
+            gl_mapping: "GL50-59"
+          - category_id: "feedback"
+            name_zh: "回饋"
+            gl_mapping: "GL60-80"
+          - category_id: "extended"
+            name_zh: "擴展"
+            gl_mapping: "GL81-83"
+          - category_id: "meta"
+            name_zh: "元規範"
+            gl_mapping: "GL90-99"
+      # -----------------------------------------------------------------------
+      # Layer 2: GL Governance Layers (治理層級架構)
+      # -----------------------------------------------------------------------
+      - layer_id: "GL_LAYERS"
+        name: "GL Governance Layers"
+        name_zh: "治理層級架構"
+        description: "定義治理層級的編碼與語意映射"
+        naming_pattern: "GL{XX}-{Name}"
+        naming_rules:
+          - "GL 為固定前綴"
+          - "XX 為兩位數字 (00-99)，反映層級與分類"
+          - "Name 為語意分類名稱，採用 PascalCase"
+          - "必須與 Taxonomy 與 FHS 路徑一致"
+        layers:
+          - gl_id: "GL00-09"
+            name: "Strategic"
+            name_zh: "戰略層"
+            range: "00-09"
+          - gl_id: "GL10-29"
+            name: "Operational"
+            name_zh: "運營層"
+            range: "10-29"
+          - gl_id: "GL30-49"
+            name: "Execution"
+            name_zh: "執行層"
+            range: "30-49"
+          - gl_id: "GL50-59"
+            name: "Observability"
+            name_zh: "觀測層"
+            range: "50-59"
+          - gl_id: "GL60-80"
+            name: "Feedback"
+            name_zh: "回饋層"
+            range: "60-80"
+          - gl_id: "GL81-83"
+            name: "Extended"
+            name_zh: "擴展層"
+            range: "81-83"
+          - gl_id: "GL90-99"
+            name: "Meta"
+            name_zh: "元規範層"
+            range: "90-99"
+      # -----------------------------------------------------------------------
+      # Layer 3: FHS (Filesystem Hierarchy Standard)
+      # -----------------------------------------------------------------------
+      - layer_id: "FHS"
+        name: "Filesystem Hierarchy Standard"
+        name_zh: "檔案系統層次標準"
+        description: "將語意分類與治理層級映射至實體目錄結構"
+        root_directory: "/gl/"
+        naming_pattern: "{XX}-{name}/"
+        naming_rules:
+          - "目錄名稱採用 kebab-case（全小寫，單詞間以 - 連接）"
+          - "XX 為兩位數字，對應 GL 層級"
+          - "name 為語意分類名稱，與 GL 層級名稱一致"
+        directories:
+          - path: "/gl/00-strategic/"
+            gl_layer: "GL00-09"
+            taxonomy: "governance"
+          - path: "/gl/10-operational/"
+            gl_layer: "GL10-29"
+            taxonomy: "operations"
+          - path: "/gl/30-execution/"
+            gl_layer: "GL30-49"
+            taxonomy: "execution"
+          - path: "/gl/50-observability/"
+            gl_layer: "GL50-59"
+            taxonomy: "observability"
+          - path: "/gl/60-feedback/"
+            gl_layer: "GL60-80"
+            taxonomy: "feedback"
+          - path: "/gl/81-extended/"
+            gl_layer: "GL81-83"
+            taxonomy: "extended"
+          - path: "/gl/90-meta/"
+            gl_layer: "GL90-99"
+            taxonomy: "meta"
+  # ===========================================================================
+  # 第三章：命名格式規範
+  # ===========================================================================
+  naming_formats:
+    chapter_id: "CHARTER-CH-03"
+    title: "命名格式規範"
+    title_en: "Naming Format Specifications"
+    formats:
+      # -----------------------------------------------------------------------
+      # 3.1 GL 層級命名格式
+      # -----------------------------------------------------------------------
+      - format_id: "FMT-ECO-LAYER"
+        name: "GL Layer Naming"
+        name_zh: "GL 層級命名"
+        pattern: "GL{XX}-{Name}"
+        regex: "^GL[0-9]{2}-[A-Z][a-zA-Z]+$"
+        examples:
+          - "GL00-Strategic"
+          - "GL10-Operational"
+          - "GL30-Execution"
+          - "GL90-Meta"
+      # -----------------------------------------------------------------------
+      # 3.2 FHS 目錄命名格式
+      # -----------------------------------------------------------------------
+      - format_id: "FMT-FHS-DIR"
+        name: "FHS Directory Naming"
+        name_zh: "FHS 目錄命名"
+        pattern: "{XX}-{name}/"
+        regex: "^[0-9]{2}-[a-z]+(-[a-z]+)*/$"
+        examples:
+          - "00-strategic/"
+          - "10-operational/"
+          - "30-execution/"
+          - "90-meta/"
+      # -----------------------------------------------------------------------
+      # 3.3 語意 URI 命名格式
+      # -----------------------------------------------------------------------
+      - format_id: "FMT-SEMANTIC-URI"
+        name: "Semantic URI Naming"
+        name_zh: "語意 URI 命名"
+        pattern: "semantic://gl/{XX}/{name}[/{subpath}]"
+        regex: "^semantic://gl/[0-9]{2}/[a-z]+(-[a-z]+)*(/[a-z]+(-[a-z]+)*)*$"
+        examples:
+          - "semantic://gl/00/strategic"
+          - "semantic://gl/10/operational/policy"
+          - "semantic://gl/30/execution/template"
+          - "semantic://gl/90/meta/naming-charter"
+      # -----------------------------------------------------------------------
+      # 3.4 檔案命名格式
+      # -----------------------------------------------------------------------
+      - format_id: "FMT-FILE"
+        name: "File Naming"
+        name_zh: "檔案命名"
+        rules:
+          - type: "gl_config"
+            pattern: "gl-{name}.yaml"
+            regex: "^gl-[a-z]+(-[a-z]+)*\\.(yaml|yml)$"
+            examples:
+              - "gl-layers.yaml"
+              - "gl-execution-mode.yaml"
+              - "gl-naming-charter.yaml"
+          - type: "policy"
+            pattern: "policy-{domain}.yaml"
+            regex: "^policy-[a-z]+(-[a-z]+)*\\.(yaml|yml)$"
+            examples:
+              - "policy-naming.yaml"
+              - "policy-security.yaml"
+          - type: "template"
+            pattern: "template-{type}.yaml"
+            regex: "^template-[a-z]+(-[a-z]+)*\\.(yaml|yml)$"
+            examples:
+              - "template-artifact.yaml"
+              - "template-policy.yaml"
+          - type: "schema"
+            pattern: "{name}.schema.yaml"
+            regex: "^[a-z]+(-[a-z]+)*\\.schema\\.(yaml|yml)$"
+            examples:
+              - "artifact.schema.yaml"
+              - "naming.schema.yaml"
+      # -----------------------------------------------------------------------
+      # 3.5 程式碼命名格式
+      # -----------------------------------------------------------------------
+      - format_id: "FMT-CODE"
+        name: "Code Naming"
+        name_zh: "程式碼命名"
+        rules:
+          - language: "python"
+            file_pattern: "snake_case.py"
+            module_pattern: "snake_case"
+            function_pattern: "snake_case"
+            variable_pattern: "snake_case"
+            constant_pattern: "UPPER_SNAKE_CASE"
+            class_pattern: "PascalCase"
+          - language: "javascript"
+            file_pattern: "kebab-case.js"
+            module_pattern: "kebab-case"
+            function_pattern: "camelCase"
+            variable_pattern: "camelCase"
+            constant_pattern: "UPPER_SNAKE_CASE"
+            class_pattern: "PascalCase"
+          - language: "typescript"
+            file_pattern: "kebab-case.ts"
+            module_pattern: "kebab-case"
+            function_pattern: "camelCase"
+            variable_pattern: "camelCase"
+            constant_pattern: "UPPER_SNAKE_CASE"
+            class_pattern: "PascalCase"
+            interface_pattern: "IPascalCase"
+          - language: "shell"
+            file_pattern: "kebab-case.sh"
+            function_pattern: "snake_case"
+            variable_pattern: "UPPER_SNAKE_CASE"
+  # ===========================================================================
+  # 第四章：語意索引整合
+  # ===========================================================================
+  semantic_integration:
+    chapter_id: "CHARTER-CH-04"
+    title: "語意索引整合"
+    title_en: "Semantic Index Integration"
+    dag_structure:
+      description: "所有命名皆可映射至語意 DAG（有向無環圖）"
+      node_definition:
+        - property: "uri"
+          description: "唯一語意 URI"
+          required: true
+        - property: "layer"
+          description: "所屬 GL 層級"
+          required: true
+        - property: "taxonomy"
+          description: "語意分類"
+          required: true
+        - property: "fhs_path"
+          description: "FHS 路徑映射"
+          required: true
+      edge_types:
+        - type: "is-a"
+          description: "繼承關係"
+        - type: "part-of"
+          description: "組成關係"
+        - type: "depends-on"
+          description: "依賴關係"
+        - type: "references"
+          description: "引用關係"
+    cross_layer_query:
+      description: "支援跨層級語意查詢"
+      query_types:
+        - type: "uri_lookup"
+          description: "以語意 URI 為鍵進行查詢"
+          example: "SELECT * FROM semantic_dag WHERE uri = 'semantic://gl/30/execution'"
+        - type: "path_query"
+          description: "查詢任意節點的上游/下游依賴"
+          example: "SHOW DEPENDENCIES semantic://gl/30/execution"
+        - type: "impact_analysis"
+          description: "追蹤命名變更對下游模組的影響"
+          example: "SHOW IMPACT semantic://gl/10/operational/policy"
+  # ===========================================================================
+  # 第五章：治理機制
+  # ===========================================================================
+  governance_mechanism:
+    chapter_id: "CHARTER-CH-05"
+    title: "治理機制"
+    title_en: "Governance Mechanism"
+    compliance_review:
+      description: "命名合規審核流程"
+      workflow:
+        - step: 1
+          name: "自動化檢查"
+          description: "CI/CD pipeline 自動執行命名規則檢查"
+          tools:
+            - "gl-naming-validator"
+            - "eslint"
+            - "yamllint"
+        - step: 2
+          name: "人工審核"
+          description: "Code Review 階段根據命名檢查清單逐項核對"
+          checklist:
+            - "所有目錄、檔案、模組、變數、函式命名符合 GL 命名標準"
+            - "命名與語意索引（semantic://）一致"
+            - "無縮寫、無語意不明命名"
+            - "目錄結構與 FHS 標準一致"
+        - step: 3
+          name: "命名驗證報告"
+          description: "自動生成命名驗證報告，列出所有不合規項目"
+        - step: 4
+          name: "例外申請"
+          description: "特殊情境可提交命名例外申請，經治理委員會審批"
+    conflict_resolution:
+      description: "命名衝突處理流程"
+      decision_matrix:
+        - conflict_type: "完全重複"
+          resolution: "保留最早註冊命名"
+          note: "其餘需重命名"
+        - conflict_type: "語意重疊"
+          resolution: "合併或細分命名"
+          note: "需補充語意註解"
+        - conflict_type: "歷史遺留"
+          resolution: "逐步遷移至新命名"
+          note: "設定過渡期與自動轉換規則"
+        - conflict_type: "外部依賴衝突"
+          resolution: "區分命名空間"
+          note: "加前綴/後綴標識來源"
+    version_control:
+      description: "命名變更的版本控制與追蹤機制"
+      requirements:
+        - "每次命名變更必須標記版本號（如 v1.0.0）"
+        - "所有命名變更自動記錄於追蹤日誌"
+        - "工具自動比對命名變更前後的差異"
+        - "支持命名變更的自動回滾與恢復"
+  # ===========================================================================
+  # 第六章：實施指南
+  # ===========================================================================
+  implementation_guide:
+    chapter_id: "CHARTER-CH-06"
+    title: "實施指南"
+    title_en: "Implementation Guide"
+    ci_cd_integration:
+      description: "CI/CD 自動化檢查配置"
+      github_actions:
+        workflow_file: ".github/workflows/gl-naming-validation.yml"
+        triggers:
+          - "push to governance/**"
+          - "push to gl/**"
+          - "pull_request"
+      checks:
+        - name: "naming_format_check"
+          description: "檢查命名格式是否符合規範"
+        - name: "semantic_uri_check"
+          description: "檢查語意 URI 是否一致"
+        - name: "fhs_structure_check"
+          description: "檢查 FHS 目錄結構是否正確"
+    pr_template:
+      description: "PR 模板中的命名合規檢查項"
+      checklist:
+        - "[ ] 本次 PR 涉及的目錄、檔案、模組、變數、函式命名均符合 GL 命名框架"
+        - "[ ] 命名與語意索引（semantic://）一致"
+        - "[ ] 如有命名例外，已提交例外申請並附上審批記錄"
+        - "[ ] 已通過自動化命名檢查（CI/CD）"
+        - "[ ] 已手動核對命名與語意一致性"
+    migration_guide:
+      description: "現有系統遷移指南"
+      phases:
+        - phase: 1
+          name: "現狀盤點"
+          tasks:
+            - "自動化掃描現有儲存庫命名"
+            - "生成命名現狀報告與不合規清單"
+        - phase: 2
+          name: "命名映射"
+          tasks:
+            - "建立現有命名與新標準命名的映射表"
+            - "明確每一項目重命名方案"
+        - phase: 3
+          name: "分階段重構"
+          tasks:
+            - "分批次、分模組進行命名重構"
+            - "確保每次變更可控、可回滾"
+        - phase: 4
+          name: "驗證與封存"
+          tasks:
+            - "每次重構後自動執行命名檢查"
+            - "語意索引同步，確保無遺漏"
+# =============================================================================
+# 附錄：命名格式速查表
+# =============================================================================
+appendix:
+  quick_reference:
+    - type: "GL 層級"
+      format: "GLXX-Name"
+      example: "GL20-DataAccess"
+      note: "PascalCase"
+    - type: "FHS 目錄"
+      format: "/gl/XX-name/"
+      example: "/gl/20-data-access/"
+      note: "kebab-case"
+    - type: "語意 URI"
+      format: "semantic://gl/XX/name"
+      example: "semantic://gl/20/data-access"
+      note: "全小寫、可多層次"
+    - type: "GL 配置檔"
+      format: "gl-{name}.yaml"
+      example: "gl-layers.yaml"
+      note: "kebab-case"
+    - type: "Python 檔案"
+      format: "snake_case.py"
+      example: "naming_validator.py"
+      note: "snake_case"
+    - type: "JavaScript 檔案"
+      format: "kebab-case.js"
+      example: "naming-validator.js"
+      note: "kebab-case"
+    - type: "常數"
+      format: "UPPER_SNAKE_CASE"
+      example: "MAX_RETRIES"
+      note: "全大寫"
+# =============================================================================
+# 框架生效聲明
+# =============================================================================
+charter_declaration:
+  status: DRAFT
+  effective_date: "TBD"
+  review_cycle: "semi-annual"
+  amendment_process: "需經治理委員會全體通過"
+  authority: "governance-committee"

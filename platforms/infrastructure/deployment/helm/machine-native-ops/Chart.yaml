@@ -1,0 +1,36 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: Chart
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: v2
+metadata:
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+name: machine-native-ops
+description: Enterprise-grade MachineNativeOps platform for infrastructure automation
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - infrastructure
+  - automation
+  - monitoring
+  - logging
+  - security
+home: https://github.com/MachineNativeOps/machine-native-ops
+sources:
+  - https://github.com/MachineNativeOps/machine-native-ops
+maintainers:
+  - name: MachineNativeOps Team
+    email: team@machinenativeops.com
+icon: https://raw.githubusercontent.com/MachineNativeOps/machine-native-ops/main/docs/logo.png
+annotations:
+  category: Infrastructure
+  licenses: Apache-2.0

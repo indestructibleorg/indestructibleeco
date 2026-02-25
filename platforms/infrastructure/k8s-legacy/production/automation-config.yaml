@@ -1,0 +1,555 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: automation-config
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:automation-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/automation-config.yaml"
+  name: automation-config
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: automation
+    environment: production
+data:
+  automation-config.yaml: |
+    version: "1.0"
+    
+    # Automated Deployment Processes
+    deployment_automation:
+      enabled: true
+      
+      pre_deployment:
+        checks:
+          health_check:
+            enabled: true
+            endpoint: "/health"
+            expected_status: 200
+            timeout: 30s
+          
+          backup:
+            enabled: true
+            verify: true
+            create_if_missing: true
+          
+          dependency_check:
+            enabled: true
+            services:
+              - "postgresql"
+              - "redis-master"
+              - "resilience-middleware"
+          
+          configuration_validation:
+            enabled: true
+            schema_validation: true
+            secret_verification: true
+          
+          resource_availability:
+            enabled: true
+            check_pvc: true
+            check_secrets: true
+            check_configmaps: true
+      
+      deployment:
+        strategy: "rolling_update"
+        max_surge: 1
+        max_unavailable: 0
+        timeout: 600s
+        rollback_on_failure: true
+        
+        monitoring:
+          enabled: true
+          check_interval: 10s
+          success_threshold: 3
+          failure_threshold: 3
+        
+        canary_deployment:
+          enabled: false  # Manual trigger required
+          initial_traffic: 0.10  # 10%
+          max_traffic: 0.50  # 50%
+          duration: 1800s  # 30 minutes
+          metrics_to_monitor:
+            - "error_rate"
+            - "latency_p95"
+            - "cpu_usage"
+            - "memory_usage"
+      
+      post_deployment:
+        smoke_tests:
+          enabled: true
+          timeout: 300s
+          tests:
+            - name: "health_check"
+              endpoint: "/health"
+              method: "GET"
+              expected_status: 200
+            - name: "api_test"
+              endpoint: "/api/v1/data"
+              method: "GET"
+              expected_status: 200
+            - name: "metrics_test"
+              endpoint: "/api/v1/metrics"
+              method: "GET"
+              expected_status: 200
+        
+        validation:
+          enabled: true
+          checks:
+            - "pod_health"
+            - "service_availability"
+            - "metrics_collection"
+            - "log_forwarding"
+            - "tracing_enabled"
+        
+        notification:
+          enabled: true
+          channels:
+            - "#deployments"
+            - "engineering@machinenativeops.com"
+          include_details: true
+          include_metrics: true
+    
+    # Automated Scaling Policies
+    scaling_automation:
+      enabled: true
+      
+      policies:
+        cpu_based:
+          enabled: true
+          scale_up_threshold: 0.70
+          scale_down_threshold: 0.30
+          scale_up_factor: 1.5
+          scale_down_factor: 0.75
+          cooldown: 300s
+        
+        memory_based:
+          enabled: true
+          scale_up_threshold: 0.80
+          scale_down_threshold: 0.40
+          scale_up_factor: 1.5
+          scale_down_factor: 0.75
+          cooldown: 300s
+        
+        request_rate_based:
+          enabled: true
+          scale_up_threshold: 1000  # requests per second per pod
+          scale_down_threshold: 200
+          scale_up_factor: 2.0
+          scale_down_factor: 0.5
+          cooldown: 180s
+        
+        latency_based:
+          enabled: true
+          scale_up_threshold: 500ms  # P95 latency
+          scale_down_threshold: 100ms
+          scale_up_factor: 2.0
+          scale_down_factor: 0.5
+          cooldown: 180s
+        
+        queue_depth_based:
+          enabled: true
+          scale_up_threshold: 100
+          scale_down_threshold: 10
+          scale_up_factor: 2.0
+          scale_down_factor: 0.5
+          cooldown: 120s
+      
+      constraints:
+        min_replicas: 3
+        max_replicas: 20
+        max_scale_up_rate: 2.0  # pods per minute
+        max_scale_down_rate: 1.0  # pods per minute
+      
+      forecasting:
+        enabled: true
+        model: "time_series"
+        forecast_window: 3600s  # 1 hour
+        prediction_interval: 300s  # 5 minutes
+        proactive_scaling: true
+    
+    # Automated Health Checks
+    health_check_automation:
+      enabled: true
+      
+      checks:
+        application_health:
+          enabled: true
+          endpoint: "/health"
+          interval: 10s
+          timeout: 5s
+          failure_threshold: 3
+          success_threshold: 2
+          auto_restart: true
+          max_restart_attempts: 3
+        
+        readiness_health:
+          enabled: true
+          endpoint: "/ready"
+          interval: 5s
+          timeout: 3s
+          failure_threshold: 3
+          success_threshold: 1
+        
+        liveness_health:
+          enabled: true
+          endpoint: "/health"
+          interval: 30s
+          timeout: 10s
+          failure_threshold: 3
+          success_threshold: 1
+        
+        database_health:
+          enabled: true
+          check_query: "SELECT 1"
+          interval: 30s
+          timeout: 10s
+          failure_threshold: 3
+          auto_reconnect: true
+          max_reconnect_attempts: 5
+        
+        cache_health:
+          enabled: true
+          command: "PING"
+          interval: 30s
+          timeout: 5s
+          failure_threshold: 3
+          auto_reconnect: true
+          max_reconnect_attempts: 5
+        
+        dependency_health:
+          enabled: true
+          services:
+            - name: "postgresql"
+              check_type: "tcp"
+              port: 5432
+              interval: 30s
+              timeout: 5s
+              failure_threshold: 3
+            - name: "redis"
+              check_type: "tcp"
+              port: 6379
+              interval: 30s
+              timeout: 5s
+              failure_threshold: 3
+      
+      actions:
+        on_failure:
+          restart_pod:
+            enabled: true
+            max_attempts: 3
+            backoff: 60s
+          
+          scale_down:
+            enabled: true
+            threshold: 0.5  # 50% of pods failed
+          
+          notify:
+            enabled: true
+            channels:
+              - "#health-checks"
+              - "oncall@machinenativeops.com"
+            include_logs: true
+        
+        on_recovery:
+          notify:
+            enabled: true
+            channels:
+              - "#health-checks"
+            include_metrics: true
+    
+    # Automated Backup Verification
+    backup_verification_automation:
+      enabled: true
+      
+      verification:
+        schedule: "0 */6 * * *"  # Every 6 hours
+        timeout: 1800s  # 30 minutes
+        
+        checks:
+          backup_completeness:
+            enabled: true
+            verify_all_resources: true
+            verify_pv_snapshots: true
+          
+          backup_integrity:
+            enabled: true
+            checksum_verification: true
+            data_validation: true
+          
+          restore_capability:
+            enabled: true
+            dry_run: true
+            verify_namespace_restore: true
+            verify_pv_restore: true
+          
+          backup_age:
+            enabled: true
+            max_age: 86400s  # 24 hours
+            create_if_missing: true
+        
+        actions:
+          on_failure:
+            notify:
+              enabled: true
+              severity: "critical"
+              channels:
+                - "#backup-alerts"
+                - "oncall@machinenativeops.com"
+            
+            auto_retry:
+              enabled: true
+              max_attempts: 3
+              backoff: 300s
+            
+            create_manual_backup:
+              enabled: true
+              notify_on_completion: true
+        
+          on_success:
+            notify:
+              enabled: true
+              severity: "info"
+              channels:
+                - "#backup-alerts"
+            log_metrics: true
+    
+    # Automated Incident Response
+    incident_response_automation:
+      enabled: true
+      
+      incident_detection:
+        enabled: true
+        sources:
+          - "alerts"
+          - "metrics"
+          - "logs"
+          - "health_checks"
+        
+        severity_levels:
+          critical:
+            auto_create: true
+            auto_escalate: true
+            notification_delay: 0s
+            channels:
+              - "#critical-alerts"
+              - "oncall@machinenativeops.com"
+          
+          high:
+            auto_create: true
+            auto_escalate: true
+            notification_delay: 300s  # 5 minutes
+            channels:
+              - "#alerts"
+              - "engineering@machinenativeops.com"
+          
+          medium:
+            auto_create: true
+            auto_escalate: false
+            notification_delay: 900s  # 15 minutes
+            channels:
+              - "#alerts"
+          
+          low:
+            auto_create: false
+            auto_escalate: false
+            channels:
+              - "#alerts"
+      
+      automated_actions:
+        enable_istio_retry:
+          enabled: true
+          condition: "error_rate > 0.05"
+          action: "increase_retry_attempts"
+          parameters:
+            max_attempts: 5
+            backoff_multiplier: 2.0
+        
+        enable_circuit_breaker:
+          enabled: true
+          condition: "error_rate > 0.10"
+          action: "open_circuit_breaker"
+          parameters:
+            timeout: 60s
+            half_open_calls: 3
+        
+        scale_up:
+          enabled: true
+          condition: "cpu_usage > 0.80 OR memory_usage > 0.85"
+          action: "scale_deployment"
+          parameters:
+            scale_factor: 1.5
+            max_replicas: 20
+        
+        enable_rate_limiting:
+          enabled: true
+          condition: "request_rate > 2000"
+          action: "apply_rate_limit"
+          parameters:
+            requests_per_second: 1000
+        
+        enable_degraded_mode:
+          enabled: true
+          condition: "system_health_score < 0.50"
+          action: "enable_degraded_mode"
+          parameters:
+            level: "degraded"
+        
+        auto_rollback:
+          enabled: true
+          condition: "error_rate > 0.15 AND recent_deployment = true"
+          action: "rollback_deployment"
+          parameters:
+            rollback_to: "previous_version"
+          
+        restart_pods:
+          enabled: true
+          condition: "pod_crash_loop_backoff = true"
+          action: "restart_deployment"
+          parameters:
+            max_restarts: 3
+      
+      incident_workflow:
+        creation:
+          auto_assign: true
+          assignee: "oncall"
+          priority: "high"
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            - "automated"
+            - "incident"
+          due_date_offset: 86400  # 24 hours
+        
+        escalation:
+          enabled: true
+          rules:
+            - condition: "severity = critical AND time_since_creation > 1800s"
+              action: "escalate_to_manager"
+            - condition: "time_since_creation > 3600s AND status = open"
+              action: "escalate_to_director"
+        
+        closure:
+          auto_close: false
+          require_postmortem: true
+          postmortem_template: "postmortem-template.md"
+        
+        knowledge_capture:
+          enabled: true
+          auto_create_incident_report: true
+          update_runbooks: true
+          create_improvement_tasks: true
+    
+    # Automated Log Analysis
+    log_analysis_automation:
+      enabled: true
+      
+      analysis:
+        real_time:
+          enabled: true
+          interval: 60s
+          lookback_period: 300s
+          
+          patterns:
+            error_patterns:
+              - regex: "ERROR"
+                severity: "error"
+                aggregate: true
+                threshold: 10
+            
+            exception_patterns:
+              - regex: "Exception|Error|Failed"
+                severity: "warning"
+                aggregate: true
+                threshold: 5
+            
+            security_patterns:
+              - regex: "Unauthorized|Forbidden|Invalid token"
+                severity: "critical"
+                aggregate: false
+                immediate_alert: true
+            
+            performance_patterns:
+              - regex: "Slow query|Timeout|Latency"
+                severity: "warning"
+                aggregate: true
+                threshold: 3
+        
+        historical:
+          enabled: true
+          schedule: "0 0 * * *"  # Daily at midnight
+          lookback_period: 86400s  # 24 hours
+          
+          analysis_types:
+            - error_trends
+            - exception_patterns
+            - performance_degradation
+            - resource_usage
+            - user_behavior
+        
+        anomaly_detection:
+          enabled: true
+          model: "statistical"
+          sensitivity: 0.95
+          lookback_period: 604800s  # 7 days
+          
+          metrics:
+            - error_rate
+            - latency_p95
+            - request_rate
+            - resource_usage
+      
+      actions:
+        on_anomaly:
+          create_alert:
+            enabled: true
+            severity: "warning"
+            channels:
+              - "#log-analysis"
+              - "engineering@machinenativeops.com"
+          
+          create_ticket:
+            enabled: true
+            priority: "medium"
+            assignee: "engineering"
+          
+          update_dashboard:
+            enabled: true
+            include_anomaly_details: true
+        
+        on_pattern_match:
+          error_pattern:
+            notify:
+              enabled: true
+              channels:
+                - "#log-analysis"
+            create_ticket:
+              enabled: true
+              if_threshold_exceeded: true
+          
+          security_pattern:
+            notify:
+              enabled: true
+              severity: "critical"
+              channels:
+                - "#security-alerts"
+                - "oncall@machinenativeops.com"
+            create_incident:
+              enabled: true
+              severity: "high"
+          
+          performance_pattern:
+            notify:
+              enabled: true
+              channels:
+                - "#log-analysis"
+            create_ticket:
+              enabled: true
+              priority: "low"
+              assignee: "engineering"

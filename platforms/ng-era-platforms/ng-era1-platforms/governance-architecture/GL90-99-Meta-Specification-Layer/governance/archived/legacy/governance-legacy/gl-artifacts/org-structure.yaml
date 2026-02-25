@@ -1,0 +1,495 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v2
+kind: OrganizationStructure
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:org-structure.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/org-structure.yaml"
+  name: machinenativeops-governance-org
+  version: "1.0.0"
+  created_at: "2025-01-18T00:00:00Z"
+  updated_at: "2025-01-18T00:00:00Z"
+  owner: governance-committee
+  layer: "GL00-09"
+  tags:
+    - strategic
+    - organization
+    - structure
+    - governance
+spec:
+  organization:
+    name: "MachineNativeOps Governance"
+    name_zh: "MachineNativeOps 治理組織"
+    type: "governance_body"
+    headquarters: "Taiwan"
+    jurisdictions:
+      - "Taiwan"
+      - "Global (Remote)"
+  governance_hierarchy:
+    # Top Level - Strategic Governance
+    - level: 1
+      name: "Governance Board"
+      name_zh: "治理委員會"
+      gl_layer: "GL00-09"
+      description: "最高治理決策機構，負責戰略方向、治理框架和重大決策"
+      responsibilities:
+        - "批准治理框架和戰略目標"
+        - "制定高層治理政策"
+        - "監督所有治理層級的執行"
+        - "審批重大風險管理策略"
+        - "確保合規性和倫理標準"
+      composition:
+        - role: "Chairperson"
+          title_zh: "主席"
+          count: 1
+          appointment: "elected"
+          term: "2 years"
+          responsibilities:
+            - "主持治理委員會會議"
+            - "代表治理委員會對外"
+            - "簽署治理決策文件"
+        - role: "Strategic Layer Representative"
+          title_zh: "戰略層代表"
+          count: 3
+          appointment: "appointed"
+          term: "2 years"
+          responsibilities:
+            - "代表 GL00-09 層級利益"
+            - "參與戰略決策制定"
+            - "確保戰略目標落地"
+        - role: "Operational Layer Representative"
+          title_zh: "運營層代表"
+          count: 2
+          appointment: "appointed"
+          term: "2 years"
+          responsibilities:
+            - "代表 GL10-29 層級利益"
+            - "提供運營執行情況回饋"
+            - "參與政策制定"
+        - role: "Independent Advisor"
+          title_zh: "獨立顧問"
+          count: 2
+          appointment: "external"
+          term: "1 year"
+          responsibilities:
+            - "提供專業建議"
+            - "確保決策客觀性"
+            - "監督治理質量"
+      decision_making:
+        quorum: "60%"
+        voting: "majority"
+        veto_power: ["Chairperson"]
+        escalation: "supermajority for major changes"
+      meeting_schedule:
+        frequency: "monthly"
+        duration: "2 hours"
+        type: "in-person + virtual"
+    # Level 2 - Operational Governance
+    - level: 2
+      name: "Operational Governance Council"
+      name_zh: "運營治理委員會"
+      gl_layer: "GL10-29"
+      description: "執行層治理機構，負責政策落地、流程管理和日常運營監控"
+      responsibilities:
+        - "執行治理委員會決策"
+        - "制定運營政策和流程"
+        - "監控運營指標和KPI"
+        - "協調跨部門運營"
+        - "管理風險和合規"
+      composition:
+        - role: "Operational Council Lead"
+          title_zh: "運營委員會負責人"
+          count: 1
+          appointment: "appointed by Governance Board"
+          term: "2 years"
+        - role: "Process Owner"
+          title_zh: "流程負責人"
+          count: 4
+          appointment: "functional leads"
+          term: "ongoing"
+        - role: "Compliance Officer"
+          title_zh: "合規官員"
+          count: 1
+          appointment: "appointed"
+          term: "2 years"
+      meeting_schedule:
+        frequency: "bi-weekly"
+        duration: "1.5 hours"
+        type: "virtual"
+    # Level 3 - Execution Governance
+    - level: 3
+      name: "Execution Coordination Team"
+      name_zh: "執行協調團隊"
+      gl_layer: "GL30-49"
+      description: "執行層治理機構，負責具體專案執行和交付"
+      responsibilities:
+        - "執行專案和產品開發"
+        - "管理技術實施和部署"
+        - "追蹤問題和異常"
+        - "確保質量和交付標準"
+      composition:
+        - role: "Execution Lead"
+          title_zh: "執行負責人"
+          count: 1
+          appointment: "project manager"
+        - role: "Technical Lead"
+          title_zh: "技術負責人"
+          count: 3
+          appointment: "senior engineers"
+        - role: "Quality Assurance Lead"
+          title_zh: "品質保證負責人"
+          count: 1
+          appointment: "qa manager"
+      meeting_schedule:
+        frequency: "weekly"
+        duration: "1 hour"
+        type: "standup"
+    # Level 4 - Observability & Monitoring
+    - level: 4
+      name: "Observability Working Group"
+      name_zh: "可觀測性工作組"
+      gl_layer: "GL50-59"
+      description: "監控和觀測層治理機構，負責系統監控、數據收集和異常檢測"
+      responsibilities:
+        - "設計監控架構"
+        - "收集和分析指標"
+        - "設置異常預警"
+        - "產出監控報告"
+      composition:
+        - role: "Observability Lead"
+          title_zh: "可觀測性負責人"
+          count: 1
+        - role: "Monitoring Engineer"
+          title_zh: "監控工程師"
+          count: 2
+        - role: "Data Analyst"
+          title_zh: "數據分析師"
+          count: 2
+      meeting_schedule:
+        frequency: "weekly"
+        duration: "30 minutes"
+        type: "standup"
+    # Level 5 - Advanced/Feedback
+    - level: 5
+      name: "Advanced Analytics & Feedback Team"
+      name_zh: "進階分析與回饋團隊"
+      gl_layer: "GL60-80"
+      description: "高階分析和回饋層治理機構，負責優化、A/B測試和策略調整"
+      responsibilities:
+        - "執行A/B測試"
+        - "分析數據並優化"
+        - "提出策略調整建議"
+        - "管理模型再訓練"
+      composition:
+        - role: "Analytics Lead"
+          title_zh: "分析負責人"
+          count: 1
+        - role: "Data Scientist"
+          title_zh: "數據科學家"
+          count: 3
+        - role: "ML Engineer"
+          title_zh: "機器學習工程師"
+          count: 2
+      meeting_schedule:
+        frequency: "bi-weekly"
+        duration: "1 hour"
+        type: "deep-dive"
+    # Level 6 - Extended Projects
+    - level: 6
+      name: "Extended Projects Task Force"
+      name_zh: "擴展專案工作組"
+      gl_layer: "GL81-83"
+      description: "擴展層治理機構，負責新興議題和創新實驗"
+      responsibilities:
+        - "推動創新實驗"
+        - "管理臨時專案"
+        - "協調跨域合作"
+        - "社群治理"
+      composition:
+        - role: "Innovation Lead"
+          title_zh: "創新負責人"
+          count: 1
+        - role: "Project Manager"
+          title_zh: "專案經理"
+          count: "variable"
+        - role: "Community Manager"
+          title_zh: "社群經理"
+          count: 1
+      meeting_schedule:
+        frequency: "ad-hoc"
+        duration: "variable"
+        type: "flexible"
+    # Level 7 - Meta-Specification
+    - level: 7
+      name: "Meta-Specification Authority"
+      name_zh: "元規範權威機構"
+      gl_layer: "GL90-99"
+      description: "元規範層治理機構，負責規範制定、標準管理和審查"
+      responsibilities:
+        - "制定治理規範和標準"
+        - "管理規範版本"
+        - "審查規範變更"
+        - "確保規範一致性"
+      composition:
+        - role: "Meta-Spec Lead"
+          title_zh: "元規範負責人"
+          count: 1
+        - role: "Standards Architect"
+          title_zh: "標準架構師"
+          count: 2
+        - role: "Specification Reviewer"
+          title_zh: "規範審查員"
+          count: 3
+      meeting_schedule:
+        frequency: "monthly"
+        duration: "1.5 hours"
+        type: "formal review"
+  cross_layer_committees:
+    - name: "Risk Management Committee"
+      name_zh: "風險管理委員會"
+      purpose: "跨層級風險管理和協調"
+      chair: "Governance Board Representative"
+      members:
+        - "GL00-09 Risk Owner"
+        - "GL10-29 Risk Manager"
+        - "GL30-49 Technical Risk Owner"
+        - "GL50-59 Monitoring Lead"
+      meeting_schedule: "monthly"
+    - name: "Compliance & Ethics Committee"
+      name_zh: "合規與倫理委員會"
+      purpose: "確保合規性和倫理標準"
+      chair: "Governance Board Independent Advisor"
+      members:
+        - "Compliance Officer"
+        - "Legal Representative"
+        - "GL90-99 Meta-Spec Lead"
+      meeting_schedule: "quarterly"
+    - name: "Architecture & Standards Committee"
+      name_zh: "架構與標準委員會"
+      purpose: "技術架構和標準協調"
+      chair: "GL90-99 Meta-Spec Lead"
+      members:
+        - "GL30-49 Technical Lead"
+        - "GL40-49 Algorithms Lead"
+        - "GL50-59 GPU Lead"
+        - "GL90-99 Standards Architect"
+      meeting_schedule: "bi-weekly"
+    - name: "Innovation & Ecosystem Committee"
+      name_zh: "創新與生態系統委員會"
+      purpose: "推動創新和生態發展"
+      chair: "GL81-83 Innovation Lead"
+      members:
+        - "GL00-09 Strategic Vision Lead"
+        - "GL60-80 Analytics Lead"
+        - "Community Manager"
+      meeting_schedule: "monthly"
+  roles_matrix:
+    # Strategic Roles
+    - role_id: "GB-CHAIR"
+      name: "Governance Board Chairperson"
+      name_zh: "治理委員會主席"
+      level: 1
+      gl_layer: "GL00-09"
+      permissions:
+        - "approve_governance_charter"
+        - "veto_decisions"
+        - "sign_governance_documents"
+        - "appoint_committee_members"
+      reporting_to: null
+    - role_id: "GB-STRAT-REP"
+      name: "Strategic Layer Representative"
+      name_zh: "戰略層代表"
+      level: 1
+      gl_layer: "GL00-09"
+      permissions:
+        - "propose_strategic_objectives"
+        - "review_policy_changes"
+        - "represent_strategic_interests"
+      reporting_to: "GB-CHAIR"
+    # Operational Roles
+    - role_id: "OC-LEAD"
+      name: "Operational Council Lead"
+      name_zh: "運營委員會負責人"
+      level: 2
+      gl_layer: "GL10-29"
+      permissions:
+        - "execute_board_decisions"
+        - "define_operational_policies"
+        - "manage_operational_budget"
+      reporting_to: "GB-CHAIR"
+    - role_id: "OC-COMPLIANCE"
+      name: "Compliance Officer"
+      name_zh: "合規官員"
+      level: 2
+      gl_layer: "GL10-29"
+      permissions:
+        - "audit_compliance"
+        - "report_violations"
+        - "define_compliance_standards"
+      reporting_to: "OC-LEAD"
+    # Execution Roles
+    - role_id: "EX-LEAD"
+      name: "Execution Lead"
+      name_zh: "執行負責人"
+      level: 3
+      gl_layer: "GL30-49"
+      permissions:
+        - "execute_projects"
+        - "manage_deliveries"
+        - "report_progress"
+      reporting_to: "OC-LEAD"
+    - role_id: "EX-TECH-LEAD"
+      name: "Technical Lead"
+      name_zh: "技術負責人"
+      level: 3
+      gl_layer: "GL30-49"
+      permissions:
+        - "approve_technical_designs"
+        - "review_code_quality"
+        - "manage_technical_risks"
+      reporting_to: "EX-LEAD"
+    # Observability Roles
+    - role_id: "OB-LEAD"
+      name: "Observability Lead"
+      name_zh: "可觀測性負責人"
+      level: 4
+      gl_layer: "GL50-59"
+      permissions:
+        - "design_monitoring_architecture"
+        - "define_alerting_rules"
+        - "access_all_metrics"
+      reporting_to: "OC-LEAD"
+    # Advanced/Feedback Roles
+    - role_id: "AF-LEAD"
+      name: "Analytics Lead"
+      name_zh: "分析負責人"
+      level: 5
+      gl_layer: "GL60-80"
+      permissions:
+        - "run_ab_tests"
+        - "analyze_data"
+        - "propose_optimizations"
+      reporting_to: "GB-STRAT-REP"
+    # Meta-Spec Roles
+    - role_id: "MS-LEAD"
+      name: "Meta-Spec Lead"
+      name_zh: "元規範負責人"
+      level: 7
+      gl_layer: "GL90-99"
+      permissions:
+        - "define_governance_standards"
+        - "approve_spec_changes"
+        - "validate_compliance"
+      reporting_to: "GB-CHAIR"
+    # Extended Roles
+    - role_id: "EX-INV-LEAD"
+      name: "Innovation Lead"
+      name_zh: "創新負責人"
+      level: 6
+      gl_layer: "GL81-83"
+      permissions:
+        - "propose_experiments"
+        - "manage_temporary_projects"
+        - "coordinate_ecosystem"
+      reporting_to: "GB-STRAT-REP"
+  escalation_matrix:
+    # From Execution to Operational
+    - from_level: 3
+      to_level: 2
+      trigger_conditions:
+        - "critical_incident"
+        - "blocker_issue"
+        - "compliance_violation"
+      escalation_path: "EX-LEAD -> OC-LEAD"
+      response_time: "2 hours"
+    # From Operational to Strategic
+    - from_level: 2
+      to_level: 1
+      trigger_conditions:
+        - "strategic_risk"
+        - "policy_violation"
+        - "resource_constraint"
+      escalation_path: "OC-LEAD -> GB-CHAIR"
+      response_time: "4 hours"
+    # Cross-Layer Risk Escalation
+    - from_level: "any"
+      to_level: 1
+      trigger_conditions:
+        - "critical_security_breach"
+        - "legal_compliance_issue"
+        - "ethical_violation"
+      escalation_path: "any -> GB-CHAIR"
+      response_time: "1 hour (immediate)"
+  communication_channels:
+    - channel: "governance-board"
+      type: "email"
+      purpose: "正式決策和公告"
+      members: "GL00-09 all members"
+      access: "restricted"
+    - channel: "operational-council"
+      type: "slack"
+      purpose: "日常運營協調"
+      members: "GL10-29 all members"
+      access: "team"
+    - channel: "execution-standup"
+      type: "daily-meeting"
+      purpose: "執行進度同步"
+      members: "GL30-49 all members"
+      access: "team"
+    - channel: "observability-alerts"
+      type: "pagerduty"
+      purpose: "異常告警"
+      members: "GL50-59 on-call"
+      access: "on-call"
+    - channel: "analytics-feedback"
+      type: "shared-dashboard"
+      purpose: "數據分析和優化建議"
+      members: "GL60-80 all members"
+      access: "team"
+    - channel: "innovation-lab"
+      type: "github"
+      purpose: "創新專案協作"
+      members: "GL81-83 all members + community"
+      access: "public"
+    - channel: "meta-spec-review"
+      type: "github-pr"
+      purpose: "規範審查和批准"
+      members: "GL90-99 all members + reviewers"
+      access: "restricted"
+  decision_framework:
+    decision_types:
+      - type: "strategic"
+        required_approval: "Governance Board"
+        voting_threshold: "majority"
+        consultation: "all layers"
+        documentation: "board-minutes.md"
+      - type: "operational"
+        required_approval: "Operational Council"
+        voting_threshold: "consensus"
+        consultation: "affected layers"
+        documentation: "council-decision.md"
+      - type: "technical"
+        required_approval: "Technical Lead"
+        voting_threshold: "majority"
+        consultation: "execution team"
+        documentation: "tech-decision.md"
+      - type: "emergency"
+        required_approval: "relevant level lead"
+        voting_threshold: "unilateral"
+        consultation: "as needed"
+        documentation: "incident-report.md"
+        retroactive_approval: true
+status:
+  version: "1.0.0"
+  last_review: "2025-01-18"
+  next_review: "2025-07-18"
+  approved_by: "Governance Board"
+  change_history:
+    - version: "1.0.0"
+      date: "2025-01-18"
+      author: "Governance Committee"
+      changes: "Initial organization structure definition"

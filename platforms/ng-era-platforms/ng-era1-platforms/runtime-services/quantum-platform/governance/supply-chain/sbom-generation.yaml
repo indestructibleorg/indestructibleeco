@@ -1,0 +1,92 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governance-core
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL90_99-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: supplychain.machinenativeops.io/v1
+kind: SBOMGenerator
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:supply-chain:sbom-generation.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/supply-chain/sbom-generation.yaml"
+  name: gl-quantum-sbom-generator
+  namespace: governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-supply-chain
+spec:
+  enabled: true
+  format:
+    - spdx
+    - cyclonedx
+    - syft-json
+    
+  generators:
+    - name: syft
+      tool: syft
+      version: latest
+      enabled: true
+      scanTargets:
+        - container-images
+        - filesystem
+        - directories
+      options:
+        scope: all-layers
+        package-type: all
+      
+    - name: trivy
+      tool: trivy
+      version: latest
+      enabled: true
+      scanTargets:
+        - container-images
+        - filesystem
+        - git-repositories
+      options:
+        security-checks:
+          - vuln
+          - config
+          
+  output:
+    artifacts:
+      path: artifacts/sbom
+      retention: 365d
+      compress: true
+      
+    upload:
+      enabled: true
+      destinations:
+        - type: github-artifacts
+          retention: 90d
+          
+        - type: s3
+          bucket: gl-sbom-artifacts
+          prefix: sbom/
+          
+  validation:
+    verifySBOM:
+      enabled: true
+      requiredFields:
+        - name
+        - version
+        - components
+        
+    compareSBOMs:
+      enabled: true
+      detectChanges:
+        - added
+        - removed
+        - modified
+        
+  attestation:
+    enabled: true
+    signer: cosign
+    keyLocation: ${{ secrets.SBOM_SIGNING_KEY }}

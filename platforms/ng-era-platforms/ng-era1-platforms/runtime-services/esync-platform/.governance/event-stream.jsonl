@@ -1,0 +1,2 @@
+{"id":"gl-event-001","type":"system_init","timestamp":"2026-01-28T02:50:00Z","source":"esync-platform","data":{"event":"platform_initialized","status":"success"}}
+{"id":"gl-validation-1769575479927","type":"validation","timestamp":"2026-01-28T04:44:39.927Z","source":"governance/gl_engine.ts","data":{"success":true,"violationCount":0,"criticalCount":0}}

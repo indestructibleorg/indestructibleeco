@@ -1,0 +1,6 @@
+era2toera3_mapping:
+  NG30100: NG60100   # microservice boundary -> business intent
+  NG30300: NG60400   # event stream -> semantic intent
+  NG30400: NG60500   # data pipeline -> neural intent
+  NG30800: NG60800   # configuration center -> automation policy
+  NG31000: NG80400   # circuit breaker -> self-protection system

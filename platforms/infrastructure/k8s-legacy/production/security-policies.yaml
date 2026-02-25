@@ -1,0 +1,138 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: security-policies
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:security-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/security-policies.yaml"
+  name: machine-native-ops-mtls
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: machine-native-ops
+    environment: production
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: machine-native-ops
+  mtls:
+    mode: STRICT
+
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:security-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/security-policies.yaml"
+  name: machine-native-ops-authz
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: machine-native-ops
+    environment: production
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: machine-native-ops
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/production/sa/machine-native-ops
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
+  - from:
+    - source:
+        namespaces:
+        - istio-system
+    to:
+    - operation:
+        methods: ["GET"]
+
+---
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:security-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/security-policies.yaml"
+  name: machine-native-ops-jwt
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: machine-native-ops
+    environment: production
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: machine-native-ops
+  jwtRules:
+  - issuer: "https://auth.machinenativeops.com"
+    jwksUri: "https://auth.machinenativeops.com/.well-known/jwks.json"
+    audiences:
+    - "machinenativeops-api"
+    forwardOriginalToken: true
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:security-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/security-policies.yaml"
+  name: external-redis
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: machine-native-ops
+    environment: production
+spec:
+  hosts:
+  - redis.production.svc.cluster.local
+  location: MESH_INTERNAL
+  ports:
+  - number: 6379
+    name: redis
+    protocol: TCP
+  resolution: DNS
+  endpoints:
+  - address: redis-master.production.svc.cluster.local
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:security-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/security-policies.yaml"
+  name: external-postgres
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: machine-native-ops
+    environment: production
+spec:
+  hosts:
+  - postgresql.production.svc.cluster.local
+  location: MESH_INTERNAL
+  ports:
+  - number: 5432
+    name: postgres
+    protocol: TCP
+  resolution: DNS
+  endpoints:
+  - address: postgresql.production.svc.cluster.local

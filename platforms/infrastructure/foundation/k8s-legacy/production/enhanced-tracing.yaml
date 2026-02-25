@@ -1,0 +1,172 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: enhanced-tracing
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Enhanced Distributed Tracing Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:enhanced-tracing.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/enhanced-tracing.yaml"
+  name: jaeger-enhanced-config
+  namespace: istio-system
+data:
+  jaeger.yaml: |
+    # Enhanced Jaeger configuration for production
+    sampling:
+      # Adaptive sampling configuration
+      defaultStrategy:
+        type: probabilistic
+        probabilistic:
+          samplingRate: 0.10  # 10% default sampling
+      # Service-specific sampling
+      serviceStrategies:
+        - service: machine-native-ops-production
+          type: probabilistic
+          probabilistic:
+            samplingRate: 0.20  # 20% for main service
+        - service: machine-native-ops-api
+          type: probabilistic
+          probabilistic:
+            samplingRate: 0.30  # 30% for API endpoints
+        - service: machine-native-ops-background
+          type: probabilistic
+          probabilistic:
+            samplingRate: 0.05  # 5% for background jobs
+      # Operation-specific sampling
+      operationStrategies:
+        - service: machine-native-ops-production
+          operation: /api/v1/health
+          type: probabilistic
+          probabilistic:
+            samplingRate: 0.01  # 1% for health checks
+        - service: machine-native-ops-production
+          operation: POST /api/v1/execute
+          type: probabilistic
+          probabilistic:
+            samplingRate: 0.50  # 50% for execution operations
+---
+# Context propagation configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:enhanced-tracing.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/enhanced-tracing.yaml"
+  name: tracing-context-config
+  namespace: istio-system
+data:
+  context-propagation.yaml: |
+    # Context propagation configuration
+    propagators:
+      - jaeger
+      - b3
+      - trace-context
+      - w3c
+      - xray
+    # Baggage propagation
+    baggage:
+      enabled: true
+      maxKeyValuePairs: 32
+      maxValueLength: 4096
+    # Trace ID propagation
+    traceId:
+      generation:
+        strategy: random
+        format: uuid4
+---
+# Trace retention policies
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:enhanced-tracing.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/enhanced-tracing.yaml"
+  name: trace-retention-config
+  namespace: istio-system
+data:
+  retention-policy.yaml: |
+    # Trace retention configuration
+    retention:
+      default:
+        days: 30  # Default retention: 30 days
+      byService:
+        machine-native-ops-production:
+          days: 90  # Main service: 90 days
+        machine-native-ops-api:
+          days: 60  # API: 60 days
+        machine-native-ops-background:
+          days: 30  # Background: 30 days
+      byOperation:
+        health-check:
+          days: 7   # Health checks: 7 days
+        execution:
+          days: 90  # Executions: 90 days
+        cache-operations:
+          days: 30  # Cache ops: 30 days
+      archive:
+        enabled: true
+        format: json
+        compression: gzip
+        storage: s3
+        destination: s3://traces-archive/
+    # Trace cleanup configuration
+    cleanup:
+      enabled: true
+      schedule: "0 2 * * *"  # Daily at 2 AM
+      batchSize: 10000
+      maxAge: 90
+---
+# Enhanced telemetry with tracing
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:enhanced-tracing.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/enhanced-tracing.yaml"
+  name: enhanced-tracing
+  namespace: istio-system
+spec:
+  tracing:
+  - providers:
+    - name: jaeger
+    randomSamplingPercentage: 10.0
+    customTags:
+      # Custom tags for better trace analysis
+      request_id:
+        environment:
+          name: ISTIO_METADATA_REQUEST_ID
+      user_id:
+        environment:
+          name: ISTIO_METADATA_USER_ID
+      session_id:
+        environment:
+          name: ISTIO_METADATA_SESSION_ID
+      operation_name:
+        environment:
+          name: ISTIO_METADATA_OPERATION_NAME
+      service_version:
+        environment:
+          name: ISTIO_METADATA_VERSION
+      deployment_id:
+        environment:
+          name: ISTIO_METADATA_DEPLOYMENT_ID
+      cluster_id:
+        environment:
+          name: ISTIO_META_CLUSTER_ID
+      zone:
+        environment:
+          name: ISTIO_META_ZONE
+      node_name:
+        environment:
+          name: ISTIO_META_NODE_NAME
+  # Access logging with trace correlation
+  accessLogging:
+  - providers:
+    - name: envoy
+    filter:
+      expression: request.headers["x-b3-traceid"] != ""

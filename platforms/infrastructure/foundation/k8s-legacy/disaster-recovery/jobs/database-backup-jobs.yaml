@@ -1,0 +1,513 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: database-backup-jobs
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+---
+# Database Backup Jobs
+# Automated backup jobs for PostgreSQL, Redis, and other databases
+
+---
+# PostgreSQL Backup Job
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:disaster-recovery:jobs:database-backup-jobs.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/disaster-recovery/jobs/database-backup-jobs.yaml"
+  name: postgres-backup
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: postgres-backup
+    app.kubernetes.io/component: backup
+spec:
+  schedule: "0 * * * *"  # Hourly
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 3
+      template:
+        spec:
+          serviceAccountName: backup-service-account
+          containers:
+          - name: postgres-backup
+            image: postgres:15-alpine
+            command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              echo "Starting PostgreSQL backup at $(date)"
+              
+              # Create backup filename with timestamp
+              BACKUP_FILE="/backup/postgres_$(date +%Y%m%d_%H%M%S).sql.gz"
+              
+              # Perform backup
+              pg_dump -h postgres.machine-native-ops.svc \
+                      -U postgres \
+                      -d machine_native_ops \
+                      --format=plain \
+                      --no-owner \
+                      --no-acl \
+                      --compress=9 \
+                      > "${BACKUP_FILE}"
+              
+              # Upload to S3
+              aws s3 cp "${BACKUP_FILE}" \
+                       s3://machine-native-ops-backups/postgres/ \
+                       --storage-class STANDARD_IA \
+                       --metadata "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              
+              # Clean up old backups (keep 7 days)
+              find /backup -name "postgres_*.sql.gz" -mtime +7 -delete
+              
+              # Cleanup S3 old backups (keep 30 days)
+              aws s3 ls s3://machine-native-ops-backups/postgres/ | \
+                while read -r line; do
+                  fileName=$(echo "$line" | awk '{print $4}')
+                  fileDate=$(echo "$line" | awk '{print $1" "$2}')
+                  fileTimestamp=$(date -d "$fileDate" +%s)
+                  currentTimestamp=$(date +%s)
+                  age=$(( (currentTimestamp - fileTimestamp) / 86400 ))
+                  if [ $age -gt 30 ]; then
+                    aws s3 rm "s3://machine-native-ops-backups/postgres/$fileName"
+                  fi
+                done
+              
+              echo "PostgreSQL backup completed successfully at $(date)"
+              echo "Backup file: ${BACKUP_FILE}"
+            env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: secret-access-key
+            - name: AWS_DEFAULT_REGION
+              value: "us-east-1"
+            volumeMounts:
+            - name: backup
+              mountPath: /backup
+            - name: backup-logs
+              mountPath: /var/log/backup
+            resources:
+              requests:
+                cpu: 200m
+                memory: 256Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+          volumes:
+          - name: backup
+            persistentVolumeClaim:
+              claimName: postgres-backup-pvc
+          - name: backup-logs
+            persistentVolumeClaim:
+              claimName: backup-logs-pvc
+          restartPolicy: OnFailure
+---
+# Redis Backup Job
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:disaster-recovery:jobs:database-backup-jobs.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/disaster-recovery/jobs/database-backup-jobs.yaml"
+  name: redis-backup
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: redis-backup
+    app.kubernetes.io/component: backup
+spec:
+  schedule: "*/30 * * * *"  # Every 30 minutes
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 3
+      template:
+        spec:
+          serviceAccountName: backup-service-account
+          containers:
+          - name: redis-backup
+            image: redis:7-alpine
+            command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              echo "Starting Redis backup at $(date)"
+              
+              # Trigger background save
+              redis-cli -h redis.machine-native-ops.svc BGSAVE
+              
+              # Wait for BGSAVE to complete
+              echo "Waiting for BGSAVE to complete..."
+              while true; do
+                LASTSAVE=$(redis-cli -h redis.machine-native-ops.svc LASTSAVE)
+                echo "Last save timestamp: $LASTSAVE"
+                sleep 5
+              done &
+              
+              # Copy RDB file
+              BACKUP_FILE="/backup/redis_$(date +%Y%m%d_%H%M%S).rdb"
+              kubectl exec -n machine-native-ops redis-0 -- cat /data/dump.rdb > "${BACKUP_FILE}"
+              
+              # Compress backup
+              gzip "${BACKUP_FILE}"
+              BACKUP_FILE="${BACKUP_FILE}.gz"
+              
+              # Upload to S3
+              aws s3 cp "${BACKUP_FILE}" \
+                       s3://machine-native-ops-backups/redis/ \
+                       --storage-class STANDARD_IA \
+                       --metadata "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              
+              # Clean up old backups (keep 7 days)
+              find /backup -name "redis_*.rdb.gz" -mtime +7 -delete
+              
+              # Cleanup S3 old backups (keep 7 days)
+              aws s3 ls s3://machine-native-ops-backups/redis/ | \
+                while read -r line; do
+                  fileName=$(echo "$line" | awk '{print $4}')
+                  fileDate=$(echo "$line" | awk '{print $1" "$2}')
+                  fileTimestamp=$(date -d "$fileDate" +%s)
+                  currentTimestamp=$(date +%s)
+                  age=$(( (currentTimestamp - fileTimestamp) / 86400 ))
+                  if [ $age -gt 7 ]; then
+                    aws s3 rm "s3://machine-native-ops-backups/redis/$fileName"
+                  fi
+                done
+              
+              echo "Redis backup completed successfully at $(date)"
+              echo "Backup file: ${BACKUP_FILE}"
+            env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: secret-access-key
+            - name: AWS_DEFAULT_REGION
+              value: "us-east-1"
+            volumeMounts:
+            - name: backup
+              mountPath: /backup
+            - name: backup-logs
+              mountPath: /var/log/backup
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 200m
+                memory: 256Mi
+          volumes:
+          - name: backup
+            persistentVolumeClaim:
+              claimName: redis-backup-pvc
+          - name: backup-logs
+            persistentVolumeClaim:
+              claimName: backup-logs-pvc
+          restartPolicy: OnFailure
+---
+# Application Configuration Backup Job
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:disaster-recovery:jobs:database-backup-jobs.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/disaster-recovery/jobs/database-backup-jobs.yaml"
+  name: config-backup
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: config-backup
+    app.kubernetes.io/component: backup
+spec:
+  schedule: "*/30 * * * *"  # Every 30 minutes
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 10
+  failedJobsHistoryLimit: 10
+  jobTemplate:
+    spec:
+      backoffLimit: 3
+      template:
+        spec:
+          serviceAccountName: backup-service-account
+          containers:
+          - name: config-backup
+            image: bitnami/kubectl:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              echo "Starting configuration backup at $(date)"
+              
+              # Create backup directory
+              BACKUP_DIR="/backup/config_$(date +%Y%m%d_%H%M%S)"
+              mkdir -p "${BACKUP_DIR}"
+              
+              # Export ConfigMaps
+              kubectl get configmaps -n machine-native-ops -o yaml > "${BACKUP_DIR}/configmaps.yaml"
+              
+              # Export Secrets (without values)
+              kubectl get secrets -n machine-native-ops -o yaml > "${BACKUP_DIR}/secrets-metadata.yaml"
+              
+              # Export Deployments
+              kubectl get deployments -n machine-native-ops -o yaml > "${BACKUP_DIR}/deployments.yaml"
+              
+              # Export StatefulSets
+              kubectl get statefulsets -n machine-native-ops -o yaml > "${BACKUP_DIR}/statefulsets.yaml"
+              
+              # Export Services
+              kubectl get services -n machine-native-ops -o yaml > "${BACKUP_DIR}/services.yaml"
+              
+              # Export Ingress
+              kubectl get ingress -n machine-native-ops -o yaml > "${BACKUP_DIR}/ingress.yaml"
+              
+              # Export Custom Resources
+              kubectl get virtualservices -n machine-native-ops -o yaml > "${BACKUP_DIR}/virtualservices.yaml" || true
+              kubectl get destinationrules -n machine-native-ops -o yaml > "${BACKUP_DIR}/destinationrules.yaml" || true
+              
+              # Create archive
+              tar -czf "/backup/config_$(date +%Y%m%d_%H%M%S).tar.gz" -C /backup "$(basename ${BACKUP_DIR})"
+              rm -rf "${BACKUP_DIR}"
+              
+              # Upload to S3
+              aws s3 cp "/backup/config_$(date +%Y%m%d_%H%M%S).tar.gz" \
+                       s3://machine-native-ops-backups/config/ \
+                       --storage-class STANDARD_IA
+              
+              # Clean up old backups (keep 30 days)
+              find /backup -name "config_*.tar.gz" -mtime +30 -delete
+              
+              # Cleanup S3 old backups (keep 90 days)
+              aws s3 ls s3://machine-native-ops-backups/config/ | \
+                while read -r line; do
+                  fileName=$(echo "$line" | awk '{print $4}')
+                  fileDate=$(echo "$line" | awk '{print $1" "$2}')
+                  fileTimestamp=$(date -d "$fileDate" +%s)
+                  currentTimestamp=$(date +%s)
+                  age=$(( (currentTimestamp - fileTimestamp) / 86400 ))
+                  if [ $age -gt 90 ]; then
+                    aws s3 rm "s3://machine-native-ops-backups/config/$fileName"
+                  fi
+                done
+              
+              echo "Configuration backup completed successfully at $(date)"
+            env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: secret-access-key
+            - name: AWS_DEFAULT_REGION
+              value: "us-east-1"
+            volumeMounts:
+            - name: backup
+              mountPath: /backup
+            - name: backup-logs
+              mountPath: /var/log/backup
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 200m
+                memory: 256Mi
+          volumes:
+          - name: backup
+            persistentVolumeClaim:
+              claimName: config-backup-pvc
+          - name: backup-logs
+            persistentVolumeClaim:
+              claimName: backup-logs-pvc
+          restartPolicy: OnFailure
+---
+# Backup Validation Job
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:disaster-recovery:jobs:database-backup-jobs.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/disaster-recovery/jobs/database-backup-jobs.yaml"
+  name: backup-validation
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: backup-validation
+    app.kubernetes.io/component: backup
+spec:
+  schedule: "0 3 * * *"  # Daily at 3 AM
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 7
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          serviceAccountName: backup-service-account
+          containers:
+          - name: backup-validator
+            image: bitnami/kubectl:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              echo "Starting backup validation at $(date)"
+              
+              # Validate Velero backups
+              echo "Checking Velero backups..."
+              LATEST_BACKUP=$(velero backup get -o json | jq -r '.items | sort_by(.metadata.creationTimestamp) | reverse | .[0].metadata.name')
+              BACKUP_STATUS=$(velero backup get $LATEST_BACKUP -o json | jq -r '.status.phase')
+              
+              if [ "$BACKUP_STATUS" != "Completed" ]; then
+                echo "ERROR: Velero backup $LATEST_BACKUP failed with status: $BACKUP_STATUS"
+                exit 1
+              fi
+              
+              echo "✓ Velero backup validation passed: $LATEST_BACKUP"
+              
+              # Validate PostgreSQL backups in S3
+              echo "Checking PostgreSQL backups..."
+              PG_BACKUP_COUNT=$(aws s3 ls s3://machine-native-ops-backups/postgres/ | wc -l)
+              if [ "$PG_BACKUP_COUNT" -lt 24 ]; then  # At least 24 hourly backups
+                echo "ERROR: Insufficient PostgreSQL backups: $PG_BACKUP_COUNT (expected >= 24)"
+                exit 1
+              fi
+              echo "✓ PostgreSQL backup validation passed: $PG_BACKUP_COUNT backups"
+              
+              # Validate Redis backups in S3
+              echo "Checking Redis backups..."
+              REDIS_BACKUP_COUNT=$(aws s3 ls s3://machine-native-ops-backups/redis/ | wc -l)
+              if [ "$REDIS_BACKUP_COUNT" -lt 48 ]; then  # At least 48 backups (every 30 min)
+                echo "ERROR: Insufficient Redis backups: $REDIS_BACKUP_COUNT (expected >= 48)"
+                exit 1
+              fi
+              echo "✓ Redis backup validation passed: $REDIS_BACKUP_COUNT backups"
+              
+              # Validate configuration backups
+              echo "Checking configuration backups..."
+              CONFIG_BACKUP_COUNT=$(aws s3 ls s3://machine-native-ops-backups/config/ | wc -l)
+              if [ "$CONFIG_BACKUP_COUNT" -lt 48 ]; then  # At least 48 backups
+                echo "ERROR: Insufficient configuration backups: $CONFIG_BACKUP_COUNT (expected >= 48)"
+                exit 1
+              fi
+              echo "✓ Configuration backup validation passed: $CONFIG_BACKUP_COUNT backups"
+              
+              echo "All backup validations passed successfully at $(date)"
+            env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: secret-access-key
+            - name: AWS_DEFAULT_REGION
+              value: "us-east-1"
+            volumeMounts:
+            - name: backup-logs
+              mountPath: /var/log/backup
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 200m
+                memory: 256Mi
+          volumes:
+          - name: backup-logs
+            persistentVolumeClaim:
+              claimName: backup-logs-pvc
+          restartPolicy: OnFailure
+---
+# Backup Service Account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:disaster-recovery:jobs:database-backup-jobs.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/disaster-recovery/jobs/database-backup-jobs.yaml"
+  name: backup-service-account
+  namespace: platform-03
+---
+# Backup Role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:disaster-recovery:jobs:database-backup-jobs.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/disaster-recovery/jobs/database-backup-jobs.yaml"
+  name: backup-role
+  namespace: platform-03
+rules:
+- apiGroups: [""]
+  resources: ["pods", "pods/exec"]
+  verbs: ["get", "list", "create"]
+- apiGroups: [""]
+  resources: ["persistentvolumes", "persistentvolumeclaims"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "statefulsets", "daemonsets"]
+  verbs: ["get", "list"]
+- apiGroups: ["networking.istio.io"]
+  resources: ["virtualservices", "destinationrules"]
+  verbs: ["get", "list"]
+---
+# Backup Role Binding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:disaster-recovery:jobs:database-backup-jobs.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/disaster-recovery/jobs/database-backup-jobs.yaml"
+  name: backup-role-binding
+  namespace: platform-03
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: backup-role
+subjects:
+- kind: ServiceAccount
+  name: backup-service-account
+  namespace: platform-03

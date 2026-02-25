@@ -1,0 +1,23 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Root Policy Manifest
+# ECO-Layer: GL06 (Root Policy)
+# Closure-Signal: manifest
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:etl-pipeline:root-policy:manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/root-policy/manifest.yaml"
+  name: root-policy
+  version: "1.0.0"
+  layer: "GL06"
+
+components:
+  - naming-convention
+  - binary-authorization
+  - admission-control

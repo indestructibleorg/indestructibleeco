@@ -1,0 +1,102 @@
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: naming-governance
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: naming-convention-alerts
+  namespace: monitoring
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: prometheus-operator
+    release: prometheus
+spec:
+  groups:
+    - name: naming-violations
+      interval: 5m
+      rules:
+        - alert: NamingConventionViolationRateHigh
+          expr: |
+            (
+              sum(rate(naming_violations_total[5m])) by (severity)
+              /
+              sum(rate(naming_checks_total[5m]))
+            ) > 0.1
+          for: 10m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            team: platform
+          annotations:
+            summary: "High naming convention violation rate detected"
+            description: "Naming violation rate is {{ $value | humanizePercentage }} for severity {{ $labels.severity }}"
+
+        - alert: CriticalNamingViolations
+          expr: |
+            sum(increase(naming_violations_total{severity="critical"}[15m])) > 5
+          for: 5m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: critical
+            team: platform
+          annotations:
+            summary: "Critical naming violations detected"
+            description: "{{ $value }} critical naming violations in the last 15 minutes"
+
+        - alert: NamingComplianceBelowThreshold
+          expr: |
+            (
+              sum(naming_checks_success_total)
+              /
+              sum(naming_checks_total)
+            ) < 0.95
+          for: 30m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            team: governance
+          annotations:
+            summary: "Naming compliance below threshold"
+            description: "Naming compliance is {{ $value | humanizePercentage }}, below 95% threshold"
+
+        - alert: AutoFixFailureRateHigh
+          expr: |
+            (
+              sum(rate(auto_fix_failures_total[10m]))
+              /
+              sum(rate(auto_fix_attempts_total[10m]))
+            ) > 0.2
+          for: 15m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            team: platform
+          annotations:
+            summary: "High auto-fix failure rate"
+            description: "Auto-fix failure rate is {{ $value | humanizePercentage }}, above 20% threshold"
+
+    - name: governance-metrics
+      interval: 1m
+      rules:
+        - record: naming_violations_by_type
+          expr: sum by (type, severity) (naming_violations_total)
+
+        - record: naming_compliance_rate
+          expr: |
+            sum(naming_checks_success_total) / sum(naming_checks_total) * 100
+
+        - record: auto_fix_success_rate
+          expr: |
+            sum(auto_fix_successes_total) / sum(auto_fix_attempts_total) * 100

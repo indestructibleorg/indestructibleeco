@@ -1,0 +1,117 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: module-manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+module_id: "04-autonomous"
+module_name: "Autonomous Systems Framework"
+module_description: |
+  The Autonomous Systems Framework module provides the foundation for autonomous operations,
+  implementing the five-skeleton architecture for unmanned/island scenarios. It operates at
+  L4-L5 autonomy levels, enabling the system to function with minimal or no human intervention
+  in controlled environments. This module includes autonomous decision-making, self-healing
+  capabilities, and support for autonomous vehicles, drones, and edge computing scenarios.
+autonomy_level: "L4-L5"
+namespace: "mno-autonomous"
+dependencies:
+  - "01-core"
+  - "02-intelligence"
+  - "03-governance"
+interfaces:
+  - name: "AutonomousController"
+    type: "service"
+    description: "High-level autonomous operations control interface"
+    endpoints:
+      - "POST /autonomous/start"
+      - "POST /autonomous/stop"
+      - "GET /autonomous/status"
+      - "POST /autonomous/command"
+  - name: "SelfHealingEngine"
+    type: "service"
+    description: "Self-diagnosis and automatic healing interface"
+    endpoints:
+      - "POST /self-healing/diagnose"
+      - "POST /self-healing/repair"
+      - "GET /self-healing/status"
+  - name: "EdgeController"
+    type: "service"
+    description: "Edge computing and device management interface"
+    endpoints:
+      - "POST /edge/deploy"
+      - "GET /edge/devices"
+      - "POST /edge/sync"
+  - name: "VehicleController"
+    type: "api"
+    description: "Autonomous vehicle and drone control interface"
+    endpoints:
+      - "POST /vehicles/mission"
+      - "GET /vehicles/status"
+      - "POST /vehicles/emergency-stop"
+  - name: "IslandManager"
+    type: "service"
+    description: "Unmanned island operation management"
+    endpoints:
+      - "POST /islands/initialize"
+      - "GET /islands/status"
+      - "POST /islands/evacuate"
+status: "in-development"
+version: "0.9.0"
+components:
+  - name: "AutonomousController"
+    type: "service"
+    description: "Central controller for autonomous operations"
+    location: "lib/mno-autonomous/autonomous-controller/"
+  - name: "SelfHealingEngine"
+    type: "service"
+    description: "Automatic system diagnosis and healing"
+    location: "lib/mno-autonomous/self-healing/"
+  - name: "FiveSkeletonFramework"
+    type: "framework"
+    description: "Five-skeleton architecture for autonomous systems"
+    location: "lib/mno-autonomous/five-skeleton/"
+  - name: "EdgeController"
+    type: "service"
+    description: "Edge computing and IoT device management"
+    location: "lib/mno-autonomous/edge-controller/"
+  - name: "VehicleController"
+    type: "service"
+    description: "Autonomous vehicle and drone control systems"
+    location: "lib/mno-autonomous/vehicle-controller/"
+  - name: "IslandManager"
+    type: "service"
+    description: "Unmanned island operation and management"
+    location: "lib/mno-autonomous/island-manager/"
+semantic_mappings:
+  - concept: "Autonomous Operation"
+    mapping: "mno-autonomous.autonomous-controller"
+    description: "Map autonomous operations to autonomous controller"
+  - concept: "Self-Healing"
+    mapping: "mno-autonomous.self-healing"
+    description: "Map self-healing concepts to self-healing engine"
+  - concept: "Edge Computing"
+    mapping: "mno-autonomous.edge-controller"
+    description: "Map edge computing to edge controller"
+  - concept: "Autonomous Vehicles"
+    mapping: "mno-autonomous.vehicle-controller"
+    description: "Map vehicle control to vehicle controller"
+  - concept: "Unmanned Island"
+    mapping: "mno-autonomous.island-manager"
+    description: "Map island operations to island manager"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:controlplane:baseline:modules:04-autonomous:module-manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/04-autonomous/module-manifest.yaml"
+  created_date: "2025-01-18"
+  last_modified: "2025-01-18"
+  maintainers:
+    - "MachineNativeOps Team"
+  tags:
+    - "autonomous"
+    - "self-healing"
+    - "edge"
+    - "vehicles"
+    - "drones"
+    - "island"
+    - "five-skeleton"

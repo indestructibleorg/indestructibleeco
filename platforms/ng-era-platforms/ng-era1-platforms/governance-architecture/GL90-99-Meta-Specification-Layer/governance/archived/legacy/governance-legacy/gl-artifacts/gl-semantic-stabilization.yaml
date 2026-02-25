@@ -1,0 +1,58 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: SemanticStabilizationStatus
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-semantic-stabilization.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-semantic-stabilization.yaml"
+  name: gl-semantic-stabilization
+  version: "1.0.0"
+  stabilization_date: "2026-01-18"
+status: STABLE
+semantic_fixes_applied:
+  - issue: "Duplicate audit dimensions (07-audit and 70-audit)"
+    fix: "Moved 07-audit from GL00-09 to GL60-80, maintaining both dimensions in Advanced/Feedback Layer"
+    layer_affected: "GL00-09, GL60-80"
+  - issue: "Boundary conflict: 26-tools and 27-templates in GL10-29 but modules assigned to GL30-49"
+    fix: "Moved 26-tools and 27-templates from GL10-29 to GL30-49"
+    layer_affected: "GL10-29, GL30-49"
+  - issue: "GL50-59 Observability Layer had no dimensions"
+    fix: "Marked as placeholder for future observability dimensions"
+    layer_affected: "GL50-59"
+layer_boundaries:
+  GL00-09:
+    semantic: "Strategic governance - vision, architecture, decisions, risk, compliance, security"
+    clear: true
+    conflicts: none
+  GL10-29:
+    semantic: "Operational governance - policies, culture, metrics, improvement, quality"
+    clear: true
+    conflicts: none
+  GL30-49:
+    semantic: "Execution artifacts - tools, templates, schemas, contracts, automation"
+    clear: true
+    conflicts: none
+  GL50-59:
+    semantic: "Observability - monitoring, alerting, insights (placeholder for future expansion)"
+    clear: true
+    conflicts: none
+  GL60-80:
+    semantic: "Advanced capabilities - audit, contracts, AI, optimization, feedback"
+    clear: true
+    conflicts: none
+  GL81-83:
+    semantic: "Extended integrations - auto-comment, stakeholder, integration"
+    clear: true
+    conflicts: none
+  GL90-99:
+    semantic: "Meta-specification - naming conventions, meta-governance"
+    clear: true
+    conflicts: none
+circular_dependencies: none
+duplicate_dimensions: none
+semantic_conflicts: none
+stabilization_complete: true

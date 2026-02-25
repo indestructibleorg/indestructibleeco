@@ -1,0 +1,231 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: service-observability
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Advanced Service Mesh Observability Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:service-observability.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/service-observability.yaml"
+  name: istio-custom-metrics
+  namespace: istio-system
+data:
+  custom-metrics.yaml: |
+    # Custom metrics configuration for enhanced observability
+    metrics:
+    # Request latency metrics
+    - name: request_latency_ms
+      kind: GAUGE
+      description: Request latency in milliseconds
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        - source_service
+        - destination_service
+        - response_code
+        - method
+        - path
+    # Traffic metrics
+    - name: request_count
+      kind: COUNTER
+      description: Total request count
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        - source_service
+        - destination_service
+        - response_code
+        - method
+    # Error rate metrics
+    - name: error_rate
+      kind: GAUGE
+      description: Error rate percentage
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        - source_service
+        - destination_service
+        - error_type
+    # Circuit breaker metrics
+    - name: circuit_breaker_state
+      kind: GAUGE
+      description: Circuit breaker state
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        - destination_service
+        - state
+    # Retry metrics
+    - name: retry_count
+      kind: COUNTER
+      description: Total retry attempts
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        - source_service
+        - destination_service
+        - reason
+    # Connection pool metrics
+    - name: active_connections
+      kind: GAUGE
+      description: Active connections count
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        - destination_service
+    - name: pending_requests
+      kind: GAUGE
+      description: Pending requests count
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        - destination_service
+---
+# Prometheus ServiceMonitor for custom metrics
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:service-observability.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/service-observability.yaml"
+  name: istio-custom-metrics-monitor
+  namespace: istio-system
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: istio-pilot
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: istiod
+  endpoints:
+  - port: http-monitoring
+    interval: 15s
+    path: /metrics
+    scheme: http
+---
+# Grafana dashboard for service mesh observability
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:service-observability.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/service-observability.yaml"
+  name: service-mesh-dashboard
+  namespace: istio-system
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    grafana_dashboard: "1"
+data:
+  service-mesh.json: |
+    {
+      "dashboard": {
+        "title": "Service Mesh Observability",
+        "panels": [
+          {
+            "title": "Request Latency",
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.95, sum(rate(istio_request_duration_milliseconds_bucket[5m])) by (le, destination_service))",
+                "legendFormat": "{{destination_service}} - P95"
+              },
+              {
+                "expr": "histogram_quantile(0.99, sum(rate(istio_request_duration_milliseconds_bucket[5m])) by (le, destination_service))",
+                "legendFormat": "{{destination_service}} - P99"
+              }
+            ],
+            "type": "graph"
+          },
+          {
+            "title": "Request Rate",
+            "targets": [
+              {
+                "expr": "sum(rate(istio_requests_total[5m])) by (source_service, destination_service)",
+                "legendFormat": "{{source_service}} -> {{destination_service}}"
+              }
+            ],
+            "type": "graph"
+          },
+          {
+            "title": "Error Rate",
+            "targets": [
+              {
+                "expr": "sum(rate(istio_requests_total{response_code=~&quot;5..&quot;}[5m])) by (destination_service) / sum(rate(istio_requests_total[5m])) by (destination_service) * 100",
+                "legendFormat": "{{destination_service}}"
+              }
+            ],
+            "type": "graph"
+          },
+          {
+            "title": "Circuit Breaker State",
+            "targets": [
+              {
+                "expr": "istio_circuit_breaker_open",
+                "legendFormat": "{{destination_service}}"
+              }
+            ],
+            "type": "stat"
+          },
+          {
+            "title": "Active Connections",
+            "targets": [
+              {
+                "expr": "istio_connection_open_total",
+                "legendFormat": "{{destination_service}}"
+              }
+            ],
+            "type": "graph"
+          }
+        ]
+      }
+    }
+---
+# Telemetry configuration for enhanced observability
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:service-observability.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/service-observability.yaml"
+  name: mesh-default
+  namespace: istio-system
+spec:
+  metrics:
+  - providers:
+    - name: prometheus
+  - overrides:
+    - match:
+        metric: requests_total
+      tagOverrides:
+        destination_service:
+          value: "destination_service_name"
+        source_service:
+          value: "source_service_name"
+  - providers:
+    - name: prometheus
+    overrides:
+    - match:
+        metric: response_duration_ms
+      tagOverrides:
+        request_operation:
+          operation: REMOVE
+  accessLogging:
+  - providers:
+    - name: envoy
+  tracing:
+  - providers:
+    - name: jaeger
+    sampling: 100.0
+    customTags:
+      cluster_id:
+        environment:
+          name: ISTIO_META_CLUSTER_ID
+      node_name:
+        environment:
+          name: ISTIO_META_NODE_NAME

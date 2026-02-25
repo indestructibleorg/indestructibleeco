@@ -1,0 +1,510 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+version: v1.0.0
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:naming-governance-v1.0.0:training:modules:roles-curriculum.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/naming-governance-v1.0.0/training/modules/roles-curriculum.yaml"
+  name: "命名治理角色培訓課程"
+  description: "針對不同角色的命名治理培訓模組與學習地圖"
+  last_updated: "2025-01-18"
+
+roles:
+  - name: "naming-gatekeeper"
+    display_name: "命名守門人"
+    description: "負責規範審議、稽核執行與例外處理的核心角色"
+    responsibilities:
+      - "規範審議與標準制定"
+      - "命名稽核與合規檢查"
+      - "例外申請審核與仲裁"
+      - "RFC 文件審查"
+      - "跨部門溝通協調"
+    
+    prerequisites:
+      - "具備 Kubernetes 基礎知識"
+      - "熟悉 CI/CD 流程"
+      - "了解組織架構與業務流程"
+    
+    training_modules:
+      - module_id: "NG-001"
+        title: "進階命名規則與規範"
+        duration: "4 小時"
+        objectives:
+          - "深入理解命名治理框架"
+          - "掌握 canonical naming 規範"
+          - "學習命名衝突解決策略"
+        content:
+          - "machine-spec.yaml 詳解"
+          - "命名模式與正則表達式"
+          - "跨環境命名策略"
+          - "命名衝突案例研究"
+        assessment:
+          type: "case_study"
+          passing_score: 80
+          description: "分析並解決實際命名衝突案例"
+      
+      - module_id: "NG-002"
+        title: "審核實作與稽核工具"
+        duration: "6 小時"
+        objectives:
+          - "熟練使用命名稽核工具"
+          - "執行自動化合規檢查"
+          - "生成與解讀稽核報告"
+        content:
+          - "naming_validator.py 工具使用"
+          - "Prometheus 監控規則配置"
+          - "Grafana Dashboard 運作"
+          - "合規報告生成"
+        assessment:
+          type: "practical"
+          passing_score: 85
+          description: "執行完整稽核流程並生成報告"
+      
+      - module_id: "NG-003"
+        title: "RFC 撰寫與變更管理"
+        duration: "4 小時"
+        objectives:
+          - "撰寫標準化的 RFC 文件"
+          - "執行變更影響評估"
+          - "管理變更審批流程"
+        content:
+          - "RFC 模板與最佳實踐"
+          - "風險評估方法論"
+          - "變更類型判斷標準"
+          - "CAB 審查流程"
+        assessment:
+          type: "document_review"
+          passing_score: 75
+          description: "撰寫並審查完整的 RFC 文件"
+      
+      - module_id: "NG-004"
+        title: "例外處理與風險管理"
+        duration: "3 小時"
+        objectives:
+          - "評估例外申請風險"
+          - "制定緩解措施"
+          - "管理例外生命週期"
+        content:
+          - "例外申請審核準則"
+          - "風險評估框架"
+          - "到期監控與複查"
+          - "例外撤銷程序"
+        assessment:
+          type: "scenario_analysis"
+          passing_score: 80
+          description: "模擬例外申請審核場景"
+    
+    practical_exercises:
+      - name: "高危例外情境演練"
+        description: "模擬生產環境緊急例外申請與處理"
+        duration: "2 小時"
+        scenarios:
+          - "生產環境命名違反緊急處理"
+          - "第三方系統整合命名衝突"
+          - "遺留系統遷移命名過渡"
+      
+      - name: "審計報告填寫實務"
+        description: "實際執行稽核並填寫審計報告"
+        duration: "3 小時"
+        tasks:
+          - "使用工具掃描集群資源"
+          - "識別並分類違規項目"
+          - "生成稽核報告並提出改進建議"
+
+  - name: "tech-lead"
+    display_name: "技術負責人"
+    description: "負責開發實踐、自動化落地與工具維護的技術角色"
+    responsibilities:
+      - "開發實踐與標準執行"
+      - "自動化工具開發與維護"
+      - "CI/CD 流程集成"
+      - "命名生成腳本開發"
+      - "技術問題排查與支援"
+    
+    prerequisites:
+      - "熟練 Python/Bash 腳本開發"
+      - "熟悉 Kubernetes 資源管理"
+      - "了解 GitOps 流程"
+      - "具備 CI/CD 工具使用經驗"
+    
+    training_modules:
+      - module_id: "TL-001"
+        title: "自動化命名生成工具實用"
+        duration: "4 小時"
+        objectives:
+          - "掌握 naming_generator.py 使用"
+          - "自定義命名模板"
+          - "批次生成資源配置"
+        content:
+          - "命名生成器 API 詳解"
+          - "模板變數與條件邏輯"
+          - "批次處理最佳實踐"
+          - "錯誤處理與日誌"
+        assessment:
+          type: "coding"
+          passing_score: 90
+          description: "開發自定義命名生成腳本"
+      
+      - module_id: "TL-002"
+        title: "YAML/腳本實作與驗證"
+        duration: "6 小時"
+        objectives:
+          - "編寫符合規範的 K8s Manifest"
+          - "實現自動化驗證腳本"
+          - "集成 CI/CD 檢查點"
+        content:
+          - "YAML 結構與語法"
+          - "K8s 資源標籤最佳實踐"
+          - "驗證邏輯實作"
+          - "GitHub Actions 集成"
+        assessment:
+          type: "practical"
+          passing_score: 85
+          description: "開發完整的驗證腳本並集成 CI"
+      
+      - module_id: "TL-003"
+        title: "CI 工具導入與維護"
+        duration: "5 小時"
+        objectives:
+          - "配置命名治理 CI/CD 管道"
+          - "設置自動化檢查點"
+          - "監控 CI 執行結果"
+        content:
+          - "GitHub Actions 工作流設計"
+          - "GitLab CI 配置"
+          - "Jenkins Pipeline 集成"
+          - "失敗處理與通知"
+        assessment:
+          type: "project"
+          passing_score: 80
+          description: "部署並測試完整的 CI/CD 管道"
+    
+    practical_exercises:
+      - name: "撰寫 CI 模板與變更測試"
+        description: "創建 CI/CD 模板並執行變更測試"
+        duration: "4 小時"
+        tasks:
+          - "設計 GitHub Actions 工作流"
+          - "配置命名驗證步驟"
+          - "執行 PR 檢查並修復問題"
+      
+      - name: "自動化工具開發"
+        description: "開發自定義命名治理工具"
+        duration: "6 小時"
+        tasks:
+          - "分析命名規範需求"
+          - "設計工具架構"
+          - "實現核心功能"
+          - "編寫單元測試"
+
+  - name: "ops-engineer"
+    display_name: "維運工程師"
+    description: "負責版本管理、實施覆蓋與監控運維的運維角色"
+    responsibilities:
+      - "版本管理與發布"
+      - "資源配置核對"
+      - "監控指標運作"
+      - "事故響應與回滾"
+      - "系統健康檢查"
+    
+    prerequisites:
+      - "熟悉 Kubernetes 運維"
+      - "了解監控與日誌系統"
+      - "具備故障排查經驗"
+      - "熟悉發布流程"
+    
+    training_modules:
+      - module_id: "OP-001"
+        title: "回滾演練與災難恢復"
+        duration: "4 小時"
+        objectives:
+          - "掌握回滾策略與程序"
+          - "執行災難恢復演練"
+          - "最小化停機時間"
+        content:
+          - "回滾策略與最佳實踐"
+          - "K8s Deployment 回滾"
+          - "資料庫回復程序"
+          - "服務中斷處理"
+        assessment:
+          type: "simulation"
+          passing_score: 85
+          description: "執行完整的回滾演練"
+      
+      - module_id: "OP-002"
+        title: "配置核對與驗證"
+        duration: "3 小時"
+        objectives:
+          - "執行資源配置核對"
+          - "驗證命名合規性"
+          - "識別配置漂移"
+        content:
+          - "配置核對工具使用"
+          - "命名規範驗證"
+          - "漂移檢測方法"
+          - "自動化修復策略"
+        assessment:
+          type: "practical"
+          passing_score: 80
+          description: "執行完整的配置核對流程"
+      
+      - module_id: "OP-003"
+        title: "指標監測與警報處理"
+        duration: "5 小時"
+        objectives:
+          - "配置監控指標"
+          - "設置警報規則"
+          - "處理警報事件"
+        content:
+          - "Prometheus 指標配置"
+          - "Grafana Dashboard 設置"
+          - "警報路由與分級"
+          - "警響應流程"
+        assessment:
+          type: "practical"
+          passing_score: 75
+          description: "配置並測試監控警報系統"
+    
+    practical_exercises:
+      - name: "發布演練"
+        description: "模擬完整發布流程並處理異常"
+        duration: "4 小時"
+        tasks:
+          - "準備發布計畫"
+          - "執行部署"
+          - "監控指標"
+          - "處理發布問題"
+      
+      - name: "指標操作實務"
+        description: "實際操作監控系統並處理警報"
+        duration: "3 小時"
+        tasks:
+          - "設置監控指標"
+          - "配置警報規則"
+          - "模擬並處理警報事件"
+
+  - name: "business-owner"
+    display_name: "業務窗口"
+    description: "負責需求界定、政策落地宣導與跨部門溝通的業務角色"
+    responsibilities:
+      - "業務需求界定"
+      - "政策落地宣導"
+      - "跨部門溝通協調"
+      - "用戶培訓與支援"
+      - "治理成效追蹤"
+    
+    prerequisites:
+      - "了解組織業務流程"
+      - "具備溝通協調能力"
+      - "熟悉項目管理"
+      - "了解基礎技術概念"
+    
+    training_modules:
+      - module_id: "BO-001"
+        title: "命名原則解說"
+        duration: "2 小時"
+        objectives:
+          - "理解命名治理價值"
+          - "掌握核心命名原則"
+          - "識別常見違規案例"
+        content:
+          - "命名治理重要性"
+          - "核心原則與規範"
+          - "常見錯誤與影響"
+          - "最佳實踐案例"
+        assessment:
+          type: "quiz"
+          passing_score: 70
+          description: "命名規範知識測驗"
+      
+      - module_id: "BO-002"
+        title: "政策落地宣導"
+        duration: "3 小時"
+        objectives:
+          - "制定宣導計畫"
+          - "執行培訓活動"
+          - "收集反饋與改進"
+        content:
+          - "宣導策略設計"
+          - "培訓材料準備"
+          - "溝通技巧與方法"
+          - "反饋收集分析"
+        assessment:
+          type: "presentation"
+          passing_score: 75
+          description: "設計並展示宣導計畫"
+    
+    practical_exercises:
+      - name: "案例回饋"
+        description: "收集並分析業務部門的反饋"
+        duration: "2 小時"
+        tasks:
+          - "設計反饋問卷"
+          - "收集用戶反饋"
+          - "分析問題並提出改進"
+      
+      - name: "小組討論"
+        description: "主持跨部門治理討論"
+        duration: "3 小時"
+        tasks:
+          - "準備討論議題"
+          - "引導討論進行"
+          - "記錄決議與行動"
+
+  - name: "general-user"
+    display_name: "一般用戶"
+    description: "負責規則認知、自助檢查與日常遵循的終端用戶角色"
+    responsibilities:
+      - "學習命名規則"
+      - "使用自助檢查工具"
+      - "遵循命名規範"
+      - "報告命名問題"
+    
+    prerequisites:
+      - "無特殊要求"
+    
+    training_modules:
+      - module_id: "GU-001"
+        title: "基礎命名訓練"
+        duration: "1 小時"
+        objectives:
+          - "理解基本命名規則"
+          - "學會使用命名生成工具"
+          - "認識常見錯誤"
+        content:
+          - "命名基本規範"
+          - "工具使用教學"
+          - "常見錯誤案例"
+          - "求助渠道"
+        assessment:
+          type: "quiz"
+          passing_score: 80
+          description: "基礎命名知識測驗"
+      
+      - module_id: "GU-002"
+        title: "錯誤案例解析"
+        duration: "1 小時"
+        objectives:
+          - "識別命名錯誤"
+          - "理解錯誤影響"
+          - "學會修正方法"
+        content:
+          - "典型錯誤案例"
+          - "錯誤影響分析"
+          - "修正步驟演示"
+          - "預防措施"
+        assessment:
+          type: "interactive"
+          passing_score: 70
+          description: "互動式錯誤識別練習"
+    
+    practical_exercises:
+      - name: "實作填表"
+        description: "使用工具生成符合規範的資源名稱"
+        duration: "30 分鐘"
+        tasks:
+          - "使用命名生成器"
+          - "生成多個資源名稱"
+          - "驗證名稱合規性"
+      
+      - name: "規範演練"
+        description: "練習識別並修正違規命名"
+        duration: "45 分鐘"
+        tasks:
+          - "識別違規命名"
+          - "分析違規原因"
+          - "提出修正方案"
+
+certification:
+  program_name: "命名治理認證"
+  levels:
+    - level: "Foundation"
+      required_roles: ["general-user", "business-owner"]
+      required_modules: ["GU-001", "GU-002", "BO-001"]
+      validity_period: "1 年"
+    
+    - level: "Practitioner"
+      required_roles: ["ops-engineer"]
+      required_modules: ["OP-001", "OP-002", "OP-003"]
+      prerequisites: ["Foundation"]
+      validity_period: "2 年"
+    
+    - level: "Expert"
+      required_roles: ["tech-lead"]
+      required_modules: ["TL-001", "TL-002", "TL-003"]
+      prerequisites: ["Practitioner"]
+      validity_period: "3 年"
+    
+    - level: "Master"
+      required_roles: ["naming-gatekeeper"]
+      required_modules: ["NG-001", "NG-002", "NG-003", "NG-004"]
+      prerequisites: ["Expert"]
+      validity_period: "3 年"
+  
+  renewal_requirements:
+    foundation:
+      - "完成年度在線複習"
+      - "通過基礎知識測驗"
+    
+    practitioner:
+      - "完成進階培訓模組"
+      - "參與至少 2 次實際稽核"
+    
+    expert:
+      - "開發或改進至少 1 個工具"
+      - "參與技術審查會議"
+    
+    master:
+      - "審核至少 5 個 RFC"
+      - "指導至少 2 名初級人員"
+      - "參與治理標準制定"
+
+learning_paths:
+  - name: "快速入門"
+    target_audience: "新加入成員"
+    duration: "1 天"
+    modules: ["GU-001", "GU-002"]
+    expected_outcome: "能夠正確使用命名規範"
+  
+  - name: "運維專家"
+    target_audience: "運維工程師"
+    duration: "1 週"
+    modules: ["OP-001", "OP-002", "OP-003", "NG-002"]
+    expected_outcome: "能夠執行完整的運維與稽核工作"
+  
+  - name: "技術領袖"
+    target_audience: "技術負責人"
+    duration: "2 週"
+    modules: ["TL-001", "TL-002", "TL-003", "NG-001", "NG-003"]
+    expected_outcome: "能夠領導技術實施與工具開發"
+  
+  - name: "治理專家"
+    target_audience: "命名守門人"
+    duration: "3 週"
+    modules: ["NG-001", "NG-002", "NG-003", "NG-004", "OP-002", "TL-002"]
+    expected_outcome: "能夠全面管理命名治理工作"
+
+resources:
+  documentation:
+    - "Canonical Naming Governance v1.0.0"
+    - "Implementation Templates v1.0.0"
+    - "Observability & Validation Guide"
+  
+  tools:
+    - "naming_generator.py"
+    - "naming_validator.py"
+    - "change_manager.py"
+    - "exception_manager.py"
+  
+  templates:
+    - "RFC 模板"
+    - "例外申請表單"
+    - "稽核報告模板"
+  
+  best_practices:
+    - "命名最佳實踐案例庫"
+    - "常見錯誤與解決方案"
+    - "跨環境命名策略"

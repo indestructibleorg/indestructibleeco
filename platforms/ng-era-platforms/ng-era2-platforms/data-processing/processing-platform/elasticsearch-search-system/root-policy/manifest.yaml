@@ -1,0 +1,23 @@
+# @ECO-governed
+# @ECO-layer: search
+# @ECO-semantic: manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Root Policy Manifest
+# ECO-Layer: GL06 (Root Policy)
+# Closure-Signal: manifest
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:data-processing:processing-platform:elasticsearch-search-system:root-policy:manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/data-processing/processing-platform/elasticsearch-search-system/root-policy/manifest.yaml"
+  name: root-policy-manifest
+  version: "1.0.0"
+  layer: "GL06"
+  description: "Root policy manifest for search system"
+
+artifacts:
+  - policy.yaml
+  - naming-convention/naming-registry.yaml

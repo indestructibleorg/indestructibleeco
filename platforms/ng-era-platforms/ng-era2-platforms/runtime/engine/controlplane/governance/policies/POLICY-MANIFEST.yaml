@@ -1,0 +1,188 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: POLICY_MANIFEST
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Policy Manifest for MachineNativeOps
+# This file defines all governance policies in the system
+
+manifest_version: "1.0.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:controlplane:governance:policies:POLICY-MANIFEST.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/governance/policies/POLICY-MANIFEST.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+last_updated: "2025-01-18"
+
+policies:
+  - policy_id: "naming"
+    policy_name: "Naming Policy"
+    description: "Enforces kebab-case naming conventions and namespace governance"
+    file: "naming.rego"
+    package: "mno.governance.policies.naming"
+    status: "active"
+    version: "1.0.0"
+    enforcement_mode: "strict"
+    applies_to:
+      - "files"
+      - "directories"
+      - "modules"
+      - "interfaces"
+      - "components"
+    severity: "medium"
+    remediation: "automatic"
+    
+  - policy_id: "semantic"
+    policy_name: "Semantic Policy"
+    description: "Ensures semantic consistency across modules and components"
+    file: "semantic.rego"
+    package: "mno.governance.policies.semantic"
+    status: "active"
+    version: "1.0.0"
+    enforcement_mode: "strict"
+    applies_to:
+      - "modules"
+      - "semantic_mappings"
+      - "components"
+    severity: "high"
+    remediation: "manual"
+    
+  - policy_id: "security"
+    policy_name: "Security Policy"
+    description: "Enforces security policies, secret management, and vulnerability requirements"
+    file: "security.rego"
+    package: "mno.governance.policies.security"
+    status: "active"
+    version: "1.0.0"
+    enforcement_mode: "strict"
+    applies_to:
+      - "artifacts"
+      - "deployments"
+      - "secrets"
+      - "dependencies"
+      - "code"
+      - "images"
+    severity: "critical"
+    remediation: "manual"
+    
+  - policy_id: "autonomy"
+    policy_name: "Autonomy Policy"
+    description: "Enforces autonomy level requirements and progression rules"
+    file: "autonomy.rego"
+    package: "mno.governance.policies.autonomy"
+    status: "active"
+    version: "1.0.0"
+    enforcement_mode: "strict"
+    applies_to:
+      - "modules"
+      - "operations"
+      - "components"
+    severity: "medium"
+    remediation: "manual"
+
+# Policy enforcement levels
+enforcement_modes:
+  - mode: "strict"
+    description: "Policy violations block operations"
+    applicable_for: ["production", "security", "governance"]
+  - mode: "advisory"
+    description: "Policy violations generate warnings but don't block"
+    applicable_for: ["development", "testing"]
+  - mode: "disabled"
+    description: "Policy not enforced"
+    applicable_for: ["experimental"]
+
+# Policy severity levels
+severity_levels:
+  - level: "critical"
+    description: "Security or compliance violations that must be blocked"
+    action: "block"
+  - level: "high"
+    description: "Significant violations that should be blocked"
+    action: "block"
+  - level: "medium"
+    description: "Important violations that should be addressed"
+    action: "warn"
+  - level: "low"
+    description: "Minor violations for informational purposes"
+    action: "inform"
+
+# Policy remediation types
+remediation_types:
+  - type: "automatic"
+    description: "System automatically fixes violations"
+    examples: ["naming corrections", "formatting"]
+  - type: "manual"
+    description: "Manual intervention required to fix violations"
+    examples: ["security fixes", "semantic changes"]
+  - type: "semi-automatic"
+    description: "System suggests fixes requiring manual approval"
+    examples: ["dependency updates", "configuration changes"]
+
+# Integration points
+integrations:
+  - name: "GitHub Actions"
+    type: "ci_cd"
+    description: "Policy validation in PR checks"
+    workflows:
+      - "pr-quality-check.yml"
+      - "ai-integration-analyzer.yml"
+    status: "pending"
+    
+  - name: "Policy Gate"
+    type: "workflow"
+    description: "Policy gate for deployment pipelines"
+    implementation: "bin/mno-policy-gate"
+    status: "in_development"
+    
+  - name: "Semantic Health Monitor"
+    type: "monitoring"
+    description: "Real-time semantic health monitoring"
+    implementation: "lib/mno-observability/semantic-health/"
+    status: "pending"
+    
+  - name: "Audit Logger"
+    type: "logging"
+    description: "Policy violation logging and auditing"
+    implementation: "lib/mno-governance/audit-logger/"
+    status: "active"
+
+# Policy statistics
+statistics:
+  total_policies: 4
+  active_policies: 4
+  strict_enforcement: 4
+  critical_severity: 1
+  high_severity: 1
+  medium_severity: 2
+  automatic_remediation: 1
+  manual_remediation: 3
+  integrated_workflows: 2
+  pending_integrations: 2
+
+# VETO authority configuration
+veto_authority:
+  enabled: true
+  veto_policies:
+    - "security"
+    - "semantic"
+  veto_conditions:
+    - "Security policy changes that decrease security level"
+    - "Semantic changes that create namespace conflicts"
+    - "Global Layer autonomy level changes"
+  approval_process: "manual_exception_request"
+
+# Next steps
+next_steps:
+  - "Integrate policies with GitHub Actions workflows"
+  - "Implement policy gate tool (bin/mno-policy-gate)"
+  - "Create policy validation test suite"
+  - "Set up policy violation alerting"
+  - "Develop policy documentation portal"

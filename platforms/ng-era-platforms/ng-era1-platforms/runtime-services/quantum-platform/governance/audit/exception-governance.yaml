@@ -1,0 +1,129 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governance-core
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL90_99-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: governance.machinenativeops.io/v1
+kind: ExceptionGovernance
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:audit:exception-governance.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/audit/exception-governance.yaml"
+  name: gl-quantum-exception-governance
+  namespace: governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-audit
+spec:
+  enabled: true
+  
+  exceptionTypes:
+    - name: naming-violation
+      severity: warning
+      autoApproval: false
+      requiredApprovers: 1
+      maxDuration: 7d
+      
+    - name: security-policy-bypass
+      severity: critical
+      autoApproval: false
+      requiredApprovers: 3
+      maxDuration: 24h
+      
+    - name: governance-policy-bypass
+      severity: high
+      autoApproval: false
+      requiredApprovers: 2
+      maxDuration: 48h
+      
+    - name: deployment-rollout-exception
+      severity: medium
+      autoApproval: false
+      requiredApprovers: 1
+      maxDuration: 72h
+      
+  workflow:
+    request:
+      requiredFields:
+        - exceptionType
+        - reason
+        - justification
+        - impact
+        - mitigation
+        - duration
+        - requester
+        - approvers
+        
+    approval:
+      workflow:
+        - name: technical-review
+          role: tech-lead
+          required: true
+          
+        - name: security-review
+          role: security-lead
+          required: true
+          condition: severity == "critical" || severity == "high"
+          
+        - name: governance-review
+          role: governance-lead
+          required: true
+          
+      conditions:
+        - name: unanimous-approval
+          required: true
+          condition: all approvers must approve
+          
+        - name: quorum
+          required: true
+          minimum: 2
+        
+    enforcement:
+      autoEnforce: true
+      onExpiration:
+        action: revoke
+        notify: ["requester", "approvers"]
+        
+      monitoring:
+        enabled: true
+        alerts:
+          - name: exception-expiring-soon
+            threshold: 24h
+            severity: warning
+            
+          - name: exception-expired
+            threshold: 0h
+            severity: critical
+            
+  audit:
+    logAllDecisions: true
+    include:
+      - request
+      - approvals
+      - denials
+      - expiration
+      - enforcement
+      
+  reporting:
+    enabled: true
+    metrics:
+      - active-exceptions
+      - expired-exceptions
+      - approved-exceptions
+      - denied-exceptions
+      
+    dashboards:
+      - name: exception-governance-dashboard
+        panels:
+          - title: "Active Exceptions by Type"
+          - title: "Exception Approval Rate"
+          - title: "Time to Approval"
+          - title: "Exceptions Expiring Soon"

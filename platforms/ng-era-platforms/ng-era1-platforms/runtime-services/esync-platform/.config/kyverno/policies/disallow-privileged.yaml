@@ -1,0 +1,47 @@
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-privileged
+  annotations:
+    policies.kyverno.io/title: Disallow Privileged Pods
+    policies.kyverno.io/category: Security
+    policies.kyverno.io/severity: high
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+    - name: disallow-privileged-containers
+      match:
+        resources:
+          kinds:
+            - Pod
+      validate:
+        message: "Privileged containers are not allowed"
+        pattern:
+          spec:
+            containers:
+              - =(securityContext):
+                  =(privileged): "false"
+    
+    - name: disallow-privileged-init-containers
+      match:
+        resources:
+          kinds:
+            - Pod
+      validate:
+        message: "Privileged init containers are not allowed"
+        pattern:
+          spec:
+            initContainers:
+              - =(securityContext):
+                  =(privileged): "false"

@@ -1,0 +1,90 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: naming-governance
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL90_99-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sAllowedRepos
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:naming:gatekeeper-constraints.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/naming/gatekeeper-constraints.yaml"
+  name: gl-quantum-naming-constraint
+  namespace: governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-naming
+spec:
+  match:
+    kinds:
+      - apiGroups: ["apps"]
+        kinds: ["Deployment"]
+      - apiGroups: [""]
+        kinds: ["Service"]
+      - apiGroups: ["networking.k8s.io"]
+        kinds: ["Ingress"]
+  parameters:
+    repos:
+      - ".*"
+    namingPattern: "^(dev|staging|prod)-[a-z0-9-]+-(deploy|svc|ing|cm|secret)-v[0-9]+\\.[0-9]+\\.[0-9]+"
+
+---
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:naming:gatekeeper-constraints.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/naming/gatekeeper-constraints.yaml"
+  name: glnamingconvention
+  namespace: governance
+spec:
+  crd:
+    spec:
+      names:
+        kind: GLNamingConvention
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            namingPattern:
+              type: string
+            requiredLabels:
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package glnamingconvention
+        
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Deployment"
+          not re_match(object.get(input.parameters, "namingPattern", ""), input.review.object.metadata.name)
+          msg := sprintf("Deployment name %s does not match naming pattern", [input.review.object.metadata.name])
+        }
+        
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Service"
+          not re_match(object.get(input.parameters, "namingPattern", ""), input.review.object.metadata.name)
+          msg := sprintf("Service name %s does not match naming pattern", [input.review.object.metadata.name])
+        }
+        
+        violation[{"msg": msg}] {
+          required := object.get(input.parameters, "requiredLabels", [])
+          missing_label(required[_])
+          msg := sprintf("Missing required label: %s", [missing])
+        }
+        
+        missing_label[label] {
+          required := object.get(input.parameters, "requiredLabels", [])
+          label := required[_]
+          not input.review.object.metadata.labels[label]
+        }

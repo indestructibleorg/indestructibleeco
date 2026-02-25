@@ -1,0 +1,475 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: root.trust
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# 🔐 Root 信任/憑證/安全配置
+# MachineNativeOps Root Layer Trust Configuration
+# Version: 1.0.0
+
+apiVersion: machinenativeops.io/v1
+kind: RootTrustConfig
+metadata:
+  name: trust-baseline-config
+  namespace: machinenativenops-trust
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    machinenativeops.io/tier: "trust"
+    machinenativeops.io/version: "v1.0.0"
+    machinenativeops.io/component: "trust-configuration"
+  annotations:
+    machinenativeops.io/description: "Root layer trust, certificates and security configuration"
+    machinenativeops.io/last-modified: "2025-12-20T22:00:00Z"
+
+spec:
+  # === 信任根 (Trust Roots) ===
+  trust_roots:
+    - name: "system-root-ca"
+      description: "System root certificate authority"
+      type: "root_ca"
+      status: "active"
+      certificate_id: "mno-root-ca-001"
+      public_key_path: "/etc/machinenativenops/trust/roots/system-root-ca.pem"
+      key_algorithm: "RSA-4096"
+      signature_algorithm: "SHA256withRSA"
+      validity_period: "10y"
+      auto_rotation: false
+      backup_required: true
+      recovery_procedures:
+        - "offline_backup_restoration"
+        - "emergency_reissuance"
+        
+    - name: "intermediate-ca-01"
+      description: "Intermediate certificate authority for system components"
+      type: "intermediate_ca"
+      status: "active"
+      certificate_id: "mno-intermediate-ca-001"
+      parent_ca: "system-root-ca"
+      public_key_path: "/etc/machinenativenops/trust/roots/intermediate-ca-01.pem"
+      private_key_path: "/etc/machinenativenops/trust/keys/intermediate-ca-01.key"
+      key_algorithm: "RSA-4096"
+      signature_algorithm: "SHA256withRSA"
+      validity_period: "5y"
+      auto_rotation: true
+      rotation_period: "4y"
+      backup_required: true
+        
+    - name: "intermediate-ca-02"
+      description: "Intermediate certificate authority for external entities"
+      type: "intermediate_ca"
+      status: "active"
+      certificate_id: "mno-intermediate-ca-002"
+      parent_ca: "system-root-ca"
+      public_key_path: "/etc/machinenativenops/trust/roots/intermediate-ca-02.pem"
+      private_key_path: "/etc/machinenativenops/trust/keys/intermediate-ca-02.key"
+      key_algorithm: "RSA-4096"
+      signature_algorithm: "SHA256withRSA"
+      validity_period: "5y"
+      auto_rotation: true
+      rotation_period: "4y"
+      backup_required: true
+
+  # === 憑證授權單位 (Certificate Authorities) ===
+  certificate_authorities:
+    - name: "system-ca"
+      description: "Internal system certificate authority"
+      type: "internal"
+      ca_certificate: "intermediate-ca-01"
+      issuing_policy:
+        - certificate_type: "server"
+          allowed_subjects: ["*.machinenativenops.local", "*.svc.cluster.local"]
+          key_usage: ["digitalSignature", "keyEncipherment"]
+          extended_key_usage: ["serverAuth", "clientAuth"]
+          max_validity: "1y"
+        - certificate_type: "client"
+          allowed_subjects: ["*.machinenativenops.local", "system-.*"]
+          key_usage: ["digitalSignature"]
+          extended_key_usage: ["clientAuth"]
+          max_validity: "1y"
+        - certificate_type: "code_signing"
+          allowed_subjects: ["machinenativenops-*"]
+          key_usage: ["digitalSignature"]
+          extended_key_usage: ["codeSigning"]
+          max_validity: "6m"
+      revocation:
+        method: "ocsp"
+        ocsp_url: "http://ocsp.machinenativenops.local:8080"
+        crl_url: "http://crl.machinenativenops.local/crl.crl"
+        update_interval: "1h"
+        
+    - name: "external-ca"
+      description: "External certificate authority for third-party integrations"
+      type: "external"
+      ca_certificate: "intermediate-ca-02"
+      trusted_external_cas:
+        - name: "letsencrypt-r3"
+          certificate_path: "/etc/machinenativenops/trust/external/letsencrypt-r3.pem"
+          purpose: "server_authentication"
+        - name: "digicert-global-ca"
+          certificate_path: "/etc/machinenativenops/trust/external/digicert-global-ca.pem"
+          purpose: "server_authentication"
+        - name: "amazon-root-ca-1"
+          certificate_path: "/etc/machinenativenops/trust/external/amazon-root-ca-1.pem"
+          purpose: "server_authentication"
+
+  # === 驗證策略 (Verification Policies) ===
+  verification_policies:
+    - name: "strict-tls-verification"
+      description: "Strict TLS verification policy for internal communications"
+      enabled: true
+      scope:
+        - "internal_services"
+        - "database_connections"
+        - "message_queues"
+      requirements:
+        - "mutual_tls_required: true"
+        - "certificate_validation: strict"
+        - "hostname_verification: true"
+        - "certificate_chain_validation: true"
+        - "ocsp_stapling: true"
+      exceptions:
+        - scenario: "emergency_recovery"
+          requirement: "mutual_tls_required"
+          override_value: false
+          approval_required: true
+          
+    - name: "code-signing-verification"
+      description: "Code signing verification policy"
+      enabled: true
+      scope:
+        - "executable_files"
+        - "python_modules"
+        - "container_images"
+        - "configuration_files"
+      requirements:
+        - "signature_verification: required"
+        - "certificate_trust: system-ca"
+        - "timestamp_verification: true"
+        - "hash_verification: sha256"
+      trusted_signers:
+        - "system-code-signer"
+        - "official-build-system"
+        
+    - name: "data-integrity-verification"
+      description: "Data integrity verification policy"
+      enabled: true
+      scope:
+        - "configuration_files"
+        - "audit_logs"
+        - "backup_files"
+        - "migration_data"
+      requirements:
+        - "digital_signature: required"
+        - "hash_verification: sha256"
+        - "merkle_tree_verification: true"
+        - "timestamp_verification: true"
+      verification_frequency: "on_access"
+
+  # === 證明捆綁包 (Attestation Bundles) ===
+  attestation_bundles:
+    - name: "system-boot-attestation"
+      description: "System boot integrity attestation"
+      version: "1.0"
+      bundle_type: "boot_integrity"
+      required_for: "system_startup"
+      attesters:
+        - name: "tpm-attester"
+          type: "hardware"
+          measurement_type: "pcr"
+          required_measurements: [0, 1, 2, 3, 4, 5, 6, 7]
+        - name: "secure-boot-attester"
+          type: "firmware"
+          verification_method: "uefi_secure_boot"
+        - name: "disk-attester"
+          type: "disk"
+          measurement_type: "disk_hash"
+          algorithm: "sha256"
+      evidence_collection:
+        - "boot_loader_hash"
+        - "kernel_hash"
+        - "initramfs_hash"
+        - "critical_config_hash"
+      validation_policy:
+        - "measurements_match_baseline: true"
+        - "signature_valid: true"
+        - "timestamp_within_window: 24h"
+        
+    - name: "module-deployment-attestation"
+      description: "Module deployment integrity attestation"
+      version: "1.0"
+      bundle_type: "deployment_integrity"
+      required_for: "module_deployment"
+      attesters:
+        - name: "build-system-attester"
+          type: "build"
+          verification_method: "build_pipeline_signature"
+        - name: "repository-attester"
+          type: "repository"
+          verification_method: "git_commit_signature"
+        - name: "container-attester"
+          type: "container"
+          verification_method: "image_signature"
+      evidence_collection:
+        - "source_code_hash"
+        - "build_artifact_hash"
+        - "container_image_hash"
+        - "deployment_config_hash"
+      validation_policy:
+        - "all_signatures_valid: true"
+        - "hashes_match_expected: true"
+        - "approval_chain_complete: true"
+        
+    - name: "configuration-change-attestation"
+      description: "Configuration change attestation"
+      version: "1.0"
+      bundle_type: "config_integrity"
+      required_for: "configuration_change"
+      attesters:
+        - name: "config-author-attester"
+          type: "human"
+          verification_method: "digital_signature"
+        - name: "reviewer-attester"
+          type: "human"
+          verification_method: "approval_signature"
+        - name: "system-attester"
+          type: "automated"
+          verification_method: "system_signature"
+      evidence_collection:
+        - "config_before_hash"
+        - "config_after_hash"
+        - "change_request_id"
+        - "approval_chain_signatures"
+      validation_policy:
+        - "required_approvals_present: true"
+        - "signature_chain_valid: true"
+        - "change_authorized: true"
+
+  # === 金鑰管理 ===
+  key_management:
+    - name: "root-ca-key"
+      description: "Root CA private key"
+      key_type: "rsa"
+      key_size: 4096
+      storage:
+        type: "hsm"
+        hsm_name: "primary_hsm"
+        key_id: "root_ca_key"
+        backup_hsm: "backup_hsm"
+      access_policy:
+        - "key_usage: key_cert_sign, crl_sign"
+        - "access_time: business_hours_only"
+        - "mfa_required: true"
+        - "approval_required: true"
+        - "audit_required: true"
+      rotation:
+        enabled: false  # Root CA typically doesn't rotate
+        emergency_rotation: true
+        
+    - name: "intermediate-ca-key"
+      description: "Intermediate CA private key"
+      key_type: "rsa"
+      key_size: 4096
+      storage:
+        type: "hsm"
+        hsm_name: "primary_hsm"
+        key_id: "intermediate_ca_key"
+        backup_location: "/secure/backup/intermediate_ca.key.enc"
+      access_policy:
+        - "key_usage: key_cert_sign, crl_sign"
+        - "access_time: any_time"
+        - "mfa_required: true"
+        - "approval_required: false"
+        - "audit_required: true"
+      rotation:
+        enabled: true
+        rotation_period: "4y"
+        overlap_period: "3m"
+        
+    - name: "system-signing-key"
+      description: "System code signing key"
+      key_type: "ecdsa"
+      curve: "P-384"
+      storage:
+        type: "hsm"
+        hsm_name: "primary_hsm"
+        key_id: "system_signing_key"
+      access_policy:
+        - "key_usage: digital_signature"
+        - "access_time: build_hours_only"
+        - "mfa_required: true"
+        - "approval_required: false"
+        - "audit_required: true"
+      rotation:
+        enabled: true
+        rotation_period: "1y"
+        overlap_period: "1m"
+
+  # === 信任鏈驗證 ===
+  trust_chain_validation:
+    - name: "certificate-chain-validation"
+      description: "Validate certificate chains against trust roots"
+      enabled: true
+      validation_rules:
+        - "certificate_chain_length: <= 5"
+        - "intermediate_ca_count: <= 3"
+        - "root_ca_trusted: true"
+        - "signature_algorithm_valid: true"
+        - "key_usage_appropriate: true"
+        - "extended_key_usage_valid: true"
+        - "certificate_not_expired: true"
+        - "certificate_not_revoked: true"
+      ocsp_validation:
+        enabled: true
+        timeout: "10s"
+        fallback_to_crl: true
+      crl_validation:
+        enabled: true
+        update_interval: "1h"
+        distribution_points:
+          - "http://crl.machinenativenops.local/crl.crl"
+          
+    - name: "path-validation"
+      description: "Validate trust paths for specific use cases"
+      enabled: true
+      validation_profiles:
+        - name: "server-authentication"
+          required_ekus: ["serverAuth"]
+          max_path_length: 3
+          require_ocsp_stapling: true
+        - name: "client-authentication"
+          required_ekus: ["clientAuth"]
+          max_path_length: 2
+          require_ocsp_stapling: false
+        - name: "code-signing"
+          required_ekus: ["codeSigning"]
+          max_path_length: 3
+          require_timestamp: true
+
+  # === 安全策略 ===
+  security_policies:
+    - name: "certificate-policy"
+      description: "Certificate issuance and management policies"
+      issuance_rules:
+        - "minimum_key_size_rsa: 2048"
+        - "minimum_key_size_ecdsa: 256"
+        - "allowed_signature_algorithms: [SHA256withRSA, SHA384withRSA, SHA512withRSA, ECDSAwithSHA256, ECDSAwithSHA384, ECDSAwithSHA512]"
+        - "forbidden_signature_algorithms: [SHA1withRSA, MD5withRSA]"
+        - "maximum_validity_period_server: 1y"
+        - "maximum_validity_period_client: 1y"
+        - "maximum_validity_period_code_signing: 6m"
+      renewal_rules:
+        - "renewal_start_period: 30d_before_expiry"
+        - "renewal_reminder_period: 7d_before_expiry"
+        - "auto_renewal_enabled: true"
+        - "manual_approval_required: false"
+        
+    - name: "key-usage-policy"
+      description: "Key usage and protection policies"
+      usage_rules:
+        - "private_key_export_prohibited: true"
+        - "key_derivation_allowed: false"
+        - "key_backup_required: true"
+        - "key_escrow_enabled: false"
+        - "session_key_derivation: true"
+      protection_rules:
+        - "hsm_protection_required: true"
+        - "mfa_access_required: true"
+        - "audit_access_required: true"
+        - "dual_control_required: true"
+
+status:
+  phase: "Active"
+  conditions:
+    - type: "TrustRootsEstablished"
+      status: "True"
+      lastTransitionTime: "2025-12-20T22:00:00Z"
+      reason: "TrustRootsConfigured"
+      message: "All trust roots established and operational"
+    - type: "CertificateAuthoritiesOperational"
+      status: "True"
+      lastTransitionTime: "2025-12-20T22:00:00Z"
+      reason: "CAsReady"
+      message: "Certificate authorities are operational and issuing certificates"
+    - type: "VerificationPoliciesActive"
+      status: "True"
+      lastTransitionTime: "2025-12-20T22:00:00Z"
+      reason: "PoliciesEnabled"
+      message: "All verification policies are active and enforced"
+
+---
+# Trust Schema 定義
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trust-schema
+  namespace: machinenativenops-trust
+data:
+  schema.yaml: |
+    # Root Trust Configuration Schema
+    type: object
+    properties:
+      trust_roots:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            type:
+              type: string
+              enum: ["root_ca", "intermediate_ca"]
+            status:
+              type: string
+              enum: ["active", "inactive", "revoked"]
+            certificate_id:
+              type: string
+            key_algorithm:
+              type: string
+            signature_algorithm:
+              type: string
+            validity_period:
+              type: string
+            auto_rotation:
+              type: boolean
+          required: ["name", "description", "type", "status", "certificate_id", "key_algorithm", "signature_algorithm"]
+      certificate_authorities:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            type:
+              type: string
+              enum: ["internal", "external"]
+            ca_certificate:
+              type: string
+            issuing_policy:
+              type: array
+            revocation:
+              type: object
+          required: ["name", "description", "type", "ca_certificate"]
+      verification_policies:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            enabled:
+              type: boolean
+            scope:
+              type: array
+            requirements:
+              type: object
+          required: ["name", "description", "enabled", "scope", "requirements"]
+    required: ["trust_roots", "certificate_authorities", "verification_policies"]

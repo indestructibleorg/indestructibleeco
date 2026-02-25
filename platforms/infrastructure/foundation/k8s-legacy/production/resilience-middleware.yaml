@@ -1,0 +1,167 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: resilience-middleware
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resilience-middleware
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: resilience-middleware
+    environment: production
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: resilience-middleware
+      environment: production
+  template:
+    metadata:
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        app.kubernetes.io/name: resilience-middleware
+        environment: production
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8001"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: resilience-middleware
+      containers:
+      - name: middleware
+        image: ghcr.io/machinenativeops/resilience-middleware:latest
+        imagePullPolicy: Always
+        
+        ports:
+        - name: http
+          containerPort: 8001
+          protocol: TCP
+        
+        env:
+        - name: ENVIRONMENT
+          value: "production"
+        - name: LOG_LEVEL
+          value: "INFO"
+        - name: RESILIENCE_CONFIG_PATH
+          value: "/config/resilience-policies.yaml"
+        
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          readOnly: true
+        
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      
+      volumes:
+      - name: config
+        configMap:
+          name: resilience-policies
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: resilience-middleware
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: resilience-middleware
+    environment: production
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "15020"
+    prometheus.io/path: "/stats/prometheus"
+spec:
+  ports:
+  - name: http
+    port: 8001
+    targetPort: http
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: resilience-middleware
+    environment: production
+  sessionAffinity: ClientIP
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: resilience-middleware-hpa
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: resilience-middleware
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: resilience-middleware
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: resilience-middleware
+  namespace: production
+automountServiceAccountToken: false

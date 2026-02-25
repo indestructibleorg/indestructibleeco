@@ -1,0 +1,31 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: kubernetes-limitrange
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+#
+# GL Unified Architecture Governance Framework Activated
+# Kubernetes Base LimitRange Manifest
+
+apiVersion: v1
+kind: LimitRange
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:kubernetes:manifests:base:limitrange.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/kubernetes/manifests/base/limitrange.yaml"
+  name: machine-native-ops-limits
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: machine-native-ops
+    app.kubernetes.io/app.kubernetes.io/component: resource-limits
+    governance.machinenativeops.io/charter-version: "2.0.0"
+spec:
+  limits:
+    - default:
+        cpu: "500m"
+        memory: "512Mi"
+      defaultRequest:
+        cpu: "100m"
+        memory: "128Mi"
+      type: Container

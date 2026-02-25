@@ -1,0 +1,479 @@
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-platform-ecosystem/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-platform-ecosystem/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-platform-ecosystem/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: gl-runtime.io/v1.0.0
+kind: UnificationSpecification
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:contracts:structural-unification-spec.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/contracts/structural-unification-spec.yaml"
+  name: structural-unification-spec
+  version: v1.0.0
+  description: "GL Structural Unification Specification - 結構統一規範"
+  namespace: gl-platform-ecosystem
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    unification.level: L1
+    unification.type: structural
+    governance.layer: constitutional
+spec:
+  ## Project Structure
+  project-structure:
+    version: v1.0.0
+    description: "GL Platform Enterprise Architecture 專案結構定義"
+    
+    root-directories:
+      - name: platforms
+        description: "平台實現層"
+        purpose: "存放所有 GL 平台的實現代碼"
+        sub-structure:
+          - pattern: "gl-<domain>-<capability>-platform/"
+            example: "gl-runtime-dag-platform/"
+        
+      - name: contracts
+        description: "架構契約層"
+        purpose: "存放全局性契約與規範"
+        sub-structure:
+          - "unification-specs/"
+          - "platform-contracts/"
+          - "api-contracts/"
+          - "governance-contracts/"
+        
+      - name: governance
+        description: "治理層"
+        purpose: "存放所有治理策略與驗證器"
+        sub-structure:
+          - "naming-governance/"
+          - "policies/"
+          - "validators/"
+          - "audit-trails/"
+        
+      - name: workflows
+        description: "自動化工作流層"
+        purpose: "存放全局工作流定義"
+        sub-structure:
+          - "validation/"
+          - "fix/"
+          - "audit/"
+          - "deployment/"
+        
+      - name: observability
+        description: "可觀測性層"
+        purpose: "存放監控、日誌、追蹤配置"
+        sub-structure:
+          - "monitoring/"
+          - "logging/"
+          - "tracing/"
+          - "metrics/"
+        
+      - name: artifacts
+        description: "構件管理層"
+        purpose: "存放構建產物與部署包"
+        sub-structure:
+          - "builds/"
+          - "packages/"
+          - "releases/"
+          - "templates/"
+        
+      - name: scripts
+        description: "工具腳本層"
+        purpose: "存放自動化腳本與工具"
+        sub-structure:
+          - "validation/"
+          - "fix/"
+          - "deployment/"
+          - "maintenance/"
+      
+      - name: libraries
+        description: "共用程式庫"
+        purpose: "存放跨平台共享的程式庫"
+        sub-structure:
+          - "common/"
+          - "utils/"
+          - "sdk/"
+          - "frameworks/"
+      
+      - name: schemas
+        description: "Schema 定義"
+        purpose: "存放所有 YAML/JSON schema"
+        sub-structure:
+          - "api/"
+          - "config/"
+          - "governance/"
+          - "platform/"
+      
+      - name: metadata
+        description: "元數據與索引"
+        purpose: "存放語意圖、索引、registry"
+        sub-structure:
+          - "semantic-graph/"
+          - "index/"
+          - "registry/"
+          - "catalog/"
+      
+      - name: registry
+        description: "註冊表"
+        purpose: "存放 domain、capability、resource 註冊表"
+        sub-structure:
+          - "domains/"
+          - "capabilities/"
+          - "resources/"
+          - "components/"
+    
+    ## Naming Governance Sub-Structure
+    naming-governance-structure:
+      description: "命名治理專案的詳細結構"
+      directories:
+        - name: contracts
+          purpose: "命名治理相關的契約"
+          contents:
+            - "naming-contract.yaml"
+            - "semantic-contract.yaml"
+            - "structural-contract.yaml"
+            - "governance-contract.yaml"
+        
+        - name: policies
+          purpose: "命名治理相關的策略"
+          contents:
+            - "naming.rego"
+            - "semantic-validation.rego"
+            - "structural-validation.rego"
+            - "governance-enforcement.rego"
+        
+        - name: validators
+          purpose: "驗證工具"
+          contents:
+            - "naming-validator.py"
+            - "semantic-validator.py"
+            - "structural-validator.py"
+            - "governance-validator.py"
+        
+        - name: fixers
+          purpose: "修復工具"
+          contents:
+            - "naming-fixer.py"
+            - "semantic-fixer.py"
+            - "refactoring-tools/"
+        
+        - name: observability
+          purpose: "可觀測性"
+          contents:
+            - "metrics.yaml"
+            - "logging.yaml"
+            - "tracing.yaml"
+            - "dashboards/"
+        
+        - name: registry
+          purpose: "命名註冊表"
+          contents:
+            - "domain-registry.yaml"
+            - "capability-registry.yaml"
+            - "resource-registry.yaml"
+            - "abbreviation-registry.yaml"
+        
+        - name: workflows
+          purpose: "工作流程"
+          contents:
+            - "validation-workflow.yaml"
+            - "fix-workflow.yaml"
+            - "audit-workflow.yaml"
+            - "migration-workflow.yaml"
+        
+        - name: templates
+          purpose: "模板文件"
+          contents:
+            - "platform-template/"
+            - "service-template/"
+            - "contract-template/"
+            - "policy-template/"
+        
+        - name: examples
+          purpose: "示例文件"
+          contents:
+            - "platform-examples/"
+            - "service-examples/"
+            - "naming-examples/"
+            - "governance-examples/"
+        
+        - name: tests
+          purpose: "測試文件"
+          contents:
+            - "unit-tests/"
+            - "integration-tests/"
+            - "e2e-tests/"
+            - "validation-tests/"
+  
+  ## Contract Structure
+  contract-structure:
+    version: v1.0.0
+    description: "契約結構定義"
+    
+    contract-schema:
+      - directory: schema/
+        description: "契約 schema 定義"
+        contents:
+          - "contract-schema.json"
+          - "platform-schema.json"
+          - "capability-schema.json"
+          - "governance-schema.json"
+      
+      - directory: index.yaml
+        description: "契約索引文件"
+        required: true
+        fields:
+          - contract_id
+          - version
+          - type
+          - status
+          - dependencies[]
+      
+      - directory: compatibility.yaml
+        description: "版本相容性矩陣"
+        required: true
+        fields:
+          - version
+          - compatible_versions[]
+          - breaking_changes[]
+          - migration_paths[]
+      
+      - directory: lifecycle.yaml
+        description: "契約生命週期定義"
+        required: true
+        fields:
+          - lifecycle_states[]
+          - transition_rules[]
+          - deprecation_policy
+          - versioning_strategy
+  
+  ## Path Integrity
+  path-integrity:
+    version: v1.0.0
+    description: "路徑完整性規範"
+    
+    rules:
+      ## Symbolic Links
+      no-symlink:
+        enabled: true
+        description: "禁止使用符號鏈接"
+        scope:
+          - "platforms/"
+          - "contracts/"
+          - "governance/"
+          - "workflows/"
+        exceptions:
+          - "/gl-runtime (allowed symlink to /workspace/machine-native-ops/gl-execution-runtime)"
+      
+      ## Hard Links
+      no-hardlink:
+        enabled: true
+        description: "禁止使用硬鏈接"
+        scope:
+          - "platforms/"
+          - "contracts/"
+          - "governance/"
+        exceptions: []
+      
+      ## Cross-Platform Paths
+      no-cross-platform-path:
+        enabled: true
+        description: "禁止跨平台路徑引用"
+        rule: "所有引用必須在同一平台內或使用契約層引用"
+        examples:
+          bad:
+            - "../../../other-platform/config.yaml"
+            - "/absolute/path/to/resource"
+          good:
+            - "./config.yaml"
+            - "./contracts/contract.yaml"
+            - "/gl-platform-ecosystem/contracts/shared.yaml"
+      
+      ## Relative Path Outside Platform
+      no-relative-path-outside-platform:
+        enabled: true
+        description: "禁止相對路徑跳出平台目錄"
+        rule: "相對路徑不能使用 ../ 跳出平台根目錄"
+        examples:
+          bad:
+            - "../../config.yaml"
+            - "../../../common/utils.yaml"
+          good:
+            - "./config.yaml"
+            - "contracts/config.yaml"
+      
+      ## Hidden Files
+      no-hidden-files:
+        enabled: true
+        description: "隱藏文件規範"
+        allowed:
+          - ".git"
+          - ".github/"
+          - ".gitignore"
+          - ".governance/"
+          - ".*.yaml"
+          - ".*.json"
+        prohibited:
+          - ".DS_Store"
+          - "Thumbs.db"
+          - ".swp"
+          - ".swo"
+      
+      ## Random Temp Paths
+      no-random-temp-path:
+        enabled: true
+        description: "禁止隨機臨時路徑"
+        rule: "所有路徑必須是確定性的、可預測的"
+        examples:
+          bad:
+            - "/tmp/random-12345/"
+            - "/tmp/temp-abcde/"
+          good:
+            - "/tmp/gl-build-<version>/"
+            - "/tmp/gl-cache-<component>/"
+  
+  ## Platform Directory Naming
+  platform-directory-naming:
+    version: v1.0.0
+    description: "平台目錄命名規範"
+    
+    format: "gl-<domain>-<capability>-platform/"
+    
+    rules:
+      - rule: "全小寫"
+      - rule: "必須使用 kebab-case"
+      - rule: "必須以 gl- 開頭"
+      - rule: "domain 必須是語意分類"
+      - rule: "capability 必須是平台能力"
+      - rule: "結尾必須是 -platform"
+    
+    examples:
+      valid:
+        - "gl-runtime-dag-platform/"
+        - "gl-quantum-compute-platform/"
+        - "gl-api-schema-platform/"
+        - "gl-agent-max-platform/"
+        - "gl-multimodal-vision-platform/"
+        - "gl-database-shard-platform/"
+      
+      invalid:
+        - "RuntimeDAGPlatform/"
+        - "gl_runtime_dag_platform/"
+        - "runtime-dag-platform/"
+        - "ECO-Runtime-DAG-Platform/"
+        - "gl-execution-runtime/"
+    
+    ## Sub-Directory Naming
+    sub-directories:
+      - src/
+      - src/api/
+      - src/core/
+      - src/adapters/
+      - src/services/
+      - src/models/
+      - src/controllers/
+      - src/workflows/
+      - src/agents/
+      - src/pipelines/
+      - tests/
+      - docs/
+      - configs/
+      - contracts/
+      - governance/
+  
+  ## File Naming
+  file-naming:
+    version: v1.0.0
+    description: "檔案命名規範"
+    
+    format: "gl-<domain>-<capability>-<resource>.<ext>"
+    
+    rules:
+      - rule: "全小寫"
+      - rule: "必須使用 kebab-case"
+      - rule: "必須以 gl- 開頭（平台層）"
+      - rule: "resource 必須是語意化名詞"
+      - rule: "檔案類型必須明確"
+    
+    core-files:
+      - "platform.config.yaml"
+      - "platform.contract.yaml"
+      - "platform.capabilities.yaml"
+      - "platform.dependencies.yaml"
+      - "platform.metadata.yaml"
+    
+    api-files:
+      - "gl-api-schema-user.yaml"
+      - "gl-api-schema-auth.yaml"
+      - "gl-api-schema-product.yaml"
+    
+    agent-files:
+      - "gl-agent-max-behavior.yaml"
+      - "gl-agent-max-rules.yaml"
+      - "gl-agent-max-actions.yaml"
+    
+    pipeline-files:
+      - "gl-runtime-dag-execution.yaml"
+      - "gl-runtime-dag-validation.yaml"
+    
+    governance-files:
+      - "gl-governance-policy-runtime.yaml"
+      - "gl-governance-policy-security.yaml"
+      - "gl-governance-policy-compliance.yaml"
+    
+    semantic-graph-files:
+      - "gl-semantic-nodes.yaml"
+      - "gl-semantic-edges.yaml"
+      - "gl-semantic-metadata.yaml"
+  
+  ## Service Structure
+  service-structure:
+    version: v1.0.0
+    description: "服務結構定義"
+    
+    naming: "gl-<domain>-<capability>-svc"
+    
+    deployment:
+      name: "gl-<domain>-<capability>-<deployment>"
+      format:
+        - "gl-runtime-dag-deployment"
+        - "gl-api-schema-deployment"
+        - "gl-agent-max-deployment"
+    
+    service:
+      name: "gl-<domain>-<capability>-svc"
+      format:
+        - "gl-runtime-dag-svc"
+        - "gl-api-schema-svc"
+        - "gl-agent-max-svc"
+    
+    configmap:
+      name: "gl-<domain>-<capability>-config"
+      format:
+        - "gl-runtime-dag-config"
+        - "gl-api-schema-config"
+        - "gl-agent-max-config"
+    
+    secret:
+      name: "gl-<domain>-<capability>-secret"
+      format:
+        - "gl-runtime-dag-secret"
+        - "gl-api-schema-secret"
+        - "gl-agent-max-secret"
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:contracts:structural-unification-spec.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/contracts/structural-unification-spec.yaml"
+  created_at: "2026-01-31T00:00:00Z"
+  updated_at: "2026-01-31T00:00:00Z"
+  governance_level: CONSTITUTIONAL
+  enforcement: MANDATORY
+  compatibility:
+    - v1.0.0

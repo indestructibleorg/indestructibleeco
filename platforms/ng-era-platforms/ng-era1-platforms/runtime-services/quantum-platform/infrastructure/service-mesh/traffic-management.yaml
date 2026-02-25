@@ -1,0 +1,133 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: servicemesh.machinenativeops.io/v1
+kind: TrafficManagement
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:infrastructure:service-mesh:traffic-management.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/infrastructure/service-mesh/traffic-management.yaml"
+  name: gl-quantum-traffic-management
+  namespace: infrastructure
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-servicemesh
+spec:
+  enabled: true
+  
+  canaryDeployments:
+    - name: gl-quantum-api-canary
+      description: "Canary deployment for API service"
+      service: gl-quantum-api
+      namespace: gl-quantum-prod
+      
+      canary:
+        enabled: true
+        steps:
+          - setWeight: 10
+          - pause: { duration: 5m }
+          - setWeight: 25
+          - pause: { duration: 10m }
+          - setWeight: 50
+          - pause: { duration: 15m }
+          - setWeight: 75
+          - pause: { duration: 10m }
+          - setWeight: 100
+          
+        analysis:
+          enabled: true
+          interval: 1m
+          iterations: 10
+          metrics:
+            - name: request-success-rate
+              thresholdRange:
+                min: 95
+            - name: request-duration
+              thresholdRange:
+                max: 500
+          webhooks:
+            - name: rollback-webhook
+              url: "https://webhook.gl-quantum.machinenativeops.com/rollback"
+              
+      trafficRouting:
+        canarySubsetName: v2
+        stableSubsetName: v1
+        
+  blueGreenDeployments:
+    - name: gl-quantum-worker-bluegreen
+      description: "Blue-green deployment for worker service"
+      service: gl-quantum-worker
+      namespace: gl-quantum-prod
+      
+      blueGreen:
+        enabled: true
+        activeService: gl-quantum-worker
+        previewService: gl-quantum-worker-preview
+        
+        autoPromotionEnabled: false
+        autoPromotionSeconds: 600
+        
+        scalePreviewReplicaCount: 1
+        
+      trafficRouting:
+        activeService: gl-quantum-worker
+        previewService: gl-quantum-worker-preview
+        
+  a_b_testing:
+    - name: api-a-b-test
+      description: "A/B testing for API endpoints"
+      service: gl-quantum-api
+      namespace: gl-quantum-prod
+      
+      matchConditions:
+        - headers:
+            x-variant:
+              exact: "A"
+          route:
+            - destination:
+                host: gl-quantum-api
+                subset: v1
+              
+        - headers:
+            x-variant:
+              exact: "B"
+          route:
+            - destination:
+                host: gl-quantum-api
+                subset: v2
+              
+  loadBalancing:
+    - name: api-load-balancing
+      description: "Load balancing for API service"
+      service: gl-quantum-api
+      namespace: gl-quantum-prod
+      
+      strategy: LEAST_CONN
+      
+      consistentHash:
+        httpCookie:
+          name: user_session
+          ttl: 300s
+          
+  mirroring:
+    - name: api-mirroring
+      description: "Traffic mirroring for testing"
+      service: gl-quantum-api
+      namespace: gl-quantum-prod
+      
+      mirrorTo:
+        host: gl-quantum-api-test
+        subset: v1
+        
+      mirrorPercentage:
+        value: 10

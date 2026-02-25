@@ -1,0 +1,646 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: root.modules
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: machinenativeops.io/v1
+kind: RootModulesConfig
+metadata:
+  name: modules-registry-config
+  namespace: machinenativenops-modules
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    machinenativeops.io/tier: modules
+    machinenativeops.io/version: v1.0.0
+    machinenativeops.io/app.kubernetes.io/component: modules-registry
+  annotations:
+    machinenativeops.io/description: Root layer modules registration and dependency management
+    machinenativeops.io/last-modified: '2025-12-20T22:00:00Z'
+spec:
+  modules:
+  - name: governance-engine
+    version: 1.0.0
+    description: Core governance and policy enforcement engine
+    entrypoint: /opt/machinenativenops/modules/governance-engine/main.py
+    group: core
+    priority: 100
+    enabled: true
+    auto_start: true
+    health_check:
+      endpoint: /health
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    dependencies:
+    - name: config-manager
+      version: '>=1.0.0'
+      optional: false
+    - name: logging-service
+      version: '>=1.0.0'
+      optional: false
+    - name: database-connector
+      version: '>=1.0.0'
+      optional: false
+    resources:
+      cpu:
+        request: 200m
+        limit: 1000m
+      memory:
+        request: 256Mi
+        limit: 1Gi
+      storage:
+        request: 100Mi
+        limit: 500Mi
+    environment:
+    - name: GOVERNANCE_MODE
+      value: enforce
+    - name: POLICY_REFRESH_INTERVAL
+      value: '300'
+    - name: AUDIT_RETENTION_DAYS
+      value: '2555'
+  - name: trust-manager
+    version: 1.0.0
+    description: Trust chain and certificate management system
+    entrypoint: /opt/machinenativenops/modules/trust-manager/main.py
+    group: security
+    priority: 90
+    enabled: true
+    auto_start: true
+    health_check:
+      endpoint: /health
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    dependencies:
+    - name: config-manager
+      version: '>=1.0.0'
+      optional: false
+    - name: crypto-provider
+      version: '>=1.0.0'
+      optional: false
+    - name: storage-backend
+      version: '>=1.0.0'
+      optional: false
+    resources:
+      cpu:
+        request: 100m
+        limit: 500m
+      memory:
+        request: 128Mi
+        limit: 512Mi
+      storage:
+        request: 500Mi
+        limit: 2Gi
+    environment:
+    - name: CERT_ROTATION_PERIOD
+      value: '7776000'
+    - name: TRUST_STORE_PATH
+      value: /etc/machinenativenops/trust
+    - name: KEY_ALGORITHM
+      value: RSA-4096
+  - name: provenance-tracker
+    version: 1.0.0
+    description: Provenance and audit trail tracking system
+    entrypoint: /opt/machinenativenops/modules/provenance-tracker/main.py
+    group: security
+    priority: 85
+    enabled: true
+    auto_start: true
+    health_check:
+      endpoint: /health
+      interval: 60s
+      timeout: 15s
+      retries: 3
+    dependencies:
+    - name: config-manager
+      version: '>=1.0.0'
+      optional: false
+    - name: database-connector
+      version: '>=1.0.0'
+      optional: false
+    - name: hash-calculator
+      version: '>=1.0.0'
+      optional: false
+    resources:
+      cpu:
+        request: 150m
+        limit: 800m
+      memory:
+        request: 512Mi
+        limit: 2Gi
+      storage:
+        request: 1Gi
+        limit: 10Gi
+    environment:
+    - name: PROVENANCE_RETENTION_YEARS
+      value: '7'
+    - name: HASH_ALGORITHM
+      value: SHA-256
+    - name: COMPRESSION_ENABLED
+      value: 'true'
+  - name: integrity-validator
+    version: 1.0.0
+    description: System integrity validation and drift detection
+    entrypoint: /opt/machinenativenops/modules/integrity-validator/main.py
+    group: security
+    priority: 80
+    enabled: true
+    auto_start: true
+    health_check:
+      endpoint: /health
+      interval: 300s
+      timeout: 30s
+      retries: 3
+    dependencies:
+    - name: config-manager
+      version: '>=1.0.0'
+      optional: false
+    - name: hash-calculator
+      version: '>=1.0.0'
+      optional: false
+    - name: notification-service
+      version: '>=1.0.0'
+      optional: true
+    resources:
+      cpu:
+        request: 100m
+        limit: 400m
+      memory:
+        request: 256Mi
+        limit: 1Gi
+      storage:
+        request: 100Mi
+        limit: 1Gi
+    environment:
+    - name: VALIDATION_INTERVAL
+      value: '3600'
+    - name: DRIFT_THRESHOLD
+      value: '0.01'
+    - name: AUTO_REPAIR_ENABLED
+      value: 'false'
+  - name: super-execution-engine
+    version: 1.0.0
+    description: Cross-system execution and workflow orchestration
+    entrypoint: /opt/machinenativenops/modules/super-execution-engine/main.py
+    group: execution
+    priority: 70
+    enabled: true
+    auto_start: true
+    health_check:
+      endpoint: /health
+      interval: 30s
+      timeout: 15s
+      retries: 3
+    dependencies:
+    - name: config-manager
+      version: '>=1.0.0'
+      optional: false
+    - name: workflow-engine
+      version: '>=1.0.0'
+      optional: false
+    - name: task-queue
+      version: '>=1.0.0'
+      optional: false
+    - name: governance-engine
+      version: '>=1.0.0'
+      optional: false
+    resources:
+      cpu:
+        request: 300m
+        limit: 2000m
+      memory:
+        request: 512Mi
+        limit: 2Gi
+      storage:
+        request: 200Mi
+        limit: 1Gi
+    environment:
+    - name: MAX_CONCURRENT_WORKFLOWS
+      value: '50'
+    - name: WORKFLOW_TIMEOUT
+      value: '3600'
+    - name: RETRY_ATTEMPTS
+      value: '3'
+  - name: config-manager
+    version: 1.0.0
+    description: Centralized configuration management
+    entrypoint: /opt/machinenativenops/modules/config-manager/main.py
+    group: core
+    priority: 110
+    enabled: true
+    auto_start: true
+    health_check:
+      endpoint: /health
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    dependencies: []
+    resources:
+      cpu:
+        request: 50m
+        limit: 200m
+      memory:
+        request: 64Mi
+        limit: 256Mi
+      storage:
+        request: 50Mi
+        limit: 200Mi
+    environment:
+    - name: CONFIG_CACHE_TTL
+      value: '300'
+    - name: CONFIG_WATCH_ENABLED
+      value: 'true'
+    - name: SCHEMA_VALIDATION_ENABLED
+      value: 'true'
+  - name: logging-service
+    version: 1.0.0
+    description: Centralized logging and log management
+    entrypoint: /opt/machinenativenops/modules/logging-service/main.py
+    group: core
+    priority: 105
+    enabled: true
+    auto_start: true
+    health_check:
+      endpoint: /health
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    dependencies:
+    - name: config-manager
+      version: '>=1.0.0'
+      optional: false
+    resources:
+      cpu:
+        request: 100m
+        limit: 500m
+      memory:
+        request: 128Mi
+        limit: 512Mi
+      storage:
+        request: 1Gi
+        limit: 5Gi
+    environment:
+    - name: LOG_ROTATION_INTERVAL
+      value: '86400'
+    - name: LOG_COMPRESSION_ENABLED
+      value: 'true'
+    - name: LOG_RETENTION_DAYS
+      value: '30'
+  - name: monitoring-service
+    version: 1.0.0
+    description: System monitoring and metrics collection service
+    entrypoint: /opt/machinenativenops/modules/monitoring-service/main.py
+    group: monitoring
+    priority: 50
+    enabled: true
+    auto_start: true
+    health_check:
+      endpoint: /health
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    dependencies:
+    - name: config-manager
+      version: '>=1.0.0'
+      optional: false
+    - name: logging-service
+      version: '>=1.0.0'
+      optional: false
+    resources:
+      cpu:
+        request: 100m
+        limit: 500m
+      memory:
+        request: 128Mi
+        limit: 512Mi
+    environment:
+    - name: METRICS_PORT
+      value: '9090'
+    - name: SCRAPE_INTERVAL
+      value: 15s
+  - name: machinenativenops-auto-monitor
+    version: 2.0.0
+    description: Production-ready auto-monitoring with quantum state tracking
+    entrypoint: /usr/bin/machinenativenops-auto-monitor
+    group: monitoring
+    priority: 55
+    enabled: true
+    auto_start: true
+    health_check:
+      endpoint: /health
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    dependencies:
+    - name: config-manager
+      version: '>=1.0.0'
+      optional: false
+    - name: logging-service
+      version: '>=1.0.0'
+      optional: false
+    - name: database-connector
+      version: '>=1.0.0'
+      optional: false
+    resources:
+      cpu:
+        request: 200m
+        limit: 1000m
+      memory:
+        request: 256Mi
+        limit: 1Gi
+      storage:
+        request: 500Mi
+        limit: 5Gi
+    environment:
+    - name: MNO_PROMETHEUS_PORT
+      value: '8000'
+    - name: MNO_LOG_LEVEL
+      value: INFO
+    - name: QUANTUM_ENABLED
+      value: 'false'
+    - name: AUTO_REPAIR_ENABLED
+      value: 'false'
+    - name: MNO_DATABASE_PATH
+      value: /var/lib/machinenativenops/auto_monitor/metrics.db
+  groups:
+  - name: core
+    description: Core system modules required for basic functionality
+    priority: 100
+    criticality: critical
+    auto_start: true
+    fail_fast: true
+  - name: security
+    description: Security and trust related modules
+    priority: 90
+    criticality: critical
+    auto_start: true
+    fail_fast: true
+  - name: execution
+    description: Execution and workflow orchestration modules
+    priority: 70
+    criticality: high
+    auto_start: true
+    fail_fast: false
+  - name: monitoring
+    description: Monitoring and alerting modules
+    priority: 60
+    criticality: medium
+    auto_start: true
+    fail_fast: false
+  - name: utility
+    description: Utility and helper modules
+    priority: 50
+    criticality: low
+    auto_start: false
+    fail_fast: false
+  dependency_graph:
+    config-manager: []
+    logging-service:
+    - config-manager
+    crypto-provider:
+    - config-manager
+    storage-backend:
+    - config-manager
+    database-connector:
+    - config-manager
+    hash-calculator:
+    - config-manager
+    notification-service:
+    - config-manager
+    workflow-engine:
+    - config-manager
+    - task-queue
+    task-queue:
+    - config-manager
+    - database-connector
+    governance-engine:
+    - config-manager
+    - logging-service
+    - database-connector
+    trust-manager:
+    - config-manager
+    - crypto-provider
+    - storage-backend
+    provenance-tracker:
+    - config-manager
+    - database-connector
+    - hash-calculator
+    integrity-validator:
+    - config-manager
+    - hash-calculator
+    - notification-service
+    super-execution-engine:
+    - config-manager
+    - workflow-engine
+    - task-queue
+    - governance-engine
+    machinenativenops-auto-monitor:
+    - config-manager
+    - logging-service
+    - database-connector
+  load_sequence:
+  - stage: 0
+    modules:
+    - config-manager
+    description: Configuration manager must load first
+  - stage: 1
+    modules:
+    - logging-service
+    - crypto-provider
+    - storage-backend
+    - database-connector
+    - hash-calculator
+    description: Core infrastructure services
+  - stage: 2
+    modules:
+    - notification-service
+    - workflow-engine
+    - task-queue
+    - machinenativenops-auto-monitor
+    description: Supporting services
+  - stage: 3
+    modules:
+    - governance-engine
+    - trust-manager
+    description: Security and governance services
+  - stage: 4
+    modules:
+    - provenance-tracker
+    - integrity-validator
+    description: Audit and integrity services
+  - stage: 5
+    modules:
+    - super-execution-engine
+    description: Execution engine loads last
+  version_management:
+    strategy: semantic_versioning
+    compatibility:
+    - major_version_breaks_compatibility: true
+    - minor_version_adds_features: true
+    - patch_version_fixes_bugs: true
+    upgrade_policy:
+    - auto_patch_upgrades: true
+    - minor_version_approval_required: true
+    - major_version_manual_approval: true
+    rollback_policy:
+    - auto_rollback_on_failure: true
+    - max_rollback_attempts: 3
+    - rollback_timeout: 300s
+  lifecycle_management:
+    installation:
+    - pre_install_validation: true
+    - dependency_check: true
+    - resource_allocation: true
+    - health_check: true
+    startup:
+    - dependency_order_enforcement: true
+    - health_check_timeout: 300s
+    - failure_retry_attempts: 3
+    - startup_failure_action: stop_dependent_modules
+    shutdown:
+    - graceful_shutdown_timeout: 60s
+    - dependency_order_reverse: true
+    - force_shutdown_after_timeout: true
+    update:
+    - rolling_update_enabled: true
+    - update_strategy: recreate
+    - max_unavailable: 25%
+    - health_check_after_update: true
+  monitoring:
+    metrics:
+    - name: module_uptime
+      type: counter
+      description: Module uptime in seconds
+    - name: module_restart_count
+      type: counter
+      description: Number of module restarts
+    - name: module_memory_usage
+      type: gauge
+      description: Current memory usage
+    - name: module_cpu_usage
+      type: gauge
+      description: Current CPU usage
+    - name: module_health_status
+      type: gauge
+      description: Health status (1=healthy, 0=unhealthy)
+    alerts:
+    - name: module_down
+      condition: module_health_status == 0 for 2m
+      severity: critical
+      action: restart_module
+    - name: high_memory_usage
+      condition: module_memory_usage > 90% for 5m
+      severity: warning
+      action: notify_administrator
+    - name: high_cpu_usage
+      condition: module_cpu_usage > 80% for 10m
+      severity: warning
+      action: scale_up_if_possible
+status:
+  phase: Ready
+  conditions:
+  - type: ModulesRegistered
+    status: 'True'
+    lastTransitionTime: '2025-12-20T22:00:00Z'
+    reason: RegistrationComplete
+    message: All modules successfully registered
+  - type: DependenciesResolved
+    status: 'True'
+    lastTransitionTime: '2025-12-20T22:00:00Z'
+    reason: DependencyGraphValid
+    message: Module dependency graph is valid and resolved
+  - type: LoadSequenceValidated
+    status: 'True'
+    lastTransitionTime: '2025-12-20T22:00:00Z'
+    reason: SequenceValid
+    message: Module load sequence is valid
+
+---
+# Modules Schema 定義
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: modules-schema
+  namespace: machinenativenops-modules
+data:
+  schema.yaml: |
+    # Root Modules Configuration Schema
+    type: object
+    properties:
+      modules:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+              pattern: "^[a-z0-9-]+$"
+            version:
+              type: string
+              pattern: "^\\d+\\.\\d+\\.\\d+$"
+            description:
+              type: string
+            entrypoint:
+              type: string
+            group:
+              type: string
+            priority:
+              type: integer
+              minimum: 0
+              maximum: 100
+            enabled:
+              type: boolean
+            auto_start:
+              type: boolean
+            dependencies:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  version:
+                    type: string
+                  optional:
+                    type: boolean
+            resources:
+              type: object
+              properties:
+                cpu:
+                  type: object
+                  properties:
+                    request:
+                      type: string
+                    limit:
+                      type: string
+                memory:
+                  type: object
+                  properties:
+                    request:
+                      type: string
+                    limit:
+                      type: string
+          required: ["name", "version", "description", "entrypoint", "group", "priority", "enabled", "auto_start", "dependencies", "resources"]
+      groups:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            priority:
+              type: integer
+            criticality:
+              type: string
+              enum: ["critical", "high", "medium", "low"]
+            auto_start:
+              type: boolean
+            fail_fast:
+              type: boolean
+          required: ["name", "description", "priority", "criticality", "auto_start", "fail_fast"]
+    required: ["modules", "groups"]

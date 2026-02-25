@@ -1,0 +1,1364 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# =============================================================================
+# GL (Governance Layers) 完整架構規範
+# MachineNativeOps Governance Architecture Specification
+# Version: 2.0.0
+# =============================================================================
+apiVersion: governance.machinenativeops.io/v2
+kind: GovernanceArchitectureSpec
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:GL-ARCHITECTURE-SPEC.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ARCHITECTURE-SPEC.yaml"
+  name: gl-architecture-specification
+  version: "2.0.0"
+  created_at: "2025-01-18T00:00:00Z"
+  updated_at: "2025-01-18T00:00:00Z"
+  owner: governance-team
+  description: |
+    MachineNativeOps GL（Governance Layers）完整架構規範
+    定義GL00-99各層級的技能、能力、責任與具體工作內容
+# =============================================================================
+# 架構總覽
+# =============================================================================
+architecture_overview:
+  name: "MachineNativeOps Governance Layers (GL)"
+  version: "2.0.0"
+  layer_summary:
+    - layer_id: "GL00-09"
+      name: "Strategic Layer"
+      name_zh: "戰略層"
+      description: "組織願景、長期目標、治理框架、核心政策與最高層級決策制定"
+    - layer_id: "GL10-29"
+      name: "Operational Layer"
+      name_zh: "運營層"
+      description: "治理政策落地、組織運作、資源調度、流程管理與日常監控"
+    - layer_id: "GL30-49"
+      name: "Execution Layer"
+      name_zh: "執行層"
+      description: "具體任務、專案、產品開發、部署與交付"
+    - layer_id: "GL50-59"
+      name: "Observability Layer"
+      name_zh: "觀測層"
+      description: "即時監控、數據收集、異常偵測、審計與合規追蹤"
+    - layer_id: "GL60-80"
+      name: "Advanced/Feedback Layer"
+      name_zh: "進階/回饋層"
+      description: "高階分析、智能優化、回饋機制、A/B測試、模型再訓練"
+    - layer_id: "GL81-83"
+      name: "Extended Layer"
+      name_zh: "擴展層"
+      description: "新興議題、跨域協作、臨時專案、外部合作、社群治理"
+    - layer_id: "GL90-99"
+      name: "Meta-Specification Layer"
+      name_zh: "元規範層"
+      description: "治理體系的元規範、標準制定、規格管理、治理流程定義"
+# =============================================================================
+# GL00-09: Strategic Layer（戰略層）完整定義
+# =============================================================================
+GL00-09:
+  metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:GL-ARCHITECTURE-SPEC.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ARCHITECTURE-SPEC.yaml"
+    layer_id: "GL00-09"
+    name: "Strategic Layer"
+    name_zh: "戰略層"
+    range: "00-09"
+    color_code: "#1E3A8A"
+    icon: "🎯"
+  semantic_definition:
+    purpose: |
+      戰略層負責定義組織的願景、使命、價值觀、長期發展方向與治理原則，
+      制定OKR（Objectives and Key Results）、治理框架、政策總則，
+      並確保所有下層治理活動與戰略目標一致。
+    scope:
+      - "制定與維護組織願景、使命、價值觀"
+      - "設計與審核治理框架、戰略目標（OKR）、政策總則"
+      - "決定資源分配與重大投資方向"
+      - "設立高階治理委員會（如董事會、戰略委員會）"
+      - "監督下層治理執行情況，確保戰略落地"
+      - "審查與批准重大風險管理策略"
+      - "定期檢討與調整戰略目標"
+      - "對外溝通組織戰略與治理成果"
+    exclusions:
+      - "日常運營細節"
+      - "具體技術執行"
+      - "即時操作決策"
+  functional_boundaries:
+    inputs:
+      - name: "external_environment_analysis"
+        description: "外部環境分析報告"
+        format: "markdown/yaml"
+      - name: "stakeholder_requirements"
+        description: "利害關係人需求"
+        format: "yaml"
+      - name: "market_intelligence"
+        description: "市場趨勢與競爭情報"
+        format: "json/yaml"
+      - name: "risk_assessment_reports"
+        description: "風險評估報告"
+        format: "yaml"
+    outputs:
+      - name: "governance_charter"
+        description: "治理框架"
+        format: "yaml/markdown"
+        path: "governance/00-vision-strategy/governance-charter.yaml"
+      - name: "strategic_objectives"
+        description: "戰略目標（OKR）"
+        format: "yaml"
+        path: "governance/00-vision-strategy/strategic-objectives.yaml"
+      - name: "vision_statement"
+        description: "願景聲明"
+        format: "yaml/markdown"
+        path: "governance/00-vision-strategy/vision-statement.yaml"
+      - name: "risk_appetite_statement"
+        description: "風險偏好聲明"
+        format: "yaml"
+        path: "governance/04-risk/risk-appetite.yaml"
+      - name: "resource_allocation_decisions"
+        description: "資源分配決策"
+        format: "yaml"
+        path: "governance/02-decision/resource-allocation.yaml"
+    constraints:
+      - "決策週期：季度/年度"
+      - "不涉及具體執行細節"
+      - "不直接操作技術系統"
+      - "決策需經委員會審批"
+  skills_capabilities:
+    required_skills:
+      - skill: "strategic_thinking"
+        name_zh: "戰略思維與前瞻規劃能力"
+        level: "expert"
+        description: "能夠進行長期規劃與戰略分析"
+      - skill: "cross_domain_integration"
+        name_zh: "跨領域整合與系統性分析"
+        level: "expert"
+        description: "整合多領域知識進行系統性決策"
+      - skill: "governance_policy_design"
+        name_zh: "治理政策設計與組織架構規劃"
+        level: "expert"
+        description: "設計有效的治理政策與組織結構"
+      - skill: "risk_assessment"
+        name_zh: "風險評估與資源配置"
+        level: "advanced"
+        description: "評估風險並合理配置資源"
+      - skill: "stakeholder_management"
+        name_zh: "利害關係人協調與溝通"
+        level: "expert"
+        description: "有效管理與協調各方利害關係人"
+      - skill: "ethical_judgment"
+        name_zh: "高階決策與倫理判斷"
+        level: "expert"
+        description: "在複雜情況下做出符合倫理的決策"
+      - skill: "compliance_knowledge"
+        name_zh: "國際標準與合規知識"
+        level: "advanced"
+        description: "熟悉ISO 38500、GDPR等國際標準"
+      - skill: "okr_kpi_design"
+        name_zh: "OKR、KPI、治理指標設計能力"
+        level: "advanced"
+        description: "設計有效的目標與關鍵結果指標"
+    capability_model:
+      level_1:
+        name: "Foundation"
+        description: "理解治理框架基礎"
+        competencies:
+          - "理解GL架構基本概念"
+          - "閱讀並理解治理文件"
+      level_2:
+        name: "Practitioner"
+        description: "參與戰略規劃流程"
+        competencies:
+          - "參與OKR制定"
+          - "協助風險評估"
+      level_3:
+        name: "Advanced"
+        description: "主導戰略目標制定"
+        competencies:
+          - "主導部門級戰略規劃"
+          - "設計治理指標"
+      level_4:
+        name: "Expert"
+        description: "設計治理架構"
+        competencies:
+          - "設計組織級治理架構"
+          - "制定治理政策"
+      level_5:
+        name: "Master"
+        description: "引領組織變革"
+        competencies:
+          - "引領組織戰略轉型"
+          - "建立治理最佳實踐"
+  responsibilities:
+    governance_roles:
+      - role: "Chief Governance Officer"
+        role_zh: "首席治理官"
+        duties:
+          - "治理框架制定與維護"
+          - "戰略目標設定與監督"
+          - "風險偏好定義"
+          - "治理架構設計"
+        authority_level: "executive"
+      - role: "Strategy Committee"
+        role_zh: "戰略委員會"
+        duties:
+          - "戰略審批"
+          - "資源分配決策"
+          - "重大投資審批"
+          - "組織架構調整"
+        authority_level: "committee"
+      - role: "Risk Committee"
+        role_zh: "風險委員會"
+        duties:
+          - "風險評估審核"
+          - "風險偏好監控"
+          - "合規監督"
+          - "危機管理"
+        authority_level: "committee"
+      - role: "Board of Directors"
+        role_zh: "董事會"
+        duties:
+          - "最高決策審批"
+          - "CEO任命與監督"
+          - "重大事項決議"
+        authority_level: "board"
+    decision_authority:
+      - "組織願景與使命變更"
+      - "年度戰略目標制定"
+      - "重大投資與合作審批（>$1M）"
+      - "治理架構調整"
+      - "高階人事任命"
+      - "風險偏好調整"
+    accountability:
+      - "對股東負責"
+      - "對監管機構負責"
+      - "對利害關係人負責"
+  typical_artifacts:
+    - artifact_type: "vision_statement"
+      name_zh: "願景聲明"
+      format: "yaml/markdown"
+      path: "governance/00-vision-strategy/vision-statement.yaml"
+      template: |
+        apiVersion: governance.machinenativeops.io/v2
+        kind: VisionStatement
+        metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:GL-ARCHITECTURE-SPEC.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ARCHITECTURE-SPEC.yaml"
+          name: organization-vision
+          version: "1.0.0"
+        spec:
+          vision: ""
+          mission: ""
+          values: []
+          strategic_pillars: []
+    - artifact_type: "strategic_objectives"
+      name_zh: "戰略目標（OKR）"
+      format: "yaml"
+      path: "governance/00-vision-strategy/strategic-objectives.yaml"
+      template: |
+        apiVersion: governance.machinenativeops.io/v2
+        kind: StrategicObjectives
+        metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:GL-ARCHITECTURE-SPEC.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ARCHITECTURE-SPEC.yaml"
+          name: annual-okr
+          fiscal_year: "2025"
+        spec:
+          objectives: []
+          key_results: []
+    - artifact_type: "governance_charter"
+      name_zh: "治理框架"
+      format: "yaml"
+      path: "governance/00-vision-strategy/governance-charter.yaml"
+    - artifact_type: "risk_register"
+      name_zh: "風險登錄表"
+      format: "yaml"
+      path: "governance/04-risk/risk-register.yaml"
+    - artifact_type: "success_metrics_dashboard"
+      name_zh: "治理指標儀表板"
+      format: "yaml"
+      path: "governance/00-vision-strategy/success-metrics-dashboard.yaml"
+    - artifact_type: "board_minutes"
+      name_zh: "高階決策會議記錄"
+      format: "markdown"
+      path: "governance/02-decision/board-minutes/"
+    - artifact_type: "org_structure"
+      name_zh: "組織架構圖"
+      format: "svg/yaml"
+      path: "governance/01-architecture/org-structure.yaml"
+  layer_dependencies:
+    downstream:
+      - layer: "GL10-29"
+        relationship: "provides_direction"
+        description: "為運營層提供戰略方向與政策約束"
+        artifacts_flow:
+          - from: "strategic_objectives"
+            to: "operational_plan"
+          - from: "governance_charter"
+            to: "operational_policies"
+    upstream:
+      - layer: "GL10-29"
+        relationship: "receives_feedback"
+        description: "接收運營層的執行回報與風險狀態"
+        artifacts_flow:
+          - from: "operational_reports"
+            to: "strategy_review"
+    interaction_patterns:
+      - pattern: "governance_meeting"
+        frequency: "quarterly"
+        participants: ["Strategy Committee", "Risk Committee", "Operations Lead"]
+      - pattern: "annual_review"
+        frequency: "annually"
+        participants: ["Board of Directors", "All Committees"]
+      - pattern: "kpi_tracking"
+        frequency: "monthly"
+        participants: ["CGO", "Strategy Committee"]
+# =============================================================================
+# GL10-29: Operational Layer（運營層）完整定義
+# =============================================================================
+GL10-29:
+  metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:GL-ARCHITECTURE-SPEC.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ARCHITECTURE-SPEC.yaml"
+    layer_id: "GL10-29"
+    name: "Operational Layer"
+    name_zh: "運營層"
+    range: "10-29"
+    color_code: "#059669"
+    icon: "⚙️"
+  semantic_definition:
+    purpose: |
+      運營層負責將戰略層的政策、目標與資源分配，轉化為具體的運營計畫、
+      流程、標準與監控機制，確保組織日常運作高效、合規且可持續。
+    scope:
+      - "制定與維護運營政策、標準作業流程（SOP）"
+      - "將戰略目標細化為年度/季度/專案運營計畫"
+      - "資源分配與調度（人力、預算、技術、設備）"
+      - "監控運營指標，定期產出運營報告"
+      - "風險識別、評估與應對措施制定"
+      - "合規審查與政策執行監督"
+      - "組織內部溝通協調與衝突管理"
+      - "問題追蹤、持續改進與知識管理"
+      - "培訓與能力建設"
+    exclusions:
+      - "最高層級政策制定"
+      - "底層技術執行"
+      - "即時操作"
+  functional_boundaries:
+    inputs:
+      - name: "strategic_objectives"
+        description: "戰略目標與政策"
+        source: "GL00-09"
+      - name: "resource_allocation"
+        description: "資源分配決策"
+        source: "GL00-09"
+      - name: "execution_feedback"
+        description: "執行層回報"
+        source: "GL30-49"
+      - name: "observability_data"
+        description: "監控數據"
+        source: "GL50-59"
+    outputs:
+      - name: "operational_plan"
+        description: "運營計畫"
+        path: "ops/annual-operational-plan.yaml"
+      - name: "sop_documents"
+        description: "標準作業流程"
+        path: "ops/sop/"
+      - name: "resource_allocation_table"
+        description: "資源分配表"
+        path: "ops/resource-allocation.yaml"
+      - name: "risk_control_report"
+        description: "風險控制報告"
+        path: "ops/risk-control-report.md"
+      - name: "compliance_audit_log"
+        description: "合規審查記錄"
+        path: "ops/compliance-audit-log.md"
+      - name: "metrics_dashboard"
+        description: "運營指標儀表板"
+        path: "ops/metrics-dashboard.yaml"
+    constraints:
+      - "決策週期：週/月/季度"
+      - "需遵循戰略層政策"
+      - "不直接執行技術操作"
+  skills_capabilities:
+    required_skills:
+      - skill: "process_design"
+        name_zh: "流程設計與優化"
+        level: "advanced"
+      - skill: "resource_management"
+        name_zh: "資源調度與運營管理"
+        level: "advanced"
+      - skill: "risk_control"
+        name_zh: "風險識別與控制"
+        level: "advanced"
+      - skill: "compliance_review"
+        name_zh: "合規審查與政策落地"
+        level: "advanced"
+      - skill: "cross_department_collaboration"
+        name_zh: "跨部門協作與溝通"
+        level: "advanced"
+      - skill: "data_analysis"
+        name_zh: "數據分析與績效監控"
+        level: "intermediate"
+      - skill: "problem_solving"
+        name_zh: "問題解決與持續改進"
+        level: "advanced"
+      - skill: "sop_development"
+        name_zh: "SOP制定與維護"
+        level: "advanced"
+      - skill: "it_governance"
+        name_zh: "IT治理與自動化工具應用"
+        level: "intermediate"
+    capability_model:
+      level_1:
+        name: "Foundation"
+        description: "理解運營流程基礎"
+      level_2:
+        name: "Practitioner"
+        description: "執行運營任務"
+      level_3:
+        name: "Advanced"
+        description: "優化運營流程"
+      level_4:
+        name: "Expert"
+        description: "設計運營體系"
+      level_5:
+        name: "Master"
+        description: "引領運營變革"
+  responsibilities:
+    governance_roles:
+      - role: "Operations Director"
+        role_zh: "運營總監"
+        duties:
+          - "運營計畫制定"
+          - "資源調度"
+          - "績效監控"
+      - role: "Process Owner"
+        role_zh: "流程負責人"
+        duties:
+          - "SOP制定與維護"
+          - "流程優化"
+          - "合規確保"
+      - role: "Risk Manager"
+        role_zh: "風險經理"
+        duties:
+          - "風險識別與評估"
+          - "風險應對措施"
+          - "風險監控"
+  typical_artifacts:
+    - artifact_type: "operational_plan"
+      name_zh: "運營計畫"
+      format: "yaml"
+      path: "ops/annual-operational-plan.yaml"
+    - artifact_type: "sop"
+      name_zh: "標準作業流程"
+      format: "markdown"
+      path: "ops/sop/"
+    - artifact_type: "resource_allocation"
+      name_zh: "資源分配表"
+      format: "yaml"
+      path: "ops/resource-allocation.yaml"
+    - artifact_type: "risk_control_report"
+      name_zh: "風險控制報告"
+      format: "markdown"
+      path: "ops/risk-control-report.md"
+    - artifact_type: "compliance_audit_log"
+      name_zh: "合規審查記錄"
+      format: "markdown"
+      path: "ops/compliance-audit-log.md"
+    - artifact_type: "metrics_dashboard"
+      name_zh: "運營指標儀表板"
+      format: "yaml"
+      path: "ops/metrics-dashboard.yaml"
+    - artifact_type: "issue_tracker"
+      name_zh: "問題追蹤與改進紀錄"
+      format: "markdown"
+      path: "ops/issue-tracker.md"
+    - artifact_type: "training_materials"
+      name_zh: "培訓教材"
+      format: "markdown"
+      path: "ops/training-materials/"
+  layer_dependencies:
+    upstream:
+      - layer: "GL00-09"
+        relationship: "receives_direction"
+        description: "承接戰略層的政策、目標與資源分配"
+    downstream:
+      - layer: "GL30-49"
+        relationship: "provides_guidance"
+        description: "為執行層提供明確的流程、標準與資源"
+    interaction_patterns:
+      - pattern: "operational_meeting"
+        frequency: "weekly"
+      - pattern: "project_review"
+        frequency: "bi-weekly"
+      - pattern: "metrics_review"
+        frequency: "monthly"
+# =============================================================================
+# GL30-49: Execution Layer（執行層）完整定義
+# =============================================================================
+GL30-49:
+  metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:GL-ARCHITECTURE-SPEC.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ARCHITECTURE-SPEC.yaml"
+    layer_id: "GL30-49"
+    name: "Execution Layer"
+    name_zh: "執行層"
+    range: "30-49"
+    color_code: "#DC2626"
+    icon: "🚀"
+  semantic_definition:
+    purpose: |
+      執行層負責根據運營層的流程、標準與資源，完成具體的專案、產品、
+      服務開發、測試、部署與交付，並確保成果符合預定目標與質量要求。
+    scope:
+      - "根據運營層指令執行專案、產品開發、測試、部署"
+      - "撰寫與維護技術文件、API文件、測試報告"
+      - "實施自動化測試、持續整合與持續部署（CI/CD）"
+      - "追蹤與回報問題、異常與改進建議"
+      - "交付符合質量標準的產品與服務"
+      - "配合運營層進行流程優化與知識回饋"
+      - "執行安全、合規、性能等技術檢查"
+      - "參與跨部門協作與專案會議"
+    exclusions:
+      - "政策制定"
+      - "資源分配決策"
+      - "高階監控與策略調整"
+  functional_boundaries:
+    inputs:
+      - name: "operational_plan"
+        description: "運營計畫與流程"
+        source: "GL10-29"
+      - name: "sop_documents"
+        description: "標準作業流程"
+        source: "GL10-29"
+      - name: "resource_allocation"
+        description: "資源分配"
+        source: "GL10-29"
+    outputs:
+      - name: "project_plan"
+        description: "專案執行計畫"
+        path: "execution/project-plan.yaml"
+      - name: "architecture_docs"
+        description: "產品開發文件"
+        path: "src/docs/architecture.md"
+      - name: "test_report"
+        description: "測試報告"
+        path: "tests/test-report.md"
+      - name: "deploy_scripts"
+        description: "部署腳本"
+        path: "scripts/deploy.sh"
+      - name: "release_notes"
+        description: "版本發佈紀錄"
+        path: "deploy/release-notes.md"
+      - name: "issue_log"
+        description: "問題追蹤紀錄"
+        path: "execution/issue-log.md"
+      - name: "api_reference"
+        description: "API文件"
+        path: "src/api/api-reference.md"
+      - name: "delivery_acceptance"
+        description: "交付驗收文件"
+        path: "execution/delivery-acceptance.md"
+  skills_capabilities:
+    required_skills:
+      - skill: "project_management"
+        name_zh: "專案管理與敏捷開發"
+        level: "advanced"
+      - skill: "software_engineering"
+        name_zh: "軟體工程與自動化部署"
+        level: "advanced"
+      - skill: "testing_qa"
+        name_zh: "測試與品質保證"
+        level: "advanced"
+      - skill: "product_delivery"
+        name_zh: "產品交付與版本控制"
+        level: "advanced"
+      - skill: "issue_tracking"
+        name_zh: "問題追蹤與回報"
+        level: "intermediate"
+      - skill: "devops"
+        name_zh: "DevOps、CI/CD、IaC實踐能力"
+        level: "advanced"
+      - skill: "requirements_analysis"
+        name_zh: "需求分析與用戶回饋整合"
+        level: "intermediate"
+  responsibilities:
+    governance_roles:
+      - role: "Tech Lead"
+        role_zh: "技術負責人"
+        duties:
+          - "技術方案設計"
+          - "代碼審查"
+          - "技術決策"
+      - role: "Project Manager"
+        role_zh: "專案經理"
+        duties:
+          - "專案計畫制定"
+          - "進度追蹤"
+          - "資源協調"
+      - role: "QA Lead"
+        role_zh: "品質保證負責人"
+        duties:
+          - "測試策略制定"
+          - "品質監控"
+          - "缺陷管理"
+      - role: "DevOps Engineer"
+        role_zh: "DevOps工程師"
+        duties:
+          - "CI/CD流水線維護"
+          - "部署自動化"
+          - "基礎設施管理"
+  typical_artifacts:
+    - artifact_type: "project_plan"
+      name_zh: "專案執行計畫"
+      format: "yaml"
+      path: "execution/project-plan.yaml"
+    - artifact_type: "architecture_doc"
+      name_zh: "產品開發文件"
+      format: "markdown"
+      path: "src/docs/architecture.md"
+    - artifact_type: "test_report"
+      name_zh: "測試報告"
+      format: "markdown"
+      path: "tests/test-report.md"
+    - artifact_type: "deploy_script"
+      name_zh: "部署腳本"
+      format: "shell/yaml"
+      path: "scripts/deploy.sh"
+    - artifact_type: "release_notes"
+      name_zh: "版本發佈紀錄"
+      format: "markdown"
+      path: "deploy/release-notes.md"
+    - artifact_type: "issue_log"
+      name_zh: "問題追蹤紀錄"
+      format: "markdown"
+      path: "execution/issue-log.md"
+    - artifact_type: "api_reference"
+      name_zh: "API文件"
+      format: "markdown/openapi"
+      path: "src/api/api-reference.md"
+    - artifact_type: "delivery_acceptance"
+      name_zh: "交付驗收文件"
+      format: "markdown"
+      path: "execution/delivery-acceptance.md"
+  layer_dependencies:
+    upstream:
+      - layer: "GL10-29"
+        relationship: "receives_guidance"
+        description: "承接運營層的流程、標準與資源"
+    downstream:
+      - layer: "GL50-59"
+        relationship: "provides_data"
+        description: "為觀測層提供執行數據、日誌與回饋"
+    interaction_patterns:
+      - pattern: "daily_standup"
+        frequency: "daily"
+      - pattern: "sprint_review"
+        frequency: "bi-weekly"
+      - pattern: "release_meeting"
+        frequency: "as_needed"
+# =============================================================================
+# GL50-59: Observability Layer（觀測層）完整定義
+# =============================================================================
+GL50-59:
+  metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:GL-ARCHITECTURE-SPEC.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ARCHITECTURE-SPEC.yaml"
+    layer_id: "GL50-59"
+    name: "Observability Layer"
+    name_zh: "觀測層"
+    range: "50-59"
+    color_code: "#7C3AED"
+    icon: "📊"
+  semantic_definition:
+    purpose: |
+      觀測層負責建立全域可觀測性架構，收集與分析系統運作、服務、流程、
+      產品等各層級的指標、日誌、追蹤與審計數據，實現異常預警、合規審查與持續改進。
+    scope:
+      - "設計與維護監控指標、日誌、追蹤與審計架構"
+      - "收集與分析系統、服務、流程等運作數據"
+      - "設計異常偵測、預警與自動化告警機制"
+      - "產出監控報告、異常分析與合規審計紀錄"
+      - "支援決策層與執行層的數據需求"
+      - "定期檢查監控覆蓋率與數據質量"
+      - "持續優化監控架構與指標設計"
+      - "配合安全、合規、審計等部門進行數據追蹤與調查"
+    exclusions:
+      - "直接參與決策"
+      - "執行操作"
+  functional_boundaries:
+    inputs:
+      - name: "execution_logs"
+        description: "執行層日誌"
+        source: "GL30-49"
+      - name: "system_metrics"
+        description: "系統指標"
+        source: "GL30-49"
+      - name: "trace_data"
+        description: "追蹤數據"
+        source: "GL30-49"
+    outputs:
+      - name: "metrics_definition"
+        description: "監控指標定義"
+        path: "observability/metrics-definition.yaml"
+      - name: "dashboard_config"
+        description: "監控儀表板"
+        path: "observability/dashboard-config.json"
+      - name: "log_collector"
+        description: "日誌收集規則"
+        path: "observability/log-collector.yaml"
+      - name: "trace_config"
+        description: "追蹤配置"
+        path: "observability/trace-config.yaml"
+      - name: "alert_rules"
+        description: "異常預警規則"
+        path: "observability/alert-rules.yaml"
+      - name: "audit_report"
+        description: "合規審計報告"
+        path: "observability/audit-report.md"
+      - name: "slo_report"
+        description: "SLA/SLO/SLI報告"
+        path: "observability/slo-report.md"
+      - name: "coverage_report"
+        description: "監控覆蓋率報告"
+        path: "observability/coverage-report.md"
+  skills_capabilities:
+    required_skills:
+      - skill: "monitoring_architecture"
+        name_zh: "監控架構設計與部署"
+        level: "advanced"
+        tools: ["Prometheus", "Grafana", "OpenTelemetry"]
+      - skill: "data_collection"
+        name_zh: "指標、日誌、追蹤數據收集與分析"
+        level: "advanced"
+      - skill: "anomaly_detection"
+        name_zh: "異常偵測與預警規則設計"
+        level: "advanced"
+      - skill: "compliance_audit"
+        name_zh: "合規審計與數據治理"
+        level: "intermediate"
+      - skill: "slo_design"
+        name_zh: "SLA/SLO/SLI指標設計與追蹤"
+        level: "advanced"
+      - skill: "data_visualization"
+        name_zh: "數據可視化與報告產出"
+        level: "intermediate"
+      - skill: "security_monitoring"
+        name_zh: "安全事件監控與審計"
+        level: "intermediate"
+  responsibilities:
+    governance_roles:
+      - role: "Observability Lead"
+        role_zh: "可觀測性負責人"
+        duties:
+          - "監控架構設計"
+          - "指標定義"
+          - "告警策略"
+      - role: "SRE"
+        role_zh: "站點可靠性工程師"
+        duties:
+          - "SLO管理"
+          - "事件響應"
+          - "容量規劃"
+      - role: "Compliance Auditor"
+        role_zh: "合規審計員"
+        duties:
+          - "審計執行"
+          - "合規報告"
+          - "風險識別"
+  typical_artifacts:
+    - artifact_type: "metrics_definition"
+      name_zh: "監控指標定義"
+      format: "yaml"
+      path: "observability/metrics-definition.yaml"
+    - artifact_type: "dashboard_config"
+      name_zh: "監控儀表板"
+      format: "json"
+      path: "observability/dashboard-config.json"
+    - artifact_type: "log_collector"
+      name_zh: "日誌收集規則"
+      format: "yaml"
+      path: "observability/log-collector.yaml"
+    - artifact_type: "trace_config"
+      name_zh: "追蹤配置"
+      format: "yaml"
+      path: "observability/trace-config.yaml"
+    - artifact_type: "alert_rules"
+      name_zh: "異常預警規則"
+      format: "yaml"
+      path: "observability/alert-rules.yaml"
+    - artifact_type: "audit_report"
+      name_zh: "合規審計報告"
+      format: "markdown"
+      path: "observability/audit-report.md"
+    - artifact_type: "slo_report"
+      name_zh: "SLA/SLO/SLI報告"
+      format: "markdown"
+      path: "observability/slo-report.md"
+    - artifact_type: "coverage_report"
+      name_zh: "監控覆蓋率報告"
+      format: "markdown"
+      path: "observability/coverage-report.md"
+  layer_dependencies:
+    upstream:
+      - layer: "GL30-49"
+        relationship: "collects_data"
+        description: "收集執行層的運作數據、日誌與追蹤資訊"
+    downstream:
+      - layer: "GL00-09"
+        relationship: "provides_insights"
+        description: "為戰略層提供決策所需的監控數據與分析"
+      - layer: "GL10-29"
+        relationship: "provides_reports"
+        description: "為運營層提供運營指標與異常報告"
+      - layer: "GL60-80"
+        relationship: "feeds_data"
+        description: "為進階/回饋層提供分析數據"
+# =============================================================================
+# GL60-80: Advanced/Feedback Layer（進階/回饋層）完整定義
+# =============================================================================
+GL60-80:
+  metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:GL-ARCHITECTURE-SPEC.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ARCHITECTURE-SPEC.yaml"
+    layer_id: "GL60-80"
+    name: "Advanced/Feedback Layer"
+    name_zh: "進階/回饋層"
+    range: "60-80"
+    color_code: "#EA580C"
+    icon: "🔄"
+  semantic_definition:
+    purpose: |
+      進階/回饋層負責基於觀測層數據進行高階分析、智能優化、回饋循環、
+      A/B測試、模型再訓練與策略調整，實現治理體系的自我學習與持續改進。
+    scope:
+      - "設計與執行A/B測試、假設檢驗與效果評估"
+      - "建立數據回饋循環，驅動模型再訓練與策略優化"
+      - "分析觀測層數據，提出自動化優化建議"
+      - "實施自動化調整、策略微調與自適應控制"
+      - "產出高階分析報告、優化建議與回饋紀錄"
+      - "支援決策層與運營層的策略調整"
+      - "監控回饋循環的效果與風險"
+      - "持續追蹤改進成效與異常事件"
+    exclusions:
+      - "日常執行"
+      - "政策制定"
+  functional_boundaries:
+    inputs:
+      - name: "observability_data"
+        description: "觀測層數據"
+        source: "GL50-59"
+      - name: "execution_feedback"
+        description: "執行層回饋"
+        source: "GL30-49"
+    outputs:
+      - name: "ab_test_design"
+        description: "A/B測試設計文件"
+        path: "feedback/ab-test-design.md"
+      - name: "hypothesis_testing"
+        description: "假設檢驗報告"
+        path: "feedback/hypothesis-testing.md"
+      - name: "model_retraining_log"
+        description: "模型再訓練紀錄"
+        path: "feedback/model-retraining-log.md"
+      - name: "strategy_optimization"
+        description: "策略優化建議"
+        path: "feedback/strategy-optimization.md"
+      - name: "feedback_loop_design"
+        description: "回饋循環設計文件"
+        path: "feedback/feedback-loop-design.yaml"
+      - name: "auto_tuning_log"
+        description: "自動化調整紀錄"
+        path: "feedback/auto-tuning-log.md"
+      - name: "advanced_analysis_report"
+        description: "高階分析報告"
+        path: "feedback/advanced-analysis-report.md"
+      - name: "improvement_tracking"
+        description: "改進成效追蹤報告"
+        path: "feedback/improvement-tracking.md"
+  skills_capabilities:
+    required_skills:
+      - skill: "data_analysis"
+        name_zh: "數據分析與高階統計建模"
+        level: "expert"
+      - skill: "machine_learning"
+        name_zh: "機器學習、深度學習與模型再訓練"
+        level: "advanced"
+      - skill: "ab_testing"
+        name_zh: "A/B測試設計與假設檢驗"
+        level: "advanced"
+      - skill: "feedback_loop_design"
+        name_zh: "反饋循環設計與自動化優化"
+        level: "advanced"
+      - skill: "adaptive_control"
+        name_zh: "策略調整與自適應控制"
+        level: "advanced"
+      - skill: "simulation"
+        name_zh: "系統仿真與預測分析"
+        level: "intermediate"
+      - skill: "change_management"
+        name_zh: "變更管理與風險評估"
+        level: "intermediate"
+  responsibilities:
+    governance_roles:
+      - role: "Data Scientist"
+        role_zh: "數據科學家"
+        duties:
+          - "高階分析"
+          - "模型開發"
+          - "A/B測試設計"
+      - role: "ML Engineer"
+        role_zh: "機器學習工程師"
+        duties:
+          - "模型訓練"
+          - "模型部署"
+          - "模型監控"
+      - role: "Optimization Specialist"
+        role_zh: "優化專家"
+        duties:
+          - "策略優化"
+          - "自動化調整"
+          - "效果評估"
+  typical_artifacts:
+    - artifact_type: "ab_test_design"
+      name_zh: "A/B測試設計文件"
+      format: "markdown"
+      path: "feedback/ab-test-design.md"
+    - artifact_type: "hypothesis_testing"
+      name_zh: "假設檢驗報告"
+      format: "markdown"
+      path: "feedback/hypothesis-testing.md"
+    - artifact_type: "model_retraining_log"
+      name_zh: "模型再訓練紀錄"
+      format: "markdown"
+      path: "feedback/model-retraining-log.md"
+    - artifact_type: "strategy_optimization"
+      name_zh: "策略優化建議"
+      format: "markdown"
+      path: "feedback/strategy-optimization.md"
+    - artifact_type: "feedback_loop_design"
+      name_zh: "回饋循環設計文件"
+      format: "yaml"
+      path: "feedback/feedback-loop-design.yaml"
+    - artifact_type: "auto_tuning_log"
+      name_zh: "自動化調整紀錄"
+      format: "markdown"
+      path: "feedback/auto-tuning-log.md"
+    - artifact_type: "advanced_analysis_report"
+      name_zh: "高階分析報告"
+      format: "markdown"
+      path: "feedback/advanced-analysis-report.md"
+    - artifact_type: "improvement_tracking"
+      name_zh: "改進成效追蹤報告"
+      format: "markdown"
+      path: "feedback/improvement-tracking.md"
+  layer_dependencies:
+    upstream:
+      - layer: "GL50-59"
+        relationship: "receives_data"
+        description: "收集觀測層的數據進行分析"
+      - layer: "GL30-49"
+        relationship: "receives_feedback"
+        description: "收集執行層的回饋"
+    downstream:
+      - layer: "GL00-09"
+        relationship: "provides_recommendations"
+        description: "為戰略層提供策略優化建議"
+      - layer: "GL10-29"
+        relationship: "provides_insights"
+        description: "為運營層提供優化建議"
+# =============================================================================
+# GL81-83: Extended Layer（擴展層）完整定義
+# =============================================================================
+GL81-83:
+  metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:GL-ARCHITECTURE-SPEC.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ARCHITECTURE-SPEC.yaml"
+    layer_id: "GL81-83"
+    name: "Extended Layer"
+    name_zh: "擴展層"
+    range: "81-83"
+    color_code: "#0891B2"
+    icon: "🌐"
+  semantic_definition:
+    purpose: |
+      擴展層負責承接新興議題、臨時專案、跨域協作與外部合作，推動治理體系的
+      彈性擴充、創新實驗與社群參與，並為正式治理層級提供前期驗證與經驗積累。
+    scope:
+      - "發起與推動新興議題、臨時專案與創新實驗"
+      - "組織跨域協作小組與外部合作夥伴"
+      - "設計與執行社群治理機制"
+      - "產出臨時artifacts、實驗報告與經驗總結"
+      - "將成果轉化為正式治理artifacts或政策建議"
+      - "支援正式治理層級的創新與變革"
+      - "促進生態系擴展與夥伴關係建立"
+    exclusions:
+      - "正式決策"
+      - "日常運營"
+  functional_boundaries:
+    inputs:
+      - name: "innovation_proposals"
+        description: "創新提案"
+        source: "all_layers"
+      - name: "external_partnerships"
+        description: "外部合作需求"
+        source: "external"
+    outputs:
+      - name: "temp_project_plan"
+        description: "臨時專案計畫"
+        path: "extended/temp-project-plan.md"
+      - name: "innovation_experiment"
+        description: "創新實驗報告"
+        path: "extended/innovation-experiment.md"
+      - name: "cross_domain_collab"
+        description: "跨域協作紀錄"
+        path: "extended/cross-domain-collab.md"
+      - name: "community_governance"
+        description: "社群治理方案"
+        path: "extended/community-governance.md"
+      - name: "external_partnership"
+        description: "外部合作協議"
+        path: "extended/external-partnership.md"
+      - name: "ecosystem_expansion"
+        description: "生態系擴展報告"
+        path: "extended/ecosystem-expansion.md"
+      - name: "lessons_learned"
+        description: "經驗總結與建議"
+        path: "extended/lessons-learned.md"
+  skills_capabilities:
+    required_skills:
+      - skill: "cross_domain_collaboration"
+        name_zh: "跨域協作與專案管理"
+        level: "advanced"
+      - skill: "emerging_tech"
+        name_zh: "新興技術與議題探索"
+        level: "intermediate"
+      - skill: "community_governance"
+        name_zh: "社群治理與外部合作"
+        level: "advanced"
+      - skill: "innovation_design"
+        name_zh: "創新實驗設計與推動"
+        level: "advanced"
+      - skill: "temp_project_management"
+        name_zh: "臨時專案規劃與執行"
+        level: "intermediate"
+      - skill: "change_management"
+        name_zh: "組織變革與知識轉移"
+        level: "intermediate"
+      - skill: "ecosystem_building"
+        name_zh: "生態系統建設與夥伴關係管理"
+        level: "advanced"
+  responsibilities:
+    governance_roles:
+      - role: "Innovation Lead"
+        role_zh: "創新負責人"
+        duties:
+          - "創新實驗設計"
+          - "新興議題探索"
+          - "成果轉化"
+      - role: "Community Manager"
+        role_zh: "社群經理"
+        duties:
+          - "社群治理"
+          - "外部合作"
+          - "生態系建設"
+      - role: "Partnership Manager"
+        role_zh: "合作夥伴經理"
+        duties:
+          - "夥伴關係管理"
+          - "合作協議"
+          - "生態系擴展"
+  typical_artifacts:
+    - artifact_type: "temp_project_plan"
+      name_zh: "臨時專案計畫"
+      format: "markdown"
+      path: "extended/temp-project-plan.md"
+    - artifact_type: "innovation_experiment"
+      name_zh: "創新實驗報告"
+      format: "markdown"
+      path: "extended/innovation-experiment.md"
+    - artifact_type: "cross_domain_collab"
+      name_zh: "跨域協作紀錄"
+      format: "markdown"
+      path: "extended/cross-domain-collab.md"
+    - artifact_type: "community_governance"
+      name_zh: "社群治理方案"
+      format: "markdown"
+      path: "extended/community-governance.md"
+    - artifact_type: "external_partnership"
+      name_zh: "外部合作協議"
+      format: "markdown"
+      path: "extended/external-partnership.md"
+    - artifact_type: "ecosystem_expansion"
+      name_zh: "生態系擴展報告"
+      format: "markdown"
+      path: "extended/ecosystem-expansion.md"
+    - artifact_type: "lessons_learned"
+      name_zh: "經驗總結與建議"
+      format: "markdown"
+      path: "extended/lessons-learned.md"
+  layer_dependencies:
+    upstream:
+      - layer: "all_layers"
+        relationship: "receives_proposals"
+        description: "接收各層級的創新提案"
+    downstream:
+      - layer: "GL00-09"
+        relationship: "provides_recommendations"
+        description: "為戰略層提供創新建議"
+      - layer: "GL10-29"
+        relationship: "transfers_knowledge"
+        description: "向運營層轉移經驗與知識"
+# =============================================================================
+# GL90-99: Meta-Specification Layer（元規範層）完整定義
+# =============================================================================
+GL90-99:
+  metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:GL-ARCHITECTURE-SPEC.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ARCHITECTURE-SPEC.yaml"
+    layer_id: "GL90-99"
+    name: "Meta-Specification Layer"
+    name_zh: "元規範層"
+    range: "90-99"
+    color_code: "#4F46E5"
+    icon: "📐"
+  semantic_definition:
+    purpose: |
+      元規範層負責定義治理體系的元規範、標準、規格、流程與審查機制，
+      管理規範的版本、演進與組合，確保治理架構的中立性、可擴展性、可組合性與一致性。
+    scope:
+      - "設計與維護治理體系的元規範、標準與規格"
+      - "管理規範的版本、演進與組合"
+      - "建立規範審查、發布與廢止流程"
+      - "實施規範自動化生成、驗證與組合"
+      - "產出規範設計文件、審查紀錄與組合說明"
+      - "支援各層級治理artifacts的標準化與組合"
+      - "監控規範一致性、可擴展性與中立性"
+      - "推動規範的持續演進與最佳實踐整合"
+    exclusions:
+      - "具體政策制定"
+      - "運營執行"
+  functional_boundaries:
+    inputs:
+      - name: "governance_requirements"
+        description: "治理需求"
+        source: "all_layers"
+      - name: "best_practices"
+        description: "最佳實踐"
+        source: "external"
+    outputs:
+      - name: "meta_specification"
+        description: "元規範設計文件"
+        path: "meta-spec/meta-specification.md"
+      - name: "composition_guide"
+        description: "規範組合說明"
+        path: "meta-spec/composition-guide.md"
+      - name: "review_log"
+        description: "規範審查紀錄"
+        path: "meta-spec/review-log.md"
+      - name: "version_history"
+        description: "規範版本管理文件"
+        path: "meta-spec/version-history.yaml"
+      - name: "composable_architecture"
+        description: "組合式架構設計圖"
+        path: "meta-spec/composable-architecture.svg"
+      - name: "generator"
+        description: "自動化生成腳本"
+        path: "meta-spec/generator.py"
+      - name: "validation_report"
+        description: "規範驗證報告"
+        path: "meta-spec/validation-report.md"
+      - name: "evolution_log"
+        description: "規範演進紀錄"
+        path: "meta-spec/evolution-log.md"
+  skills_capabilities:
+    required_skills:
+      - skill: "meta_spec_design"
+        name_zh: "元規範設計與標準制定"
+        level: "expert"
+      - skill: "spec_management"
+        name_zh: "規格管理與版本控制"
+        level: "advanced"
+      - skill: "composable_architecture"
+        name_zh: "組合式架構設計與模組化"
+        level: "expert"
+      - skill: "spec_review"
+        name_zh: "規範審查與流程管理"
+        level: "advanced"
+      - skill: "cross_domain_standards"
+        name_zh: "跨域標準整合與中立性維護"
+        level: "advanced"
+      - skill: "automation"
+        name_zh: "規範自動化生成與驗證"
+        level: "advanced"
+      - skill: "evolution_management"
+        name_zh: "規範演進與變更管理"
+        level: "advanced"
+      - skill: "documentation"
+        name_zh: "規範文件撰寫與結構化設計"
+        level: "advanced"
+  responsibilities:
+    governance_roles:
+      - role: "Chief Architect"
+        role_zh: "首席架構師"
+        duties:
+          - "元規範設計"
+          - "架構審查"
+          - "標準制定"
+      - role: "Standards Committee"
+        role_zh: "標準委員會"
+        duties:
+          - "規範審批"
+          - "版本管理"
+          - "演進規劃"
+      - role: "Spec Engineer"
+        role_zh: "規格工程師"
+        duties:
+          - "規範撰寫"
+          - "自動化工具開發"
+          - "驗證執行"
+  typical_artifacts:
+    - artifact_type: "meta_specification"
+      name_zh: "元規範設計文件"
+      format: "markdown"
+      path: "meta-spec/meta-specification.md"
+    - artifact_type: "composition_guide"
+      name_zh: "規範組合說明"
+      format: "markdown"
+      path: "meta-spec/composition-guide.md"
+    - artifact_type: "review_log"
+      name_zh: "規範審查紀錄"
+      format: "markdown"
+      path: "meta-spec/review-log.md"
+    - artifact_type: "version_history"
+      name_zh: "規範版本管理文件"
+      format: "yaml"
+      path: "meta-spec/version-history.yaml"
+    - artifact_type: "composable_architecture"
+      name_zh: "組合式架構設計圖"
+      format: "svg"
+      path: "meta-spec/composable-architecture.svg"
+    - artifact_type: "generator"
+      name_zh: "自動化生成腳本"
+      format: "python"
+      path: "meta-spec/generator.py"
+    - artifact_type: "validation_report"
+      name_zh: "規範驗證報告"
+      format: "markdown"
+      path: "meta-spec/validation-report.md"
+    - artifact_type: "evolution_log"
+      name_zh: "規範演進紀錄"
+      format: "markdown"
+      path: "meta-spec/evolution-log.md"
+  layer_dependencies:
+    upstream:
+      - layer: "all_layers"
+        relationship: "receives_requirements"
+        description: "接收各層級的規範需求"
+    downstream:
+      - layer: "all_layers"
+        relationship: "provides_standards"
+        description: "為所有層級提供規範、標準與自動化生成工具"
+# =============================================================================
+# 跨層級整合規範
+# =============================================================================
+cross_layer_integration:
+  communication_protocols:
+    - protocol: "artifact_flow"
+      description: "Artifacts在層級間的流動規範"
+      rules:
+        - "上層artifacts對下層具有約束力"
+        - "下層需定期回報執行情況"
+        - "跨層級artifacts需經審核"
+    - protocol: "decision_escalation"
+      description: "決策升級規範"
+      rules:
+        - "超出層級權限的決策需升級"
+        - "升級需提供完整背景資料"
+        - "升級決策需記錄追蹤"
+    - protocol: "feedback_loop"
+      description: "回饋循環規範"
+      rules:
+        - "執行結果需回饋至上層"
+        - "異常需即時通報"
+        - "改進建議需記錄追蹤"
+  governance_meetings:
+    - meeting: "strategic_review"
+      frequency: "quarterly"
+      participants: ["GL00-09", "GL10-29"]
+      purpose: "戰略目標檢討與調整"
+    - meeting: "operational_sync"
+      frequency: "monthly"
+      participants: ["GL10-29", "GL30-49"]
+      purpose: "運營與執行同步"
+    - meeting: "observability_review"
+      frequency: "weekly"
+      participants: ["GL30-49", "GL50-59"]
+      purpose: "監控數據檢討"
+    - meeting: "feedback_analysis"
+      frequency: "bi-weekly"
+      participants: ["GL50-59", "GL60-80"]
+      purpose: "回饋分析與優化"
+    - meeting: "innovation_showcase"
+      frequency: "monthly"
+      participants: ["GL81-83", "all_layers"]
+      purpose: "創新成果展示"
+    - meeting: "spec_review"
+      frequency: "quarterly"
+      participants: ["GL90-99", "all_layers"]
+      purpose: "規範審查與演進"
+  automation_integration:
+    ci_cd_hooks:
+      - hook: "pre_commit"
+        layer: "GL30-49"
+        actions: ["lint", "test", "security_scan"]
+      - hook: "post_merge"
+        layer: "GL50-59"
+        actions: ["metrics_update", "dashboard_refresh"]
+      - hook: "release"
+        layer: "GL10-29"
+        actions: ["changelog_update", "notification"]
+    automated_checks:
+      - check: "artifact_validation"
+        layer: "GL90-99"
+        frequency: "on_change"
+      - check: "compliance_scan"
+        layer: "GL50-59"
+        frequency: "daily"
+      - check: "slo_monitoring"
+        layer: "GL50-59"
+        frequency: "continuous"
+# =============================================================================
+# 版本與演進
+# =============================================================================
+versioning:
+  current_version: "2.0.0"
+  release_date: "2025-01-18"
+  changelog:
+    - version: "2.0.0"
+      date: "2025-01-18"
+      changes:
+        - "完整定義GL00-99所有層級"
+        - "新增技能與能力模型"
+        - "新增跨層級整合規範"
+        - "新增自動化整合規範"
+    - version: "1.0.0"
+      date: "2025-01-15"
+      changes:
+        - "初始版本"
+        - "基本層級定義"

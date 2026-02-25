@@ -1,0 +1,89 @@
+# @ECO-governed
+# @ECO-layer: GL20-29
+# @ECO-semantic: encryption-provider
+# @ECO-audit-trail: ../../../engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# RKE2 Secrets Encryption Provider Configuration
+# Encrypts Kubernetes secrets at rest using AES-CBC
+
+# ============================================================================
+# Configuration Instructions
+# ============================================================================
+# 1. Generate a 32-byte random key:
+#    HEAD -c 32 /dev/urandom | base64
+#
+# 2. Replace <BASE64_ENCODED_KEY> with the generated key
+#
+# 3. Apply this configuration:
+#    cp encryption-provider-config.yaml /etc/rancher/rke2/
+#
+# 4. Restart RKE2 server:
+#    systemctl restart rke2-server
+#
+# 5. Encrypt existing secrets:
+#    kubectl get secrets --all-namespaces -o json | kubectl replace -f -
+
+# ============================================================================
+# Encryption Configuration
+# ============================================================================
+apiVersion: apiserver.config.k8s.io/v1
+kind: EncryptionConfiguration
+resources:
+  # Encrypt all secrets
+  - resources:
+      - secrets
+    providers:
+      # Primary encryption: AES-CBC
+      - aescbc:
+          keys:
+            - name: key1
+              secret: <BASE64_ENCODED_KEY>
+      
+      # Fallback: no encryption (for migration)
+      - identity: {}
+
+# ============================================================================
+# Key Rotation Procedure
+# ============================================================================
+# 1. Generate new key:
+#    NEW_KEY=$(head -c 32 /dev/urandom | base64)
+#
+# 2. Update configuration with new key:
+#    Add new key to providers list with name: key2
+#
+# 3. Apply configuration:
+#    systemctl restart rke2-server
+#
+# 4. Re-encrypt all secrets:
+#    kubectl get secrets --all-namespaces -o json | kubectl replace -f -
+#
+# 5. Remove old key after verification
+#
+# 6. Restart RKE2 server
+
+# ============================================================================
+# GL Compliance
+# ============================================================================
+# - GL20-29: Resource & Standards - Encryption standards
+# - GL30-39: Process & Control - Key rotation procedures
+# - GL40-49: Monitoring & Optimization - Encryption monitoring
+# - GL50-59: Observability Layer - Audit logging of key operations
+
+# ============================================================================
+# Security Notes
+# ============================================================================
+# - Store the encryption key securely (e.g., AWS KMS, HashiCorp Vault)
+# - Never commit encryption keys to version control
+# - Rotate keys at least every 90 days
+# - Maintain key rotation audit logs
+# - Test encryption/decryption regularly
+# - Have a disaster recovery plan for key loss
+
+# ============================================================================
+# Backup and Recovery
+# ============================================================================
+# 1. Backup etcd regularly (configured in main config.yaml)
+# 2. Store encryption keys securely
+# 3. Document key locations and access procedures
+# 4. Test restore procedures regularly
+# 5. Have offline backups of critical secrets

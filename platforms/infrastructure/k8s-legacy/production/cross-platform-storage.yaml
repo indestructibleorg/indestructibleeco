@@ -1,0 +1,387 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: cross-platform-storage
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Cross-Platform Storage Configuration
+# Supports S3-compatible, GCS, Azure Blob, MinIO, and local storage
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cross-platform-storage-config
+  namespace: production
+data:
+  # Universal Storage Interface
+  storage-interface.yaml: |
+    apiVersion: storage.k8s.io/v1
+    kind: StorageClass
+    metadata:
+      name: universal-storage
+      annotations:
+        storageclass.kubernetes.io/is-default-class: "true"
+    provisioner: ${STORAGE_PROVISIONER:-kubernetes.io/aws-ebs}
+    parameters:
+      # AWS EBS parameters
+      type: ${STORAGE_TYPE:-gp3}
+      encrypted: "true"
+      kmsKeyId: ${KMS_KEY_ID:-}
+      iops: ${IOPS:-3000}
+      throughput: ${THROUGHPUT:-125}
+      
+      # GCP Persistent Disk parameters
+      type: ${GCP_DISK_TYPE:-pd-balanced}
+      replication-type: ${REPLICATION_TYPE:-regional-pd}
+      
+      # Azure Managed Disk parameters
+      skuName: ${AZURE_DISK_SKU:-StandardSSD_LRS}
+      cachingMode: ${AZURE_CACHE_MODE:-ReadWrite}
+    reclaimPolicy: Retain
+    allowVolumeExpansion: true
+    volumeBindingMode: WaitForFirstConsumer
+    allowedTopologies:
+      - matchLabelExpressions:
+        - key: topology.kubernetes.io/zone
+          values:
+            - ${ZONE_1:-us-east-1a}
+            - ${ZONE_2:-us-east-1b}
+            - ${ZONE_3:-us-east-1c}
+  
+  # Object Storage Configuration
+  object-storage.yaml: |
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: object-storage-credentials
+      namespace: production
+    type: Opaque
+    stringData:
+      # AWS S3
+      aws_access_key_id: ${AWS_ACCESS_KEY_ID:-}
+      aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY:-}
+      aws_region: ${AWS_REGION:-us-east-1}
+      aws_endpoint: ${AWS_S3_ENDPOINT:-https://s3.amazonaws.com}
+      
+      # Google Cloud Storage
+      gcp_service_account_key: ${GCP_SERVICE_ACCOUNT_KEY:-}
+      gcp_project: ${GCP_PROJECT:-}
+      gcp_bucket: ${GCS_BUCKET:-}
+      gcp_endpoint: ${GCS_ENDPOINT:-https://storage.googleapis.com}
+      
+      # Azure Blob Storage
+      azure_storage_account: ${AZURE_STORAGE_ACCOUNT:-}
+      azure_storage_key: ${AZURE_STORAGE_KEY:-}
+      azure_container: ${AZURE_CONTAINER:-}
+      azure_endpoint: ${AZURE_BLOB_ENDPOINT:-https://${AZURE_STORAGE_ACCOUNT}.blob.core.windows.net}
+      
+      # MinIO / S3-Compatible
+      minio_access_key: ${MINIO_ACCESS_KEY:-}
+      minio_secret_key: ${MINIO_SECRET_KEY:-}
+      minio_endpoint: ${MINIO_ENDPOINT:-http://minio:9000}
+      minio_use_ssl: ${MINIO_USE_SSL:-false}
+      
+      # Local Storage
+      local_path: ${LOCAL_STORAGE_PATH:-/data/storage}
+  
+  # S3-Compatible Storage Configuration
+  s3-compatible.yaml: |
+    s3Storage:
+      enabled: true
+      provider: ${S3_PROVIDER:-aws}  # aws | minio | wasabi | digitalocean | backblaze
+      
+      # AWS S3 Configuration
+      aws:
+        region: ${AWS_REGION:-us-east-1}
+        bucket: ${S3_BUCKET:-machine-native-ops}
+        prefix: ${S3_PREFIX:-data/}
+        endpoint: ${S3_ENDPOINT:-https://s3.amazonaws.com}
+        forcePathStyle: false
+        sse: AES256  # Server-side encryption
+        acl: private
+        lifecycle:
+          enabled: true
+          rules:
+            - id: transition-to-ia
+              status: enabled
+              filter:
+                prefix: archive/
+              transitions:
+                - days: 30
+                  storageClass: STANDARD_IA
+                - days: 90
+                  storageClass: GLACIER
+            - id: delete-old-files
+              status: enabled
+              expiration:
+                days: 365
+      
+      # Google Cloud Storage (S3-compatible)
+      gcs:
+        project: ${GCP_PROJECT:-}
+        bucket: ${GCS_BUCKET:-machine-native-ops}
+        prefix: ${GCS_PREFIX:-data/}
+        endpoint: ${GCS_ENDPOINT:-https://storage.googleapis.com}
+        forcePathStyle: false
+        sse: true
+        lifecycle:
+          enabled: true
+          rules:
+            - action: delete
+              condition:
+                age: 365
+      
+      # Azure Blob Storage (S3-compatible)
+      azure:
+        account: ${AZURE_STORAGE_ACCOUNT:-}
+        container: ${AZURE_CONTAINER:-machine-native-ops}
+        prefix: ${AZURE_PREFIX:-data/}
+        endpoint: ${AZURE_BLOB_ENDPOINT:-https://${AZURE_STORAGE_ACCOUNT}.blob.core.windows.net}
+        forcePathStyle: false
+        sse: true
+        lifecycle:
+          enabled: true
+          rules:
+            - enableVersioning: true
+            - daysAfterModifyingGreaterThan: 365
+              delete: true
+      
+      # MinIO Configuration
+      minio:
+        endpoint: ${MINIO_ENDPOINT:-http://minio:9000}
+        accessKey: ${MINIO_ACCESS_KEY:-}
+        secretKey: ${MINIO_SECRET_KEY:-}
+        bucket: ${MINIO_BUCKET:-machine-native-ops}
+        prefix: ${MINIO_PREFIX:-data/}
+        useSSL: ${MINIO_USE_SSL:-false}
+        region: ${MINIO_REGION:-us-east-1}
+        lifecycle:
+          enabled: true
+          rules:
+            - days: 90
+              delete: true
+      
+      # Wasabi Configuration
+      wasabi:
+        region: ${WASABI_REGION:-us-east-1}
+        bucket: ${WASABI_BUCKET:-machine-native-ops}
+        prefix: ${WASABI_PREFIX:-data/}
+        endpoint: ${WASABI_ENDPOINT:-https://s3.wasabisys.com}
+        accessKey: ${WASABI_ACCESS_KEY:-}
+        secretKey: ${WASABI_SECRET_KEY:-}
+        forcePathStyle: true
+      
+      # DigitalOcean Spaces Configuration
+      digitalocean:
+        region: ${DO_REGION:-nyc3}
+        bucket: ${DO_BUCKET:-machine-native-ops}
+        prefix: ${DO_PREFIX:-data/}
+        endpoint: ${DO_ENDPOINT:-https://nyc3.digitaloceanspaces.com}
+        accessKey: ${DO_ACCESS_KEY:-}
+        secretKey: ${DO_SECRET_KEY:-}
+        forcePathStyle: false
+  
+  # Database Storage Configuration
+  database-storage.yaml: |
+    databaseStorage:
+      # PostgreSQL Storage
+      postgresql:
+        provider: ${POSTGRES_PROVIDER:-aws}  # aws | gcp | azure | on-prem
+        
+        aws:
+          service: rds
+          engine: postgres
+          version: 15
+          instanceClass: ${RDS_INSTANCE_CLASS:-db.r6g.xlarge}
+          allocatedStorage: ${RDS_STORAGE:-100}
+          storageType: ${RDS_STORAGE_TYPE:-gp3}
+          iops: ${RDS_IOPS:-3000}
+          multiAZ: true
+          backupRetention: 30
+          backupWindow: 03:00-04:00
+          maintenanceWindow: sun:04:00-sun:05:00
+          encryption: true
+          kmsKeyId: ${KMS_KEY_ID:-}
+          performanceInsights: true
+          monitoringInterval: 60
+        
+        gcp:
+          service: cloud-sql
+          engine: postgres
+          version: POSTGRES_15
+          tier: ${CLOUDSQL_TIER:-db-custom-4-16384}
+          diskSize: ${CLOUDSQL_DISK_SIZE:-100}
+          diskType: ${CLOUDSQL_DISK_TYPE:-PD_SSD}
+          availabilityType: REGIONAL
+          backupRetention: 30
+          pointInTimeRecovery: true
+          binaryLogEnabled: true
+          databaseFlags:
+            - name: max_connections
+              value: "200"
+            - name: shared_buffers
+              value: "4GB"
+            - name: effective_cache_size
+              value: "12GB"
+        
+        azure:
+          service: sql-database
+          engine: postgresql
+          version: 15
+          sku: ${AZURE_SQL_SKU:-GP_Gen5_8}
+          maxSizeBytes: 107374182400  # 100GB
+          backupRetentionDays: 30
+          geoRedundantBackup: true
+          zoneRedundant: true
+          transparentDataEncryption: true
+      
+      # MySQL Storage
+      mysql:
+        provider: ${MYSQL_PROVIDER:-aws}  # aws | gcp | azure | on-prem
+        
+        aws:
+          service: rds
+          engine: mysql
+          version: 8.0
+          instanceClass: ${RDS_INSTANCE_CLASS:-db.r6g.xlarge}
+          allocatedStorage: ${RDS_STORAGE:-100}
+          storageType: ${RDS_STORAGE_TYPE:-gp3}
+          multiAZ: true
+          backupRetention: 30
+          encryption: true
+          kmsKeyId: ${KMS_KEY_ID:-}
+        
+        gcp:
+          service: cloud-sql
+          engine: mysql
+          version: MYSQL_8_0
+          tier: ${CLOUDSQL_TIER:-db-custom-4-16384}
+          diskSize: ${CLOUDSQL_DISK_SIZE:-100}
+          diskType: ${CLOUDSQL_DISK_TYPE:-PD_SSD}
+          availabilityType: REGIONAL
+          backupRetention: 30
+          pointInTimeRecovery: true
+        
+        azure:
+          service: sql-database
+          engine: mysql
+          version: 8.0
+          sku: ${AZURE_SQL_SKU:-GP_Gen5_8}
+          maxSizeBytes: 107374182400
+          backupRetentionDays: 30
+          geoRedundantBackup: true
+          zoneRedundant: true
+  
+  # Cache Storage Configuration
+  cache-storage.yaml: |
+    cacheStorage:
+      # Redis Storage
+      redis:
+        provider: ${REDIS_PROVIDER:-aws}  # aws | gcp | azure | on-prem
+        
+        aws:
+          service: elasticache
+          engine: redis
+          version: 7.0
+          nodeType: ${REDIS_NODE_TYPE:-cache.r6g.xlarge}
+          numCacheNodes: 3
+          replicationGroup: true
+          multiAZ: true
+          automaticFailover: true
+          encryptionAtRest: true
+          encryptionInTransit: true
+          authTokenEnabled: false
+          clusterMode: false
+          snapshotRetentionLimit: 7
+          snapshotWindow: 02:00-03:00
+          maintenanceWindow: sun:03:00-sun:04:00
+          redisConfiguration:
+            maxmemory-policy: allkeys-lru
+            maxmemory: ${REDIS_MAXMEMORY:-8GB}
+            timeout: 300
+        
+        gcp:
+          service: memorystore
+          engine: redis
+          version: REDIS_7_0
+          tier: ${REDIS_TIER:-STANDARD_HA}
+          memorySizeGb: ${REDIS_MEMORY_SIZE:-16}
+          redisConfig:
+            maxmemory-policy: allkeys-lru
+          readReplicas: 3
+          transitEncryption: true
+          authEnabled: true
+        
+        azure:
+          service: redis-cache
+          sku: ${AZURE_REDIS_SKU:-Premium}
+          size: ${AZURE_REDIS_SIZE:-P6}
+          capacity: 3
+          enableNonSslPort: false
+            minSslVersion: TLS1_2
+          replicaCount: 3
+          shardCount: 3
+          redisConfiguration:
+            maxmemory-policy: allkeys-lru
+            maxmemory: ${REDIS_MAXMEMORY:-8GB}
+            maxfragmentationmemory-reserved: 100
+            notify-keyspace-events: KEA
+  
+  # Backup Storage Configuration
+  backup-storage.yaml: |
+    backupStorage:
+      enabled: true
+      provider: ${BACKUP_PROVIDER:-aws}  # aws | gcp | azure | minio
+      
+      # Primary Backup Location
+      primary:
+        provider: aws
+        type: s3
+        bucket: ${BACKUP_BUCKET:-machine-native-ops-backups}
+        prefix: backups/
+        region: ${AWS_REGION:-us-east-1}
+        encryption: AES256
+        lifecycle:
+          - transition:
+              days: 30
+              storageClass: STANDARD_IA
+          - expiration:
+              days: 90
+      
+      # DR Backup Location 1
+      dr1:
+        provider: aws
+        type: s3
+        bucket: ${BACKUP_BUCKET_DR1:-machine-native-ops-backups-dr1}
+        prefix: backups/
+        region: ${DR1_REGION:-us-west-2}
+        encryption: AES256
+        lifecycle:
+          - expiration:
+              days: 180
+      
+      # DR Backup Location 2
+      dr2:
+        provider: gcp
+        type: gcs
+        bucket: ${BACKUP_BUCKET_DR2:-machine-native-ops-backups-dr2}
+        prefix: backups/
+        project: ${GCP_PROJECT:-}
+        encryption: true
+        lifecycle:
+          - action: delete
+            condition:
+              age: 180
+      
+      # Archive Location
+      archive:
+        provider: azure
+        type: blob
+        container: ${ARCHIVE_CONTAINER:-machine-native-ops-archive}
+        prefix: archives/
+        encryption: true
+        lifecycle:
+          - enableVersioning: true
+          - daysAfterModifyingGreaterThan: 365
+            delete: true

@@ -1,0 +1,96 @@
+# @ECO-governed
+# @ECO-layer: GL30-49
+# @ECO-semantic: policy-gate-configuration
+# @ECO-audit-trail: ../../../governance/GL_SEMANTIC_ANCHOR.json
+#
+# GL Unified Architecture Governance Framework Activated
+# gates-01-99.yaml
+# Intelligent-Hyperautomation Pipeline Gate - Best Practice Structure
+# GL Unified Architecture Governance Framework Activated v2.0.0
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:gl-gate:gates:gates-01-99.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/gl-gate/gates/gates-01-99.yaml"
+  name: gates-01-99
+  id: gates-01-99
+  version: '2.0.0'
+  description: Comprehensive pipeline gate system with compliance, attestation, and runtime triggers
+  tags: [pipeline, gate, ci, cd, devsecops, compliance, attestation]
+  maintainer: 'automation-team@machinenativeops.io'
+  created: '2025-01-28'
+  updated: '2025-01-28'
+  gl_version: '2.0.0'
+  compliance_level: 'strict'
+
+parameters:
+  inputs:
+    environment:
+      type: string
+      enum: [development, staging, production]
+      default: staging
+      gl_required: true
+    build_version:
+      type: string
+      default: 'v1.0.0'
+      gl_required: true
+
+triggers:
+  ci:
+    enabled: true
+  pr:
+    enabled: true
+  schedule:
+    enabled: true
+  manual:
+    enabled: true
+
+conditions:
+  gates:
+    - name: gl_governance_validation
+      enabled: true
+      required: true
+      on_failure: block
+      gl_required: true
+    - name: source_code_lint
+      enabled: true
+      required: true
+      on_failure: block
+      gl_required: true
+    - name: sast_scan
+      enabled: true
+      required: true
+      on_failure: block
+      gl_required: true
+
+actions:
+  - name: GL Governance Validation
+    type: gl_validation
+    enabled: true
+    continue_on_failure: false
+  - name: Lint Code
+    type: lint
+    enabled: true
+    continue_on_failure: false
+
+outputs:
+  artifacts:
+    - name: GL Validation Report
+      path: gl-validation-report.json
+      type: json
+
+compliance:
+  fail_on_violation: true
+  allow_override: false
+
+attestation:
+  enabled: true
+  types: [sbom, signature]
+
+approvals:
+  manual_approval:
+    enabled: true
+
+variables:
+  global:
+    GL_STRICT_MODE: 'true'

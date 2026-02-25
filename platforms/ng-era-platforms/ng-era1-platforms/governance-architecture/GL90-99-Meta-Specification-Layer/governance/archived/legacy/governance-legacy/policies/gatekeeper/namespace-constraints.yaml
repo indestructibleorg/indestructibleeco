@@ -1,0 +1,410 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# Gatekeeper Namespace Constraints
+# Kubernetes Admission Control 用於強制執行命名和標籤規範
+# 此文件的 parameters 應從 canonical/machine-spec.yaml 自動生成（codegen）
+
+# ConstraintTemplate 定義驗證邏輯
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8snamespacenamingcanonical
+  annotations:
+    description: "Validates namespace naming follows canonical patterns and has required labels"
+    source: "canonical/machine-spec.yaml"
+    generated: "false"  # 未來應標記為 true（codegen）
+
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sNamespaceNamingCanonical
+
+      validation:
+        # OpenAPI schema for parameters
+        openAPIV3Schema:
+          type: object
+          properties:
+            # 命名正則表達式
+            canonicalRegex:
+              type: string
+              description: "主命名正則表達式"
+
+            # 允許的環境
+            allowedEnvironments:
+              type: array
+              items:
+                type: string
+              description: "允許的環境列表"
+
+            # 必需標籤
+            requiredLabels:
+              type: array
+              items:
+                type: string
+              description: "必需的標籤列表"
+
+            # 必需 annotations
+            requiredAnnotations:
+              type: array
+              items:
+                type: string
+              description: "必需的 annotation 列表"
+
+            # 保留關鍵字
+            reservedKeywords:
+              type: array
+              items:
+                type: string
+              description: "不可用於命名的保留關鍵字"
+
+            # 豁免資源
+            exemptions:
+              type: array
+              items:
+                type: string
+              description: "豁免資源列表"
+
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8snamespacenamingcanonical
+
+        import future.keywords.contains
+        import future.keywords.if
+        import future.keywords.in
+
+        ##############################################
+        # 違規 1: 命名格式不符合 Canonical Pattern
+        ##############################################
+        violation[{"msg": msg, "details": details}] {
+          # 僅檢查 Namespace 資源
+          input.review.kind.kind == "Namespace"
+
+          # 獲取 Namespace 名稱
+          name := input.review.object.metadata.name
+
+          # 檢查是否豁免
+          not is_exempted(name)
+
+          # 驗證命名格式
+          not regex.match(input.parameters.canonicalRegex, name)
+
+          msg := sprintf("Namespace '%v' does not match canonical naming pattern", [name])
+          details := {
+            "expected_pattern": input.parameters.canonicalRegex,
+            "actual_name": name,
+            "violation_type": "naming_format",
+            "severity": "critical"
+          }
+        }
+
+        ##############################################
+        # 違規 2: 缺少必需標籤
+        ##############################################
+        violation[{"msg": msg, "details": details}] {
+          input.review.kind.kind == "Namespace"
+          name := input.review.object.metadata.name
+          not is_exempted(name)
+
+          # 檢查每個必需標籤
+          required := input.parameters.requiredLabels[_]
+          labels := object.get(input.review.object.metadata, "labels", {})
+          not labels[required]
+
+          msg := sprintf("Namespace '%v' is missing required label '%v'", [name, required])
+          details := {
+            "missing_label": required,
+            "violation_type": "missing_label",
+            "severity": "critical"
+          }
+        }
+
+        ##############################################
+        # 違規 3: 環境標籤值不合法
+        ##############################################
+        violation[{"msg": msg, "details": details}] {
+          input.review.kind.kind == "Namespace"
+          name := input.review.object.metadata.name
+          not is_exempted(name)
+
+          # 檢查環境標籤
+          labels := object.get(input.review.object.metadata, "labels", {})
+          env := labels.environment
+
+          # 環境標籤存在但值不在允許列表中
+          env
+          not env_in_allowed_list(env)
+
+          msg := sprintf("Namespace '%v' has invalid environment '%v', must be one of %v",
+                         [name, env, input.parameters.allowedEnvironments])
+          details := {
+            "invalid_value": env,
+            "allowed_values": input.parameters.allowedEnvironments,
+            "violation_type": "invalid_label_value",
+            "severity": "critical"
+          }
+        }
+
+        ##############################################
+        # 違規 4: 缺少必需 Annotations
+        ##############################################
+        violation[{"msg": msg, "details": details}] {
+          input.review.kind.kind == "Namespace"
+          name := input.review.object.metadata.name
+          not is_exempted(name)
+
+          # 檢查每個必需 annotation
+          required := input.parameters.requiredAnnotations[_]
+          annotations := object.get(input.review.object.metadata, "annotations", {})
+          not annotations[required]
+
+          msg := sprintf("Namespace '%v' is missing required annotation '%v'", [name, required])
+          details := {
+            "missing_annotation": required,
+            "violation_type": "missing_annotation",
+            "severity": "high"
+          }
+        }
+
+        ##############################################
+        # 違規 5: 包含保留關鍵字
+        ##############################################
+        violation[{"msg": msg, "details": details}] {
+          input.review.kind.kind == "Namespace"
+          name := input.review.object.metadata.name
+
+          # 檢查保留關鍵字（即使豁免也檢查，除非是系統命名空間）
+          not is_system_namespace(name)
+
+          keyword := input.parameters.reservedKeywords[_]
+          contains(name, keyword)
+
+          msg := sprintf("Namespace '%v' contains reserved keyword '%v'", [name, keyword])
+          details := {
+            "reserved_keyword": keyword,
+            "violation_type": "reserved_keyword",
+            "severity": "critical"
+          }
+        }
+
+        ##############################################
+        # 違規 6: 標籤值格式錯誤
+        ##############################################
+        violation[{"msg": msg, "details": details}] {
+          input.review.kind.kind == "Namespace"
+          name := input.review.object.metadata.name
+          not is_exempted(name)
+
+          labels := object.get(input.review.object.metadata, "labels", {})
+
+          # 檢查 tenant 標籤格式
+          tenant := labels.tenant
+          tenant
+          not regex.match("^[a-z0-9-]{2,32}$", tenant)
+
+          msg := sprintf("Namespace '%v' has invalid tenant label format '%v'", [name, tenant])
+          details := {
+            "invalid_label": "tenant",
+            "invalid_value": tenant,
+            "expected_format": "^[a-z0-9-]{2,32}$",
+            "violation_type": "invalid_label_format",
+            "severity": "high"
+          }
+        }
+
+        ##############################################
+        # 輔助函數
+        ##############################################
+
+        # 檢查資源是否豁免
+        is_exempted(name) {
+          exemption := input.parameters.exemptions[_]
+          name == exemption
+        }
+
+        # 檢查資源是否豁免（支持通配符）
+        is_exempted(name) {
+          exemption := input.parameters.exemptions[_]
+          glob.match(exemption, ["/"], name)
+        }
+
+        # 檢查是否為系統命名空間
+        is_system_namespace(name) {
+          system_namespaces := ["kube-system", "kube-public", "kube-node-lease", "default"]
+          name == system_namespaces[_]
+        }
+
+        # 檢查環境是否在允許列表中
+        env_in_allowed_list(env) {
+          allowed := input.parameters.allowedEnvironments[_]
+          env == allowed
+        }
+
+---
+# Constraint 實例 - 應用上述模板的具體約束
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sNamespaceNamingCanonical
+metadata:
+  name: namespace-naming-constraint
+  annotations:
+    description: "Enforces canonical naming and labeling for namespaces"
+    enforcement: "Production-ready enforcement"
+
+spec:
+  # 強制模式
+  enforcementAction: deny  # deny | dryrun | warn
+
+  # 匹配規則
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Namespace"]
+
+    # 排除某些命名空間（即使違規也不阻止）
+    excludedNamespaces: []
+
+  # 參數（從 canonical/machine-spec.yaml 派生）
+  parameters:
+    # Canonical 命名正則表達式
+    canonicalRegex: "^(team|tenant|dev|test|staging|prod|learn)-[a-z0-9-]{1,56}[a-z0-9]$"
+
+    # 允許的環境
+    allowedEnvironments:
+      - "dev"
+      - "test"
+      - "staging"
+      - "prod"
+      - "learn"
+
+    # 必需標籤
+    requiredLabels:
+      - "environment"
+      - "tenant"
+
+    # 必需 annotations
+    requiredAnnotations:
+      - "machinenativeops.io/canonical-urn"
+
+    # 保留關鍵字
+    reservedKeywords:
+      - "core"
+      - "internal"
+      - "system"
+      - "legacy"
+      - "experimental"
+      - "kube"
+      - "kubernetes"
+
+    # 豁免資源（完全豁免所有規則）
+    exemptions:
+      - "kube-system"
+      - "kube-public"
+      - "kube-node-lease"
+      - "default"
+      - "gatekeeper-system"
+      - "cert-manager"
+      - "ingress-nginx"
+      - "monitoring"
+      - "logging"
+      - "legacy-*"  # 支持通配符
+
+---
+# 可選: Dryrun 模式的 Constraint (用於測試)
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sNamespaceNamingCanonical
+metadata:
+  name: namespace-naming-constraint-dryrun
+  annotations:
+    description: "Dryrun mode for testing - reports violations but doesn't block"
+
+spec:
+  enforcementAction: dryrun  # 僅報告違規，不阻止
+
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Namespace"]
+
+  parameters:
+    canonicalRegex: "^(team|tenant|dev|test|staging|prod|learn)-[a-z0-9-]{1,56}[a-z0-9]$"
+    allowedEnvironments: ["dev", "test", "staging", "prod", "learn"]
+    requiredLabels: ["environment", "tenant"]
+    requiredAnnotations: ["machinenativeops.io/canonical-urn"]
+    reservedKeywords: ["core", "internal", "system", "legacy", "experimental"]
+    exemptions: ["kube-system", "kube-public", "kube-node-lease", "default"]
+
+---
+# 可選: Warn 模式的 Constraint (用於過渡期)
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sNamespaceNamingCanonical
+metadata:
+  name: namespace-naming-constraint-warn
+  annotations:
+    description: "Warn mode for transition period - reports violations as warnings"
+
+spec:
+  enforcementAction: warn  # 顯示警告但允許創建
+
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Namespace"]
+
+  parameters:
+    canonicalRegex: "^(team|tenant|dev|test|staging|prod|learn)-[a-z0-9-]{1,56}[a-z0-9]$"
+    allowedEnvironments: ["dev", "test", "staging", "prod", "learn"]
+    requiredLabels: ["environment", "tenant"]
+    requiredAnnotations: ["machinenativeops.io/canonical-urn"]
+    reservedKeywords: ["core", "internal", "system", "legacy", "experimental"]
+    exemptions: ["kube-system", "kube-public", "kube-node-lease", "default"]
+
+---
+# 使用說明和測試指南
+#
+# 1. 安裝 Gatekeeper (如果尚未安裝)
+# kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper/release-3.14/src/autonomous/deployment/gatekeeper.yaml
+#
+# 2. 部署此 ConstraintTemplate 和 Constraint
+# kubectl apply -f policies/gatekeeper/namespace-constraints.yaml
+#
+# 3. 驗證安裝
+# kubectl get constrainttemplates
+# kubectl get k8snamespacenamingcanonical
+#
+# 4. 測試 (Dry-run 模式)
+# kubectl create namespace test-namespace --dry-run=server -o yaml
+#
+# 5. 查看違規報告
+# kubectl get k8snamespacenamingcanonical namespace-naming-constraint -o yaml
+#
+# 6. 查看違規詳情
+# kubectl describe k8snamespacenamingcanonical namespace-naming-constraint
+#
+# 7. 測試合規 Namespace
+# kubectl apply -f - <<EOF
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: team-frontend-prod
+#   labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+#     environment: prod
+#     tenant: platform-team
+#   annotations:
+#     machinenativeops.io/canonical-urn: "urn:machinenativeops:team:frontend:env:prod:v1"
+# EOF
+#
+# 8. 測試不合規 Namespace (應該被拒絕)
+# kubectl apply -f - <<EOF
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: BadNamespace
+# EOF
+#
+# 預期輸出: Error from server (denied by namespace-naming-constraint)

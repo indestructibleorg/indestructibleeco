@@ -1,0 +1,95 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLFilesystemMapping
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-filesystem-mapping.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-filesystem-mapping.yaml"
+  name: gl-filesystem-mapping
+  version: "1.0.0"
+  created: "2026-01-21"
+filesystem_mapping:
+  # Governance Layers Root
+  gl_root:
+    path: "gl/"
+    description: "GL Governance Layers Root Directory"
+    semantic_urn: "urn:machinenativeops:gl:root:1.0.0"
+  # AI-Native Layers
+  data_layer:
+    path: "workspace/src/data/"
+    layer_id: "GL20-29"
+    description: "Data Science / Data Access Layer"
+    semantic_urn: "urn:machinenativeops:gl:data:layer:1.0.0"
+    subdirectories:
+      - path: "ingestion/"
+        module_id: "GL20"
+        semantic_urn: "urn:machinenativeops:gl:data:ingestion:1.0.0"
+      - path: "catalog/"
+        module_id: "GL21"
+        semantic_urn: "urn:machinenativeops:gl:data:catalog:1.0.0"
+      - path: "metadata/"
+        module_id: "GL22"
+        semantic_urn: "urn:machinenativeops:gl:data:metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-filesystem-mapping.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-filesystem-mapping.yaml"1.0.0"
+      - path: "assets/"
+        module_id: "GL23"
+        semantic_urn: "urn:machinenativeops:gl:data:assets:1.0.0"
+  algorithms_layer:
+    path: "workspace/src/algorithms/"
+    layer_id: "GL40-49"
+    description: "Algorithm Layer"
+    semantic_urn: "urn:machinenativeops:gl:algorithms:layer:1.0.0"
+    subdirectories:
+      - path: "models/"
+        module_id: "GL40"
+        semantic_urn: "urn:machinenativeops:gl:algorithms:models:1.0.0"
+      - path: "pipelines/"
+        module_id: "GL41"
+        semantic_urn: "urn:machinenativeops:gl:algorithms:pipelines:1.0.0"
+      - path: "feature_engineering/"
+        module_id: "GL42"
+        semantic_urn: "urn:machinenativeops:gl:algorithms:feature-engineering:1.0.0"
+  gpu_layer:
+    path: "workspace/src/gpu/"
+    layer_id: "GL50-59"
+    description: "CUDA / GPU Acceleration Layer"
+    semantic_urn: "urn:machinenativeops:gl:gpu:layer:1.0.0"
+    subdirectories:
+      - path: "cuda_kernels/"
+        module_id: "GL50"
+        semantic_urn: "urn:machinenativeops:gl:gpu:cuda-kernels:1.0.0"
+      - path: "gpu_scheduler/"
+        module_id: "GL51"
+        semantic_urn: "urn:machinenativeops:gl:gpu:scheduler:1.0.0"
+      - path: "accelerators/"
+        module_id: "GL52"
+        semantic_urn: "urn:machinenativeops:gl:gpu:accelerators:1.0.0"
+  # Validation Scripts
+  validation_scripts:
+    path: "scripts/gl/"
+    description: "GL Validation Scripts"
+    semantic_urn: "urn:machinenativeops:gl:validation:scripts:1.0.0"
+  # Evidence Storage
+  evidence_storage:
+    path: "var/evidence/"
+    description: "GL Evidence Chain Storage"
+    semantic_urn: "urn:machinenativeops:gl:evidence:storage:1.0.0"
+  audit_storage:
+    path: "var/audit/"
+    description: "GL Audit Report Storage"
+    semantic_urn: "urn:machinenativeops:gl:audit:storage:1.0.0"
+  risk_storage:
+    path: "var/risk/"
+    description: "GL Risk Assessment Storage"
+    semantic_urn: "urn:machinenativeops:gl:risk:storage:1.0.0"
+  monitoring_storage:
+    path: "var/monitoring/"
+    description: "GL Monitoring Report Storage"
+    semantic_urn: "urn:machinenativeops:gl:monitoring:storage:1.0.0"
+activation_status: "GL Unified Architecture Governance Framework Activated"

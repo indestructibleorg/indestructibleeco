@@ -1,0 +1,135 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: module-manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+module_id: "05-observability"
+module_name: "Observability & Monitoring System"
+module_description: |
+  The Observability & Monitoring System module provides comprehensive monitoring, alerting,
+  and operational visibility across the entire platform. It operates at L4-L5 autonomy levels,
+  enabling proactive detection of issues, automatic remediation, and semantic health monitoring.
+  This module integrates metrics collection, logging, tracing, and intelligent anomaly detection
+  to ensure system reliability and performance.
+autonomy_level: "L4-L5"
+namespace: "mno-observability"
+dependencies:
+  - "01-core"
+  - "02-intelligence"
+  - "03-governance"
+interfaces:
+  - name: "MetricsCollector"
+    type: "service"
+    description: "Metrics collection and aggregation interface"
+    endpoints:
+      - "POST /metrics/publish"
+      - "GET /metrics/{metric_id}"
+      - "GET /metrics/query"
+  - name: "AlertManager"
+    type: "service"
+    description: "Alert generation and notification interface"
+    endpoints:
+      - "POST /alerts/evaluate"
+      - "GET /alerts/{alert_id}"
+      - "POST /alerts/acknowledge"
+  - name: "TracingSystem"
+    type: "data"
+    description: "Distributed tracing and performance analysis interface"
+    endpoints:
+      - "POST /traces/span"
+      - "GET /traces/{trace_id}"
+      - "POST /traces/query"
+  - name: "LogAggregator"
+    type: "data"
+    description: "Centralized log collection and search interface"
+    endpoints:
+      - "POST /logs/ingest"
+      - "GET /logs/search"
+      - "GET /logs/{log_id}"
+  - name: "AnomalyDetector"
+    type: "service"
+    description: "AI-powered anomaly detection and prediction"
+    endpoints:
+      - "POST /anomalies/detect"
+      - "GET /anomalies/{anomaly_id}"
+      - "POST /anomalies/predict"
+  - name: "SemanticHealthMonitor"
+    type: "service"
+    description: "Semantic health scoring and monitoring"
+    endpoints:
+      - "GET /semantic-health/score"
+      - "GET /semantic-health/trends"
+      - "POST /semantic-health/evaluate"
+status: "active"
+version: "1.0.0"
+components:
+  - name: "MetricsCollector"
+    type: "service"
+    description: "Prometheus-compatible metrics collection"
+    location: "lib/mno-observability/metrics-collector/"
+  - name: "AlertManager"
+    type: "service"
+    description: "Intelligent alert management and notification"
+    location: "lib/mno-observability/alert-manager/"
+  - name: "TracingSystem"
+    type: "service"
+    description: "OpenTelemetry-based distributed tracing"
+    location: "lib/mno-observability/tracing-system/"
+  - name: "LogAggregator"
+    type: "service"
+    description: "Elasticsearch-compatible log aggregation"
+    location: "lib/mno-observability/log-aggregator/"
+  - name: "AnomalyDetector"
+    type: "service"
+    description: "ML-based anomaly detection and prediction"
+    location: "lib/mno-observability/anomaly-detector/"
+  - name: "SemanticHealthMonitor"
+    type: "service"
+    description: "Semantic health scoring and monitoring dashboard"
+    location: "lib/mno-observability/semantic-health/"
+  - name: "AutoFixEngine"
+    type: "service"
+    description: "Automatic remediation and fix execution"
+    location: "lib/mno-observability/autofix/"
+semantic_mappings:
+  - concept: "Metrics Collection"
+    mapping: "mno-observability.metrics-collector"
+    description: "Map metrics concepts to metrics collector"
+  - concept: "Alerting"
+    mapping: "mno-observability.alert-manager"
+    description: "Map alert concepts to alert manager"
+  - concept: "Distributed Tracing"
+    mapping: "mno-observability.tracing-system"
+    description: "Map tracing concepts to tracing system"
+  - concept: "Log Aggregation"
+    mapping: "mno-observability.log-aggregator"
+    description: "Map log concepts to log aggregator"
+  - concept: "Anomaly Detection"
+    mapping: "mno-observability.anomaly-detector"
+    description: "Map anomaly detection to anomaly detector"
+  - concept: "Semantic Health"
+    mapping: "mno-observability.semantic-health"
+    description: "Map semantic health to semantic health monitor"
+  - concept: "Auto-Fix"
+    mapping: "mno-observability.autofix"
+    description: "Map automatic fixes to auto-fix engine"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:controlplane:baseline:modules:05-observability:module-manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/05-observability/module-manifest.yaml"
+  created_date: "2025-01-18"
+  last_modified: "2025-01-18"
+  maintainers:
+    - "MachineNativeOps Team"
+  tags:
+    - "observability"
+    - "monitoring"
+    - "metrics"
+    - "alerting"
+    - "tracing"
+    - "logging"
+    - "anomaly-detection"
+    - "semantic-health"
+    - "autofix"

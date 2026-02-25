@@ -1,0 +1,180 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: disaster-recovery-job
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:disaster-recovery-job.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/disaster-recovery-job.yaml"
+  name: dr-health-check
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: disaster-recovery
+    test-type: health-check
+    environment: production
+spec:
+  schedule: "*/15 * * * *"  # Every 15 minutes
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: dr-health-check
+            image: ghcr.io/machinenativeops/dr-testing:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Starting DR health check at $(date)"
+              
+              # Check backup status
+              echo "Checking backup status..."
+              velero backup get --output json > /tmp/backup-status.json
+              BACKUP_STATUS=$(cat /tmp/backup-status.json | jq -r '.[0].status.phase')
+              echo "Latest backup status: $BACKUP_STATUS"
+              
+              if [ "$BACKUP_STATUS" != "Completed" ]; then
+                echo "ERROR: Backup status is not Completed"
+                exit 1
+              fi
+              
+              # Check database health
+              echo "Checking database health..."
+              kubectl exec -it deployment/postgresql -n production -- \
+                psql -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "SELECT 1;" > /tmp/db-health.txt
+              DB_HEALTH=$(cat /tmp/db-health.txt | grep -c "1")
+              
+              if [ "$DB_HEALTH" -ne 1 ]; then
+                echo "ERROR: Database health check failed"
+                exit 1
+              fi
+              
+              # Check cache health
+              echo "Checking cache health..."
+              kubectl exec -it deployment/redis-master -n production -- \
+                redis-cli ping > /tmp/cache-health.txt
+              CACHE_HEALTH=$(cat /tmp/cache-health.txt | grep -c "PONG")
+              
+              if [ "$CACHE_HEALTH" -ne 1 ]; then
+                echo "ERROR: Cache health check failed"
+                exit 1
+              fi
+              
+              # Check application health
+              echo "Checking application health..."
+              kubectl exec -it deployment/machine-native-ops -n production -- \
+                curl http://localhost:8000/health > /tmp/app-health.txt
+              APP_HEALTH=$(cat /tmp/app-health.txt | grep -c "OK")
+              
+              if [ "$APP_HEALTH" -ne 1 ]; then
+                echo "ERROR: Application health check failed"
+                exit 1
+              fi
+              
+              echo "DR health check completed successfully at $(date)"
+            env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: machine-native-ops-secrets
+                  key: postgres-user
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: machine-native-ops-secrets
+                  key: postgres-db
+            volumeMounts:
+            - name: results
+              mountPath: /tmp
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 200m
+                memory: 256Mi
+          volumes:
+          - name: results
+            emptyDir: {}
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:disaster-recovery-job.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/disaster-recovery-job.yaml"
+  name: dr-backup-verification
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: disaster-recovery
+    test-type: backup-verification
+    environment: production
+spec:
+  schedule: "0 */6 * * *"  # Every 6 hours
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: dr-backup-verification
+            image: ghcr.io/machinenativeops/dr-testing:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Starting DR backup verification at $(date)"
+              
+              # Create test backup
+              echo "Creating test backup..."
+              velero backup create dr-verification-$(date +%Y%m%d-%H%M%S) \
+                --include-namespaces production \
+                --wait
+              
+              # Verify backup was created
+              echo "Verifying backup creation..."
+              BACKUP_NAME=$(velero backup get -o json | jq -r '.[0].name')
+              BACKUP_STATUS=$(velero backup get -o json | jq -r '.[0].status.phase')
+              
+              if [ "$BACKUP_STATUS" != "Completed" ]; then
+                echo "ERROR: Backup verification failed"
+                exit 1
+              fi
+              
+              # Test restore (dry-run)
+              echo "Testing restore (dry-run)..."
+              velero restore create dr-verification-restore \
+                --from-backup $BACKUP_NAME \
+                --dry-run \
+                --wait
+              
+              echo "DR backup verification completed successfully at $(date)"
+              
+              # Clean up
+              velero backup delete $BACKUP_NAME --confirm
+            resources:
+              requests:
+                cpu: 200m
+                memory: 256Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi

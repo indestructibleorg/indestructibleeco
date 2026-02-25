@@ -1,0 +1,165 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: backup-encryption
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Backup Encryption Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:backup-encryption.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/backup-encryption.yaml"
+  name: backup-encryption-config
+  namespace: velero
+data:
+  encryption-policy.yaml: |
+    # Backup encryption policy
+    encryption:
+      enabled: true
+      
+      # Encryption at rest
+      atRest:
+        algorithm: AES256-GCM
+        keyManagement:
+          type: AWS-KMS
+          keyArn: arn:aws:kms:us-east-1:123456789012:key/abcd1234-5678-90ab-cdef-1234567890ab
+          region: us-east-1
+        keyRotation:
+          enabled: true
+          schedule: "0 0 1 * *"  # Monthly on 1st day
+          retention: 2  # Keep 2 versions of keys
+      
+      # Encryption in transit
+      inTransit:
+        protocol: TLSv1.2
+        cipherSuites:
+          - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+          - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        minVersion: TLSv1.2
+        maxVersion: TLSv1.3
+        certificateVerification: strict
+        caBundle: /etc/ssl/certs/ca-certificates.crt
+      
+      # Encryption settings per backup type
+      perBackupType:
+        fullCluster:
+          atRest: true
+          inTransit: true
+          compression: true
+          compressionAlgorithm: gzip
+        incremental:
+          atRest: true
+          inTransit: true
+          compression: false
+        database:
+          atRest: true
+          inTransit: true
+          compression: true
+          compressionAlgorithm: zstd
+        configuration:
+          atRest: true
+          inTransit: true
+          compression: false
+      
+      # Key management for cross-region replication
+      crossRegionEncryption:
+        enabled: true
+        strategy: region-isolated  # Each region uses its own KMS key
+        regions:
+          us-east-1:
+            keyArn: arn:aws:kms:us-east-1:123456789012:key/key1
+          us-west-2:
+            keyArn: arn:aws:kms:us-west-2:123456789012:key/key2
+          eu-west-1:
+            keyArn: arn:aws:kms:eu-west-1:123456789012:key/key3
+---
+# Secret for encryption keys
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:backup-encryption.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/backup-encryption.yaml"
+  name: velero-encryption-keys
+  namespace: velero
+type: Opaque
+stringData:
+  encryption-key: |
+    -----BEGIN ENCRYPTION KEY-----
+    # Generated encryption key for backup encryption
+    # This is a placeholder - use AWS KMS in production
+    aes-256-key: your-generated-aes-256-key-here
+    key-version: 1
+    key-created: "2026-01-27T00:00:00Z"
+    key-expires: "2026-04-27T00:00:00Z"
+    -----END ENCRYPTION KEY-----
+  cross-region-keys.yaml: |
+    us-east-1-key: arn:aws:kms:us-east-1:123456789012:key/key1
+    us-west-2-key: arn:aws:kms:us-west-2:123456789012:key/key2
+    eu-west-1-key: arn:aws:kms:eu-west-1:123456789012:key/key3
+---
+# Velero backup storage configuration with encryption
+apiVersion: velero.io/v1
+kind: BackupStorageLocation
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:backup-encryption.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/backup-encryption.yaml"
+  name: primary-backup
+  namespace: velero
+spec:
+  provider: aws
+  objectStorage:
+    bucket: machine-native-ops-backups-primary
+    prefix: backups
+  config:
+    region: us-east-1
+    s3Url: https://s3.us-east-1.amazonaws.com
+    encryptionEnabled: true
+    kmsKeyId: arn:aws:kms:us-east-1:123456789012:key/abcd1234-5678-90ab-cdef-1234567890ab
+  accessMode: ReadWrite
+---
+# DR region backup storage location
+apiVersion: velero.io/v1
+kind: BackupStorageLocation
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:backup-encryption.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/backup-encryption.yaml"
+  name: dr-backup-us-west-2
+  namespace: velero
+spec:
+  provider: aws
+  objectStorage:
+    bucket: machine-native-ops-backups-dr
+    prefix: backups
+  config:
+    region: us-west-2
+    s3Url: https://s3.us-west-2.amazonaws.com
+    encryptionEnabled: true
+    kmsKeyId: arn:aws:kms:us-west-2:123456789012:key/efgh5678-9012-34cd-efgh-567890123456
+  accessMode: ReadWrite
+---
+# EU region backup storage location
+apiVersion: velero.io/v1
+kind: BackupStorageLocation
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:backup-encryption.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/backup-encryption.yaml"
+  name: dr-backup-eu-west-1
+  namespace: velero
+spec:
+  provider: aws
+  objectStorage:
+    bucket: machine-native-ops-backups-eu
+    prefix: backups
+  config:
+    region: eu-west-1
+    s3Url: https://s3.eu-west-1.amazonaws.com
+    encryptionEnabled: true
+    kmsKeyId: arn:aws:kms:eu-west-1:123456789012:key/ijkl9012-3456-78ef-ghij-901234567890
+  accessMode: ReadWrite

@@ -1,0 +1,113 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: namespace
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+---
+# Istio-enabled namespace with automatic sidecar injection
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:istio:namespace.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/istio/namespace.yaml"
+  name: machine-native-ops
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    istio-injection: enabled
+    name: machine-native-ops
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+---
+# Resource quotas for namespace
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:istio:namespace.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/istio/namespace.yaml"
+  name: compute-resources
+  namespace: platform-03
+spec:
+  hard:
+    requests.cpu: "10"
+    requests.memory: 20Gi
+    limits.cpu: "20"
+    limits.memory: 40Gi
+    persistentvolumeclaims: "10"
+---
+# Limit range for pods
+apiVersion: v1
+kind: LimitRange
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:istio:namespace.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/istio/namespace.yaml"
+  name: default-limits
+  namespace: platform-03
+spec:
+  limits:
+  - default:
+      cpu: 1000m
+      memory: 512Mi
+    defaultRequest:
+      cpu: 100m
+      memory: 128Mi
+    type: Container
+---
+# Network policy for namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:istio:namespace.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/istio/namespace.yaml"
+  name: deny-all
+  namespace: platform-03
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
+# Network policy allowing Istio traffic
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:istio:namespace.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/istio/namespace.yaml"
+  name: allow-istio
+  namespace: platform-03
+spec:
+  podSelector:
+    matchLabels:
+      istio-injection: enabled
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          istio-injection: enabled
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          istio-injection: enabled
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: istio-system
+    ports:
+    - protocol: TCP
+      port: 15012
+    - protocol: TCP
+      port: 15014
+    - protocol: TCP
+      port: 15021

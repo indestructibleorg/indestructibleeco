@@ -1,0 +1,894 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: naming-governance
+# @ECO-audit-trail: gl-platform-ecosystem/governance/audit-trails/GL90_99-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-platform-ecosystem/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-platform-ecosystem/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: gl-runtime.io/v1.0.0
+kind: GovernanceContract
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:contracts:unified-naming-governance-contract.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/contracts/unified-naming-governance-contract.yaml"
+  name: unified-naming-governance-contract
+  version: v1.0.0
+  description: "GL Unified Naming Governance Contract - 統一命名治理契約"
+  namespace: gl-platform-ecosystem
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    contract.level: L1
+    contract.type: constitutional
+    governance.layer: unified
+    unification: complete
+spec:
+  ## Contract Overview
+  overview:
+    version: v1.0.0
+    status: ACTIVE
+    effective_date: "2026-01-31T00:00:00Z"
+    description: |
+      GL 統一命名治理契約整合了語意統一、結構統一、治理統一三個層級，
+      提供完整的 MachineNativeOps 命名治理標準。
+    
+    governance-level: CONSTITUTIONAL
+    enforcement-level: MANDATORY
+    compatibility: v1.0.0
+  
+  ## Integration of Three Unification Specs
+  unification-integration:
+    ## Semantic Unification
+    semantic:
+      spec_ref: "semantic-unification-spec.yaml"
+      version: v1.0.0
+      components:
+        - semantic-taxonomy
+        - semantic-mapping
+        - semantic-validation
+        - semantic-graph
+        - comment-naming
+    
+    ## Structural Unification
+    structural:
+      spec_ref: "structural-unification-spec.yaml"
+      version: v1.0.0
+      components:
+        - project-structure
+        - contract-structure
+        - path-integrity
+        - platform-directory-naming
+        - file-naming
+        - service-structure
+    
+    ## Governance Unification
+    governance:
+      spec_ref: "governance-unification-spec.yaml"
+      version: v1.0.0
+      components:
+        - governance-events
+        - governance-apis
+        - governance-model
+        - enforcement-levels
+  
+  ## Complete Naming Standards
+  naming-standards:
+    ## 1. Comment Naming Convention
+    comment-naming:
+      version: v1.0.0
+      format: "gl:<domain>:<capability>:<tag>"
+      block-format: "gl-block:<domain>:<capability>:<block_name>"
+      key-format: "gl.key.<domain>.<capability>.<semantic_key>"
+      
+      rules:
+        - "必須以 gl: 開頭"
+        - "使用冒號分隔（machine-friendly）"
+        - "domain/capability 必須與平台一致"
+        - "tag 必須是語意化名詞"
+      
+      examples:
+        tag:
+          - "gl:runtime:dag:description"
+          - "gl:api:schema:field"
+          - "gl:agent:max:behavior"
+          - "gl:governance:policy:rule"
+          - "gl:semantic:node:explain"
+        block:
+          - "gl-block:runtime:dag:validation"
+          - "gl-block:agent:max:planning"
+          - "gl-block:governance:policy:enforcement"
+        key:
+          - "gl.key.runtime.dag.node_type"
+          - "gl.key.api.schema.field_type"
+          - "gl.key.agent.max.intent"
+          - "gl.key.governance.policy.level"
+    
+    ## 2. Mapping Naming Convention
+    mapping-naming:
+      version: v1.0.0
+      format: "gl-<domain>-<capability>-map"
+      
+      rules:
+        - "全小寫"
+        - "只能使用 a-z、0-9、-"
+        - "domain 必須是語意分類"
+        - "capability 必須是平台能力"
+      
+      examples:
+        - "gl-runtime-dag-map"
+        - "gl-quantum-compute-map"
+        - "gl-api-schema-map"
+        - "gl-agent-behavior-map"
+        - "gl-multimodal-vision-map"
+    
+    ## 3. Reference Naming Convention
+    reference-naming:
+      version: v1.0.0
+      format: "gl.ref.<domain>.<capability>.<resource>"
+      
+      rules:
+        - "使用 dot notation（便於工具解析）"
+        - "domain + capability 必須與平台一致"
+        - "resource 必須是具體功能"
+      
+      examples:
+        - "gl.ref.runtime.dag.executor"
+        - "gl.ref.api.schema.user"
+        - "gl.ref.agent.max.behavior"
+        - "gl.ref.mcp.multimodal.router"
+        - "gl.ref.db.shard.manager"
+    
+    ## 4. Path Naming Convention
+    path-naming:
+      version: v1.0.0
+      
+      repo-format: "/platforms/gl-<domain>-<capability>-platform"
+      api-format: "/gl/<domain>/<capability>/<resource>"
+      
+      rules:
+        - "所有 API path 必須以 /gl/ 開頭"
+        - "domain/capability 必須與平台一致"
+      
+      examples:
+        repo:
+          - "/platforms/gl-runtime-dag-platform"
+          - "/platforms/gl-api-schema-platform"
+          - "/platforms/gl-agent-max-platform"
+        api:
+          - "/gl/runtime/dag/submit"
+          - "/gl/api/schema/generate"
+          - "/gl/agent/max/execute"
+          - "/gl/mcp/multimodal/process"
+          - "/gl/db/shard/rebalance"
+    
+    ## 5. Port Naming Convention
+    port-naming:
+      version: v1.0.0
+      format: "<protocol>-<domain>-<capability>"
+      
+      protocols:
+        - http
+        - grpc
+        - metrics
+      
+      rules:
+        - "protocol = http | grpc | metrics"
+        - "domain/capability 必須與平台一致"
+        - "端口號不寫在名稱裡（避免耦合）"
+      
+      examples:
+        - "http-runtime-dag"
+        - "grpc-quantum-compute"
+        - "http-api-schema"
+        - "grpc-agent-max"
+        - "metrics-mcp-multimodal"
+    
+    ## 6. Service Naming Convention
+    service-naming:
+      version: v1.0.0
+      format: "gl-<domain>-<capability>-svc"
+      
+      rules:
+        - "必須以 gl- 開頭"
+        - "必須以 -svc 結尾"
+        - "domain/capability 必須與平台一致"
+      
+      examples:
+        - "gl-runtime-dag-svc"
+        - "gl-quantum-compute-svc"
+        - "gl-api-schema-svc"
+        - "gl-agent-max-svc"
+        - "gl-mcp-multimodal-svc"
+    
+    ## 7. Dependency Naming Convention
+    dependency-naming:
+      version: v1.0.0
+      format: "gl.dep.<domain>.<capability>"
+      
+      rules:
+        - "使用 dot notation"
+        - "domain/capability 必須與平台一致"
+        - "用於自動生成 semantic dependency graph"
+      
+      examples:
+        - "gl.dep.runtime.dag"
+        - "gl.dep.quantum.compute"
+        - "gl.dep.api.schema"
+        - "gl.dep.agent.max"
+        - "gl.dep.db.shard"
+    
+    ## 8. Short Naming Convention
+    short-naming:
+      version: v1.0.0
+      formats:
+        - "gl.<abbr>"
+        - "gl.<domainabbr>.<capabbr>"
+      
+      rules:
+        - "全小寫"
+        - "不超過 15 字元"
+        - "domain、capability 必須有標準縮寫"
+        - "必須以 gl. 開頭"
+        - "不允許破折號（短命名用 dot notation）"
+      
+      standard-abbreviations:
+        runtime: rt
+        quantum: qm
+        api: api
+        agent: ag
+        multimodal: mm
+        database: db
+        compute: cp
+        storage: st
+        governance: gov
+        semantic: sem
+      
+      examples:
+        - "gl.rt.dag"
+        - "gl.api.sch"
+        - "gl.ag.max"
+        - "gl.mm.proc"
+        - "gl.db.shd"
+        - "gl.qm.comp"
+        - "gl.sem.map"
+    
+    ## 9. Long Naming Convention
+    long-naming:
+      version: v1.0.0
+      formats:
+        - "gl-<domain>-<capability>-<resource>"
+        - "gl-<domain>-<capability>-platform"
+        - "gl-<domain>-<capability>-service"
+      
+      rules:
+        - "全小寫"
+        - "使用破折號（kebab-case）"
+        - "domain、capability 必須使用完整語意"
+        - "resource 可選"
+        - "必須以 gl- 開頭"
+      
+      examples:
+        - "gl-runtime-dag-platform"
+        - "gl-quantum-compute-service"
+        - "gl-api-schema-generator"
+        - "gl-agent-max-runner"
+        - "gl-multimodal-vision-router"
+        - "gl-database-shard-manager"
+        - "gl-governance-policy-engine"
+    
+    ## 10. Directory Naming Convention
+    directory-naming:
+      version: v1.0.0
+      
+      platform-format: "gl-<domain>-<capability>-platform/"
+      service-format: "gl-<domain>-<capability>-service/"
+      module-format: "gl-<domain>-<capability>-module/"
+      
+      rules:
+        - "全小寫"
+        - "必須使用 kebab-case"
+        - "必須以 gl- 開頭"
+        - "domain 必須是語意分類"
+        - "capability 必須是平台能力"
+        - "結尾必須是 platform/service/module"
+      
+      sub-directories:
+        - src/
+        - src/api/
+        - src/core/
+        - src/adapters/
+        - src/services/
+        - src/models/
+        - src/controllers/
+        - src/workflows/
+        - src/agents/
+        - src/pipelines/
+        - tests/
+        - docs/
+        - configs/
+        - contracts/
+        - governance/
+      
+      examples:
+        - "gl-api-realtime-platform/"
+        - "gl-code-ai-platform/"
+        - "gl-agent-autonomy-platform/"
+        - "gl-mcp-multimodal-platform/"
+        - "gl-ai-suite-platform/"
+        - "gl-learning-ai-platform/"
+        - "gl-model-hub-platform/"
+        - "gl-collaboration-ai-platform/"
+        - "gl-gitops-dev-platform/"
+        - "gl-edge-deploy-platform/"
+        - "gl-iac-multicloud-platform/"
+        - "gl-community-ai-platform/"
+        - "gl-docs-collab-platform/"
+        - "gl-nocode-ai-platform/"
+        - "gl-distributed-db-platform/"
+        - "gl-code-search-platform/"
+        - "gl-ci-review-platform/"
+        - "gl-longtext-multimodal-platform/"
+        - "gl-realtime-agent-platform/"
+        - "gl-general-ai-platform/"
+        - "gl-build-accelerator-platform/"
+    
+    ## 11. File Naming Convention
+    file-naming:
+      version: v1.0.0
+      format: "gl-<domain>-<capability>-<resource>.<ext>"
+      
+      rules:
+        - "全小寫"
+        - "必須使用 kebab-case"
+        - "必須以 gl- 開頭（平台層）"
+        - "resource 必須是語意化名詞"
+        - "檔案類型必須明確（yaml/json/md/ts/js/go/py）"
+      
+      core-files:
+        - "platform.config.yaml"
+        - "platform.contract.yaml"
+        - "platform.capabilities.yaml"
+        - "platform.dependencies.yaml"
+        - "platform.metadata.yaml"
+      
+      api-files:
+        - "gl-api-schema-user.yaml"
+        - "gl-api-schema-auth.yaml"
+        - "gl-api-schema-product.yaml"
+      
+      agent-files:
+        - "gl-agent-max-behavior.yaml"
+        - "gl-agent-max-rules.yaml"
+        - "gl-agent-max-actions.yaml"
+      
+      pipeline-files:
+        - "gl-runtime-dag-execution.yaml"
+        - "gl-runtime-dag-validation.yaml"
+      
+      governance-files:
+        - "gl-governance-policy-runtime.yaml"
+        - "gl-governance-policy-security.yaml"
+        - "gl-governance-policy-compliance.yaml"
+      
+      semantic-graph-files:
+        - "gl-semantic-nodes.yaml"
+        - "gl-semantic-edges.yaml"
+        - "gl-semantic-metadata.yaml"
+    
+    ## 12. Event Naming Convention
+    event-naming:
+      version: v1.0.0
+      format: "gl.event.<domain>.<capability>.<action>"
+      
+      rules:
+        - "必須以 gl.event. 開頭"
+        - "使用 dot notation"
+        - "action 必須是動詞"
+      
+      examples:
+        - "gl.event.runtime.dag.started"
+        - "gl.event.runtime.dag.completed"
+        - "gl.event.api.schema.generated"
+        - "gl.event.api.schema.validated"
+        - "gl.event.agent.max.completed"
+        - "gl.event.agent.max.failed"
+        - "gl.event.naming.violation.detected"
+        - "gl.event.naming.fix.applied"
+        - "gl.event.contract.updated"
+        - "gl.event.semantic.changed"
+    
+    ## 13. Variable Naming Convention
+    variable-naming:
+      version: v1.0.0
+      format: "GL<DOMAIN><CAPABILITY>_<RESOURCE>"
+      
+      rules:
+        - "全大寫"
+        - "使用下劃線分隔"
+        - "必須以 GL 開頭"
+        - "適用於常量和配置變量"
+      
+      examples:
+        - "GLRUNTIMEDAG_TIMEOUT"
+        - "GLRUNTIMEDAG_MAX_DEPTH"
+        - "GLAPISCHEMA_VERSION"
+        - "GLAPISCHEMA_VALIDATION_ENABLED"
+        - "GLAGENTMAX_RETRIES"
+        - "GLAGENTMAX_TIMEOUT"
+        - "GLMULTIMODALVISION_MODEL"
+        - "GLGOVERNANCEPOLICY_LEVEL"
+    
+    ## 14. Environment Variable Naming Convention
+    env-naming:
+      version: v1.0.0
+      format: "GL_<PLATFORM>_<SETTING>"
+      
+      rules:
+        - "全大寫"
+        - "使用下劃線分隔"
+        - "必須以 GL_ 開頭"
+        - "適用於環境變量"
+      
+      examples:
+        - "GL_RUNTIME_MAX_WORKERS"
+        - "GL_RUNTIME_TIMEOUT"
+        - "GL_API_RATE_LIMIT"
+        - "GL_API_PORT"
+        - "GL_DB_SHARD_COUNT"
+        - "GL_DB_CONNECTION_POOL"
+        - "GL_AGENT_MAX_ENABLED"
+        - "GL_GOVERNANCE_LEVEL"
+    
+    ## 15. GitOps Naming Convention
+    gitops-naming:
+      version: v1.0.0
+      format: "gl-<domain>-<capability>-app"
+      
+      rules:
+        - "全小寫"
+        - "使用 kebab-case"
+        - "必須以 gl- 開頭"
+        - "必須以 -app 結尾"
+      
+      examples:
+        - "gl-runtime-dag-app"
+        - "gl-quantum-compute-app"
+        - "gl-api-schema-app"
+        - "gl-agent-max-app"
+        - "gl-multimodal-vision-app"
+    
+    ## 16. Helm Release Naming Convention
+    helm-naming:
+      version: v1.0.0
+      format: "gl-<domain>-<capability>-release"
+      
+      rules:
+        - "全小寫"
+        - "使用 kebab-case"
+        - "必須以 gl- 開頭"
+        - "必須以 -release 結尾"
+      
+      examples:
+        - "gl-runtime-dag-release"
+        - "gl-quantum-compute-release"
+        - "gl-api-schema-release"
+        - "gl-agent-max-release"
+        - "gl-multimodal-vision-release"
+
+## 17. Namespace Governance Baseline
+namespace-governance-framework-baseline:
+  version: v1.0.0
+  description: "整合 gl- 命名規範的 Namespace Governance Baseline"
+  
+  namespace:
+    name: intelligent-hyperautomation-baseline
+    labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+      baseline.level: L-A
+      baseline.version: v1.0.0
+      baseline.type: namespace-governance
+      governance.io/constitutional: "true"
+      governance.io/layer: L1
+      governance.io/enforcement: mandatory
+  
+  naming-patterns:
+    production:
+      regex: "^[a-z][a-z0-9-]*-(prod|production)$"
+      description: "生產環境命名規範"
+    
+    gl-platform:
+      regex: "^gl-[a-z]+-[a-z0-9-]+$"
+      description: "GL 平台命名規範"
+    
+    gl-service:
+      regex: "^gl-[a-z]+-[a-z0-9-]+-svc$"
+      description: "GL 服務命名規範"
+    
+    gl-deployment:
+      regex: "^gl-[a-z]+-[a-z0-9-]+-deployment$"
+      description: "GL 部署命名規範"
+
+## 18. Mandatory Labels
+mandatory-labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+  version: v1.0.0
+  description: "強制標籤定義"
+  
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    - key: baseline.component
+      required: true
+      regex: "^[a-z0-9-]+$"
+      description: "基線組件標籤"
+    
+    - key: policy.level
+      required: true
+      regex: "^L[0-5]$"
+      description: "策略等級標籤"
+    
+    - key: semantic.type
+      required: false
+      regex: "^[a-z0-9-]+$"
+      description: "語意類型標籤"
+    
+    - key: capability.scope
+      required: false
+      regex: "^[a-z0-9-]+$"
+      description: "能力範圍標籤"
+    
+    - key: execution.mode
+      required: false
+      regex: "^[a-z0-9-]+$"
+      description: "執行模式標籤"
+    
+    - key: data.sensitivity
+      required: false
+      regex: "^(public|internal|confidential|restricted)$"
+      description: "數據敏感度標籤"
+    
+    - key: audit.level
+      required: false
+      regex: "^(none|basic|detailed|comprehensive)$"
+      description: "審計等級標籤"
+
+## 19. Capability Registry Schema
+capability-registry:
+  version: v1.0.0
+  description: "能力註冊表 Schema"
+  
+  schema:
+    capability_id:
+      pattern: "^cap-[a-z0-9-]+$"
+      description: "能力唯一標識"
+      examples:
+        - "cap-gl-runtime-dag"
+        - "cap-gl-quantum-compute"
+        - "cap-gl-api-schema"
+        - "cap-gl-agent-max"
+        - "cap-gl-multimodal-vision"
+        - "cap-gl-machine-native-ops"
+    
+    capability_name:
+      type: string
+      required: true
+      description: "能力名稱"
+    
+    domain:
+      type: string
+      required: true
+      description: "所屬域"
+      enum:
+        - runtime
+        - quantum
+        - api
+        - agent
+        - multimodal
+        - database
+        - compute
+        - storage
+        - governance
+        - semantic
+    
+    capability_type:
+      type: string
+      required: true
+      description: "能力類型"
+      enum:
+        - platform
+        - service
+        - tool
+        - library
+        - framework
+    
+    version:
+      type: string
+      required: true
+      pattern: "^v[0-9]+\\.[0-9]+\\.[0-9]+$"
+      description: "版本號"
+    
+    status:
+      type: string
+      required: true
+      enum:
+        - DEVELOPMENT
+        - TESTING
+        - STABLE
+        - DEPRECATED
+        - RETIRED
+      description: "能力狀態"
+    
+    dependencies[]:
+      type: string
+      required: false
+      description: "依賴列表"
+      pattern: "^cap-[a-z0-9-]+$"
+
+## 20. Governance Levels
+governance-levels:
+  version: v1.0.0
+  description: "治理等級定義"
+  
+  levels:
+    - level: L0
+      name: DISABLED
+      description: "治理禁用"
+      enforcement: NONE
+    
+    - level: L1
+      name: MONITORING
+      description: "僅監控"
+      enforcement: PASSIVE
+    
+    - level: L2
+      name: ADVISORY
+      description: "建議修復"
+      enforcement: SOFT
+    
+    - level: L3
+      name: STRICT
+      description: "嚴格執行"
+      enforcement: HARD
+    
+    - level: L4
+      name: CRITICAL
+      description: "關鍵執行"
+      enforcement: BLOCKING
+    
+    - level: L5
+      name: CONSTITUTIONAL
+      description: "憲法級"
+      enforcement: ABSOLUTE
+
+## 21. Lifecycle States
+lifecycle-states:
+  version: v1.0.0
+  description: "生命週期狀態定義"
+  
+  state-machine: "DECLARED->REGISTERED->COORDINATED->ACTIVE->DEPRECATED->RETIRED"
+  
+  states:
+    - state: DECLARED
+      description: "已聲明"
+      transitions:
+        - to: REGISTERED
+          condition: "naming_compliant == true"
+    
+    - state: REGISTERED
+      description: "已註冊"
+      transitions:
+        - to: COORDINATED
+          condition: "dependencies_resolved == true"
+    
+    - state: COORDINATED
+      description: "已協調"
+      transitions:
+        - to: ACTIVE
+          condition: "validation_passed == true"
+    
+    - state: ACTIVE
+      description: "活躍"
+      transitions:
+        - to: DEPRECATED
+          condition: "deprecation_requested == true"
+    
+    - state: DEPRECATED
+      description: "已棄用"
+      transitions:
+        - to: RETIRED
+          condition: "all_consumers_migrated == true"
+    
+    - state: RETIRED
+      description: "已退役"
+      transitions: []
+
+## 22. Version Compatibility
+version-compatibility:
+  version: v1.0.0
+  description: "版本相容性矩陣"
+  
+  compatibility-matrix:
+    - version: v1.0.0
+      compatible_versions:
+        - v1.0.0
+      breaking_changes: []
+      migration_paths: []
+
+## 23. Deployment Requirements
+deployment-requirements:
+  version: v1.0.0
+  description: "部署要求"
+  
+  prerequisites:
+    - "所有命名必須符合規範"
+    - "所有契約必須已驗證"
+    - "所有依賴必須已解析"
+    - "合規分數必須 >= 90"
+  
+  validation-checks:
+    - check: "naming-compliance"
+      required: true
+      tool: "naming-validator"
+    
+    - check: "semantic-consistency"
+      required: true
+      tool: "semantic-validator"
+    
+    - check: "structural-integrity"
+      required: true
+      tool: "structural-validator"
+    
+    - check: "governance-compliance"
+      required: true
+      tool: "governance-validator"
+
+## 24. Audit Requirements
+audit-requirements:
+  version: v1.0.0
+  description: "審計要求"
+  
+  audit-events:
+    - gl.event.naming.violation
+    - gl.event.naming.fix
+    - gl.event.naming.exception
+    - gl.event.contract.update
+    - gl.event.contract.validation
+    - gl.event.semantic.change
+    - gl.event.semantic.conflict
+    - gl.event.platform.register
+    - gl.event.platform.deregister
+  
+  retention-period: "30 days"
+  audit-level: COMPREHENSIVE
+
+## 25. Exception Handling
+exception-handling:
+  version: v1.0.0
+  description: "例外處理"
+  
+  exception-types:
+    - type: NAMING_FORMAT
+      approval_required: true
+      approval_level: L3
+      max_duration: "90 days"
+    
+    - type: NAMING_CONVENTION
+      approval_required: true
+      approval_level: L2
+      max_duration: "180 days"
+    
+    - type: SEMANTIC_CONFLICT
+      approval_required: true
+      approval_level: L4
+      max_duration: "30 days"
+    
+    - type: DUPLICATE_NAME
+      approval_required: false
+      auto_resolution: true
+
+## 26. Migration Guide
+migration-guide:
+  version: v1.0.0
+  description: "遷移指南"
+  
+  steps:
+    - step: 1
+      action: "Validate existing naming"
+      tool: "naming-validator"
+    
+    - step: 2
+      action: "Generate fix plan"
+      tool: "naming-fixer --dry-run"
+    
+    - step: 3
+      action: "Apply fixes"
+      tool: "naming-fixer"
+    
+    - step: 4
+      action: "Validate fixes"
+      tool: "naming-validator"
+    
+    - step: 5
+      action: "Update references"
+      tool: "reference-updater"
+    
+    - step: 6
+      action: "Run full audit"
+      tool: "governance-audit"
+
+## 27. Best Practices
+best-practices:
+  version: v1.0.0
+  description: "最佳實踐"
+  
+  naming:
+    - "使用語意化的名稱，避免縮寫（除非有標準）"
+    - "保持名稱簡短但描述性"
+    - "使用一致的命名風格"
+    - "避免使用保留字"
+    - "定期審查和清理命名"
+  
+  governance:
+    - "從 L1（MONITORING）開始，逐步提升到 L3（STRICT）"
+    - "建立定期審計機制"
+    - "記錄所有例外並定期審查"
+    - "使用自動化工具進行驗證"
+    - "維護命名合規分數 >= 90"
+  
+  documentation:
+    - "為所有命名添加註解"
+    - "維護命名註冊表"
+    - "提供命名範例和反例"
+    - "建立命名遷移指南"
+
+## 28. Troubleshooting
+troubleshooting:
+  version: v1.0.0
+  description: "故障排除"
+  
+  common-issues:
+    - issue: "命名違規檢測失敗"
+      solution: "檢查命名規範配置，確認規則已正確定義"
+    
+    - issue: "語意衝突"
+      solution: "檢查語意圖，確認沒有重複或衝突的語意定義"
+    
+    - issue: "驗證超時"
+      solution: "優化驗證邏輯，或增加超時時間"
+    
+    - issue: "修復失敗"
+      solution: "檢查文件權限，確認工具可以修改文件"
+    
+    - issue: "合規分數低"
+      solution: "修復 HIGH 和 MEDIUM 優先級的違規"
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:contracts:unified-naming-governance-contract.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/contracts/unified-naming-governance-contract.yaml"
+  created_at: "2026-01-31T00:00:00Z"
+  updated_at: "2026-01-31T00:00:00Z"
+  governance_level: CONSTITUTIONAL
+  enforcement: MANDATORY
+  compatibility:
+    - v1.0.0
+  
+  signatures:
+    - signature: "sha256:unified-naming-governance-v1.0.0"
+      algorithm: "SHA256"
+      signed_by: "GL Governance Layer"
+  
+  changelog:
+    - version: v1.0.0
+      date: "2026-01-31"
+      changes:
+        - "Initial release of unified naming governance contract"
+        - "Integrated semantic, structural, and governance unification"
+        - "Defined 16 naming conventions"
+        - "Established governance levels and lifecycle states"
+        - "Created migration guide and best practices"

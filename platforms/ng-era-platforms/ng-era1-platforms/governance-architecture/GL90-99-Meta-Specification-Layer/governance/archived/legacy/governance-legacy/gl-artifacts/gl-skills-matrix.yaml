@@ -1,0 +1,991 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLSkillsMatrix
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-skills-matrix.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-skills-matrix.yaml"
+  name: gl-skills-matrix
+  version: "1.0.0"
+  status: SEALED
+  created_at: "2025-01-18T00:00:00Z"
+  sealed_at: "2025-01-18T00:00:00Z"
+  owner: governance-committee
+matrix_seal:
+  status: SEALED
+  immutable: true
+  cross_layer_prohibited: true
+  mix_layer_prohibited: true
+  skip_layer_prohibited: true
+  expansion_prohibited: true
+  rewrite_prohibited: true
+  drift_prohibited: true
+GL00-09:
+  matrix_id: "MATRIX-GL00-09"
+  layer_id: "GL00-09"
+  name: "Strategic Layer"
+  name_zh: "戰略層"
+  status: SEALED
+  skills:
+    - skill_id: "SK-00-01"
+      name: "strategic_thinking"
+      name_zh: "戰略思維"
+      description: "制定長期願景與戰略方向的能力"
+      level: "expert"
+      artifacts_mapping:
+        - "vision-statement"
+        - "strategic-objectives"
+    - skill_id: "SK-00-02"
+      name: "vision_formulation"
+      name_zh: "願景制定"
+      description: "定義組織願景與使命的能力"
+      level: "expert"
+      artifacts_mapping:
+        - "vision-statement"
+        - "governance-charter"
+    - skill_id: "SK-00-03"
+      name: "risk_assessment"
+      name_zh: "風險評估"
+      description: "識別、評估與管理企業風險的能力"
+      level: "expert"
+      artifacts_mapping:
+        - "risk-assessment"
+    - skill_id: "SK-00-04"
+      name: "compliance_management"
+      name_zh: "合規管理"
+      description: "確保法規與政策合規的能力"
+      level: "expert"
+      artifacts_mapping:
+        - "compliance-policy"
+    - skill_id: "SK-00-05"
+      name: "architecture_design"
+      name_zh: "架構設計"
+      description: "設計治理架構與組織結構的能力"
+      level: "expert"
+      artifacts_mapping:
+        - "architecture-decision-record"
+    - skill_id: "SK-00-06"
+      name: "stakeholder_engagement"
+      name_zh: "利害關係人管理"
+      description: "管理高層利害關係人的能力"
+      level: "advanced"
+      artifacts_mapping:
+        - "governance-charter"
+  capabilities:
+    - capability_id: "CAP-00-01"
+      name: "define_organizational_vision"
+      name_zh: "定義組織願景"
+      description: "制定並維護組織願景、使命與價值觀"
+      skills_required:
+        - "strategic_thinking"
+        - "vision_formulation"
+      artifacts_output:
+        - "vision-statement"
+    - capability_id: "CAP-00-02"
+      name: "establish_governance_charter"
+      name_zh: "建立治理框架"
+      description: "設計與審核治理框架與政策總則"
+      skills_required:
+        - "strategic_thinking"
+        - "compliance_management"
+      artifacts_output:
+        - "governance-charter"
+    - capability_id: "CAP-00-03"
+      name: "approve_strategic_decisions"
+      name_zh: "審批戰略決策"
+      description: "審批重大戰略決策與資源分配"
+      skills_required:
+        - "strategic_thinking"
+        - "risk_assessment"
+      artifacts_output:
+        - "architecture-decision-record"
+    - capability_id: "CAP-00-04"
+      name: "manage_enterprise_risk"
+      name_zh: "管理企業風險"
+      description: "識別、評估與管理企業級風險"
+      skills_required:
+        - "risk_assessment"
+        - "compliance_management"
+      artifacts_output:
+        - "risk-assessment"
+    - capability_id: "CAP-00-05"
+      name: "ensure_regulatory_compliance"
+      name_zh: "確保法規合規"
+      description: "確保組織符合法規與政策要求"
+      skills_required:
+        - "compliance_management"
+      artifacts_output:
+        - "compliance-policy"
+  responsibilities:
+    - responsibility_id: "RESP-00-01"
+      name: "vision_mission_ownership"
+      name_zh: "願景使命所有權"
+      description: "制定與維護組織願景、使命、價值觀"
+      capabilities_required:
+        - "define_organizational_vision"
+      accountability: "governance-committee"
+    - responsibility_id: "RESP-00-02"
+      name: "governance_charter_ownership"
+      name_zh: "治理框架所有權"
+      description: "設計與審核治理框架、戰略目標（OKR）、政策總則"
+      capabilities_required:
+        - "establish_governance_charter"
+      accountability: "governance-committee"
+    - responsibility_id: "RESP-00-03"
+      name: "resource_allocation_decision"
+      name_zh: "資源分配決策"
+      description: "決定資源分配與重大投資方向"
+      capabilities_required:
+        - "approve_strategic_decisions"
+      accountability: "executive-board"
+    - responsibility_id: "RESP-00-04"
+      name: "governance_committee_establishment"
+      name_zh: "治理委員會設立"
+      description: "設立高階治理委員會（如董事會、戰略委員會）"
+      capabilities_required:
+        - "establish_governance_charter"
+      accountability: "executive-board"
+    - responsibility_id: "RESP-00-05"
+      name: "downstream_governance_oversight"
+      name_zh: "下層治理監督"
+      description: "監督下層治理執行情況，確保戰略落地"
+      capabilities_required:
+        - "approve_strategic_decisions"
+        - "manage_enterprise_risk"
+      accountability: "governance-committee"
+    - responsibility_id: "RESP-00-06"
+      name: "risk_strategy_approval"
+      name_zh: "風險策略審批"
+      description: "審查與批准重大風險管理策略"
+      capabilities_required:
+        - "manage_enterprise_risk"
+      accountability: "risk-committee"
+GL10-29:
+  matrix_id: "MATRIX-GL10-29"
+  layer_id: "GL10-29"
+  name: "Operational Layer"
+  name_zh: "運營層"
+  status: SEALED
+  skills:
+    - skill_id: "SK-10-01"
+      name: "policy_development"
+      name_zh: "政策制定"
+      description: "制定與落地治理政策的能力"
+      level: "advanced"
+      artifacts_mapping:
+        - "policy-document"
+    - skill_id: "SK-10-02"
+      name: "process_optimization"
+      name_zh: "流程優化"
+      description: "設計與優化運營流程的能力"
+      level: "advanced"
+      artifacts_mapping:
+        - "process-definition"
+    - skill_id: "SK-10-03"
+      name: "resource_management"
+      name_zh: "資源管理"
+      description: "協調與分配運營資源的能力"
+      level: "advanced"
+      artifacts_mapping:
+        - "resource-allocation"
+    - skill_id: "SK-10-04"
+      name: "quality_assurance"
+      name_zh: "品質保證"
+      description: "建立與維護品質標準的能力"
+      level: "advanced"
+      artifacts_mapping:
+        - "quality-standard"
+    - skill_id: "SK-10-05"
+      name: "team_coordination"
+      name_zh: "團隊協調"
+      description: "協調跨團隊合作的能力"
+      level: "intermediate"
+      artifacts_mapping:
+        - "operational-plan"
+    - skill_id: "SK-10-06"
+      name: "capability_development"
+      name_zh: "能力發展"
+      description: "培養團隊能力的能力"
+      level: "advanced"
+      artifacts_mapping:
+        - "capability-matrix"
+  capabilities:
+    - capability_id: "CAP-10-01"
+      name: "implement_governance_policies"
+      name_zh: "實施治理政策"
+      description: "將戰略層政策轉化為可執行流程"
+      skills_required:
+        - "policy_development"
+        - "process_optimization"
+      artifacts_output:
+        - "policy-document"
+        - "process-definition"
+    - capability_id: "CAP-10-02"
+      name: "manage_operational_processes"
+      name_zh: "管理運營流程"
+      description: "管理日常運營活動與流程"
+      skills_required:
+        - "process_optimization"
+        - "team_coordination"
+      artifacts_output:
+        - "operational-plan"
+    - capability_id: "CAP-10-03"
+      name: "allocate_resources"
+      name_zh: "分配資源"
+      description: "協調跨團隊資源分配"
+      skills_required:
+        - "resource_management"
+      artifacts_output:
+        - "resource-allocation"
+    - capability_id: "CAP-10-04"
+      name: "monitor_quality_metrics"
+      name_zh: "監控品質指標"
+      description: "維護品質標準與監控指標"
+      skills_required:
+        - "quality_assurance"
+      artifacts_output:
+        - "quality-standard"
+    - capability_id: "CAP-10-05"
+      name: "develop_team_capabilities"
+      name_zh: "發展團隊能力"
+      description: "培養組織能力與團隊技能"
+      skills_required:
+        - "capability_development"
+        - "team_coordination"
+      artifacts_output:
+        - "capability-matrix"
+  responsibilities:
+    - responsibility_id: "RESP-10-01"
+      name: "policy_implementation"
+      name_zh: "政策實施"
+      description: "將戰略層政策轉化為可執行流程"
+      capabilities_required:
+        - "implement_governance_policies"
+      accountability: "operations-team"
+    - responsibility_id: "RESP-10-02"
+      name: "daily_operations_management"
+      name_zh: "日常運營管理"
+      description: "管理日常運營活動"
+      capabilities_required:
+        - "manage_operational_processes"
+      accountability: "operations-manager"
+    - responsibility_id: "RESP-10-03"
+      name: "cross_team_coordination"
+      name_zh: "跨團隊協調"
+      description: "協調跨團隊資源"
+      capabilities_required:
+        - "allocate_resources"
+      accountability: "resource-coordinator"
+    - responsibility_id: "RESP-10-04"
+      name: "quality_standard_maintenance"
+      name_zh: "品質標準維護"
+      description: "維護品質標準"
+      capabilities_required:
+        - "monitor_quality_metrics"
+      accountability: "quality-team"
+    - responsibility_id: "RESP-10-05"
+      name: "capability_cultivation"
+      name_zh: "能力培養"
+      description: "培養組織能力"
+      capabilities_required:
+        - "develop_team_capabilities"
+      accountability: "hr-team"
+GL30-49:
+  matrix_id: "MATRIX-GL30-49"
+  layer_id: "GL30-49"
+  name: "Execution Layer"
+  name_zh: "執行層"
+  status: SEALED
+  skills:
+    - skill_id: "SK-30-01"
+      name: "template_design"
+      name_zh: "模板設計"
+      description: "設計可重用模板的能力"
+      level: "intermediate"
+      artifacts_mapping:
+        - "template-file"
+    - skill_id: "SK-30-02"
+      name: "schema_definition"
+      name_zh: "Schema 定義"
+      description: "定義數據結構與驗證規則的能力"
+      level: "intermediate"
+      artifacts_mapping:
+        - "schema-definition"
+    - skill_id: "SK-30-03"
+      name: "automation_scripting"
+      name_zh: "自動化腳本"
+      description: "開發自動化腳本的能力"
+      level: "intermediate"
+      artifacts_mapping:
+        - "automation-script"
+    - skill_id: "SK-30-04"
+      name: "configuration_management"
+      name_zh: "配置管理"
+      description: "管理系統配置的能力"
+      level: "intermediate"
+      artifacts_mapping:
+        - "config-file"
+    - skill_id: "SK-30-05"
+      name: "contract_specification"
+      name_zh: "契約規範"
+      description: "規範行為契約的能力"
+      level: "intermediate"
+      artifacts_mapping:
+        - "behavior-contract"
+    - skill_id: "SK-30-06"
+      name: "rule_engine_design"
+      name_zh: "規則引擎設計"
+      description: "設計規則引擎的能力"
+      level: "advanced"
+      artifacts_mapping:
+        - "rule-definition"
+  capabilities:
+    - capability_id: "CAP-30-01"
+      name: "create_execution_templates"
+      name_zh: "創建執行模板"
+      description: "創建可重用模板"
+      skills_required:
+        - "template_design"
+      artifacts_output:
+        - "template-file"
+    - capability_id: "CAP-30-02"
+      name: "define_data_schemas"
+      name_zh: "定義數據 Schema"
+      description: "定義數據結構與驗證規則"
+      skills_required:
+        - "schema_definition"
+      artifacts_output:
+        - "schema-definition"
+    - capability_id: "CAP-30-03"
+      name: "implement_automation"
+      name_zh: "實現自動化"
+      description: "實現自動化流程"
+      skills_required:
+        - "automation_scripting"
+      artifacts_output:
+        - "automation-script"
+    - capability_id: "CAP-30-04"
+      name: "manage_configurations"
+      name_zh: "管理配置"
+      description: "管理系統配置"
+      skills_required:
+        - "configuration_management"
+      artifacts_output:
+        - "config-file"
+    - capability_id: "CAP-30-05"
+      name: "specify_behavior_contracts"
+      name_zh: "規範行為契約"
+      description: "規範行為契約"
+      skills_required:
+        - "contract_specification"
+      artifacts_output:
+        - "behavior-contract"
+  responsibilities:
+    - responsibility_id: "RESP-30-01"
+      name: "template_creation"
+      name_zh: "模板創建"
+      description: "創建可重用模板"
+      capabilities_required:
+        - "create_execution_templates"
+      accountability: "dev-team"
+    - responsibility_id: "RESP-30-02"
+      name: "schema_management"
+      name_zh: "Schema 管理"
+      description: "定義數據結構與驗證規則"
+      capabilities_required:
+        - "define_data_schemas"
+      accountability: "dev-team"
+    - responsibility_id: "RESP-30-03"
+      name: "automation_implementation"
+      name_zh: "自動化實現"
+      description: "實現自動化流程"
+      capabilities_required:
+        - "implement_automation"
+      accountability: "devops-team"
+    - responsibility_id: "RESP-30-04"
+      name: "configuration_control"
+      name_zh: "配置控制"
+      description: "管理系統配置"
+      capabilities_required:
+        - "manage_configurations"
+      accountability: "devops-team"
+    - responsibility_id: "RESP-30-05"
+      name: "contract_enforcement"
+      name_zh: "契約執行"
+      description: "規範行為契約"
+      capabilities_required:
+        - "specify_behavior_contracts"
+      accountability: "dev-team"
+GL50-59:
+  matrix_id: "MATRIX-GL50-59"
+  layer_id: "GL50-59"
+  name: "Observability Layer"
+  name_zh: "觀測層"
+  status: SEALED
+  skills:
+    - skill_id: "SK-50-01"
+      name: "monitoring_design"
+      name_zh: "監控設計"
+      description: "設計監控系統的能力"
+      level: "intermediate"
+      artifacts_mapping:
+        - "monitoring-config"
+    - skill_id: "SK-50-02"
+      name: "metric_definition"
+      name_zh: "指標定義"
+      description: "定義關鍵指標的能力"
+      level: "intermediate"
+      artifacts_mapping:
+        - "metric-definition"
+    - skill_id: "SK-50-03"
+      name: "alert_configuration"
+      name_zh: "告警配置"
+      description: "配置告警規則的能力"
+      level: "intermediate"
+      artifacts_mapping:
+        - "alert-rule"
+    - skill_id: "SK-50-04"
+      name: "log_analysis"
+      name_zh: "日誌分析"
+      description: "分析日誌數據的能力"
+      level: "intermediate"
+      artifacts_mapping:
+        - "logging-config"
+    - skill_id: "SK-50-05"
+      name: "trace_correlation"
+      name_zh: "追蹤關聯"
+      description: "關聯分散式追蹤的能力"
+      level: "advanced"
+      artifacts_mapping:
+        - "tracing-config"
+    - skill_id: "SK-50-06"
+      name: "dashboard_design"
+      name_zh: "儀表板設計"
+      description: "設計儀表板的能力"
+      level: "intermediate"
+      artifacts_mapping:
+        - "dashboard-definition"
+  capabilities:
+    - capability_id: "CAP-50-01"
+      name: "configure_monitoring_systems"
+      name_zh: "配置監控系統"
+      description: "配置監控系統"
+      skills_required:
+        - "monitoring_design"
+      artifacts_output:
+        - "monitoring-config"
+    - capability_id: "CAP-50-02"
+      name: "define_metrics_and_kpis"
+      name_zh: "定義指標與 KPI"
+      description: "定義關鍵指標"
+      skills_required:
+        - "metric_definition"
+      artifacts_output:
+        - "metric-definition"
+    - capability_id: "CAP-50-03"
+      name: "setup_alerting_rules"
+      name_zh: "設置告警規則"
+      description: "設置告警規則"
+      skills_required:
+        - "alert_configuration"
+      artifacts_output:
+        - "alert-rule"
+    - capability_id: "CAP-50-04"
+      name: "aggregate_logs"
+      name_zh: "聚合日誌"
+      description: "收集與分析日誌"
+      skills_required:
+        - "log_analysis"
+      artifacts_output:
+        - "logging-config"
+    - capability_id: "CAP-50-05"
+      name: "correlate_traces"
+      name_zh: "關聯追蹤"
+      description: "追蹤分散式請求"
+      skills_required:
+        - "trace_correlation"
+      artifacts_output:
+        - "tracing-config"
+    - capability_id: "CAP-50-06"
+      name: "generate_insights"
+      name_zh: "生成洞察"
+      description: "生成洞察報告"
+      skills_required:
+        - "dashboard_design"
+        - "metric_definition"
+      artifacts_output:
+        - "insight-report"
+        - "dashboard-definition"
+  responsibilities:
+    - responsibility_id: "RESP-50-01"
+      name: "monitoring_configuration"
+      name_zh: "監控配置"
+      description: "配置監控系統"
+      capabilities_required:
+        - "configure_monitoring_systems"
+      accountability: "sre-team"
+    - responsibility_id: "RESP-50-02"
+      name: "metric_management"
+      name_zh: "指標管理"
+      description: "定義關鍵指標"
+      capabilities_required:
+        - "define_metrics_and_kpis"
+      accountability: "sre-team"
+    - responsibility_id: "RESP-50-03"
+      name: "alerting_management"
+      name_zh: "告警管理"
+      description: "設置告警規則"
+      capabilities_required:
+        - "setup_alerting_rules"
+      accountability: "sre-team"
+    - responsibility_id: "RESP-50-04"
+      name: "log_management"
+      name_zh: "日誌管理"
+      description: "收集與分析日誌"
+      capabilities_required:
+        - "aggregate_logs"
+      accountability: "sre-team"
+    - responsibility_id: "RESP-50-05"
+      name: "tracing_management"
+      name_zh: "追蹤管理"
+      description: "追蹤分散式請求"
+      capabilities_required:
+        - "correlate_traces"
+      accountability: "sre-team"
+    - responsibility_id: "RESP-50-06"
+      name: "insight_generation"
+      name_zh: "洞察生成"
+      description: "生成洞察報告"
+      capabilities_required:
+        - "generate_insights"
+      accountability: "analytics-team"
+GL60-80:
+  matrix_id: "MATRIX-GL60-80"
+  layer_id: "GL60-80"
+  name: "Advanced/Feedback Layer"
+  name_zh: "進階/回饋層"
+  status: SEALED
+  skills:
+    - skill_id: "SK-60-01"
+      name: "ai_optimization"
+      name_zh: "AI 優化"
+      description: "實施 AI 驅動優化的能力"
+      level: "expert"
+      artifacts_mapping:
+        - "ai-model-config"
+    - skill_id: "SK-60-02"
+      name: "feedback_analysis"
+      name_zh: "回饋分析"
+      description: "分析回饋循環的能力"
+      level: "advanced"
+      artifacts_mapping:
+        - "feedback-mechanism"
+    - skill_id: "SK-60-03"
+      name: "audit_management"
+      name_zh: "審計管理"
+      description: "管理審計追蹤的能力"
+      level: "advanced"
+      artifacts_mapping:
+        - "audit-trail"
+    - skill_id: "SK-60-04"
+      name: "innovation_tracking"
+      name_zh: "創新追蹤"
+      description: "追蹤創新項目的能力"
+      level: "intermediate"
+      artifacts_mapping:
+        - "innovation-registry"
+    - skill_id: "SK-60-05"
+      name: "continuous_improvement"
+      name_zh: "持續改進"
+      description: "推動持續改進的能力"
+      level: "advanced"
+      artifacts_mapping:
+        - "improvement-plan"
+    - skill_id: "SK-60-06"
+      name: "pattern_recognition"
+      name_zh: "模式識別"
+      description: "識別數據模式的能力"
+      level: "expert"
+      artifacts_mapping:
+        - "optimization-rule"
+  capabilities:
+    - capability_id: "CAP-60-01"
+      name: "implement_ai_optimization"
+      name_zh: "實施 AI 優化"
+      description: "實施 AI 驅動優化"
+      skills_required:
+        - "ai_optimization"
+        - "pattern_recognition"
+      artifacts_output:
+        - "ai-model-config"
+        - "optimization-rule"
+    - capability_id: "CAP-60-02"
+      name: "analyze_feedback_loops"
+      name_zh: "分析回饋循環"
+      description: "分析回饋循環"
+      skills_required:
+        - "feedback_analysis"
+      artifacts_output:
+        - "feedback-mechanism"
+    - capability_id: "CAP-60-03"
+      name: "manage_audit_trails"
+      name_zh: "管理審計追蹤"
+      description: "管理審計追蹤"
+      skills_required:
+        - "audit_management"
+      artifacts_output:
+        - "audit-trail"
+    - capability_id: "CAP-60-04"
+      name: "track_innovations"
+      name_zh: "追蹤創新"
+      description: "追蹤創新項目"
+      skills_required:
+        - "innovation_tracking"
+      artifacts_output:
+        - "innovation-registry"
+    - capability_id: "CAP-60-05"
+      name: "drive_continuous_improvement"
+      name_zh: "推動持續改進"
+      description: "推動持續改進"
+      skills_required:
+        - "continuous_improvement"
+        - "feedback_analysis"
+      artifacts_output:
+        - "improvement-plan"
+  responsibilities:
+    - responsibility_id: "RESP-60-01"
+      name: "ai_optimization_implementation"
+      name_zh: "AI 優化實施"
+      description: "實施 AI 驅動優化"
+      capabilities_required:
+        - "implement_ai_optimization"
+      accountability: "ai-team"
+    - responsibility_id: "RESP-60-02"
+      name: "feedback_loop_analysis"
+      name_zh: "回饋循環分析"
+      description: "分析回饋循環"
+      capabilities_required:
+        - "analyze_feedback_loops"
+      accountability: "analytics-team"
+    - responsibility_id: "RESP-60-03"
+      name: "audit_trail_management"
+      name_zh: "審計追蹤管理"
+      description: "管理審計追蹤"
+      capabilities_required:
+        - "manage_audit_trails"
+      accountability: "compliance-team"
+    - responsibility_id: "RESP-60-04"
+      name: "innovation_tracking"
+      name_zh: "創新追蹤"
+      description: "追蹤創新項目"
+      capabilities_required:
+        - "track_innovations"
+      accountability: "innovation-team"
+    - responsibility_id: "RESP-60-05"
+      name: "continuous_improvement_drive"
+      name_zh: "持續改進推動"
+      description: "推動持續改進"
+      capabilities_required:
+        - "drive_continuous_improvement"
+      accountability: "improvement-team"
+GL81-83:
+  matrix_id: "MATRIX-GL81-83"
+  layer_id: "GL81-83"
+  name: "Extended Layer"
+  name_zh: "擴展層"
+  status: SEALED
+  skills:
+    - skill_id: "SK-81-01"
+      name: "external_integration"
+      name_zh: "外部整合"
+      description: "整合外部系統的能力"
+      level: "advanced"
+      artifacts_mapping:
+        - "integration-config"
+        - "external-integration-config"
+    - skill_id: "SK-81-02"
+      name: "stakeholder_management"
+      name_zh: "利害關係人管理"
+      description: "管理利害關係人溝通的能力"
+      level: "intermediate"
+      artifacts_mapping:
+        - "stakeholder-bridge"
+    - skill_id: "SK-81-03"
+      name: "automated_documentation"
+      name_zh: "自動化文檔"
+      description: "自動化評論與文檔的能力"
+      level: "intermediate"
+      artifacts_mapping:
+        - "auto-comment-rule"
+    - skill_id: "SK-81-04"
+      name: "api_management"
+      name_zh: "API 管理"
+      description: "管理外部 API 的能力"
+      level: "advanced"
+      artifacts_mapping:
+        - "integration-config"
+    - skill_id: "SK-81-05"
+      name: "cross_system_collaboration"
+      name_zh: "跨系統協作"
+      description: "跨系統協作的能力"
+      level: "advanced"
+      artifacts_mapping:
+        - "external-integration-config"
+  capabilities:
+    - capability_id: "CAP-81-01"
+      name: "integrate_external_systems"
+      name_zh: "整合外部系統"
+      description: "整合外部系統"
+      skills_required:
+        - "external_integration"
+        - "api_management"
+      artifacts_output:
+        - "integration-config"
+        - "external-integration-config"
+    - capability_id: "CAP-81-02"
+      name: "manage_stakeholder_communication"
+      name_zh: "管理利害關係人溝通"
+      description: "管理利害關係人溝通"
+      skills_required:
+        - "stakeholder_management"
+      artifacts_output:
+        - "stakeholder-bridge"
+    - capability_id: "CAP-81-03"
+      name: "automate_commenting"
+      name_zh: "自動化評論"
+      description: "自動化評論與文檔"
+      skills_required:
+        - "automated_documentation"
+      artifacts_output:
+        - "auto-comment-rule"
+    - capability_id: "CAP-81-04"
+      name: "bridge_external_apis"
+      name_zh: "橋接外部 API"
+      description: "橋接外部 API"
+      skills_required:
+        - "api_management"
+        - "cross_system_collaboration"
+      artifacts_output:
+        - "integration-config"
+  responsibilities:
+    - responsibility_id: "RESP-81-01"
+      name: "external_system_integration"
+      name_zh: "外部系統整合"
+      description: "整合外部系統"
+      capabilities_required:
+        - "integrate_external_systems"
+      accountability: "integration-team"
+    - responsibility_id: "RESP-81-02"
+      name: "stakeholder_communication"
+      name_zh: "利害關係人溝通"
+      description: "管理利害關係人溝通"
+      capabilities_required:
+        - "manage_stakeholder_communication"
+      accountability: "communication-team"
+    - responsibility_id: "RESP-81-03"
+      name: "auto_commenting"
+      name_zh: "自動評論"
+      description: "自動化評論與文檔"
+      capabilities_required:
+        - "automate_commenting"
+      accountability: "dev-team"
+    - responsibility_id: "RESP-81-04"
+      name: "api_bridging"
+      name_zh: "API 橋接"
+      description: "橋接外部 API"
+      capabilities_required:
+        - "bridge_external_apis"
+      accountability: "integration-team"
+GL90-99:
+  matrix_id: "MATRIX-GL90-99"
+  layer_id: "GL90-99"
+  name: "Meta-Specification Layer"
+  name_zh: "元規範層"
+  status: SEALED
+  skills:
+    - skill_id: "SK-90-01"
+      name: "specification_design"
+      name_zh: "規範設計"
+      description: "設計治理規範的能力"
+      level: "expert"
+      artifacts_mapping:
+        - "governance-spec"
+    - skill_id: "SK-90-02"
+      name: "naming_convention_management"
+      name_zh: "命名規範管理"
+      description: "管理命名規範的能力"
+      level: "expert"
+      artifacts_mapping:
+        - "naming-convention"
+    - skill_id: "SK-90-03"
+      name: "semantic_definition"
+      name_zh: "語意定義"
+      description: "定義語意標準的能力"
+      level: "expert"
+      artifacts_mapping:
+        - "semantic-definition"
+    - skill_id: "SK-90-04"
+      name: "governance_standardization"
+      name_zh: "治理標準化"
+      description: "標準化治理規格的能力"
+      level: "expert"
+      artifacts_mapping:
+        - "governance-standards"
+    - skill_id: "SK-90-05"
+      name: "metadata_management"
+      name_zh: "元數據管理"
+      description: "管理元數據架構的能力"
+      level: "advanced"
+      artifacts_mapping:
+        - "metadata-schema"
+  capabilities:
+    - capability_id: "CAP-90-01"
+      name: "define_naming_conventions"
+      name_zh: "定義命名規範"
+      description: "定義命名規範"
+      skills_required:
+        - "naming_convention_management"
+      artifacts_output:
+        - "naming-convention"
+    - capability_id: "CAP-90-02"
+      name: "establish_semantic_standards"
+      name_zh: "建立語意標準"
+      description: "建立語意標準"
+      skills_required:
+        - "semantic_definition"
+      artifacts_output:
+        - "semantic-definition"
+    - capability_id: "CAP-90-03"
+      name: "manage_governance_specifications"
+      name_zh: "管理治理規格"
+      description: "管理治理規格"
+      skills_required:
+        - "specification_design"
+        - "governance_standardization"
+      artifacts_output:
+        - "governance-spec"
+        - "governance-standards"
+    - capability_id: "CAP-90-04"
+      name: "maintain_metadata_schemas"
+      name_zh: "維護元數據架構"
+      description: "維護元數據架構"
+      skills_required:
+        - "metadata_management"
+      artifacts_output:
+        - "metadata-schema"
+    - capability_id: "CAP-90-05"
+      name: "govern_all_layers"
+      name_zh: "治理所有層級"
+      description: "治理所有其他層級"
+      skills_required:
+        - "specification_design"
+        - "governance_standardization"
+        - "semantic_definition"
+      artifacts_output:
+        - "governance-spec"
+  responsibilities:
+    - responsibility_id: "RESP-90-01"
+      name: "naming_convention_ownership"
+      name_zh: "命名規範所有權"
+      description: "定義命名規範"
+      capabilities_required:
+        - "define_naming_conventions"
+      accountability: "governance-committee"
+    - responsibility_id: "RESP-90-02"
+      name: "semantic_standard_ownership"
+      name_zh: "語意標準所有權"
+      description: "建立語意標準"
+      capabilities_required:
+        - "establish_semantic_standards"
+      accountability: "governance-committee"
+    - responsibility_id: "RESP-90-03"
+      name: "governance_spec_management"
+      name_zh: "治理規格管理"
+      description: "管理治理規格"
+      capabilities_required:
+        - "manage_governance_specifications"
+      accountability: "governance-committee"
+    - responsibility_id: "RESP-90-04"
+      name: "metadata_schema_maintenance"
+      name_zh: "元數據架構維護"
+      description: "維護元數據架構"
+      capabilities_required:
+        - "maintain_metadata_schemas"
+      accountability: "architecture-team"
+    - responsibility_id: "RESP-90-05"
+      name: "cross_layer_governance"
+      name_zh: "跨層級治理"
+      description: "治理所有其他層級"
+      capabilities_required:
+        - "govern_all_layers"
+      accountability: "governance-committee"
+matrix_validation:
+  rules:
+    - rule_id: "MATRIX-VAL-001"
+      name: "技能層級一致性"
+      description: "技能必須與層級語意一致"
+      enforcement: STRICT
+    - rule_id: "MATRIX-VAL-002"
+      name: "能力技能對應"
+      description: "能力必須對應正確的技能"
+      enforcement: STRICT
+    - rule_id: "MATRIX-VAL-003"
+      name: "責任能力對應"
+      description: "責任必須對應正確的能力"
+      enforcement: STRICT
+    - rule_id: "MATRIX-VAL-004"
+      name: "Artifacts 對應驗證"
+      description: "Artifacts 必須對應正確的技能與能力"
+      enforcement: STRICT
+    - rule_id: "MATRIX-VAL-005"
+      name: "跨層禁止"
+      description: "技能/能力/責任不得跨層"
+      enforcement: STRICT
+    - rule_id: "MATRIX-VAL-006"
+      name: "語意漂移禁止"
+      description: "不得產生語意漂移"
+      enforcement: STRICT
+matrix_statistics:
+  total_skills: 39
+  total_capabilities: 34
+  total_responsibilities: 36
+  layers_covered: 7
+  per_layer:
+    GL00-09:
+      skills: 6
+      capabilities: 5
+      responsibilities: 6
+    GL10-29:
+      skills: 6
+      capabilities: 5
+      responsibilities: 5
+    GL30-49:
+      skills: 6
+      capabilities: 5
+      responsibilities: 5
+    GL50-59:
+      skills: 6
+      capabilities: 6
+      responsibilities: 6
+    GL60-80:
+      skills: 6
+      capabilities: 5
+      responsibilities: 5
+    GL81-83:
+      skills: 5
+      capabilities: 4
+      responsibilities: 4
+    GL90-99:
+      skills: 5
+      capabilities: 5
+      responsibilities: 5
+matrix_signature:
+  matrix_id: "ECO-SKILLS-MATRIX-001"
+  version: "1.0.0"
+  status: SEALED
+  sealed_at: "2025-01-18T00:00:00Z"
+  integrity_hash: "sha256:gl-skills-matrix-v1"

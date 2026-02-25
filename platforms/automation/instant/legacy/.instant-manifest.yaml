@@ -1,0 +1,39 @@
+# @ECO-governed
+# @ECO-layer: data
+# @ECO-semantic: .instant-manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+name: namespace-mcp
+version: "2.0.1"
+status: active
+description: "INSTANT manifest for namespace-mcp; enumerates expected artifacts referenced in project docs."
+artifacts:
+  - path: config/conversion.yaml
+    type: config
+  - path: config/mcp-rules.yaml
+    type: config
+  - path: config/governance.yaml
+    type: config
+  - path: src/converter.py
+    type: runtime
+  - path: src/advanced_converter.py
+    type: runtime
+  - path: scripts/convert.sh
+    type: script
+  - path: scripts/advanced-convert.sh
+    type: script
+  - path: examples/example-project
+    type: example-source
+  - path: examples/converted-example
+    type: example-output
+  - path: reports/
+    type: output
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:automation:instant:legacy:.instant-manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/automation/instant/legacy/.instant-manifest.yaml"
+  slsa_level: "L3+"
+  mcp_protocol: "2024.1"
+  updated_at: "2025-01-09"

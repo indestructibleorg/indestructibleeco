@@ -1,0 +1,264 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: multi-cluster-mesh
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Multi-Cluster Service Mesh Configuration
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:multi-cluster-mesh.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/multi-cluster-mesh.yaml"
+  name: multi-cluster-services
+  namespace: production
+spec:
+  hosts:
+  - "cluster1.machine-native-ops.svc.cluster.local"
+  - "cluster2.machine-native-ops.svc.cluster.local"
+  - "cluster3.machine-native-ops.svc.cluster.local"
+  location: MESH_INTERNAL
+  ports:
+  - number: 80
+    name: http
+    protocol: HTTP
+  - number: 443
+    name: https
+    protocol: HTTPS
+  resolution: DNS
+  addresses:
+  - 10.0.0.0/16
+---
+# Multi-cluster gateway configuration
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:multi-cluster-mesh.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/multi-cluster-mesh.yaml"
+  name: multi-cluster-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 15443
+      name: tls
+      protocol: TLS
+    tls:
+      mode: AUTO_PASSTHROUGH
+    hosts:
+    - "*.machine-native-ops.svc.cluster.local"
+---
+# Multi-cluster virtual service for cross-cluster routing
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:multi-cluster-mesh.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/multi-cluster-mesh.yaml"
+  name: multi-cluster-routing
+  namespace: production
+spec:
+  hosts:
+  - "machine-native-ops.production.svc.cluster.local"
+  http:
+  - route:
+    - destination:
+        host: machine-native-ops-service
+        subset: cluster1
+      weight: 40
+    - destination:
+        host: machine-native-ops-service
+        subset: cluster2
+      weight: 40
+    - destination:
+        host: machine-native-ops-service
+        subset: cluster3
+      weight: 20
+    # Cross-cluster retry
+    retries:
+      attempts: 2
+      perTryTimeout: 5s
+      retryOn: gateway-error,connect-failure,refused-stream
+    # Cross-cluster timeout
+    timeout: 10s
+---
+# Destination rule for multi-cluster load balancing
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:multi-cluster-mesh.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/multi-cluster-mesh.yaml"
+  name: multi-cluster-lb
+  namespace: production
+spec:
+  host: machine-native-ops-service
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+      localityLbSetting:
+        enabled: true
+        failover:
+        - from: us-east-1
+          to:
+          - us-west-2
+          - eu-west-1
+        - from: us-west-2
+          to:
+          - us-east-1
+          - eu-west-1
+        - from: eu-west-1
+          to:
+          - us-east-1
+          - us-west-2
+    outlierDetection:
+      consecutiveGatewayFailure: 3
+      interval: 10s
+      baseEjectionTime: 60s
+      maxEjectionPercent: 40
+      minHealthPercent: 50
+  subsets:
+  - name: cluster1
+    labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+      cluster: cluster1
+      topology.istio.io/network: network1
+  - name: cluster2
+    labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+      cluster: cluster2
+      topology.istio.io/network: network2
+  - name: cluster3
+    labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+      cluster: cluster3
+      topology.istio.io/network: network3
+---
+# Cross-cluster authentication
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:multi-cluster-mesh.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/multi-cluster-mesh.yaml"
+  name: cross-cluster-auth
+  namespace: production
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: machine-native-ops
+  mtls:
+    mode: STRICT
+    # Allow cross-cluster communication
+    overrides:
+    - selector:
+        matchLabels:
+          topology.istio.io/network: "network1"
+      mtls:
+        mode: PERMISSIVE
+    - selector:
+        matchLabels:
+          topology.istio.io/network: "network2"
+      mtls:
+        mode: PERMISSIVE
+    - selector:
+        matchLabels:
+          topology.istio.io/network: "network3"
+      mtls:
+        mode: PERMISSIVE
+---
+# Service-to-service authorization across clusters
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:multi-cluster-mesh.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/multi-cluster-mesh.yaml"
+  name: cross-cluster-authorization
+  namespace: production
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: machine-native-ops
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - "cluster1/ns/production/sa/machine-native-ops"
+        - "cluster2/ns/production/sa/machine-native-ops"
+        - "cluster3/ns/production/sa/machine-native-ops"
+  to:
+  - operation:
+      methods: ["GET", "POST", "PUT", "DELETE"]
+---
+# Multi-cluster network topology
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:multi-cluster-mesh.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/multi-cluster-mesh.yaml"
+  name: istio
+  namespace: istio-system
+data:
+  mesh: |-
+    networks:
+    - networkID: network1
+      gateways:
+      - registryServiceName: istio-ingressgateway.istio-system.svc.cluster.local
+        port: 15443
+        locality: us-east-1
+    - networkID: network2
+      gateways:
+      - registryServiceName: istio-ingressgateway.istio-system.svc.cluster.local
+        port: 15443
+        locality: us-west-2
+    - networkID: network3
+      gateways:
+      - registryServiceName: istio-ingressgateway.istio-system.svc.cluster.local
+        port: 15443
+        locality: eu-west-1
+---
+# Multi-cluster health checks
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:multi-cluster-mesh.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/multi-cluster-mesh.yaml"
+  name: multi-cluster-health-config
+  namespace: production
+data:
+  health-check.yaml: |
+    clusters:
+      cluster1:
+        endpoint: https://cluster1.machine-native-ops.svc.cluster.local/health
+        timeout: 5s
+        interval: 30s
+        unhealthyThreshold: 3
+        healthyThreshold: 2
+      cluster2:
+        endpoint: https://cluster2.machine-native-ops.svc.cluster.local/health
+        timeout: 5s
+        interval: 30s
+        unhealthyThreshold: 3
+        healthyThreshold: 2
+      cluster3:
+        endpoint: https://cluster3.machine-native-ops.svc.cluster.local/health
+        timeout: 5s
+        interval: 30s
+        unhealthyThreshold: 3
+        healthyThreshold: 2
+    failover:
+      enabled: true
+      strategy: automatic
+      cooldown: 300s

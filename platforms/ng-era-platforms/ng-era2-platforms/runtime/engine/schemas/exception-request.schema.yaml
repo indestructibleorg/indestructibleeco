@@ -1,0 +1,105 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: exception-request.schema
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+---
+version: "1.0.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:schemas:exception-request.schema.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/schemas/exception-request.schema.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+$schema: "http://json-schema.org/draft-07/schema#"
+title: "Exception Request Schema"
+description: "Schema for governance exception requests"
+type: object
+required:
+  - exception_id
+  - type
+  - applicant
+  - item
+  - reason
+  - risk_evaluation
+properties:
+  exception_id:
+    type: string
+    description: "Unique exception identifier"
+    pattern: "^EXC-\\d{4}-\\d{3}$"
+  
+  type:
+    type: string
+    description: "Type of exception"
+    enum:
+      - "temporary"
+      - "standard"
+      - "permanent"
+  
+  applicant:
+    type: string
+    description: "Team or user requesting the exception"
+  
+  item:
+    type: string
+    description: "The item for which exception is requested"
+  
+  reason:
+    type: string
+    description: "Business or technical justification"
+    minLength: 20
+  
+  risk_evaluation:
+    type: string
+    description: "Risk assessment of the exception"
+  
+  duration:
+    type: object
+    properties:
+      requested_start:
+        type: string
+        format: "date-time"
+      
+      requested_end:
+        type: string
+        format: "date-time"
+      
+      justification:
+        type: string
+  
+  linked_change_id:
+    type: string
+    description: "Associated change request ID"
+    pattern: "^CHG-\\d{4}-\\d{3}$"
+  
+  approval:
+    type: object
+    properties:
+      status:
+        type: string
+        enum: ["under_review", "approved", "rejected", "expired"]
+      
+      reviewer:
+        type: string
+      
+      conditions:
+        type: array
+        items:
+          type: string
+  
+  mitigation:
+    type: object
+    properties:
+      measures:
+        type: array
+        items:
+          type: string
+      
+      monitoring:
+        type: string

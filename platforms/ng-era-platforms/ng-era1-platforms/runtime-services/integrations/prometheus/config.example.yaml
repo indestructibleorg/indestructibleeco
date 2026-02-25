@@ -1,0 +1,212 @@
+# @ECO-governed
+# @ECO-layer: GL90-95 (Integration Layer)
+# @ECO-semantic: prometheus-integration-configuration
+# @ECO-charter-version: 5.0.0
+# @ECO-audit-trail: Created for GL Platform v5.0 deployment
+
+apiVersion: integrations.machinenativeops.io/v1
+kind: PrometheusIntegration
+metadata:
+  name: gl-platform-prometheus
+  namespace: gl-platform
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: gl-platform
+    app.kubernetes.io/component: prometheus-integration
+    tier: observability
+  annotations:
+    governance.machinenativeops.io/charter: "GL Unified Architecture Governance Framework v5.0"
+    governance.machinenativeops.io/layer: "Integration"
+    governance.machinenativeops.io/version: "5.0.0"
+
+spec:
+  enabled: true
+  prometheus:
+    serverUrl: "http://prometheus-operated.gl-platform.svc.cluster.local:9090"
+    externalUrl: "https://prometheus.machinenativeops.io"
+    version: "v2.45.0"
+    retentionTime: "15d"
+    retentionSize: "50GB"
+  
+  dataSources:
+    - name: "prometheus-main"
+      type: "prometheus"
+      url: "http://prometheus-operated.gl-platform.svc.cluster.local:9090"
+      access: "proxy"
+      isDefault: true
+      editable: false
+      jsonData:
+        timeInterval: "30s"
+        queryTimeout: "60s"
+        httpMethod: "POST"
+  
+  scrapeConfigs:
+    - jobName: "gl-platform-kubernetes-pods"
+      scrapeInterval: 30s
+      scrapeTimeout: 10s
+      honorTimestamps: true
+      honorLabels: true
+      scheme: http
+      kubernetesSDConfigs:
+        - role: pod
+          namespaces:
+            names:
+              - gl-platform
+              - default
+              - monitoring
+      relabelConfigs:
+        - sourceLabels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+          action: keep
+          regex: true
+        - sourceLabels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+          action: replace
+          targetLabel: __metrics_path__
+          regex: (.+)
+        - sourceLabels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+          action: replace
+          regex: ([^:]+)(?::\d+)?;(\d+)
+          replacement: $1:$2
+          targetLabel: __address__
+        - action: labelmap
+          regex: __meta_kubernetes_pod_label_(.+)
+        - sourceLabels: [__meta_kubernetes_namespace]
+          action: replace
+          targetLabel: kubernetes_namespace
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          action: replace
+          targetLabel: kubernetes_pod_name
+    
+    - jobName: "gl-platform-kubernetes-nodes"
+      scrapeInterval: 30s
+      scrapeTimeout: 10s
+      honorTimestamps: true
+      scheme: https
+      tlsConfig:
+        insecureSkipVerify: true
+      kubernetesSDConfigs:
+        - role: node
+      relabelConfigs:
+        - action: labelmap
+          regex: __meta_kubernetes_node_label_(.+)
+        - sourceLabels: [__meta_kubernetes_node_name]
+          action: replace
+          targetLabel: instance
+    
+    - jobName: "gl-platform-kubernetes-services"
+      scrapeInterval: 30s
+      scrapeTimeout: 10s
+      honorTimestamps: true
+      scheme: http
+      kubernetesSDConfigs:
+        - role: service
+          namespaces:
+            names:
+              - gl-platform
+      relabelConfigs:
+        - sourceLabels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+          action: keep
+          regex: true
+        - sourceLabels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+          action: replace
+          targetLabel: __metrics_path__
+          regex: (.+)
+        - sourceLabels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
+          action: replace
+          regex: ([^:]+)(?::\d+)?;(\d+)
+          replacement: $1:$2
+          targetLabel: __address__
+        - action: labelmap
+          regex: __meta_kubernetes_service_label_(.+)
+        - sourceLabels: [__meta_kubernetes_namespace]
+          action: replace
+          targetLabel: kubernetes_namespace
+        - sourceLabels: [__meta_kubernetes_service_name]
+          action: replace
+          targetLabel: kubernetes_service_name
+  
+  alerting:
+    alertmanagers:
+      - staticConfigs:
+          - targets:
+              - "alertmanager-operated.gl-platform.svc.cluster.local:9093"
+        timeout: 10s
+        apiVersion: v2
+        scheme: http
+  
+  ruleFiles:
+    - "/etc/prometheus/rules/*.yaml"
+  
+  storage:
+    tsdb:
+      path: /prometheus
+      outOfOrderTimeWindow: 30m
+  
+  remoteWrite:
+    - url: "http://thanos-receive.gl-platform.svc.cluster.local:19291"
+      queueConfig:
+        capacity: 10000
+        maxShards: 50
+        minShards: 1
+        maxSamplesPerSend: 1000
+        batchSendDeadline: 5s
+        minBackoff: 30ms
+        maxBackoff: 100ms
+      writeRelabelConfigs:
+        - sourceLabels: [__name__]
+          regex: "gl_platform_.*"
+          action: keep
+  
+  recordingRules:
+    - name: "gl-platform-recording-rules"
+      interval: 30s
+      rules:
+        - record: "gl_platform:namespace_cpu_usage:rate5m"
+          expr: |
+            sum by (namespace) (
+              rate(container_cpu_usage_seconds_total{namespace=~"gl-platform|default", container!=""}[5m])
+            )
+        - record: "gl_platform:namespace_memory_usage:avg5m"
+          expr: |
+            avg by (namespace) (
+              container_memory_working_set_bytes{namespace=~"gl-platform|default", container!=""}
+            )
+        - record: "gl_platform:pod_ready_ratio"
+          expr: |
+            sum by (namespace) (kube_pod_status_ready{namespace=~"gl-platform|default", condition="true"})
+            /
+            sum by (namespace) (kube_pod_status_ready{namespace=~"gl-platform|default"})
+        - record: "gl_platform:naming_compliance_rate"
+          expr: |
+            sum(gl_naming_compliance_compliant_resources) /
+            sum(gl_naming_compliance_total_resources) * 100
+        - record: "gl_platform:auto_fix_success_rate"
+          expr: |
+            sum(gl_auto_fix_success_total) /
+            sum(gl_auto_fix_attempts_total) * 100
+  
+  externalLabels:
+    cluster: "gl-platform"
+    region: "us-east-1"
+    environment: "production"
+  
+  tracing:
+    enabled: true
+    endpoint: "http://jaeger-collector.gl-platform.svc.cluster.local:14268/api/traces"
+    sampleRate: 0.1
+  
+  security:
+    tlsConfig:
+      insecureSkipVerify: false
+      minVersion: "TLS1.2"
+      cipherSuites:
+        - "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+        - "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+  
+  resources:
+    limits:
+      cpu: "4"
+      memory: "8Gi"
+    requests:
+      cpu: "2"
+      memory: "4Gi"

@@ -1,0 +1,24 @@
+# @ECO-layer: GL60-80
+# @ECO-governed
+version: "1.0.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:governance:compliance:data:evolution:gl-evolution-data:deltas:2efec51a-0936-415c-8e07-767ece957571.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/governance/compliance/data/evolution/gl-evolution-data/deltas/2efec51a-0936-415c-8e07-767ece957571.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+base_execution: 05a65738-f8e8-4e40-88a9-484e81458e0d
+comparison_id: 2efec51a-0936-415c-8e07-767ece957571
+evolution_metrics:
+  automation_level_delta: 0.05
+  process_maturity_delta: 0.1
+  self_healing_capability_delta: 0.08
+improvements: []
+regressions: []
+significant_changes: []
+target_execution: 1d86e97a-96c1-4d5d-bede-0fd283643b01
+upgrade_triggers: []

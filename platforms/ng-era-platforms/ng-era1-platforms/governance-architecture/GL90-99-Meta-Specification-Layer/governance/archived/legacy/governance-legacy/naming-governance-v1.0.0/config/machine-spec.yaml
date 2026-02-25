@@ -1,0 +1,327 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+version: v1.0.0
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:naming-governance-v1.0.0:config:machine-spec.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/naming-governance-v1.0.0/config/machine-spec.yaml"
+  name: "canonical-naming-governance"
+  description: "組織層級命名治理規範與技術實施標準"
+  last_updated: "2025-01-18"
+  maintainer: "platform-governance-committee"
+
+naming:
+  strategy: "hierarchical"
+  allowed_chars: "[a-z0-9-]"
+  max_length: 63
+  segments:
+    - name: "environment"
+      required: true
+      pattern: "^(dev|staging|prod|test|learn)$"
+      description: "環境標識"
+    - name: "app"
+      required: true
+      pattern: "^[a-z0-9-]{3,30}$"
+      description: "應用名稱"
+    - name: "resource_type"
+      required: true
+      pattern: "^(deploy|svc|ing|cm|secret|statefulset|daemonset)$"
+      description: "資源類型"
+    - name: "version"
+      required: true
+      pattern: "^v\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9]+)?$"
+      description: "版本號（遵循 SemVer）"
+    - name: "suffix"
+      required: false
+      pattern: "^[a-z0-9-]{0,10}$"
+      description: "可選後綴（如 canary、blue、green）"
+  
+  canonical_regex: "^(dev|staging|prod|test|learn)-[a-z0-9-]{3,30}-(deploy|svc|ing|cm|secret|statefulset|daemonset)-v\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9]+)?$"
+  
+  naming_template: "{{ .environment }}-{{ .app }}-{{ .resource_type }}-{{ .version }}{{ if .suffix }}-{{ .suffix }}{{ end }}"
+
+required_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+  - name: "app.kubernetes.io/name"
+    value_from: "app"
+  - name: "app.kubernetes.io/managed-by"
+    default: "platform-team"
+  - name: "environment"
+    value_from: "environment"
+  - name: "tenant"
+    required: true
+    validation: "^[a-z0-9-]{3,20}$"
+  - name: "version"
+    value_from: "version"
+
+governance:
+  phases:
+    - name: "planning"
+      duration: "2 weeks"
+      objectives:
+        - "確立命名標準"
+        - "制定治理策略"
+        - "定義優先範疇"
+      deliverables:
+        - "治理組織架構"
+        - "標準規範草案"
+        - "門檻條件定義"
+    
+    - name: "pilot"
+      duration: "4 weeks"
+      objectives:
+        - "核心專案試點應用"
+        - "收集反饋與調整"
+      deliverables:
+        - "試點治理模板"
+        - "版本命名範例"
+        - "改進建議報告"
+    
+    - name: "rollout"
+      duration: "8 weeks"
+      objectives:
+        - "大規模推展標準化"
+        - "建立監控指標"
+        - "執行稽核報告"
+      deliverables:
+        - "全域規範上線"
+        - "指標監控儀表板"
+        - "稽核報告系統"
+    
+    - name: "optimize"
+      duration: "ongoing"
+      objectives:
+        - "例外管理優化"
+        - "持續追蹤改進"
+        - "閉環優化"
+      deliverables:
+        - "例外審核處理流程"
+        - "成效復盤報告"
+        - "年度優化計劃"
+
+roles:
+  - name: "naming-gatekeeper"
+    responsibilities:
+      - "規範審議"
+      - "稽核執行"
+      - "例外處理"
+    training_modules:
+      - "進階命名規則"
+      - "審核實作"
+      - "RFC撰寫"
+    skills_required:
+      - "命名治理全貌理解"
+      - "標準與例外處理"
+      - "實務案例分析"
+  
+  - name: "tech-lead"
+    responsibilities:
+      - "開發實踐"
+      - "自動化落地"
+      - "工具維護"
+    training_modules:
+      - "命名生成工具"
+      - "YAML/腳本實作"
+      - "CI工具導入"
+    skills_required:
+      - "自動化工具使用"
+      - "腳本開發"
+      - "CI/CD集成"
+  
+  - name: "ops-engineer"
+    responsibilities:
+      - "版本管理"
+      - "實施覆蓋"
+      - "監控運維"
+    training_modules:
+      - "回滾演練"
+      - "配置核對"
+      - "指標監測"
+    skills_required:
+      - "發布流程管理"
+      - "配置驗證"
+      - "監控工具使用"
+  
+  - name: "business-owner"
+    responsibilities:
+      - "需求界定"
+      - "政策落地宣導"
+    training_modules:
+      - "命名原則解說"
+      - "政策落地溝通"
+    skills_required:
+      - "治理溝通"
+      - "需求管理"
+  
+  - name: "general-user"
+    responsibilities:
+      - "規則認知"
+      - "自助檢查"
+    training_modules:
+      - "基礎命名訓練"
+      - "錯誤案例解析"
+    skills_required:
+      - "基本規則理解"
+      - "自助檢查工具"
+
+metrics:
+  compliance:
+    - name: "naming_compliance_rate"
+      description: "命名合規遵循率"
+      formula: "(合規命名數 / 總命名數) × 100%"
+      target: "95%"
+      frequency: "daily"
+    
+    - name: "deployment_success_rate"
+      description: "部署成功率"
+      formula: "(成功部署數 / 總部署數) × 100%"
+      target: "98%"
+      frequency: "per_deployment"
+    
+    - name: "rollback_count"
+      description: "回滾次數"
+      target: "< 2 per month"
+      frequency: "monthly"
+    
+    - name: "automation_ratio"
+      description: "自動化變更比率"
+      formula: "(自動化變更數 / 總變更數) × 100%"
+      target: "80%"
+      frequency: "monthly"
+  
+  performance:
+    - name: "avg_review_time"
+      description: "平均審核時長"
+      target: "< 2 days"
+      frequency: "weekly"
+    
+    - name: "incident_count"
+      description: "變更後事件數"
+      target: "< 5 per month"
+      frequency: "monthly"
+
+change_management:
+  types:
+    - name: "standard"
+      risk_level: "low"
+      approval_method: "pre-approved"
+      responsible_role: "devops-engineer"
+      characteristics: "高重複性、低風險"
+    
+    - name: "normal"
+      risk_level: "medium"
+      approval_method: "CAB"
+      responsible_role: "department-head"
+      characteristics: "多專案介入、中風險"
+    
+    - name: "emergency"
+      risk_level: "high"
+      approval_method: "post-review"
+      responsible_role: "cto/security-officer"
+      characteristics: "事故/事件、高風險"
+  
+  rfc_template:
+    required_fields:
+      - "id"
+      - "title"
+      - "type"
+      - "requester"
+      - "risk_level"
+      - "impact_assessment"
+      - "approval_method"
+      - "implementation_plan"
+      - "rollback_plan"
+      - "metrics"
+
+compliance_exceptions:
+  required_fields:
+    - "applicant"
+    - "exception_type"
+    - "justification"
+    - "risk_assessment"
+    - "expiry_date"
+    - "reviewer"
+  
+  process:
+    - "提交申請"
+    - "風險評估"
+    - "審核批准"
+    - "設置到期提醒"
+    - "定期複查"
+    - "過期收回或續申報"
+
+observability:
+  pillars:
+    - name: "metrics"
+      tools:
+        - "prometheus"
+        - "grafana"
+      data_types:
+        - "counter"
+        - "gauge"
+        - "histogram"
+    
+    - name: "logs"
+      tools:
+        - "elasticsearch"
+        - "fluentd"
+        - "kibana"
+      retention: "30 days"
+    
+    - name: "events"
+      tools:
+        - "kubernetes_events"
+        - "alertmanager"
+      retention: "7 days"
+    
+    - name: "traces"
+      tools:
+        - "jaeger"
+        - "opentelemetry"
+      sampling_rate: "0.1"
+
+security_compliance:
+  standards:
+    - "ISO27001"
+    - "ISO27701"
+    - "GDPR"
+  
+  cia_triad:
+    - "confidentiality"
+    - "integrity"
+    - "availability"
+  
+  requirements:
+    - "DPIA評估"
+    - "權限分級控制"
+    - "個資保護"
+    - "審計追蹤"
+    - "定期稽核"
+
+integration_points:
+  ci_cd:
+    - "github_actions"
+    - "gitlab_ci"
+    - "jenkins"
+  
+  kubernetes:
+    - "gatekeeper"
+    - "opa_conftest"
+    - "kyverno"
+  
+  monitoring:
+    - "prometheus"
+    - "grafana"
+    - "alertmanager"
+
+versioning:
+  semver:
+    major: "大幅架構升級"
+    minor: "功能新增"
+    patch: "Bug修復或優化"
+  
+  example: "prod-payment-deploy-v1.2.3"

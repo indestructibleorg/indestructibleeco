@@ -1,0 +1,105 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: enhanced-backup-strategy
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Enhanced Backup Strategy Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:enhanced-backup-strategy.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/enhanced-backup-strategy.yaml"
+  name: velero-enhanced-backup-config
+  namespace: velero
+data:
+  backup-policy.yaml: |
+    # Enhanced backup policy with cross-region replication
+    backupPolicy:
+      # Local backups (primary region)
+      local:
+        enabled: true
+        storage:
+          type: s3
+          endpoint: https://s3.us-east-1.amazonaws.com
+          bucket: machine-native-ops-backups-primary
+          region: us-east-1
+        schedules:
+          full-cluster:
+            enabled: true
+            schedule: "0 2 * * *"  # Daily at 2 AM UTC
+            retention: 30d
+            type: full
+            includeNamespaces:
+              - production
+              - istio-system
+              - monitoring
+          incremental:
+            enabled: true
+            schedule: "0 * * * *"  # Hourly
+            retention: 7d
+            type: incremental
+            includeNamespaces:
+              - production
+      
+      # Cross-region replication (DR region)
+      crossRegion:
+        enabled: true
+        regions:
+          - name: us-west-2
+            storage:
+              type: s3
+              endpoint: https://s3.us-west-2.amazonaws.com
+              bucket: machine-native-ops-backups-dr
+              region: us-west-2
+            replicationMode: async
+            syncSchedule: "0 3 * * *"  # Daily at 3 AM UTC
+            retention: 90d
+          - name: eu-west-1
+            storage:
+              type: s3
+              endpoint: https://s3.eu-west-1.amazonaws.com
+              bucket: machine-native-ops-backups-eu
+              region: eu-west-1
+            replicationMode: async
+            syncSchedule: "0 4 * * *"  # Daily at 4 AM UTC
+            retention: 90d
+      
+      # Database-specific backups
+      databases:
+        postgresql:
+          enabled: true
+          primary:
+            schedule: "0 */4 * * *"  # Every 4 hours
+            retention: 30d
+            storage: local
+          crossRegion:
+            schedule: "0 5 * * *"  # Daily at 5 AM UTC
+            retention: 90d
+            storage: crossRegion
+        redis:
+          enabled: true
+          primary:
+            schedule: "*/30 * * * *"  # Every 30 minutes
+            retention: 7d
+            storage: local
+          crossRegion:
+            schedule: "0 6 * * *"  # Daily at 6 AM UTC
+            retention: 30d
+            storage: crossRegion
+      
+      # Configuration backups
+      configuration:
+        enabled: true
+        schedule: "*/30 * * * *"  # Every 30 minutes
+        retention: 90d
+        includeResources:
+          - configmaps
+          - secrets
+          - deployments
+          - services
+          - ingress
+          - networkpolicies
+          - poddisruptionbudgets

@@ -1,0 +1,108 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: external-integration-config
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# =============================================================================
+# GL81-83 Extended Layer - External Integration Configuration
+# MachineNativeOps Governance Artifact
+# =============================================================================
+apiVersion: governance.machinenativeops.io/v2
+kind: ExternalIntegrationConfig
+metadata:
+  name: gl-external-integration-config
+  version: "1.0.0"
+  created_at: "2025-01-18T00:00:00Z"
+  updated_at: "2025-01-18T00:00:00Z"
+  owner: integration-team
+  layer: "GL81-83"
+  tags:
+    - extended
+    - integration
+    - external
+  annotations:
+    governance.machinenativeops.io/integration-type: "external"
+spec:
+  # ===========================================================================
+  # 81-auto-comment: 自動評論配置
+  # ===========================================================================
+  auto_comment:
+    enabled: true
+    triggers:
+      - event: "pull_request.opened"
+        template: "pr-review-checklist"
+      - event: "pull_request.merged"
+        template: "pr-merge-summary"
+      - event: "issue.created"
+        template: "issue-triage"
+    templates:
+      - id: "pr-review-checklist"
+        content: |
+          ## PR Review Checklist
+          - [ ] Code follows GL naming conventions
+          - [ ] YAML validation passed
+          - [ ] Layer boundaries respected
+      - id: "pr-merge-summary"
+        content: |
+          ## Merge Summary
+          PR merged successfully. Changes applied to main branch.
+      - id: "issue-triage"
+        content: |
+          ## Issue Triage
+          Thank you for reporting. This issue will be triaged within 24 hours.
+  # ===========================================================================
+  # 82-stakeholder: 利害關係人橋接配置
+  # ===========================================================================
+  stakeholder_bridge:
+    notification_channels:
+      - channel_id: "slack-governance"
+        type: "slack"
+        events:
+          - "policy.updated"
+          - "layer.modified"
+      - channel_id: "email-leadership"
+        type: "email"
+        events:
+          - "strategic.decision"
+          - "risk.escalation"
+    reporting:
+      frequency: "weekly"
+      recipients:
+        - "governance-committee"
+        - "technical-leads"
+      format: "markdown"
+  # ===========================================================================
+  # 83-integration: 外部系統整合配置
+  # ===========================================================================
+  external_integrations:
+    - integration_id: "github-actions"
+      type: "ci-cd"
+      status: "active"
+      config:
+        repository: "MachineNativeOps/machine-native-ops"
+        workflows:
+          - "ci.yml"
+          - "schema-validation.yml"
+    - integration_id: "dependabot"
+      type: "security"
+      status: "active"
+      config:
+        alerts: true
+        auto_merge: false
+    - integration_id: "slack-webhook"
+      type: "notification"
+      status: "active"
+      config:
+        webhook_url_secret: "SLACK_WEBHOOK_URL"
+        events:
+          - "deployment.completed"
+          - "validation.failed"
+  # ===========================================================================
+  # 整合驗證規則
+  # ===========================================================================
+  validation:
+    semantic_boundary: "External integrations - auto-comment, stakeholder bridge, external systems"
+    layer_compliance: "GL81-83"
+    no_cross_layer: true

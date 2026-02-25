@@ -1,0 +1,181 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: ECO-AI-NATIVE-MODULES
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLModuleRegistry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:controlplane:registries:GL-AI-NATIVE-MODULES.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/registries/GL-AI-NATIVE-MODULES.yaml"
+  name: gl-ai-native-modules-registry
+  version: "1.0.0"
+  created: "2026-01-21"
+
+modules:
+  # GL20-29: Data Science / Data Access Layer
+  - id: "GL20-INGESTION"
+    name: "Data Ingestion Module"
+    layer: "GL20-29"
+    sub_layer: "GL20"
+    path: "workspace/src/data/ingestion"
+    semantic_urn: "urn:machinenativeops:gl:data:ingestion:1.0.0"
+    parent_urn: "urn:machinenativeops:gl:data:layer:1.0.0"
+    status: "ACTIVE"
+    audit_status: "REGISTERED"
+    capabilities:
+      - "batch_ingestion"
+      - "stream_ingestion"
+      - "data_validation"
+      - "schema_enforcement"
+
+  - id: "GL21-CATALOG"
+    name: "Data Catalog Module"
+    layer: "GL20-29"
+    sub_layer: "GL21"
+    path: "workspace/src/data/catalog"
+    semantic_urn: "urn:machinenativeops:gl:data:catalog:1.0.0"
+    parent_urn: "urn:machinenativeops:gl:data:layer:1.0.0"
+    status: "ACTIVE"
+    audit_status: "REGISTERED"
+    capabilities:
+      - "asset_discovery"
+      - "lineage_tracking"
+      - "data_profiling"
+      - "search_indexing"
+
+  - id: "GL22-METADATA"
+    name: "Metadata Module"
+    layer: "GL20-29"
+    sub_layer: "GL22"
+    path: "workspace/src/data/metadata"
+    semantic_urn: "urn:machinenativeops:gl:data:metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:controlplane:registries:GL-AI-NATIVE-MODULES.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/registries/GL-AI-NATIVE-MODULES.yaml"1.0.0"
+    parent_urn: "urn:machinenativeops:gl:data:layer:1.0.0"
+    status: "ACTIVE"
+    audit_status: "REGISTERED"
+    capabilities:
+      - "metadata_management"
+      - "tagging_system"
+      - "classification"
+      - "policy_application"
+
+  - id: "GL23-ASSETS"
+    name: "Data Assets Module"
+    layer: "GL20-29"
+    sub_layer: "GL23"
+    path: "workspace/src/data/assets"
+    semantic_urn: "urn:machinenativeops:gl:data:assets:1.0.0"
+    parent_urn: "urn:machinenativeops:gl:data:layer:1.0.0"
+    status: "ACTIVE"
+    audit_status: "REGISTERED"
+    capabilities:
+      - "asset_storage"
+      - "versioning"
+      - "access_control"
+      - "retention_policy"
+
+  # GL40-49: Algorithm Layer
+  - id: "GL40-MODELS"
+    name: "Model Registry Module"
+    layer: "GL40-49"
+    sub_layer: "GL40"
+    path: "workspace/src/algorithms/models"
+    semantic_urn: "urn:machinenativeops:gl:algorithms:models:1.0.0"
+    parent_urn: "urn:machinenativeops:gl:algorithms:layer:1.0.0"
+    status: "ACTIVE"
+    audit_status: "REGISTERED"
+    capabilities:
+      - "model_registration"
+      - "version_control"
+      - "model_metadata"
+      - "deployment_tracking"
+
+  - id: "GL41-PIPELINES"
+    name: "Pipelines Module"
+    layer: "GL40-49"
+    sub_layer: "GL41"
+    path: "workspace/src/algorithms/pipelines"
+    semantic_urn: "urn:machinenativeops:gl:algorithms:pipelines:1.0.0"
+    parent_urn: "urn:machinenativeops:gl:algorithms:layer:1.0.0"
+    status: "ACTIVE"
+    audit_status: "REGISTERED"
+    capabilities:
+      - "pipeline_orchestration"
+      - "dag_execution"
+      - "dependency_management"
+      - "fault_tolerance"
+
+  - id: "GL42-FEATURE-ENGINEERING"
+    name: "Feature Engineering Module"
+    layer: "GL40-49"
+    sub_layer: "GL42"
+    path: "workspace/src/algorithms/feature_engineering"
+    semantic_urn: "urn:machinenativeops:gl:algorithms:feature-engineering:1.0.0"
+    parent_urn: "urn:machinenativeops:gl:algorithms:layer:1.0.0"
+    status: "ACTIVE"
+    audit_status: "REGISTERED"
+    capabilities:
+      - "feature_extraction"
+      - "feature_transformation"
+      - "feature_selection"
+      - "feature_store"
+
+  # GL50-59: CUDA / GPU Acceleration Layer
+  - id: "GL50-CUDA-KERNELS"
+    name: "CUDA Kernels Module"
+    layer: "GL50-59"
+    sub_layer: "GL50"
+    path: "workspace/src/gpu/cuda_kernels"
+    semantic_urn: "urn:machinenativeops:gl:gpu:cuda-kernels:1.0.0"
+    parent_urn: "urn:machinenativeops:gl:gpu:layer:1.0.0"
+    status: "ACTIVE"
+    audit_status: "REGISTERED"
+    capabilities:
+      - "kernel_optimization"
+      - "memory_management"
+      - "parallel_computation"
+      - "tensor_operations"
+
+  - id: "GL51-GPU-SCHEDULER"
+    name: "GPU Scheduler Module"
+    layer: "GL50-59"
+    sub_layer: "GL51"
+    path: "workspace/src/gpu/gpu_scheduler"
+    semantic_urn: "urn:machinenativeops:gl:gpu:scheduler:1.0.0"
+    parent_urn: "urn:machinenativeops:gl:gpu:layer:1.0.0"
+    status: "ACTIVE"
+    audit_status: "REGISTERED"
+    capabilities:
+      - "resource_allocation"
+      - "job_scheduling"
+      - "load_balancing"
+      - "queue_management"
+
+  - id: "GL52-ACCELERATORS"
+    name: "Accelerators Module"
+    layer: "GL50-59"
+    sub_layer: "GL52"
+    path: "workspace/src/gpu/accelerators"
+    semantic_urn: "urn:machinenativeops:gl:gpu:accelerators:1.0.0"
+    parent_urn: "urn:machinenativeops:gl:gpu:layer:1.0.0"
+    status: "ACTIVE"
+    audit_status: "REGISTERED"
+    capabilities:
+      - "tensorrt_optimization"
+      - "quantization"
+      - "pruning"
+      - "inference_acceleration"
+
+governance_policy:
+  audit_required: true
+  evidence_chain_required: true
+  validation_required: true
+  blocking_on_failure: true
+
+activation_status: "GL Unified Architecture Governance Framework Activated"

@@ -1,0 +1,249 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: trace-analysis-dashboard
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Trace Analysis Dashboards and Monitoring
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trace-analysis-dashboard
+  namespace: istio-system
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    grafana_dashboard: "1"
+data:
+  trace-analysis.json: |
+    {
+      "dashboard": {
+        "title": "Distributed Tracing Analysis",
+        "panels": [
+          {
+            "title": "Trace Throughput",
+            "targets": [
+              {
+                "expr": "rate(jaeger_traces_started_total[5m])",
+                "legendFormat": "Traces/sec"
+              }
+            ],
+            "type": "graph"
+          },
+          {
+            "title": "Trace Duration Percentiles",
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.50, sum(rate(jaeger_tracer_duration_milliseconds_bucket[5m])) by (le))",
+                "legendFormat": "P50"
+              },
+              {
+                "expr": "histogram_quantile(0.95, sum(rate(jaeger_tracer_duration_milliseconds_bucket[5m])) by (le))",
+                "legendFormat": "P95"
+              },
+              {
+                "expr": "histogram_quantile(0.99, sum(rate(jaeger_tracer_duration_milliseconds_bucket[5m])) by (le))",
+                "legendFormat": "P99"
+              }
+            ],
+            "type": "graph"
+          },
+          {
+            "title": "Trace Duration by Service",
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.95, sum(rate(jaeger_tracer_duration_milliseconds_bucket[5m])) by (le, service_name))",
+                "legendFormat": "{{service_name}}"
+              }
+            ],
+            "type": "heatmap"
+          },
+          {
+            "title": "Span Duration Distribution",
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.95, sum(rate(jaeger_span_duration_milliseconds_bucket[5m])) by (le, operation_name))",
+                "legendFormat": "{{operation_name}}"
+              }
+            ],
+            "type": "graph"
+          },
+          {
+            "title": "Error Rate",
+            "targets": [
+              {
+                "expr": "sum(rate(jaeger_spans_total{error=true}[5m])) / sum(rate(jaeger_spans_total[5m])) * 100",
+                "legendFormat": "Error Rate %"
+              }
+            ],
+            "type": "graph"
+          },
+          {
+            "title": "Trace Sampling Rate",
+            "targets": [
+              {
+                "expr": "sum(rate(jaeger_spans_total[5m])) / sum(rate(istio_requests_total[5m])) * 100",
+                "legendFormat": "Sampling Rate %"
+              }
+            ],
+            "type": "gauge"
+          },
+          {
+            "title": "Service Dependency Graph",
+            "targets": [
+              {
+                "expr": "sum(increase(istio_requests_total[5m])) by (source_service, destination_service)",
+                "legendFormat": "{{source_service}} -> {{destination_service}}"
+              }
+            ],
+            "type": "graph"
+          },
+          {
+            "title": "Hot Operations",
+            "targets": [
+              {
+                "expr": "topk(10, sum(rate(jaeger_spans_total[5m])) by (operation_name))",
+                "legendFormat": "{{operation_name}}"
+              }
+            ],
+            "type": "table"
+          },
+          {
+            "title": "Slow Traces (>5s)",
+            "targets": [
+              {
+                "expr": "sum(increase(jaeger_tracer_duration_milliseconds_bucket{le=&quot;+Inf&quot;}[5m])) by (trace_id)",
+                "legendFormat": "{{trace_id}}"
+              }
+            ],
+            "type": "table"
+          },
+          {
+            "title": "Trace Success Rate",
+            "targets": [
+              {
+                "expr": "sum(rate(jaeger_traces_finished_total{success=true}[5m])) / sum(rate(jaeger_traces_finished_total[5m])) * 100",
+                "legendFormat": "Success Rate %"
+              }
+            ],
+            "type": "gauge"
+          }
+        ]
+      }
+    }
+---
+# Trace analysis alerting rules
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trace-analysis-alerts
+  namespace: istio-system
+data:
+  alerts.yaml: |
+    groups:
+    - name: trace_analysis
+      rules:
+      # High error rate in traces
+      - alert: HighTraceErrorRate
+        expr: |
+          sum(rate(jaeger_spans_total{error=true}[5m])) 
+          / sum(rate(jaeger_spans_total[5m])) * 100 > 5
+        for: 5m
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High error rate detected in traces"
+          description: "Trace error rate is {{ $value }}% for the last 5 minutes"
+      
+      # Slow traces detection
+      - alert: SlowTracesDetected
+        expr: |
+          histogram_quantile(0.95, sum(rate(jaeger_tracer_duration_milliseconds_bucket[5m])) by (le)) > 5000
+        for: 10m
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Slow traces detected"
+          description: "95th percentile trace duration is {{ $value }}ms for the last 10 minutes"
+      
+      # Trace sampling rate anomaly
+      - alert: TraceSamplingRateAnomaly
+        expr: |
+          abs(
+            sum(rate(jaeger_spans_total[5m])) / sum(rate(istio_requests_total[5m])) * 100 
+            - 10
+          ) > 50
+        for: 5m
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          severity: info
+          team: platform
+        annotations:
+          summary: "Trace sampling rate anomaly detected"
+          description: "Current sampling rate is {{ $value }}%, expected ~10%"
+      
+      # Missing trace context
+      - alert: MissingTraceContext
+        expr: |
+          sum(rate(istio_requests_total[5m])) - sum(rate(jaeger_traces_started_total[5m])) > 100
+        for: 5m
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Missing trace context detected"
+          description: "{{ $value }} requests per second are not being traced"
+---
+# Trace analysis jobs
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: trace-analysis-report
+  namespace: istio-system
+spec:
+  schedule: "0 6 * * *"  # Daily at 6 AM
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: trace-analyzer
+            image: jaegertracing/jaeger-query:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # Analyze traces and generate report
+              echo "=== Trace Analysis Report - $(date) ===" > /tmp/trace-report.txt
+              echo "" >> /tmp/trace-report.txt
+              
+              # Get trace statistics
+              echo "Trace Statistics:" >> /tmp/trace-report.txt
+              curl -s http://jaeger-query:16686/api/traces?service=machine-native-ops-production&limit=1000 \
+                | jq '.data | length' >> /tmp/trace-report.txt
+              
+              echo "" >> /tmp/trace-report.txt
+              echo "Slow Traces (>5s):" >> /tmp/trace-report.txt
+              curl -s "http://jaeger-query:16686/api/traces?service=machine-native-ops-production&limit=100" \
+                | jq -r '.data[] | select(.duration > 5000000) | .traceID' >> /tmp/trace-report.txt
+              
+              cat /tmp/trace-report.txt
+            volumeMounts:
+            - name: reports
+              mountPath: /tmp
+          volumes:
+          - name: reports
+            emptyDir: {}
+          restartPolicy: OnFailure

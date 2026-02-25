@@ -1,0 +1,29 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: kubernetes-resourcequota
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+#
+# GL Unified Architecture Governance Framework Activated
+# Kubernetes Base ResourceQuota Manifest
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:kubernetes:manifests:base:resourcequota.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/kubernetes/manifests/base/resourcequota.yaml"
+  name: machine-native-ops-quota
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: machine-native-ops
+    app.kubernetes.io/app.kubernetes.io/component: resource-quota
+    governance.machinenativeops.io/charter-version: "2.0.0"
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: "8Gi"
+    limits.cpu: "8"
+    limits.memory: "16Gi"
+    persistentvolumeclaims: "10"

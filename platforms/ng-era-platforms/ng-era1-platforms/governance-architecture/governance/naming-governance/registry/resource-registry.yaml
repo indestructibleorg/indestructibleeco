@@ -1,0 +1,272 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: naming-governance
+# @ECO-audit-trail: gl-platform-ecosystem/governance/audit-trails/GL90_99-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-platform-ecosystem/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-platform-ecosystem/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: gl-runtime.io/v1.0.0
+kind: ResourceRegistry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:governance:naming-governance:registry:resource-registry.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/governance/naming-governance/registry/resource-registry.yaml"
+  name: resource-registry
+  version: v1.0.0
+  description: "GL Resource Registry - 定義所有可用的 resource"
+  namespace: gl-platform-ecosystem
+spec:
+  resources:
+    ## Execution Resources
+    - resource_id: executor
+      description: "執行器實例"
+      semantics:
+        - "execution-context"
+        - "runtime-handler"
+        - "process-manager"
+      capabilities:
+        - dag
+        - workflow
+        - executor
+      status: ACTIVE
+    
+    - resource_id: scheduler
+      description: "調度器實例"
+      semantics:
+        - "task-scheduling"
+        - "resource-allocation"
+        - "job-queue"
+      capabilities:
+        - dag
+        - workflow
+      status: ACTIVE
+    
+    - resource_id: validator
+      description: "驗證器實例"
+      semantics:
+        - "validation-logic"
+        - "compliance-check"
+        - "rule-evaluation"
+      capabilities:
+        - dag
+        - schema
+        - policy
+      status: ACTIVE
+    
+    ## Generation Resources
+    - resource_id: generator
+      description: "生成器實例"
+      semantics:
+        - "content-creation"
+        - "code-generation"
+        - "schema-generation"
+      capabilities:
+        - schema
+        - text
+      status: ACTIVE
+    
+    ## Routing Resources
+    - resource_id: router
+      description: "路由器實例"
+      semantics:
+        - "request-routing"
+        - "traffic-distribution"
+        - "service-discovery"
+      capabilities:
+        - gateway
+        - api
+      status: ACTIVE
+    
+    ## Management Resources
+    - resource_id: manager
+      description: "管理器實例"
+      semantics:
+        - "resource-management"
+        - "lifecycle-control"
+        - "coordination-handler"
+      capabilities:
+        - shard
+        - replication
+        - cache
+      status: ACTIVE
+    
+    - resource_id: coordinator
+      description: "協調器實例"
+      semantics:
+        - "coordination"
+        - "synchronization"
+        - "consensus"
+      capabilities:
+        - shard
+        - replication
+      status: ACTIVE
+    
+    ## Processing Resources
+    - resource_id: processor
+      description: "處理器實例"
+      semantics:
+        - "data-processing"
+        - "transformation-logic"
+        - "computation-handler"
+      capabilities:
+        - batch
+        - stream
+        - compute
+      status: ACTIVE
+    
+    ## Monitoring Resources
+    - resource_id: monitor
+      description: "監控器實例"
+      semantics:
+        - "health-check"
+        - "metrics-collection"
+        - "performance-tracking"
+      capabilities:
+        - dag
+        - workflow
+        - audit
+      status: ACTIVE
+    
+    ## Analysis Resources
+    - resource_id: analyzer
+      description: "分析器實例"
+      semantics:
+        - "data-analysis"
+        - "pattern-recognition"
+        - "insight-extraction"
+      capabilities:
+        - vision
+        - text
+        - audio
+        - graph
+      status: ACTIVE
+    
+    ## Recognition Resources
+    - resource_id: recognizer
+      description: "識別器實例"
+      semantics:
+        - "pattern-recognition"
+        - "entity-recognition"
+        - "feature-extraction"
+      capabilities:
+        - vision
+        - audio
+      status: ACTIVE
+    
+    ## Detection Resources
+    - resource_id: detector
+      description: "檢測器實例"
+      semantics:
+        - "object-detection"
+        - "anomaly-detection"
+        - "change-detection"
+      capabilities:
+        - vision
+        - audit
+      status: ACTIVE
+    
+    ## Planning Resources
+    - resource_id: planner
+      description: "規劃器實例"
+      semantics:
+        - "task-planning"
+        - "goal-decomposition"
+        - "strategy-generation"
+      capabilities:
+        - max
+        - planning
+      status: ACTIVE
+    
+    ## Behavior Resources
+    - resource_id: behavior
+      description: "行為模型"
+      semantics:
+        - "agent-behavior"
+        - "decision-logic"
+        - "action-selection"
+      capabilities:
+        - max
+      status: ACTIVE
+    
+    ## Rules Resources
+    - resource_id: rules
+      description: "規則集"
+      semantics:
+        - "business-rules"
+        - "validation-rules"
+        - "policy-rules"
+      capabilities:
+        - max
+        - policy
+      status: ACTIVE
+    
+    ## Actions Resources
+    - resource_id: actions
+      description: "動作集"
+      semantics:
+        - "executable-actions"
+        - "response-actions"
+        - "remediation-actions"
+      capabilities:
+        - max
+      status: ACTIVE
+    
+    ## Documentation Resources
+    - resource_id: documentation
+      description: "文檔生成器"
+      semantics:
+        - "api-documentation"
+        - "contract-documentation"
+        - "user-guide"
+      capabilities:
+        - schema
+        - gateway
+      status: ACTIVE
+    
+    ## Query Resources
+    - resource_id: query
+      description: "查詢執行器"
+      semantics:
+        - "query-execution"
+        - "data-retrieval"
+        - "search"
+      capabilities:
+        - database
+        - graph
+      status: ACTIVE
+    
+    ## Migration Resources
+    - resource_id: migration
+      description: "遷移工具"
+      semantics:
+        - "data-migration"
+        - "schema-migration"
+        - "version-upgrade"
+      capabilities:
+        - database
+        - api
+      status: ACTIVE
+    
+    ## Backup Resources
+    - resource_id: backup
+      description: "備份管理器"
+      semantics:
+        - "data-backup"
+        - "snapshot"
+        - "recovery"
+      capabilities:
+        - database
+        - storage
+      status: ACTIVE
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:governance:naming-governance:registry:resource-registry.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/governance/naming-governance/registry/resource-registry.yaml"
+  created_at: "2026-01-31T00:00:00Z"
+  updated_at: "2026-01-31T00:00:00Z"
+  total_resources: 19
+  active_resources: 19

@@ -1,0 +1,68 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: .gl-manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# GL Semantic Manifest - Parser Subsystem
+# @gl-layer ECO-30-EXECUTION
+# @gl-semantic-anchor ECO-30-EXEC-PARSER
+# GL Unified Architecture Governance Framework Activated
+
+gl_version: "1.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:parser:.gl-manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/parser/.gl-manifest.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+manifest:
+  subsystem: "parser"
+  module: "aep-engine"
+  layer: "ECO-30-EXECUTION"
+  semantic_anchor: "ECO-30-EXEC-PARSER"
+  updated: "2026-01-26"
+
+components:
+  anchor_resolver:
+    file: "anchor_resolver.ts"
+    class: "AnchorResolver"
+    description: "YAML anchor and alias resolution"
+    version: "1.0.0"
+    exports:
+      - "AnchorResolver"
+    dependencies:
+      - "js-yaml"
+      - "../interfaces.d"
+      - "../types"
+
+  json_passthrough:
+    file: "json_passthrough.ts"
+    class: "JsonPassthroughParser"
+    description: "JSON passthrough parser with validation"
+    version: "1.0.0"
+    exports:
+      - "JsonPassthroughParser"
+    dependencies:
+      - "../interfaces.d"
+
+  yaml_parser:
+    file: "yaml_parser.ts"
+    class: "YamlParser"
+    description: "YAML parser with schema validation"
+    version: "1.0.0"
+    exports:
+      - "YamlParser"
+    dependencies:
+      - "js-yaml"
+      - "../interfaces.d"
+
+governance:
+  charter_activated: true
+  evidence_required: true
+  audit_compliant: true

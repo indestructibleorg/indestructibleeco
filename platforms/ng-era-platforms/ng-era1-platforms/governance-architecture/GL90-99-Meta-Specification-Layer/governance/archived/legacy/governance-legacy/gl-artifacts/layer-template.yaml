@@ -1,0 +1,30 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLLayerTemplate
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:layer-template.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/layer-template.yaml"
+  name: gl-layer-template
+  version: "1.0.0"
+spec:
+  layer_id: "GL00-00"  # Replace with actual layer ID
+  name: "Layer Name"   # Replace with actual layer name
+  range: "00-00"       # Replace with actual range
+  description: "Layer description"  # Replace with actual description
+  dimensions:
+    - "00-dimension-name"  # List all dimensions in this layer
+    # Add more dimensions as needed
+  properties:
+    semantic_boundary: "Clear semantic boundary description"
+    dependencies: []  # List any layer dependencies
+    interfaces: []    # List any exposed interfaces
+  validation:
+    no_conflicts: true
+    no_duplicates: true
+    clear_boundaries: true
+    semantic_stability: true

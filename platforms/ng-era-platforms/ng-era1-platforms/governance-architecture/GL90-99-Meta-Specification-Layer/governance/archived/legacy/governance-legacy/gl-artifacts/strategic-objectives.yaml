@@ -1,0 +1,294 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# =============================================================================
+# GL00-09 Strategic Layer - Strategic Objectives (OKR)
+# MachineNativeOps Governance Artifact
+# =============================================================================
+apiVersion: governance.machinenativeops.io/v2
+kind: StrategicObjectives
+metadata:
+  name: machinenativeops-okr-2025
+  version: "1.0.0"
+  created_at: "2025-01-18T00:00:00Z"
+  updated_at: "2025-01-18T00:00:00Z"
+  owner: governance-team
+  layer: "GL00-09"
+  tags:
+    - strategic
+    - okr
+    - objectives
+  annotations:
+    governance.machinenativeops.io/period: "2025-Q1-Q4"
+    governance.machinenativeops.io/review-cycle: "quarterly"
+spec:
+  # Required fields for GL00-09 compliance
+  vision: "成為機器原生運維領域的領導者"
+  mission: "透過GL架構提供完整的治理解決方案"
+  values:
+    - transparency
+    - automation
+    - continuous_improvement
+  period:
+    start: "2025-01-01"
+    end: "2025-12-31"
+    fiscal_year: "FY2025"
+  objectives:
+    # Objective 1: GL架構完善
+    - id: "OBJ-2025-001"
+      title: "完善GL治理架構標準"
+      title_en: "Complete GL Governance Architecture Standards"
+      description: |
+        建立完整的GL00-99治理層級標準，包含所有層級的規範定義、
+        Artifact模板、驗證規則與最佳實踐指南。
+      owner: "architecture-team"
+      priority: "P0"
+      status: "in_progress"
+      progress: 65
+      key_results:
+        - id: "KR-001-1"
+          title: "完成所有GL層級規範文件"
+          metric: "gl_spec_completion_rate"
+          unit: "percentage"
+          baseline: 50
+          target: 100
+          current: 75
+          status: "on_track"
+        - id: "KR-001-2"
+          title: "建立50+標準Artifact模板"
+          metric: "artifact_template_count"
+          unit: "count"
+          baseline: 20
+          target: 50
+          current: 35
+          status: "on_track"
+        - id: "KR-001-3"
+          title: "實現100%自動化驗證覆蓋"
+          metric: "validation_coverage"
+          unit: "percentage"
+          baseline: 30
+          target: 100
+          current: 60
+          status: "at_risk"
+      milestones:
+        - name: "GL00-09規範完成"
+          due_date: "2025-03-31"
+          status: "completed"
+        - name: "GL10-29規範完成"
+          due_date: "2025-06-30"
+          status: "in_progress"
+        - name: "全層級規範完成"
+          due_date: "2025-09-30"
+          status: "planned"
+    # Objective 2: CI/CD整合
+    - id: "OBJ-2025-002"
+      title: "實現完整CI/CD治理整合"
+      title_en: "Achieve Complete CI/CD Governance Integration"
+      description: |
+        將GL治理流程完全整合至CI/CD管線，實現自動化的
+        Artifact生成、驗證、部署與監控。
+      owner: "platform-team"
+      priority: "P0"
+      status: "in_progress"
+      progress: 45
+      key_results:
+        - id: "KR-002-1"
+          title: "建立5+治理工作流程"
+          metric: "governance_workflow_count"
+          unit: "count"
+          baseline: 2
+          target: 5
+          current: 3
+          status: "on_track"
+        - id: "KR-002-2"
+          title: "PR合規檢查覆蓋率達95%"
+          metric: "pr_compliance_coverage"
+          unit: "percentage"
+          baseline: 60
+          target: 95
+          current: 75
+          status: "on_track"
+        - id: "KR-002-3"
+          title: "自動化報告生成"
+          metric: "automated_report_types"
+          unit: "count"
+          baseline: 1
+          target: 5
+          current: 2
+          status: "at_risk"
+      milestones:
+        - name: "基礎工作流程建立"
+          due_date: "2025-02-28"
+          status: "completed"
+        - name: "合規檢查整合"
+          due_date: "2025-05-31"
+          status: "in_progress"
+        - name: "完整自動化達成"
+          due_date: "2025-10-31"
+          status: "planned"
+    # Objective 3: 觀測性提升
+    - id: "OBJ-2025-003"
+      title: "建立完整治理觀測體系"
+      title_en: "Establish Complete Governance Observability System"
+      description: |
+        建立涵蓋所有GL層級的觀測體系，包含指標收集、
+        儀表板、告警與趨勢分析。
+      owner: "observability-team"
+      priority: "P1"
+      status: "in_progress"
+      progress: 30
+      key_results:
+        - id: "KR-003-1"
+          title: "定義50+治理指標"
+          metric: "governance_metrics_count"
+          unit: "count"
+          baseline: 10
+          target: 50
+          current: 25
+          status: "on_track"
+        - id: "KR-003-2"
+          title: "建立治理健康儀表板"
+          metric: "dashboard_completion"
+          unit: "percentage"
+          baseline: 0
+          target: 100
+          current: 40
+          status: "on_track"
+        - id: "KR-003-3"
+          title: "實現即時告警系統"
+          metric: "alert_rules_count"
+          unit: "count"
+          baseline: 5
+          target: 20
+          current: 8
+          status: "at_risk"
+      milestones:
+        - name: "指標定義完成"
+          due_date: "2025-04-30"
+          status: "in_progress"
+        - name: "儀表板上線"
+          due_date: "2025-07-31"
+          status: "planned"
+        - name: "告警系統完成"
+          due_date: "2025-11-30"
+          status: "planned"
+    # Objective 4: 文件與知識管理
+    - id: "OBJ-2025-004"
+      title: "建立完整治理知識庫"
+      title_en: "Build Complete Governance Knowledge Base"
+      description: |
+        建立完整的GL治理文件、最佳實踐、案例研究與
+        培訓材料，支援組織內外的知識傳播。
+      owner: "documentation-team"
+      priority: "P1"
+      status: "in_progress"
+      progress: 40
+      key_results:
+        - id: "KR-004-1"
+          title: "完成GL架構文件"
+          metric: "documentation_completion"
+          unit: "percentage"
+          baseline: 30
+          target: 100
+          current: 55
+          status: "on_track"
+        - id: "KR-004-2"
+          title: "建立10+最佳實踐指南"
+          metric: "best_practice_guides"
+          unit: "count"
+          baseline: 2
+          target: 10
+          current: 4
+          status: "on_track"
+        - id: "KR-004-3"
+          title: "開發培訓課程"
+          metric: "training_modules"
+          unit: "count"
+          baseline: 0
+          target: 5
+          current: 1
+          status: "at_risk"
+      milestones:
+        - name: "核心文件完成"
+          due_date: "2025-03-31"
+          status: "in_progress"
+        - name: "最佳實踐發布"
+          due_date: "2025-06-30"
+          status: "planned"
+        - name: "培訓課程上線"
+          due_date: "2025-09-30"
+          status: "planned"
+    # Objective 5: 安全與合規
+    - id: "OBJ-2025-005"
+      title: "強化治理安全與合規"
+      title_en: "Strengthen Governance Security and Compliance"
+      description: |
+        確保GL治理架構符合安全最佳實踐與合規要求，
+        包含存取控制、審計追蹤與風險管理。
+      owner: "security-team"
+      priority: "P0"
+      status: "in_progress"
+      progress: 50
+      key_results:
+        - id: "KR-005-1"
+          title: "實現RBAC存取控制"
+          metric: "rbac_implementation"
+          unit: "percentage"
+          baseline: 20
+          target: 100
+          current: 60
+          status: "on_track"
+        - id: "KR-005-2"
+          title: "建立完整審計追蹤"
+          metric: "audit_coverage"
+          unit: "percentage"
+          baseline: 40
+          target: 100
+          current: 70
+          status: "on_track"
+        - id: "KR-005-3"
+          title: "通過安全評估"
+          metric: "security_assessment_score"
+          unit: "score"
+          baseline: 65
+          target: 90
+          current: 75
+          status: "on_track"
+      milestones:
+        - name: "RBAC設計完成"
+          due_date: "2025-02-28"
+          status: "completed"
+        - name: "審計系統上線"
+          due_date: "2025-05-31"
+          status: "in_progress"
+        - name: "安全評估通過"
+          due_date: "2025-08-31"
+          status: "planned"
+  summary:
+    total_objectives: 5
+    total_key_results: 15
+    overall_progress: 46
+    on_track_count: 10
+    at_risk_count: 5
+    off_track_count: 0
+  governance:
+    review_frequency: "quarterly"
+    review_committee: "strategy-committee"
+    escalation_path:
+      - "objective-owner"
+      - "department-head"
+      - "strategy-committee"
+      - "executive-team"
+status:
+  phase: "active"
+  approved_by: "strategy-committee"
+  approved_at: "2025-01-15T00:00:00Z"
+  last_review: "2025-01-18T00:00:00Z"
+  next_review: "2025-04-01T00:00:00Z"
+  change_history:
+    - version: "1.0.0"
+      date: "2025-01-18"
+      author: "governance-team"
+      changes: "Initial OKR creation for FY2025"

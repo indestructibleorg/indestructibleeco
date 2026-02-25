@@ -1,0 +1,410 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# ECO-ARTIFACT-DSL.yaml
+# GL 層級產物生成 DSL（Domain-Specific Language）
+# Version: 1.0.0
+# Status: ACTIVE
+# Mode: MACHINE_NATIVE
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-artifact-dsl.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-artifact-dsl.yaml"
+  name: ECO-ARTIFACT-DSL
+  version: 1.0.0
+  created: 2025-01-18
+  status: ACTIVE
+  mode: MACHINE_NATIVE
+  authority: ECO-CONSTITUTION
+  description: |
+    GL 層級產物生成 DSL，以結構化、可解析、可重播的方式描述 GL 產物生成請求。
+    嚴格對應 GL00-99 的語意、邊界、責任、技能、能力與 artifacts 模型。
+# ============================================================================
+# DSL SCHEMA DEFINITION
+# ============================================================================
+dsl_schema:
+  name: GL_DSL_REQUEST
+  version: 1.0.0
+  fields:
+    - field: gl_layer
+      type: string
+      required: true
+      description: GL 層級或區段
+      valid_values:
+        - "GL00-09"
+        - "GL10-29"
+        - "GL30-49"
+        - "GL50-59"
+        - "GL60-80"
+        - "GL81-83"
+        - "GL90-99"
+      validation_rule: Must match valid GL layer range, no cross-layer, no mix-layer, no skip-layer
+    - field: artifact_type
+      type: string
+      required: true
+      description: 產物類型
+      valid_values:
+        - schema
+        - template
+        - contract
+        - policy
+        - index
+        - config
+        - spec
+        - registry
+        - matrix
+        - mapping
+        - report
+        - definition
+      validation_rule: Must match allowed artifact types for the specified gl_layer
+    - field: intent
+      type: string
+      required: true
+      description: 產物用途的簡短機器可讀描述
+      max_length: 256
+      validation_rule: Must be concise, machine-readable, no analysis or commentary
+    - field: constraints
+      type: object
+      required: true
+      description: 約束條件
+      properties:
+        - property: boundaries
+          type: string
+          required: true
+          description: 語意邊界約束
+          validation_rule: Must conform to GL layer semantic boundaries
+        - property: dependencies
+          type: array
+          required: false
+          description: 上游依賴
+          item_type: string
+          validation_rule: Must conform to GL DAG, no cycles allowed
+        - property: filesystem_target
+          type: string
+          required: false
+          description: 對應的 filesystem 目錄或路徑
+          validation_rule: Must conform to GL filesystem mapping
+        - property: sealing
+          type: string
+          required: true
+          description: 封存模式
+          valid_values:
+            - semantic_only
+            - semantic+filesystem
+            - none
+          validation_rule: Must trigger corresponding sealing procedure
+    - field: output_format
+      type: string
+      required: true
+      description: 產物輸出格式
+      valid_values:
+        - single-line-json
+        - yaml
+        - markdown
+        - plain-text
+      validation_rule: Output must strictly conform to specified format
+    - field: minimal_change
+      type: boolean
+      required: true
+      description: 是否僅允許 minimal actionable output
+      validation_rule: If true, only minimal actionable fixes or minimal artifact generation allowed
+    - field: parallelism
+      type: string
+      required: true
+      description: 並行模式
+      valid_values:
+        - none
+        - intra-layer
+        - cross-module
+      validation_rule: Must conform to GL parallelism constraints
+# ============================================================================
+# DSL PARSING RULES
+# ============================================================================
+parsing_rules:
+  - rule_id: PARSE-001
+    name: Layer Validation
+    description: gl_layer 必須對應有效 GL 層級或區段
+    check: gl_layer IN valid_gl_layers
+    error: "Invalid gl_layer: must be valid GL layer range"
+  - rule_id: PARSE-002
+    name: Artifact Type Validation
+    description: artifact_type 必須對應該層級允許的 artifacts 類型
+    check: artifact_type IN allowed_artifacts[gl_layer]
+    error: "Invalid artifact_type for specified gl_layer"
+  - rule_id: PARSE-003
+    name: Boundary Validation
+    description: constraints.boundaries 必須符合該 GL 層級的語意邊界
+    check: boundaries CONFORMS_TO semantic_boundaries[gl_layer]
+    error: "Boundary constraint violates GL layer semantic boundaries"
+  - rule_id: PARSE-004
+    name: Dependency Validation
+    description: constraints.dependencies 必須符合 GL DAG
+    check: dependencies CONFORMS_TO gl_dag AND NOT creates_cycle
+    error: "Dependency constraint violates GL DAG or creates cycle"
+  - rule_id: PARSE-005
+    name: Filesystem Validation
+    description: filesystem_target 若存在，必須符合 GL filesystem 映射
+    check: filesystem_target CONFORMS_TO filesystem_mapping[gl_layer]
+    error: "Filesystem target does not conform to GL filesystem mapping"
+  - rule_id: PARSE-006
+    name: Sealing Validation
+    description: sealing 必須觸發對應封存程序
+    check: sealing IN valid_sealing_modes
+    error: "Invalid sealing mode"
+  - rule_id: PARSE-007
+    name: Minimal Change Validation
+    description: minimal_change = true 時，只允許 minimal actionable output
+    check: IF minimal_change THEN output IS minimal_actionable
+    error: "Output violates minimal change constraint"
+  - rule_id: PARSE-008
+    name: Output Format Validation
+    description: 輸出必須符合指定格式
+    check: output FORMAT_MATCHES output_format
+    error: "Output does not match specified format"
+# ============================================================================
+# LAYER-ARTIFACT MAPPING
+# ============================================================================
+layer_artifact_mapping:
+  GL00-09:
+    allowed_artifacts:
+      - policy
+      - definition
+      - spec
+      - index
+      - mapping
+    semantic_boundary: Strategic planning, vision, governance policy, architecture principles
+  GL10-29:
+    allowed_artifacts:
+      - config
+      - template
+      - spec
+      - registry
+      - mapping
+    semantic_boundary: Process management, resource allocation, workflow optimization
+  GL30-49:
+    allowed_artifacts:
+      - schema
+      - template
+      - config
+      - spec
+      - contract
+    semantic_boundary: Task execution, code implementation, testing, deployment
+  GL50-59:
+    allowed_artifacts:
+      - config
+      - template
+      - spec
+      - report
+      - definition
+    semantic_boundary: Monitoring, logging, tracing, alerting, dashboarding
+  GL60-80:
+    allowed_artifacts:
+      - registry
+      - config
+      - report
+      - index
+      - mapping
+    semantic_boundary: Feedback collection, learning integration, optimization, innovation
+  GL81-83:
+    allowed_artifacts:
+      - config
+      - spec
+      - registry
+      - mapping
+      - contract
+    semantic_boundary: External integration, partner management, ecosystem coordination
+  GL90-99:
+    allowed_artifacts:
+      - schema
+      - template
+      - spec
+      - index
+      - definition
+      - matrix
+    semantic_boundary: Meta-governance, specification management, standard definition
+# ============================================================================
+# DSL EXECUTION ENGINE
+# ============================================================================
+execution_engine:
+  name: GL DSL Execution Engine
+  version: 1.0.0
+  status: ACTIVE
+  execution_phases:
+    - phase_id: EXEC-01
+      name: Request Parsing
+      description: 解析 GL_DSL_REQUEST
+      actions:
+        - Parse request structure
+        - Validate all fields
+        - Check all parsing rules
+      output: Parsed request object
+    - phase_id: EXEC-02
+      name: Layer Classification
+      description: 確認 GL 層級
+      actions:
+        - Validate gl_layer
+        - Load layer semantic boundaries
+        - Load allowed artifacts
+      output: Layer context
+    - phase_id: EXEC-03
+      name: Artifact Generation
+      description: 產生 artifact
+      actions:
+        - Generate artifact based on intent
+        - Apply output_format
+        - Enforce minimal_change if true
+      output: Generated artifact
+    - phase_id: EXEC-04
+      name: Validation
+      description: 驗證產物
+      actions:
+        - Validate layer boundaries
+        - Validate dependencies
+        - Validate artifact structure
+        - Validate minimal change
+      output: Validation result
+    - phase_id: EXEC-05
+      name: Semantic Sealing
+      description: 語意封存
+      actions:
+        - IF sealing IN [semantic_only, semantic+filesystem]
+        - Apply semantic seal to artifact
+        - Record seal timestamp
+      output: Semantic seal certificate
+    - phase_id: EXEC-06
+      name: Filesystem Sealing
+      description: Filesystem 封存
+      actions:
+        - IF sealing = semantic+filesystem
+        - Write artifact to filesystem_target
+        - Apply filesystem seal
+      output: Filesystem seal certificate
+    - phase_id: EXEC-07
+      name: Feedback Integration
+      description: 回饋整合
+      actions:
+        - Record execution result
+        - Integrate feedback into GL60-80
+      output: Feedback record
+    - phase_id: EXEC-08
+      name: Task Closure
+      description: 任務閉環
+      actions:
+        - Mark task as closed
+        - Record closure timestamp
+      output: Closure certificate
+    - phase_id: EXEC-09
+      name: Next-Cycle Continuation
+      description: 進入下一輪
+      actions:
+        - Reset engine state
+        - Ready for next GL_DSL_REQUEST
+      output: Ready state
+# ============================================================================
+# DSL VALIDATION RULES
+# ============================================================================
+validation_rules:
+  - rule_id: VAL-001
+    name: Layer Isolation
+    check: Artifact must be within specified gl_layer boundaries
+  - rule_id: VAL-002
+    name: Boundary Compliance
+    check: Artifact must not violate semantic boundaries
+  - rule_id: VAL-003
+    name: Dependency Acyclicity
+    check: Dependencies must not create cycles in GL DAG
+  - rule_id: VAL-004
+    name: Artifact Type Compliance
+    check: Artifact type must be allowed for specified gl_layer
+  - rule_id: VAL-005
+    name: Minimal Change Compliance
+    check: If minimal_change=true, output must be minimal actionable
+  - rule_id: VAL-006
+    name: Output Format Compliance
+    check: Output must match specified output_format
+  - rule_id: VAL-007
+    name: Filesystem Mapping Compliance
+    check: Filesystem target must conform to GL filesystem mapping
+  - rule_id: VAL-008
+    name: Sealing Mode Compliance
+    check: Sealing must follow specified mode
+# ============================================================================
+# DSL EXECUTION DEMONSTRATION
+# ============================================================================
+execution_demonstration:
+  request_id: DEMO-001
+  timestamp: 2025-01-18T22:30:00Z
+  # Step 1: GL_DSL_REQUEST
+  request:
+    gl_layer: "GL30-49"
+    artifact_type: "schema"
+    intent: "為 GL 任務生命週期生成單行 JSON schema"
+    constraints:
+      boundaries: "僅限 Execution Layer，不得涉及策略、政策或觀測"
+      dependencies:
+        - "GL10-29"
+        - "GL50-59"
+      filesystem_target: "workspace/layers/GL30-tasks/schemas/"
+      sealing: "semantic+filesystem"
+    output_format: "single-line-json"
+    minimal_change: true
+    parallelism: "cross-module"
+  # Step 2: Artifact Generation Output
+  artifact_output: >-
+    {"task_lifecycle":{"intake":"object","classification":"object",
+    "decomposition":"object","execution":"object","validation":"object",
+    "sealing":"object","feedback":"object","closure":"object","next_cycle":"object"}}
+  # Step 3: Validation Output
+  validation_output:
+    status: "OK"
+    layer: "GL30-49"
+    boundaries: "OK"
+    dependencies: "OK"
+    artifacts: "schema valid"
+    minimal_change: "satisfied"
+  # Step 4: Semantic Sealing Output
+  semantic_sealing_output:
+    status: "GL30-49 schema sealed"
+    timestamp: 2025-01-18T22:30:01Z
+  # Step 5: Filesystem Sealing Output
+  filesystem_sealing_output:
+    status: "workspace/layers/GL30-tasks/schemas/task_lifecycle.schema.json sealed"
+    timestamp: 2025-01-18T22:30:02Z
+  # Step 6: Feedback Integration Output
+  feedback_integration_output:
+    status: "Feedback integrated into GL60-80"
+    timestamp: 2025-01-18T22:30:03Z
+  # Step 7: Task Closure Output
+  task_closure_output:
+    status: "Task closed"
+    timestamp: 2025-01-18T22:30:04Z
+  # Step 8: Next-Cycle Continuation Output
+  next_cycle_output:
+    status: "Ready for next GL_DSL_REQUEST"
+    timestamp: 2025-01-18T22:30:05Z
+# ============================================================================
+# DSL ACTIVATION STATUS
+# ============================================================================
+activation_status:
+  dsl_status: ACTIVE
+  engine_status: ACTIVE
+  timestamp: 2025-01-18T22:30:00Z
+  activated_components:
+    - "✓ DSL Schema Definition"
+    - "✓ DSL Parsing Rules (8 rules)"
+    - "✓ Layer-Artifact Mapping (7 layers)"
+    - "✓ Execution Engine (9 phases)"
+    - "✓ Validation Rules (8 rules)"
+    - "✓ Execution Demonstration Complete"
+  constraints_enforced:
+    - "✓ No cross-layer operations"
+    - "✓ No mix-layer operations"
+    - "✓ No skip-layer operations"
+    - "✓ Artifact boundary compliance"
+    - "✓ DAG acyclicity"
+    - "✓ Semantic sealing preservation"
+    - "✓ Actionable output only"
+    - "✓ Minimal changes only"
+  confirmation: "GL Artifact DSL 已啟動"

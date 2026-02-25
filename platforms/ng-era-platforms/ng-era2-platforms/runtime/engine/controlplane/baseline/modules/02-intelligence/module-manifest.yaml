@@ -1,0 +1,103 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: module-manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+module_id: "02-intelligence"
+module_name: "Intelligence Engine & Multi-Agent Collaboration"
+module_description: |
+  The Intelligence Engine module provides AI decision-making capabilities, multi-agent collaboration,
+  and semantic understanding infrastructure. It operates at L2-L3 autonomy levels, enabling the system
+  to make intelligent decisions, coordinate multiple agents, and maintain contextual awareness for
+  complex task execution. This module leverages LLMs, knowledge graphs, and agent frameworks to
+  achieve sophisticated automation and problem-solving capabilities.
+autonomy_level: "L2-L3"
+namespace: "mno-intelligence"
+dependencies:
+  - "01-core"
+interfaces:
+  - name: "AgentOrchestrator"
+    type: "service"
+    description: "Multi-agent coordination and orchestration interface"
+    endpoints:
+      - "POST /agents/orchestrate"
+      - "GET /agents/status"
+      - "POST /agents/communicate"
+  - name: "DecisionEngine"
+    type: "api"
+    description: "AI-driven decision making and reasoning interface"
+    endpoints:
+      - "POST /decisions/evaluate"
+      - "POST /decisions/optimize"
+      - "GET /decisions/history"
+  - name: "KnowledgeGraph"
+    type: "data"
+    description: "Semantic knowledge graph storage and query interface"
+    endpoints:
+      - "GET /knowledge/nodes"
+      - "POST /knowledge/nodes"
+      - "GET /knowledge/relationships"
+      - "POST /knowledge/query"
+  - name: "ContextManager"
+    type: "service"
+    description: "Contextual awareness and state management interface"
+    endpoints:
+      - "GET /context/{session_id}"
+      - "POST /context/{session_id}"
+      - "DELETE /context/{session_id}"
+status: "active"
+version: "1.0.0"
+components:
+  - name: "AgentOrchestrator"
+    type: "service"
+    description: "Multi-agent coordination and communication framework"
+    location: "lib/mno-intelligence/agent-orchestrator/"
+  - name: "DecisionEngine"
+    type: "service"
+    description: "AI decision-making engine with reasoning capabilities"
+    location: "lib/mno-intelligence/decision-engine/"
+  - name: "KnowledgeGraph"
+    type: "service"
+    description: "Semantic knowledge graph for contextual understanding"
+    location: "lib/mno-intelligence/knowledge-graph/"
+  - name: "ContextManager"
+    type: "service"
+    description: "Session context and state management"
+    location: "lib/mno-intelligence/context-manager/"
+  - name: "LLMIntegration"
+    type: "library"
+    description: "LLM integration layer with multiple provider support"
+    location: "lib/mno-intelligence/llm-integration/"
+semantic_mappings:
+  - concept: "Multi-Agent System"
+    mapping: "mno-intelligence.agent-orchestrator"
+    description: "Map multi-agent coordination to agent orchestrator"
+  - concept: "Decision Making"
+    mapping: "mno-intelligence.decision-engine"
+    description: "Map AI decision-making to decision engine"
+  - concept: "Knowledge Representation"
+    mapping: "mno-intelligence.knowledge-graph"
+    description: "Map knowledge concepts to knowledge graph"
+  - concept: "Contextual Awareness"
+    mapping: "mno-intelligence.context-manager"
+    description: "Map context management to context manager"
+  - concept: "LLM Integration"
+    mapping: "mno-intelligence.llm-integration"
+    description: "Map LLM provider integration to LLM integration layer"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:controlplane:baseline:modules:02-intelligence:module-manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/02-intelligence/module-manifest.yaml"
+  created_date: "2025-01-18"
+  last_modified: "2025-01-18"
+  maintainers:
+    - "MachineNativeOps Team"
+  tags:
+    - "intelligence"
+    - "ai"
+    - "multi-agent"
+    - "decision-making"
+    - "knowledge-graph"
+    - "context-awareness"

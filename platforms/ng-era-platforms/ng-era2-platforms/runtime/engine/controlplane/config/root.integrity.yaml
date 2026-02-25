@@ -1,0 +1,542 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: root.integrity
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# 🛡️ Root 整體性驗證規則配置
+# MachineNativeOps Root Layer Integrity Configuration
+# Version: 1.0.0
+
+apiVersion: machinenativeops.io/v1
+kind: RootIntegrityConfig
+metadata:
+  name: integrity-baseline-config
+  namespace: machinenativenops-integrity
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    machinenativeops.io/tier: "integrity"
+    machinenativeops.io/version: "v1.0.0"
+    machinenativeops.io/component: "integrity-configuration"
+  annotations:
+    machinenativeops.io/description: "Root layer integrity verification and validation rules configuration"
+    machinenativeops.io/last-modified: "2025-12-20T22:00:00Z"
+
+spec:
+  # === 雜湊鎖定 (Hash Lock) 規則 ===
+  hash_lock_rules:
+    - name: "critical-system-files"
+      description: "Hash lock for critical system files"
+      enabled: true
+      scope: "system_criticality"
+      file_patterns:
+        - "/etc/machinenativenops/**/*.yaml"
+        - "/etc/machinenativenops/**/*.json"
+        - "/opt/machinenativenops/modules/**/*.py"
+        - "/usr/local/bin/machinenativenops-*"
+      hash_algorithm: "SHA256"
+      verification_frequency: "on_access"
+      baseline_storage:
+        type: "secure_database"
+        encryption: true
+        access_control: "read_only"
+        backup_frequency: "daily"
+      violation_actions:
+        - "immediate_alert"
+        - "file_quarantine"
+        - "incident_creation"
+        - "automatic_rollback_if_possible"
+      exceptions:
+        - scenario: "authorized_update"
+          requirement: "verification_before_update"
+          approval_required: true
+          
+    - name: "configuration-integrity"
+      description: "Configuration file integrity verification"
+      enabled: true
+      scope: "configuration"
+      file_patterns:
+        - ".root.*.yaml"
+        - ".github/workflows/*.yaml"
+        - "config/**/*.yaml"
+        - "config/**/*.json"
+      hash_algorithm: "SHA256"
+      verification_frequency: "on_change"
+      baseline_storage:
+        type: "version_control"
+        git_repository: "integrity-baselines"
+        branch: "main"
+        encryption: true
+      violation_actions:
+        - "alert_configuration_team"
+        - "prevent_deployment"
+        - "require_manual_review"
+      cross_validation:
+        - "governance_policy_compliance"
+        - "trust_signature_verification"
+        
+    - name: "executable-integrity"
+      description: "Executable file integrity verification"
+      enabled: true
+      scope: "security"
+      file_patterns:
+        - "/opt/machinenativenops/modules/**/*"
+        - "/usr/local/bin/machinenativenops-*"
+        - "/usr/local/sbin/machinenativenops-*"
+      hash_algorithm: "SHA256"
+      verification_frequency: "on_execution"
+      baseline_storage:
+        type: "hsm_protected"
+        hsm_name: "integrity_hsm"
+        key_id: "integrity_baseline_key"
+      violation_actions:
+        - "block_execution"
+        - "security_incident"
+        - "system_isolation"
+      code_signing_required: true
+
+  # === 偏移檢測 (Drift Detection) 規則 ===
+  drift_detection:
+    - name: "system-configuration-drift"
+      description: "Detect system configuration drift from baseline"
+      enabled: true
+      check_frequency: "hourly"
+      comparison_baseline: "last_known_good_state"
+      drift_threshold: 0.01  # 1% change threshold
+      monitored_attributes:
+        - "file_permissions"
+        - "file_ownership"
+        - "file_content_hash"
+        - "directory_structure"
+        - "symlink_targets"
+        - "process_configuration"
+      alerting:
+        drift_detected:
+          severity: "warning"
+          notification_channels: ["configuration_team", "operations_team"]
+          auto_remediation: false
+        significant_drift:
+          severity: "critical"
+          threshold: 0.05  # 5% change threshold
+          notification_channels: ["all_teams", "management"]
+          auto_remediation: true
+          remediation_action: "rollback_to_baseline"
+      exclusion_patterns:
+        - "/tmp/**"
+        - "/var/log/**"
+        - "/var/cache/**"
+        - "/proc/**"
+        - "/sys/**"
+        
+    - name: "security-configuration-drift"
+      description: "Detect security configuration drift"
+      enabled: true
+      check_frequency: "30min"
+      comparison_baseline: "security_baseline"
+      drift_threshold: 0.0  # Zero tolerance for security drift
+      monitored_attributes:
+        - "user_accounts"
+        - "group_memberships"
+        - "sudo_configurations"
+        - "firewall_rules"
+        - "ssl_certificates"
+        - "access_control_lists"
+      alerting:
+        any_drift:
+          severity: "critical"
+          notification_channels: ["security_team", "incident_response"]
+          auto_remediation: false
+          immediate_action: "investigation_required"
+      compliance_requirements:
+        - "SOX_section_404"
+        - "PCI_DSS_requirement_1"
+        - "ISO27001_A_9.1"
+
+  # === 凍結策略 (Freeze Policies) ===
+  freeze_policies:
+    - name: "production-freeze"
+      description: "Production environment freeze policy"
+      enabled: true
+      schedule:
+        - type: "maintenance_window"
+          start: "2025-12-20T23:00:00Z"
+          end: "2025-12-21T07:00:00Z"
+          recurring: "daily"
+        - type: "holiday_period"
+          start: "2025-12-24T00:00:00Z"
+          end: "2025-12-26T23:59:59Z"
+          recurring: "yearly"
+      frozen_operations:
+        - "configuration_changes"
+        - "module_deployments"
+        - "security_policy_modifications"
+        - "user_account_changes"
+        - "system_upgrades"
+      exception_process:
+        - "emergency_approval_required: true"
+        - "approval_authority: cto"
+        - "documentation_required: true"
+        - "rollback_plan_required: true"
+        - "post_change_validation: true"
+      notification:
+        freeze_start: ["all_stakeholders"]
+        freeze_end: ["all_stakeholders"]
+        exception_granted: ["all_stakeholders"]
+        
+    - name: "security-freeze"
+      description: "Security-related freeze during incidents"
+      enabled: true
+      trigger_conditions:
+        - "security_incident_declared"
+        - "vulnerability_scan_high_risk"
+        - "compliance_audit_in_progress"
+      frozen_operations:
+        - "all_changes_except_security_patches"
+        - "user_privilege_modifications"
+        - "network_configuration_changes"
+      exception_process:
+        - "security_team_approval_only"
+        - "immediate_rollback_capability_required"
+        - "enhanced_monitoring_required"
+      auto_activation: true
+      deactivation_conditions:
+        - "incident_resolved"
+        - "vulnerabilities_mitigated"
+        - "audit_completed"
+
+  # === 整體性驗證工作流程 ===
+  integrity_verification_workflows:
+    - name: "baseline-establishment"
+      description: "Establish integrity baseline for system"
+      enabled: true
+      schedule: "on_system_installation"
+      steps:
+        - name: "discover_critical_files"
+          module: "integrity-validator"
+          action: "discover_critical_assets"
+          parameters:
+            scan_directories: ["/etc", "/opt", "/usr/local"]
+            file_patterns: ["*.yaml", "*.json", "*.py", "*.sh"]
+            exclude_patterns: ["/tmp", "/var/log", "/var/cache"]
+          timeout: "300s"
+          
+        - name: "calculate_file_hashes"
+          module: "integrity-validator"
+          action: "calculate_hashes"
+          parameters:
+            algorithm: "SHA256"
+            parallel_processing: true
+            include_metadata: true
+          timeout: "600s"
+          
+        - name: "store_baseline"
+          module: "integrity-validator"
+          action: "store_baseline"
+          parameters:
+            storage_type: "secure_database"
+            encryption: true
+            backup_enabled: true
+            baseline_version: "v1.0.0"
+          timeout: "120s"
+          
+        - name: "verify_baseline"
+          module: "integrity-validator"
+          action: "verify_baseline_integrity"
+          parameters:
+            verification_method: "cross_check"
+            sample_percentage: 10
+          timeout: "180s"
+          
+      success_actions:
+        - "activate_continuous_monitoring"
+        - "notify_administrators"
+        - "update_system_status"
+        
+      failure_actions:
+        - "retry_baseline_creation"
+        - "notify_administrators"
+        - "create_support_ticket"
+        
+    - name: "continuous-integrity-monitoring"
+      description: "Continuous integrity monitoring workflow"
+      enabled: true
+      schedule: "continuous"
+      steps:
+        - name: "monitor_file_changes"
+          module: "integrity-validator"
+          action: "monitor_changes"
+          parameters:
+            monitoring_interval: "60s"
+            real_time_notification: true
+            batch_processing: false
+          timeout: "continuous"
+          
+        - name: "verify_file_integrity"
+          module: "integrity-validator"
+          action: "verify_integrity"
+          parameters:
+            verification_method: "hash_comparison"
+            deep_scan_enabled: false
+            parallel_verification: true
+          timeout: "300s"
+          
+        - name: "check_configuration_drift"
+          module: "integrity-validator"
+          action: "detect_drift"
+          parameters:
+            comparison_baseline: "last_verified"
+            drift_threshold: 0.01
+            detailed_reporting: true
+          timeout: "180s"
+          
+      success_actions:
+        - "update_integrity_status"
+        - "log_verification_results"
+        
+      failure_actions:
+        - "trigger_integrity_incident"
+        - "isolate_affected_components"
+        - "notify_security_team"
+
+  # === 恢復機制 ===
+  recovery_mechanisms:
+    - name: "automatic-rollback"
+      description: "Automatic rollback to last known good state"
+      enabled: true
+      trigger_conditions:
+        - "integrity_violation_confirmed"
+        - "critical_file_modified"
+        - "unauthorized_configuration_change"
+      rollback_targets:
+        - "configuration_files"
+        - "executable_modules"
+        - "security_policies"
+      rollback_methods:
+        - name: "version_control_rollback"
+          description: "Rollback using version control"
+          repository: "system-configuration"
+          branch: "main"
+          commit_reference: "last_verified"
+        - name: "backup_restoration"
+          description: "Restore from verified backup"
+          backup_location: "/secure/backups/integrity"
+          backup_type: "incremental"
+          verification_required: true
+      rollback_validation:
+        - "post_rollback_integrity_check"
+        - "functional_verification"
+        - "performance_baseline_comparison"
+        
+    - name: "manual-intervention"
+      description: "Manual intervention recovery procedure"
+      enabled: true
+      trigger_conditions:
+        - "automatic_rollback_failed"
+        - "complex_integrity_violation"
+        - "system_state_ambiguous"
+      intervention_steps:
+        - "isolate_affected_system"
+        - "gather_forensic_evidence"
+        - "analyze_root_cause"
+        - "plan_recovery_strategy"
+        - "execute_recovery_with_approval"
+        - "validate_recovery"
+        - "document_incident"
+      required_approvals:
+        - "system_administrator"
+        - "security_administrator"
+        - "incident_commander"
+
+  # === 合規性驗證 ===
+  compliance_verification:
+    - name: "SOX_compliance"
+      description: "Sarbanes-Oxley Act compliance verification"
+      enabled: true
+      verification_frequency: "weekly"
+      compliance_controls:
+        - "access_control_verification"
+        - "change_management_audit"
+        - "data_integrity_checks"
+        - "segregation_of_duties"
+        - "audit_trail_completeness"
+      reporting:
+        - format: "executive_summary"
+        - recipients: ["compliance_officer", "audit_committee", "cto"]
+        - retention: "7_years"
+        - archiving: "compliance_storage"
+        
+    - name: "PCI_DSS_compliance"
+      description: "PCI DSS compliance verification"
+      enabled: true
+      verification_frequency: "daily"
+      compliance_controls:
+        - "cardholder_data_protection"
+        - "network_security_monitoring"
+        - "access_control_verification"
+        - "vulnerability_management"
+        - "secure_coding_practices"
+      reporting:
+        - format: "detailed_technical"
+        - recipients: ["security_officer", "pci_compliance_team"]
+        - retention: "3_years"
+        - archiving: "secure_archive"
+        
+    - name: "ISO27001_compliance"
+      description: "ISO 27001 compliance verification"
+      enabled: true
+      verification_frequency: "monthly"
+      compliance_controls:
+        - "information_security_policy"
+        - "risk_assessment_process"
+        - "asset_management"
+        - "access_control"
+        - "operations_security"
+      reporting:
+        - format: "comprehensive_report"
+        - recipients: ["information_security_manager", "management"]
+        - retention: "3_years"
+        - archiving: "compliance_archive"
+
+  # === 整體性指標 ===
+  integrity_metrics:
+    - name: "integrity_score"
+      description: "Overall system integrity score"
+      calculation_method: "weighted_average"
+      components:
+        - name: "file_integrity"
+          weight: 0.3
+          metric_source: "hash_verification_results"
+        - name: "configuration_integrity"
+          weight: 0.25
+          metric_source: "drift_detection_results"
+        - name: "security_integrity"
+          weight: 0.25
+          metric_source: "security_policy_compliance"
+        - name: "operational_integrity"
+          weight: 0.2
+          metric_source: "system_health_monitoring"
+      scoring:
+        excellent: "95-100"
+        good: "85-94"
+        acceptable: "70-84"
+        poor: "50-69"
+        critical: "0-49"
+      alerting:
+        threshold_good: 85
+        threshold_acceptable: 70
+        threshold_critical: 50
+        
+    - name: "drift_percentage"
+      description: "Percentage of configuration drift detected"
+      calculation_method: "absolute_percentage"
+      measurement_scope: "all_monitored_assets"
+      alerting:
+        warning_threshold: 1
+        critical_threshold: 5
+        
+    - name: "violation_rate"
+      description: "Rate of integrity violations per day"
+      calculation_method: "count_per_period"
+      period: "24h"
+      alerting:
+        warning_threshold: 5
+        critical_threshold: 10
+
+status:
+  phase: "Active"
+  conditions:
+    - type: "HashLockRulesConfigured"
+      status: "True"
+      lastTransitionTime: "2025-12-20T22:00:00Z"
+      reason: "RulesConfigured"
+      message: "Hash lock rules configured and active"
+    - type: "DriftDetectionEnabled"
+      status: "True"
+      lastTransitionTime: "2025-12-20T22:00:00Z"
+      reason: "MonitoringActive"
+      message: "Drift detection is enabled and monitoring"
+    - type: "IntegrityWorkflowsActive"
+      status: "True"
+      lastTransitionTime: "2025-12-20T22:00:00Z"
+      reason: "WorkflowsRunning"
+      message: "Integrity verification workflows are active"
+
+---
+# Integrity Schema 定義
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: integrity-schema
+  namespace: machinenativenops-integrity
+data:
+  schema.yaml: |
+    # Root Integrity Configuration Schema
+    type: object
+    properties:
+      hash_lock_rules:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            enabled:
+              type: boolean
+            scope:
+              type: string
+            file_patterns:
+              type: array
+            hash_algorithm:
+              type: string
+            verification_frequency:
+              type: string
+            baseline_storage:
+              type: object
+            violation_actions:
+              type: array
+          required: ["name", "description", "enabled", "scope", "file_patterns", "hash_algorithm"]
+      drift_detection:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            enabled:
+              type: boolean
+            check_frequency:
+              type: string
+            comparison_baseline:
+              type: string
+            drift_threshold:
+              type: number
+            monitored_attributes:
+              type: array
+            alerting:
+              type: object
+          required: ["name", "description", "enabled", "check_frequency", "comparison_baseline", "drift_threshold"]
+      freeze_policies:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            enabled:
+              type: boolean
+            schedule:
+              type: array
+            frozen_operations:
+              type: array
+            exception_process:
+              type: object
+          required: ["name", "description", "enabled", "schedule", "frozen_operations"]
+    required: ["hash_lock_rules", "drift_detection", "freeze_policies"]

@@ -1,0 +1,147 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: rollback.machinenativeops.io/v1
+kind: RollbackProcedures
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:k3s-upgrade:rollback:rollback-procedures.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/k3s-upgrade/rollback/rollback-procedures.yaml"
+  name: gl-quantum-k3s-rollback
+  namespace: k3s-upgrade
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-upgrade
+spec:
+  enabled: true
+  maxRollbackTime: 20m
+  
+  preRollback:
+    checks:
+      - name: verify-backup-exists
+        command: |
+          ls -lh /var/lib/rancher/k3s/backups/ | grep -q pre-upgrade
+        timeout: 30s
+        
+      - name: check-cluster-status
+        command: |
+          kubectl get nodes
+          kubectl get pods --all-namespaces
+        timeout: 60s
+        
+      - name: create-rollback-snapshot
+        command: |
+          k3s etcd-snapshot save --name "pre-rollback-$(date +%Y%m%d-%H%M%S)"
+        timeout: 120s
+        
+  rollbackSteps:
+    - name: drain-node
+      order: 1
+      description: "Drain node to safely remove pods"
+      command: |
+        kubectl drain ${NODE_NAME} --ignore-daemonsets --delete-emptydir-data --force
+      timeout: 300s
+      
+    - name: stop-k3s
+      order: 2
+      description: "Stop k3s service"
+      command: |
+        systemctl stop k3s
+      timeout: 60s
+      
+    - name: restore-etcd
+      order: 3
+      description: "Restore etcd from backup"
+      command: |
+        k3s etcd-snapshot restore ${BACKUP_FILE}
+      timeout: 300s
+      
+    - name: replace-k3s-binary
+      order: 4
+      description: "Replace k3s binary with previous version"
+      command: |
+        mv /usr/local/bin/k3s /usr/local/bin/k3s-new
+        cp ${BACKUP_DIR}/k3s /usr/local/bin/k3s
+        chmod +x /usr/local/bin/k3s
+      timeout: 30s
+      
+    - name: start-k3s
+      order: 5
+      description: "Start k3s service"
+      command: |
+        systemctl start k3s
+      timeout: 60s
+      
+    - name: uncordon-node
+      order: 6
+      description: "Uncordon node to schedule pods"
+      command: |
+        kubectl uncordon ${NODE_NAME}
+      timeout: 60s
+      
+  postRollback:
+    verification:
+      - name: check-k3s-version
+        command: |
+          k3s --version | grep -q ${PREVIOUS_VERSION}
+        timeout: 30s
+        
+      - name: verify-cluster-health
+        command: |
+          kubectl wait --for=condition=ready nodes --all --timeout=5m
+          kubectl wait --for=condition=ready pods --all --all-namespaces --timeout=10m
+        timeout: 600s
+        
+      - name: run-health-checks
+        command: |
+          kubectl get nodes
+          kubectl get pods --all-namespaces
+          kubectl get deployments --all-namespaces
+        timeout: 60s
+        
+  safety:
+    autoRollback: true
+    conditions:
+      - name: pod-failure-rate
+        threshold: 50%
+        window: 5m
+        
+      - name: node-not-ready
+        threshold: 10m
+        window: 10m
+        
+      - name: api-server-unavailable
+        threshold: 2m
+        window: 2m
+        
+  monitoring:
+    enabled: true
+    metrics:
+      - rollback-duration
+      - rollback-success-rate
+      - post-rollback-health
+      
+    alerts:
+      - name: rollback-failed
+        severity: critical
+        condition: rollback_status == "failed"
+        
+      - name: rollback-slow
+        severity: warning
+        condition: rollback_duration > 15m
+        
+  reporting:
+    enabled: true
+    format: json
+    output: artifacts/rollback-reports/
+    retention: 365d

@@ -1,0 +1,116 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: module-manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+module_id: "03-governance"
+module_name: "Governance System & Policy Enforcement"
+module_description: |
+  The Governance System module provides comprehensive governance automation, policy enforcement,
+  and semantic governance capabilities. It operates at L3-L4 autonomy levels, ensuring all
+  operations comply with defined policies, maintaining semantic consistency, and providing
+  audit trails for all system activities. This module implements Governance-as-Code and
+  Policy-as-Code principles using OPA/Rego, with policy gates, semantic validation, and
+  comprehensive audit logging.
+autonomy_level: "L3-L4"
+namespace: "mno-governance"
+dependencies:
+  - "01-core"
+  - "02-intelligence"
+interfaces:
+  - name: "PolicyEngine"
+    type: "service"
+    description: "Policy evaluation and enforcement interface"
+    endpoints:
+      - "POST /policies/evaluate"
+      - "GET /policies/{policy_id}"
+      - "POST /policies/validate"
+  - name: "SemanticValidator"
+    type: "api"
+    description: "Semantic consistency validation interface"
+    endpoints:
+      - "POST /semantic/validate"
+      - "GET /semantic/health-score"
+      - "GET /semantic/violations"
+  - name: "AuditLogger"
+    type: "data"
+    description: "Comprehensive audit logging and retrieval interface"
+    endpoints:
+      - "POST /audit/log"
+      - "GET /audit/logs"
+      - "GET /audit/reports"
+  - name: "PolicyGate"
+    type: "workflow"
+    description: "Policy gate integration for CI/CD pipelines"
+    endpoints:
+      - "POST /gates/evaluate"
+      - "GET /gates/status"
+  - name: "NamespaceManager"
+    type: "service"
+    description: "Namespace governance and management interface"
+    endpoints:
+      - "GET /namespaces"
+      - "POST /namespaces"
+      - "PUT /namespaces/{namespace_id}"
+      - "DELETE /namespaces/{namespace_id}"
+status: "active"
+version: "1.0.0"
+components:
+  - name: "PolicyEngine"
+    type: "service"
+    description: "OPA/Rego-based policy evaluation and enforcement engine"
+    location: "lib/mno-governance/policy-engine/"
+  - name: "SemanticValidator"
+    type: "service"
+    description: "Semantic consistency validation and health scoring"
+    location: "lib/mno-governance/semantic-validator/"
+  - name: "AuditLogger"
+    type: "service"
+    description: "Comprehensive audit logging and reporting system"
+    location: "lib/mno-governance/audit-logger/"
+  - name: "PolicyGate"
+    type: "tool"
+    description: "CI/CD policy gate integration"
+    location: "bin/mno-policy-gate/"
+  - name: "NamespaceManager"
+    type: "service"
+    description: "Namespace governance and semantic mapping management"
+    location: "lib/mno-governance/namespace-manager/"
+  - name: "RegistryManager"
+    type: "service"
+    description: "Module and component registry management"
+    location: "lib/mno-governance/registry-manager/"
+semantic_mappings:
+  - concept: "Policy Enforcement"
+    mapping: "mno-governance.policy-engine"
+    description: "Map policy concepts to policy engine"
+  - concept: "Semantic Validation"
+    mapping: "mno-governance.semantic-validator"
+    description: "Map semantic validation to semantic validator"
+  - concept: "Audit Trail"
+    mapping: "mno-governance.audit-logger"
+    description: "Map audit concepts to audit logger"
+  - concept: "Namespace Governance"
+    mapping: "mno-governance.namespace-manager"
+    description: "Map namespace management to namespace manager"
+  - concept: "Registry Management"
+    mapping: "mno-governance.registry-manager"
+    description: "Map registry concepts to registry manager"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:controlplane:baseline:modules:03-governance:module-manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/03-governance/module-manifest.yaml"
+  created_date: "2025-01-18"
+  last_modified: "2025-01-18"
+  maintainers:
+    - "MachineNativeOps Team"
+  tags:
+    - "governance"
+    - "policy"
+    - "semantic"
+    - "audit"
+    - "compliance"
+    - "opa"
+    - "rego"

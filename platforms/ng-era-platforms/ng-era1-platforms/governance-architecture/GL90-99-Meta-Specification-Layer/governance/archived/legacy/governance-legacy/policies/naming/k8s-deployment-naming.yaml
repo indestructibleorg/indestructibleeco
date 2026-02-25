@@ -1,0 +1,138 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1alpha1
+kind: NamingPolicy
+metadata:
+  name: k8s-deployment-standard
+  description: "Kubernetes Deployment 资源的标准命名规范"
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    category: "kubernetes"
+    resourceType: "deployment"
+    team: "platform"
+  annotations:
+    version: "v1.0.0"
+    lastReviewed: "2025-12-17"
+    owner: "platform-team@example.com"
+
+spec:
+  # 命名模式（使用 Go 模板语法）
+  pattern: "{{ .environment }}-{{ .app }}-deploy-{{ .version }}"
+
+  # 关联的 schema
+  schemaRef: "schemas/resource-name.schema.yaml"
+
+  # 额外验证规则
+  validation:
+    minLength: 10
+    maxLength: 63  # Kubernetes 资源名称限制
+    customPattern: "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"  # DNS-1123 subdomain
+    description: |
+      命名必须符合 DNS-1123 子域名规范：
+      - 只包含小写字母、数字、连字符
+      - 以字母或数字开头和结尾
+      - 总长度不超过 63 字符
+
+  # 执行策略
+  enforcement:
+    level: "error"  # error | warning | advisory
+    scope:
+      - "production"
+      - "staging"
+      - "dev"
+    exemptions:
+      - "legacy-payment-system"  # 已批准的例外
+      - "third-party-*"          # 第三方集成服务
+    autoReject: true
+    ciIntegration: true
+
+  # 示例
+  examples:
+    valid:
+      - name: "prod-payment-deploy-v1.3.0"
+        description: "生产环境支付服务 v1.3.0"
+        components:
+          environment: "prod"
+          app: "payment"
+          resourceType: "deploy"
+          version: "v1.3.0"
+
+      - name: "staging-user-api-deploy-v2.0.0-beta1"
+        description: "预发布环境用户 API v2.0.0-beta1"
+        components:
+          environment: "staging"
+          app: "user-api"
+          resourceType: "deploy"
+          version: "v2.0.0-beta1"
+
+      - name: "dev-order-processor-deploy-v1.0.0"
+        description: "开发环境订单处理器 v1.0.0"
+        components:
+          environment: "dev"
+          app: "order-processor"
+          resourceType: "deploy"
+          version: "v1.0.0"
+
+    invalid:
+      - name: "production-payment-deploy-v1.3.0"
+        reason: "环境名应使用缩写 'prod' 而非 'production'"
+        fix: "prod-payment-deploy-v1.3.0"
+
+      - name: "prod_payment_deploy_1.3.0"
+        reason: "使用下划线分隔符，且版本号缺少 'v' 前缀"
+        fix: "prod-payment-deploy-v1.3.0"
+
+      - name: "prod-Payment-Service-deploy-v1.3.0"
+        reason: "包含大写字母"
+        fix: "prod-payment-service-deploy-v1.3.0"
+
+      - name: "prod-payment-deployment-v1.3.0"
+        reason: "资源类型应使用缩写 'deploy' 而非 'deployment'"
+        fix: "prod-payment-deploy-v1.3.0"
+
+  # 错误消息模板
+  errorMessages:
+    patternMismatch: |
+      资源名称 '{{ .actualName }}' 不符合命名规范。
+      期望格式: {{ .pattern }}
+      例如: prod-payment-deploy-v1.3.0
+    invalidEnvironment: |
+      环境名 '{{ .environment }}' 无效。
+      允许的值: dev, staging, prod
+    invalidVersion: |
+      版本号 '{{ .version }}' 不符合语义化版本规范。
+      格式: vMAJOR.MINOR.PATCH[-PRERELEASE]
+      例如: v1.0.0, v2.3.1-beta1
+
+  # 元数据
+  metadata:
+    version: "v1.0.0"
+    owner: "platform-team"
+    reviewDate: "2025-12-17"
+    nextReviewDate: "2026-06-17"
+    approvers:
+      - "tech-lead@example.com"
+      - "architect@example.com"
+    changelog:
+      - version: "v1.0.0"
+        date: "2025-12-17"
+        changes:
+          - "初始版本"
+          - "定义 Kubernetes Deployment 命名标准"
+
+  # 关联资源
+  relatedPolicies:
+    - "api-naming"
+    - "pipeline-naming"
+
+  references:
+    - title: "Kubernetes Object Names"
+      url: "https://kubernetes.io/docs/concepts/overview/working-with-objects/names/"
+    - title: "DNS-1123 Subdomain Names"
+      url: "https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-subdomain-names"
+    - title: "Semantic Versioning"
+      url: "https://semver.org/"

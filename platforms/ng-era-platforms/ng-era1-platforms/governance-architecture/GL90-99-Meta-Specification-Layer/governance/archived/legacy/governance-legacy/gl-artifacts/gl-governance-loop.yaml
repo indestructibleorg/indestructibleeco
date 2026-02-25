@@ -1,0 +1,251 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLGovernanceLoop
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-governance-loop.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-governance-loop.yaml"
+  name: gl-governance-loop
+  version: "1.0.0"
+  status: ACTIVE
+  created_at: "2025-01-18T00:00:00Z"
+  owner: governance-committee
+loop_state:
+  current_cycle: 1
+  status: ACTIVE
+  started_at: "2025-01-18T00:00:00Z"
+  phases_completed: []
+phase_1_task_intake:
+  phase_id: "PHASE-1"
+  name: "Task Intake"
+  name_zh: "任務接收"
+  gl_layer: "GL00-09"
+  status: COMPLETE
+  intake_protocol:
+    validation:
+      - check: "task_definition_exists"
+        status: PASS
+      - check: "task_scope_defined"
+        status: PASS
+      - check: "task_priority_assigned"
+        status: PASS
+    task_registry:
+      - task_id: "TASK-001"
+        name: "GL Governance Loop Implementation"
+        priority: HIGH
+        received_at: "2025-01-18T00:00:00Z"
+        status: ACCEPTED
+phase_2_layer_classification:
+  phase_id: "PHASE-2"
+  name: "GL Layer Classification"
+  name_zh: "任務分層"
+  gl_layer: "GL10-29"
+  status: COMPLETE
+  classification_rules:
+    - rule_id: "CLASS-001"
+      description: "戰略決策類任務 → GL00-09"
+      pattern: "vision|strategy|charter|architecture|risk|compliance"
+    - rule_id: "CLASS-002"
+      description: "運營管理類任務 → GL10-29"
+      pattern: "policy|process|resource|quality|capability"
+    - rule_id: "CLASS-003"
+      description: "執行實現類任務 → GL30-49"
+      pattern: "template|schema|automation|config|script"
+    - rule_id: "CLASS-004"
+      description: "觀測監控類任務 → GL50-59"
+      pattern: "monitoring|alerting|logging|tracing|dashboard"
+    - rule_id: "CLASS-005"
+      description: "回饋優化類任務 → GL60-80"
+      pattern: "feedback|optimization|ai|audit|innovation"
+    - rule_id: "CLASS-006"
+      description: "外部整合類任務 → GL81-83"
+      pattern: "integration|stakeholder|auto-comment|external"
+    - rule_id: "CLASS-007"
+      description: "元規範類任務 → GL90-99"
+      pattern: "naming|semantic|specification|meta|standard"
+  classification_result:
+    task_id: "TASK-001"
+    primary_layer: "GL90-99"
+    secondary_layers:
+      - "GL00-09"
+      - "GL10-29"
+      - "GL30-49"
+    execution_order:
+      - "GL90-99"
+      - "GL00-09"
+      - "GL10-29"
+      - "GL30-49"
+phase_3_layered_execution:
+  phase_id: "PHASE-3"
+  name: "Layered Execution"
+  name_zh: "任務執行"
+  gl_layer: "GL30-49"
+  status: COMPLETE
+  execution_log:
+    - layer: "GL90-99"
+      action: "定義治理閉環元規範"
+      artifact: "ECO-GOVERNANCE-LOOP.yaml"
+      status: COMPLETE
+    - layer: "GL00-09"
+      action: "建立治理閉環戰略框架"
+      artifact: "governance-loop-charter"
+      status: COMPLETE
+    - layer: "GL10-29"
+      action: "制定治理閉環運營流程"
+      artifact: "governance-loop-process"
+      status: COMPLETE
+    - layer: "GL30-49"
+      action: "實現治理閉環執行機制"
+      artifact: "governance-loop-executor"
+      status: COMPLETE
+phase_4_validation:
+  phase_id: "PHASE-4"
+  name: "Validation Layer"
+  name_zh: "任務驗證"
+  gl_layer: "GL50-59"
+  status: COMPLETE
+  validation_checks:
+    - check_id: "VAL-001"
+      name: "層級對應驗證"
+      description: "驗證任務是否正確對應到 GL 層級"
+      status: PASS
+    - check_id: "VAL-002"
+      name: "語意邊界驗證"
+      description: "驗證輸出是否符合層級語意"
+      status: PASS
+    - check_id: "VAL-003"
+      name: "可執行成果驗證"
+      description: "驗證輸出是否為 actionable output"
+      status: PASS
+    - check_id: "VAL-004"
+      name: "跨層檢測"
+      description: "檢測是否存在跨層、跳層、混層"
+      status: PASS
+    - check_id: "VAL-005"
+      name: "Artifacts 分類驗證"
+      description: "驗證 artifacts 是否正確分類"
+      status: PASS
+  validation_summary:
+    total_checks: 5
+    passed: 5
+    failed: 0
+    status: ALL_PASS
+phase_5_semantic_sealing:
+  phase_id: "PHASE-5"
+  name: "Semantic Sealing"
+  name_zh: "語意封存"
+  gl_layer: "GL90-99"
+  status: COMPLETE
+  sealing_record:
+    sealed_artifacts:
+      - artifact: "ECO-GOVERNANCE-LOOP.yaml"
+        layer: "GL90-99"
+        sealed_at: "2025-01-18T00:00:00Z"
+        integrity_hash: "sha256:gl-governance-loop-v1"
+    seal_verification:
+      - rule: "SEAL-001"
+        status: ENFORCED
+      - rule: "SEAL-002"
+        status: ENFORCED
+      - rule: "SEAL-003"
+        status: ENFORCED
+      - rule: "SEAL-004"
+        status: ENFORCED
+      - rule: "SEAL-005"
+        status: ENFORCED
+phase_6_feedback_integration:
+  phase_id: "PHASE-6"
+  name: "Feedback Integration"
+  name_zh: "回饋整合"
+  gl_layer: "GL60-80"
+  status: COMPLETE
+  feedback_channels:
+    - channel_id: "FB-001"
+      name: "執行效率回饋"
+      source: "GL30-49"
+      target: "GL10-29"
+      status: ACTIVE
+    - channel_id: "FB-002"
+      name: "驗證結果回饋"
+      source: "GL50-59"
+      target: "GL00-09"
+      status: ACTIVE
+    - channel_id: "FB-003"
+      name: "語意一致性回饋"
+      source: "GL90-99"
+      target: "GL00-09"
+      status: ACTIVE
+  feedback_actions:
+    - action_id: "FBA-001"
+      description: "記錄本輪執行結果"
+      status: COMPLETE
+    - action_id: "FBA-002"
+      description: "更新治理指標"
+      status: COMPLETE
+    - action_id: "FBA-003"
+      description: "準備下一輪輸入"
+      status: COMPLETE
+phase_7_next_cycle:
+  phase_id: "PHASE-7"
+  name: "Next-Cycle Continuation"
+  name_zh: "進入下一輪"
+  gl_layer: "GL00-09"
+  status: READY
+  cycle_transition:
+    current_cycle: 1
+    next_cycle: 2
+    transition_status: READY
+    cycle_summary:
+      cycle_id: 1
+      started_at: "2025-01-18T00:00:00Z"
+      completed_at: "2025-01-18T00:00:00Z"
+      phases_completed: 7
+      validation_status: ALL_PASS
+      seal_status: SEALED
+    next_cycle_readiness:
+      task_queue_ready: true
+      feedback_integrated: true
+      resources_available: true
+      governance_state: STABLE
+loop_executor:
+  executor_id: "ECO-LOOP-EXEC-001"
+  version: "1.0.0"
+  execution_flow:
+    sequence:
+      - phase: "PHASE-1"
+        name: "Task Intake"
+        gl_layer: "GL00-09"
+      - phase: "PHASE-2"
+        name: "GL Layer Classification"
+        gl_layer: "GL10-29"
+      - phase: "PHASE-3"
+        name: "Layered Execution"
+        gl_layer: "GL30-49"
+      - phase: "PHASE-4"
+        name: "Validation Layer"
+        gl_layer: "GL50-59"
+      - phase: "PHASE-5"
+        name: "Semantic Sealing"
+        gl_layer: "GL90-99"
+      - phase: "PHASE-6"
+        name: "Feedback Integration"
+        gl_layer: "GL60-80"
+      - phase: "PHASE-7"
+        name: "Next-Cycle Continuation"
+        gl_layer: "GL00-09"
+  loop_constraints:
+    - "每階段僅產出可執行成果"
+    - "不得跨層、不跳層、不混層"
+    - "驗證失敗時產出 minimal actionable fixes"
+    - "封存後不可修改、不可擴張、不可重寫"
+    - "回饋必須整合至下一輪"
+loop_signature:
+  cycle: 1
+  status: COMPLETE
+  all_phases_passed: true
+  sealed_at: "2025-01-18T00:00:00Z"
+  next_cycle_ready: true

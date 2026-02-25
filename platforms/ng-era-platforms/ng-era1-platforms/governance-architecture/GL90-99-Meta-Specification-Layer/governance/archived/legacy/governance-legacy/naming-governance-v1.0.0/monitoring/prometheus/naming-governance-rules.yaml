@@ -1,0 +1,244 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: naming-governance-rules
+  namespace: monitoring
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: naming-governance
+    version: v1.0.0
+    managed-by: platform-team
+spec:
+  groups:
+  - name: naming.compliance.rules
+    interval: 5m
+    rules:
+    # 命名合規率指標
+    - record: naming:compliance:rate
+      expr: |
+        sum(rate(kube_deployment_status_replicas_available[5m]))
+        /
+        sum(rate(kube_deployment_status_replicas_desired[5m]))
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        metric_type: "compliance_rate"
+    
+    # 違規命名計數
+    - record: naming:violations:total
+      expr: |
+        count(kube_deployment_metadata_name{namespace=~"dev|staging|prod|test|learn"})
+        -
+        count(kube_deployment_metadata_name{
+          namespace=~"dev|staging|prod|test|learn",
+          name=~"^(dev|staging|prod|test|learn)-[a-z0-9-]{3,30}-(deploy|svc|ing|cm|secret|statefulset|daemonset)-v\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9]+)?$"
+        })
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        severity: "warning"
+    
+    # 各環境合規率
+    - record: naming:compliance:by_environment
+      expr: |
+        sum by (namespace) (rate(kube_deployment_status_replicas_available[5m]))
+        /
+        sum by (namespace) (rate(kube_deployment_status_replicas_desired[5m]))
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        metric_type: "environment_compliance"
+  
+  - name: naming.alerts
+    rules:
+    # 命名規範違反告警
+    - alert: NamingConventionViolation
+      expr: |
+        count(kube_deployment_metadata_name{namespace=~"dev|staging|prod|test|learn"})
+        -
+        count(kube_deployment_metadata_name{
+          namespace=~"dev|staging|prod|test|learn",
+          name=~"^(dev|staging|prod|test|learn)-[a-z0-9-]{3,30}-(deploy|svc|ing|cm|secret|statefulset|daemonset)-v\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9]+)?$"
+        }) > 0
+      for: 5m
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        severity: warning
+        category: naming
+        team: platform-governance
+      annotations:
+        summary: "偵測到命名規範違反"
+        description: "在命名空間 {{ $labels.namespace }} 中發現 {{ $value }} 個資源不符合命名規範"
+        runbook_url: "https://docs.example.com/naming-governance/runbooks/naming-violation"
+        suggested_action: "請檢查並修正違規資源的名稱，使其符合標準命名規範"
+    
+    # 合規率過低告警
+    - alert: NamingComplianceRateLow
+      expr: naming:compliance:rate < 0.95
+      for: 10m
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        severity: warning
+        category: naming
+        team: platform-governance
+      annotations:
+        summary: "命名合規率低於閾值"
+        description: "當前命名合規率為 {{ $value | humanizePercentage }}，低於目標 95%"
+        runbook_url: "https://docs.example.com/naming-governance/runbooks/low-compliance"
+        suggested_action: "執行命名稽核並修正違規資源"
+    
+    # 生產環境命名違反告警（高優先級）
+    - alert: ProductionNamingViolation
+      expr: |
+        count(kube_deployment_metadata_name{namespace="prod"})
+        -
+        count(kube_deployment_metadata_name{
+          namespace="prod",
+          name=~"^prod-[a-z0-9-]{3,30}-(deploy|svc|ing|cm|secret|statefulset|daemonset)-v\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9]+)?$"
+        }) > 0
+      for: 2m
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        severity: critical
+        category: naming
+        team: platform-governance
+      annotations:
+        summary: "生產環境偵測到命名規範違反"
+        description: "生產環境中發現 {{ $value }} 個資源不符合命名規範"
+        runbook_url: "https://docs.example.com/naming-governance/runbooks/production-violation"
+        suggested_action: "立即檢查並修正生產環境中的違規資源"
+    
+    # 缺少必要標籤告警
+    - alert: MissingRequiredLabels
+      expr: |
+        sum by (namespace) (kube_deployment_labels{namespace=~"dev|staging|prod|test|learn"})
+        -
+        sum by (namespace) (kube_deployment_labels{
+          namespace=~"dev|staging|prod|test|learn",
+          label_app_kubernetes_io_name!="",
+          label_environment!="",
+          label_tenant!="",
+          label_version!=""
+        }) > 0
+      for: 10m
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        severity: warning
+        category: naming
+        team: platform-governance
+      annotations:
+        summary: "資源缺少必要標籤"
+        description: "命名空間 {{ $labels.namespace }} 中有 {{ $value }} 個資源缺少必要標籤"
+        runbook_url: "https://docs.example.com/naming-governance/runbooks/missing-labels"
+        suggested_action: "為資源添加必要的標籤：app.kubernetes.io/name, environment, tenant, version"
+    
+    # 版本號格式錯誤告警
+    - alert: InvalidVersionFormat
+      expr: |
+        count(kube_deployment_metadata_name{
+          namespace=~"dev|staging|prod|test|learn",
+          name!~".*-v\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9]+)?$"
+        }) > 0
+      for: 5m
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        severity: warning
+        category: naming
+        team: platform-governance
+      annotations:
+        summary: "偵測到無效的版本號格式"
+        description: "發現 {{ $value }} 個資源的版本號格式不符合 SemVer 規範"
+        runbook_url: "https://docs.example.com/naming-governance/runbooks/invalid-version"
+        suggested_action: "修正版本號格式，使其符合 v1.2.3 格式"
+    
+    # 部署成功率監控
+    - alert: DeploymentSuccessRateLow
+      expr: |
+        sum(rate(kube_deployment_status_updated[1h]))
+        /
+        sum(rate(kube_deployment_status_observed[1h])) < 0.95
+      for: 15m
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        severity: warning
+        category: deployment
+        team: platform-ops
+      annotations:
+        summary: "部署成功率低於閾值"
+        description: "過去一小時的部署成功率為 {{ $value | humanizePercentage }}，低於目標 95%"
+        runbook_url: "https://docs.example.com/naming-governance/runbooks/deployment-failure"
+        suggested_action: "檢查部署日誌並修正失敗的部署"
+    
+    # 回滾頻率告警
+    - alert: HighRollbackRate
+      expr: |
+        increase(kube_deployment_status_replicas_updated[1h])
+        -
+        increase(kube_deployment_status_replicas_available[1h]) > 2
+      for: 1h
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        severity: warning
+        category: deployment
+        team: platform-ops
+      annotations:
+        summary: "偵測到高頻率回滾"
+        description: "過去一小時內發生 {{ $value }} 次回滾"
+        runbook_url: "https://docs.example.com/naming-governance/runbooks/high-rollback"
+        suggested_action: "調查回滾原因並修正問題"
+  
+  - name: naming.metrics.aggregation
+    interval: 1m
+    rules:
+    # 每日命名合規率
+    - record: naming:compliance:daily
+      expr: |
+        avg_over_time(naming:compliance:rate[1d])
+    
+    # 每週命名合規率趨勢
+    - record: naming:compliance:weekly
+      expr: |
+        avg_over_time(naming:compliance:rate[7d])
+    
+    # 各環境違規數量
+    - record: naming:violations:by_environment
+      expr: |
+        sum by (namespace) (
+          kube_deployment_metadata_name{namespace=~"dev|staging|prod|test|learn"}
+          unless on (name) (
+            kube_deployment_metadata_name{
+              namespace=~"dev|staging|prod|test|learn",
+              name=~"^(dev|staging|prod|test|learn)-[a-z0-9-]{3,30}-(deploy|svc|ing|cm|secret|statefulset|daemonset)-v\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9]+)?$"
+            }
+          )
+        )
+    
+    # 缺少標籤統計
+    - record: naming:missing_labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: alignedcount
+      expr: |
+        sum by (namespace) (
+          kube_deployment_labels{namespace=~"dev|staging|prod|test|learn"}
+          unless on (namespace, pod) (
+            kube_deployment_labels{
+              label_app_kubernetes_io_name!="",
+              label_environment!="",
+              label_tenant!="",
+              label_version!=""
+            }
+          )
+        )

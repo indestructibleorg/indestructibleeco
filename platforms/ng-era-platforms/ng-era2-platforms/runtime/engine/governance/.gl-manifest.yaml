@@ -1,0 +1,81 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: .gl-manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# GL Semantic Manifest - Governance Subsystem
+# @gl-layer ECO-10-OPERATIONAL
+# @gl-semantic-anchor ECO-10-GOV-ENGINE
+# GL Unified Architecture Governance Framework Activated
+
+gl_version: "2.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:governance:.gl-manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/.gl-manifest.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+manifest:
+  subsystem: "governance"
+  module: "aep-engine"
+  layer: "ECO-10-OPERATIONAL"
+  semantic_anchor: "ECO-10-GOV-ENGINE"
+  updated: "2026-01-28"
+  migration_status: "completed"
+
+components:
+  anchor_resolver:
+    file: "anchor_resolver.ts"
+    class: "AnchorResolver"
+    description: "Semantic anchor resolution for governance"
+    version: "1.0.0"
+    exports:
+      - "AnchorResolver"
+    dependencies:
+      - "../interfaces.d"
+
+  events_writer:
+    file: "events_writer.ts"
+    class: "EventsWriter"
+    description: "Governance event stream writer"
+    version: "1.0.0"
+    exports:
+      - "EventsWriter"
+    dependencies:
+      - "fs"
+      - "path"
+      - "../interfaces.d"
+
+  gl_engine:
+    file: "gl_engine.ts"
+    class: "GovernanceEngine"
+    description: "Core governance engine orchestrator"
+    version: "1.0.0"
+    exports:
+      - "GovernanceEngine"
+    dependencies:
+      - "./rule_evaluator"
+      - "./anchor_resolver"
+      - "./events_writer"
+      - "../interfaces.d"
+
+  rule_evaluator:
+    file: "rule_evaluator.ts"
+    class: "RuleEvaluator"
+    description: "Governance rule evaluation engine"
+    version: "1.0.0"
+    exports:
+      - "RuleEvaluator"
+    dependencies:
+      - "../interfaces.d"
+
+governance:
+  charter_activated: true
+  evidence_required: true
+  audit_compliant: true

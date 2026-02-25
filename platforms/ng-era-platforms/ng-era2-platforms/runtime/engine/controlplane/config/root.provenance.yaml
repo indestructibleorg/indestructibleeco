@@ -1,0 +1,599 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: root.provenance
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# 🔍 Root 來源追溯與元資料配置
+# MachineNativeOps Root Layer Provenance Configuration
+# Version: 1.0.0
+
+apiVersion: machinenativeops.io/v1
+kind: RootProvenanceConfig
+metadata:
+  name: provenance-baseline-config
+  namespace: machinenativenops-provenance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    machinenativeops.io/tier: "provenance"
+    machinenativeops.io/version: "v1.0.0"
+    machinenativeops.io/component: "provenance-configuration"
+  annotations:
+    machinenativeops.io/description: "Root layer provenance, metadata and audit trail configuration"
+    machinenativeops.io/last-modified: "2025-12-20T22:00:00Z"
+
+spec:
+  # === 來源追溯來源定義 ===
+  provenance_sources:
+    - name: "source-code-repository"
+      description: "Source code repository provenance"
+      type: "git"
+      enabled: true
+      collection_frequency: "on_commit"
+      data_points:
+        - "commit_hash"
+        - "author_identity"
+        - "commit_timestamp"
+        - "branch_name"
+        - "tag_information"
+        - "commit_message"
+        - "parent_commits"
+        - "file_changes"
+        - "code_signatures"
+        - "vulnerability_scans"
+      storage_backend:
+        type: "postgresql"
+        retention_period: "7y"
+        compression: true
+        encryption: true
+      verification_methods:
+        - "git_signature_verification"
+        - "commit_hash_verification"
+        - "author_identity_verification"
+        
+    - name: "build-pipeline"
+      description: "Build pipeline execution provenance"
+      type: "ci_cd"
+      enabled: true
+      collection_frequency: "on_build"
+      data_points:
+        - "build_id"
+        - "pipeline_definition"
+        - "build_environment"
+        - "build_tools_versions"
+        - "source_commit"
+        - "build_artifacts"
+        - "test_results"
+        - "security_scan_results"
+        - "build_duration"
+        - "build_operator"
+        - "quality_gates_status"
+      storage_backend:
+        type: "postgresql"
+        retention_period: "5y"
+        compression: true
+        encryption: true
+      verification_methods:
+        - "pipeline_signature_verification"
+        - "artifact_hash_verification"
+        - "quality_gate_verification"
+        
+    - name: "deployment-events"
+      description: "Deployment operations provenance"
+      type: "deployment"
+      enabled: true
+      collection_frequency: "on_deployment"
+      data_points:
+        - "deployment_id"
+        - "deployment_environment"
+        - "deployed_artifact"
+        - "deployment_strategy"
+        - "deployment_configuration"
+        - "deployment_operator"
+        - "deployment_timestamp"
+        - "rollback_information"
+        - "health_check_results"
+        - "performance_metrics"
+      storage_backend:
+        type: "postgresql"
+        retention_period: "5y"
+        compression: true
+        encryption: true
+      verification_methods:
+        - "deployment_approval_verification"
+        - "artifact_integrity_verification"
+        - "configuration_signature_verification"
+        
+    - name: "configuration-changes"
+      description: "Configuration management provenance"
+      type: "configuration"
+      enabled: true
+      collection_frequency: "on_change"
+      data_points:
+        - "config_file_path"
+        - "config_before_hash"
+        - "config_after_hash"
+        - "change_description"
+        - "change_author"
+        - "change_approval"
+        - "change_timestamp"
+        - "change_reason"
+        - "rollback_capability"
+        - "impact_assessment"
+      storage_backend:
+        type: "postgresql"
+        retention_period: "7y"
+        compression: true
+        encryption: true
+      verification_methods:
+        - "change_signature_verification"
+        - "approval_chain_verification"
+        - "impact_assessment_verification"
+        
+    - name: "access-events"
+      description: "System access and authentication provenance"
+      type: "access"
+      enabled: true
+      collection_frequency: "on_access"
+      data_points:
+        - "user_identity"
+        - "authentication_method"
+        - "access_timestamp"
+        - "accessed_resource"
+        - "access_type"
+        - "access_result"
+        - "session_id"
+        - "client_information"
+        - "geo_location"
+        - "risk_score"
+      storage_backend:
+        type: "elasticsearch"
+        retention_period: "2y"
+        compression: true
+        encryption: true
+      verification_methods:
+        - "authentication_verification"
+        - "authorization_verification"
+        - "session_integrity_verification"
+
+  # === 元資料結構定義 ===
+  metadata_schema:
+    common_fields:
+      - name: "event_id"
+        type: "uuid"
+        description: "Unique identifier for the provenance event"
+        required: true
+        indexed: true
+      - name: "event_timestamp"
+        type: "timestamp"
+        description: "Timestamp when the event occurred"
+        required: true
+        indexed: true
+      - name: "event_type"
+        type: "string"
+        description: "Type of provenance event"
+        required: true
+        indexed: true
+        enum: ["commit", "build", "deploy", "config_change", "access"]
+      - name: "source_system"
+        type: "string"
+        description: "System that generated the event"
+        required: true
+        indexed: true
+      - name: "actor_identity"
+        type: "string"
+        description: "Identity of the actor who performed the action"
+        required: true
+        indexed: true
+      - name: "resource_id"
+        type: "string"
+        description: "Identifier of the affected resource"
+        required: true
+        indexed: true
+      - name: "resource_type"
+        type: "string"
+        description: "Type of the affected resource"
+        required: true
+        indexed: true
+      - name: "action"
+        type: "string"
+        description: "Action performed on the resource"
+        required: true
+        indexed: true
+      - name: "outcome"
+        type: "string"
+        description: "Outcome of the action"
+        required: true
+        indexed: true
+        enum: ["success", "failure", "partial"]
+      - name: "hash_value"
+        type: "string"
+        description: "Cryptographic hash of relevant data"
+        required: false
+        indexed: true
+      - name: "signature_value"
+        type: "string"
+        description: "Digital signature of the event"
+        required: false
+        indexed: false
+      - name: "parent_event_ids"
+        type: "array"
+        description: "IDs of parent events in the chain"
+        required: false
+        indexed: false
+      - name: "metadata"
+        type: "json"
+        description: "Additional event-specific metadata"
+        required: false
+        indexed: false
+        
+    type_specific_schemas:
+      commit:
+        - name: "repository_url"
+          type: "string"
+          description: "URL of the source repository"
+        - name: "branch_name"
+          type: "string"
+          description: "Name of the branch"
+        - name: "commit_message"
+          type: "text"
+          description: "Commit message"
+        - name: "files_changed"
+          type: "array"
+          description: "List of changed files"
+        - name: "code_diff"
+          type: "text"
+          description: "Code diff information"
+          
+      build:
+        - name: "build_id"
+          type: "string"
+          description: "Build identifier"
+        - name: "pipeline_name"
+          type: "string"
+          description: "Name of the build pipeline"
+        - name: "build_environment"
+          type: "json"
+          description: "Build environment configuration"
+        - name: "artifact_hashes"
+          type: "object"
+          description: "Hashes of build artifacts"
+        - name: "test_results"
+          type: "json"
+          description: "Test execution results"
+          
+      deploy:
+        - name: "deployment_id"
+          type: "string"
+          description: "Deployment identifier"
+        - name: "target_environment"
+          type: "string"
+          description: "Target deployment environment"
+        - name: "deployment_strategy"
+          type: "string"
+          description: "Deployment strategy used"
+        - name: "rollback_info"
+          type: "json"
+          description: "Rollback information"
+        - name: "health_checks"
+          type: "json"
+          description: "Health check results"
+
+  # === 審計軌跡配置 ===
+  audit_trails:
+    - name: "system-operations-trail"
+      description: "Comprehensive trail of all system operations"
+      enabled: true
+      scope: "all_operations"
+      retention_period: "7y"
+      collection_methods:
+        - "system_event_hooks"
+        - "api_request_logging"
+        - "database_audit_logging"
+        - "file_system_monitoring"
+      immutable_storage:
+        enabled: true
+        storage_type: "worm_storage"
+        verification_method: "blockchain_hash"
+        backup_strategy: "geo_replicated"
+      access_control:
+        read_access: ["auditors", "compliance_officers", "security_administrators"]
+        write_access: ["system_only"]
+        deletion_access: ["none"]
+        
+    - name: "security-events-trail"
+      description: "Security-related events and incidents"
+      enabled: true
+      scope: "security_operations"
+      retention_period: "10y"
+      collection_methods:
+        - "security_event_hooks"
+        - "authentication_logging"
+        - "authorization_logging"
+        - "intrusion_detection_logs"
+      immutable_storage:
+        enabled: true
+        storage_type: "append_only"
+        verification_method: "merkle_tree"
+        backup_strategy: "multi_region"
+      access_control:
+        read_access: ["security_administrators", "incident_response_team", "compliance_officers"]
+        write_access: ["security_systems_only"]
+        deletion_access: ["none"]
+        
+    - name: "compliance-audit-trail"
+      description: "Compliance-specific audit trail"
+      enabled: true
+      scope: "compliance_operations"
+      retention_period: "7y"
+      collection_methods:
+        - "compliance_event_hooks"
+        - "policy_violation_logging"
+        - "regulatory_report_generation"
+        - "risk_assessment_logging"
+      immutable_storage:
+        enabled: true
+        storage_type: "compliance_archive"
+        verification_method: "digital_signature_chain"
+        backup_strategy: "regional_compliance"
+      access_control:
+        read_access: ["compliance_officers", "auditors", "legal_team"]
+        write_access: ["compliance_systems_only"]
+        deletion_access: ["compliance_officers_with_approval"]
+
+  # === 跨系統關聯配置 ===
+  cross_system_references:
+    trust_system_integration:
+      - trust_reference_field: "certificate_id"
+        provenance_reference_field: "trust_certificate_id"
+        reference_type: "certificate_chain"
+        bidirectional: true
+        validation_required: true
+      - trust_reference_field: "signature_value"
+        provenance_reference_field: "event_signature"
+        reference_type: "signature_verification"
+        bidirectional: false
+        validation_required: true
+        
+    governance_system_integration:
+      - governance_reference_field: "policy_id"
+        provenance_reference_field: "applicable_policy_id"
+        reference_type: "policy_application"
+        bidirectional: true
+        validation_required: true
+      - governance_reference_field: "role_id"
+        provenance_reference_field: "actor_role_id"
+        reference_type: "role_based_access"
+        bidirectional: true
+        validation_required: true
+        
+    integrity_system_integration:
+      - integrity_reference_field: "integrity_check_id"
+        provenance_reference_field: "related_integrity_check"
+        reference_type: "integrity_verification"
+        bidirectional: true
+        validation_required: true
+      - integrity_reference_field: "baseline_hash"
+        provenance_reference_field: "baseline_reference_hash"
+        reference_type: "baseline_tracking"
+        bidirectional: false
+        validation_required: true
+
+  # === 資料保留與清理 ===
+  data_retention:
+    policies:
+      - data_type: "source_code_provenance"
+        retention_period: "7y"
+        archival_after: "2y"
+        deletion_after: "7y"
+        compliance_requirement: "SOX, GDPR"
+        archival_storage: "cold_storage"
+        deletion_method: "secure_erase"
+        
+      - data_type: "build_provenance"
+        retention_period: "5y"
+        archival_after: "1y"
+        deletion_after: "5y"
+        compliance_requirement: "ISO27001"
+        archival_storage: "cold_storage"
+        deletion_method: "secure_erase"
+        
+      - data_type: "deployment_provenance"
+        retention_period: "5y"
+        archival_after: "2y"
+        deletion_after: "5y"
+        compliance_requirement: "SOX"
+        archival_storage: "cold_storage"
+        deletion_method: "secure_erase"
+        
+      - data_type: "access_provenance"
+        retention_period: "2y"
+        archival_after: "6m"
+        deletion_after: "2y"
+        compliance_requirement: "GDPR"
+        archival_storage: "cold_storage"
+        deletion_method: "secure_erase"
+        
+      - data_type: "security_provenance"
+        retention_period: "10y"
+        archival_after: "3y"
+        deletion_after: "10y"
+        compliance_requirement: "PCI-DSS, HIPAA"
+        archival_storage: "cold_storage"
+        deletion_method: "secure_erase"
+        
+    archival_procedures:
+      - procedure_name: "standard_archival"
+        compression: true
+        encryption: true
+        integrity_verification: true
+        storage_location: "regional_archive"
+        retrieval_sla: "24h"
+        
+      - procedure_name: "compliance_archival"
+        compression: true
+        encryption: true
+        integrity_verification: true
+        storage_location: "compliance_archive"
+        retrieval_sla: "48h"
+        additional_metadata: "compliance_tags"
+
+  # === 查詢與報告 ===
+  query_capabilities:
+    - query_name: "trace-by-resource"
+      description: "Trace all operations on a specific resource"
+      parameters:
+        - name: "resource_id"
+          type: "string"
+          required: true
+        - name: "time_range"
+          type: "daterange"
+          required: false
+        - name: "event_types"
+          type: "array"
+          required: false
+      output_format: "chronological_list"
+      
+    - query_name: "trace-by-actor"
+      description: "Trace all operations by a specific actor"
+      parameters:
+        - name: "actor_identity"
+          type: "string"
+          required: true
+        - name: "time_range"
+          type: "daterange"
+          required: false
+        - name: "resource_types"
+          type: "array"
+          required: false
+      output_format: "chronological_list"
+      
+    - query_name: "compliance-report"
+      description: "Generate compliance reports"
+      parameters:
+        - name: "compliance_framework"
+          type: "string"
+          required: true
+        - name: "reporting_period"
+          type: "daterange"
+          required: true
+        - name: "report_format"
+          type: "string"
+          required: false
+          enum: ["json", "csv", "pdf"]
+      output_format: "compliance_report"
+      
+    - query_name: "integrity-verification"
+      description: "Verify integrity of provenance data"
+      parameters:
+        - name: "verification_scope"
+          type: "string"
+          required: true
+          enum: ["all", "time_range", "specific_events"]
+        - name: "verification_method"
+          type: "string"
+          required: true
+          enum: ["hash_verification", "signature_verification", "blockchain_verification"]
+      output_format: "verification_report"
+
+status:
+  phase: "Active"
+  conditions:
+    - type: "ProvenanceSourcesConfigured"
+      status: "True"
+      lastTransitionTime: "2025-12-20T22:00:00Z"
+      reason: "SourcesConfigured"
+      message: "All provenance sources configured and operational"
+    - type: "MetadataSchemaDefined"
+      status: "True"
+      lastTransitionTime: "2025-12-20T22:00:00Z"
+      reason: "SchemaValidated"
+      message: "Metadata schema defined and validated"
+    - type: "AuditTrailsActive"
+      status: "True"
+      lastTransitionTime: "2025-12-20T22:00:00Z"
+      reason: "TrailsOperational"
+      message: "All audit trails are active and collecting data"
+
+---
+# Provenance Schema 定義
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: provenance-schema
+  namespace: machinenativenops-provenance
+data:
+  schema.yaml: |
+    # Root Provenance Configuration Schema
+    type: object
+    properties:
+      provenance_sources:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            type:
+              type: string
+              enum: ["git", "ci_cd", "deployment", "configuration", "access"]
+            enabled:
+              type: boolean
+            collection_frequency:
+              type: string
+            data_points:
+              type: array
+            storage_backend:
+              type: object
+            verification_methods:
+              type: array
+          required: ["name", "description", "type", "enabled", "collection_frequency", "data_points"]
+      metadata_schema:
+        type: object
+        properties:
+          common_fields:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                type:
+                  type: string
+                description:
+                  type: string
+                required:
+                  type: boolean
+                indexed:
+                  type: boolean
+              required: ["name", "type", "description", "required", "indexed"]
+          type_specific_schemas:
+            type: object
+        required: ["common_fields", "type_specific_schemas"]
+      audit_trails:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            enabled:
+              type: boolean
+            scope:
+              type: string
+            retention_period:
+              type: string
+            collection_methods:
+              type: array
+            immutable_storage:
+              type: object
+            access_control:
+              type: object
+          required: ["name", "description", "enabled", "scope", "retention_period"]
+    required: ["provenance_sources", "metadata_schema", "audit_trails"]

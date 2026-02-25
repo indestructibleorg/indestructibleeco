@@ -1,0 +1,195 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: root.validator.schema
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: machinenativeops.io/v1
+kind: RootValidatorSchema
+metadata:
+  name: root-validator-schema
+  version: v1.0.0
+  urn: urn:machinenativeops:root:validator-schema:v1
+  description: Complete validation schema for all root layer files
+  lastUpdated: "2025-01-20T22:00:00Z"
+  owner: "system-architect"
+
+spec:
+  # === Universal Metadata Schema ===
+  universal_metadata:
+    required_fields:
+      - apiVersion
+      - kind
+      - metadata
+      - spec
+    metadata_schema:
+      type: object
+      required:
+        - name
+        - version
+        - urn
+      properties:
+        name:
+          type: string
+          pattern: "^root\\.[a-z0-9-]+$"
+        version:
+          type: string
+          pattern: "^v\\d+\\.\\d+\\.\\d+$"
+        urn:
+          type: string
+          pattern: "^urn:machinenativeops:root:[a-z0-9-]+:v\\d+$"
+        namespace:
+          type: string
+          default: "machinenativenops-root"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          type: object
+          properties:
+            machinenativeops.io/tier:
+              type: string
+              enum: ["root", "config", "policy", "engine"]
+            machinenativeops.io/version:
+              type: string
+            machinenativeops.io/app.kubernetes.io/component: type: string
+        annotations:
+          type: object
+          properties:
+            machinenativeops.io/description:
+              type: string
+            machinenativeops.io/last-modified:
+              type: string
+              format: date-time
+
+  # === Root File Types ===
+  root_file_types:
+    config_files:
+      - root.config.yaml
+      - root.governance.yaml
+      - root.modules.yaml
+      - root.super-execution.yaml
+      - root.trust.yaml
+      - root.provenance.yaml
+      - root.integrity.yaml
+      - root.bootstrap.yaml
+    map_files:
+      - root.devices.map
+      - root.fs.map
+      - root.kernel.map
+    policy_files:
+      - root.naming-policy.yaml
+      - root.specs.*.yaml
+    registry_files:
+      - root.registry.*.yaml
+
+  # === Consistency Validation Rules ===
+  consistency_checks:
+    module_reference_validation:
+      description: "Ensure all module references exist and are correctly typed"
+      rules:
+        - check: "module_exists_in_registry"
+          source: "root.modules.yaml"
+          reference: "root.registry.modules.yaml"
+          error_code: "ERR_MODULE_NOT_FOUND"
+        - check: "module_version_compatibility"
+          source: "root.modules.yaml"
+          reference: "root.registry.modules.yaml"
+          error_code: "ERR_MODULE_VERSION_INCOMPATIBLE"
+    
+    dependency_graph_validation:
+      description: "Validate module dependency graph for cycles and missing dependencies"
+      rules:
+        - check: "no_circular_dependencies"
+          algorithm: "depth_first_search"
+          error_code: "ERR_CIRCULAR_DEPENDENCY"
+        - check: "all_dependencies_exist"
+          reference: "root.modules.yaml"
+          error_code: "ERR_MISSING_DEPENDENCY"
+        - check: "load_sequence_valid"
+          reference: "root.modules.yaml"
+          error_code: "ERR_INVALID_LOAD_SEQUENCE"
+    
+    execution_flow_validation:
+      description: "Validate execution flows reference correct modules and actions"
+      rules:
+        - check: "flow_modules_exist"
+          source: "root.super-execution.yaml"
+          reference: "root.modules.yaml"
+          error_code: "ERR_FLOW_MODULE_NOT_FOUND"
+        - check: "flow_actions_valid"
+          source: "root.super-execution.yaml"
+          reference: "root.modules.yaml"
+          error_code: "ERR_FLOW_ACTION_INVALID"
+        - check: "trigger_conditions_valid"
+          source: "root.super-execution.yaml"
+          error_code: "ERR_TRIGGER_CONDITION_INVALID"
+
+  # === Error Classification System ===
+  error_classification:
+    critical_errors:
+      - "ERR_CIRCULAR_DEPENDENCY"
+      - "ERR_MODULE_NOT_FOUND"
+      - "ERR_SCHEMA_VALIDATION_FAILED"
+      - "ERR_FILE_NOT_FOUND"
+    high_errors:
+      - "ERR_MODULE_VERSION_INCOMPATIBLE"
+      - "ERR_MISSING_DEPENDENCY"
+      - "ERR_INVALID_LOAD_SEQUENCE"
+      - "ERR_FLOW_MODULE_NOT_FOUND"
+    medium_errors:
+      - "ERR_FLOW_ACTION_INVALID"
+      - "ERR_TRIGGER_CONDITION_INVALID"
+      - "ERR_NAMING_CONVENTION_VIOLATION"
+    low_errors:
+      - "ERR_DEPRECATED_FIELD_USED"
+      - "ERR_STYLE_GUIDELINE_VIOLATION"
+
+  # === Hash Lock Configuration ===
+  hash_lock:
+    algorithm: "blake3"
+    files_to_lock:
+      - root.config.yaml
+      - root.governance.yaml
+      - root.modules.yaml
+      - root.super-execution.yaml
+      - root.trust.yaml
+      - root.provenance.yaml
+      - root.integrity.yaml
+      - root.bootstrap.yaml
+    lock_file: "root.hashlock.json"
+    signature_required: true
+    signature_algorithm: "ed25519"
+
+  # === Validation Pipeline ===
+  validation_pipeline:
+    stages:
+      - name: "file_existence_check"
+        description: "Ensure all required root files exist"
+        required: true
+      - name: "schema_validation"
+        description: "Validate YAML structure against schemas"
+        required: true
+      - name: "metadata_validation"
+        description: "Validate universal metadata structure"
+        required: true
+      - name: "consistency_validation"
+        description: "Cross-file consistency checks"
+        required: true
+      - name: "hash_verification"
+        description: "Verify file integrity against hash lock"
+        required: false
+      - name: "policy_validation"
+        description: "Validate against naming and governance policies"
+        required: true
+
+status:
+  phase: "Active"
+  version: "v1.0.0"
+  lastValidated: "2025-01-20T22:00:00Z"
+  validationResults:
+    totalFiles: 0
+    passedFiles: 0
+    failedFiles: 0
+    warnings: 0
+    errors: 0

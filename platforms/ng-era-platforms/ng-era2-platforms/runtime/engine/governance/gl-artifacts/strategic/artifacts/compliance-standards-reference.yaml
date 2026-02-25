@@ -1,0 +1,550 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: compliance-standards-reference
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: governance.machinenativeops.io/v2
+kind: ComplianceStandardsReference
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:governance:gl-artifacts:strategic:artifacts:compliance-standards-reference.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/strategic/artifacts/compliance-standards-reference.yaml"
+  name: machinenativeops-compliance-standards
+  version: "1.0.0"
+  created_at: "2025-01-18T00:00:00Z"
+  updated_at: "2025-01-18T00:00:00Z"
+  owner: governance-committee
+  layer: "GL00-09"
+  tags:
+    - strategic
+    - compliance
+    - standards
+    - regulations
+spec:
+  international_standards:
+    - standard_id: "ISO-38500"
+      name: "ISO/IEC 38500"
+      full_name: "Corporate Governance of Information Technology"
+      category: "governance"
+      relevance: "critical"
+      applicability: "global"
+      year: 2015
+      description: |
+        ISO/IEC 38500 提供了 IT 治理的框架，幫助組織理解、評估和指導 IT 的使用。
+        標準涵蓋六個主要原則：責任、策略、獲取、執行、監控和合規。
+      principles:
+        - principle: "Responsibility"
+          description_zh: "責任"
+          description: "組織應明確界定和接受其 IT 相關責任"
+          implementation:
+            - "定義明確的治理角色和責任"
+            - "建立問責機制"
+            - "確保資源分配到位"
+          reference_artifact: "gl/00-strategic/artifacts/org-structure.yaml"
+        - principle: "Strategy"
+          description_zh: "策略"
+          description: "IT 應與組織策略一致"
+          implementation:
+            - "將 IT 治理與組織戰略對齊"
+            - "制定 IT 治理策略"
+            - "定期審查和調整策略"
+          reference_artifact: "gl/00-strategic/artifacts/vision-statement.yaml"
+        - principle: "Acquisition"
+          description_zh: "獲取"
+          description: "IT 的獲取應以透明和合理的方式進行"
+          implementation:
+            - "建立 IT 獲取流程"
+            - "評估供應商風險"
+            - "確保合規性"
+        - principle: "Performance"
+          description_zh: "執行"
+          description: "IT 的執行應確保服務質量"
+          implementation:
+            - "建立性能指標"
+            - "監控 IT 執行"
+            - "持續改進"
+          reference_artifact: "gl/00-strategic/artifacts/success-metrics-dashboard.yaml"
+        - principle: "Conformance"
+          description_zh: "合規"
+          description: "IT 應符合所有適用的法律和法規"
+          implementation:
+            - "識別適用的法律和法規"
+            - "建立合規監控"
+            - "定期審計"
+        - principle: "Human Behaviour"
+          description_zh: "人類行為"
+          description: "IT 治理應考慮人類行為和組織文化"
+          implementation:
+            - "提供培訓和教育"
+            - "促進合規文化"
+            - "建立溝通機制"
+      compliance_status:
+        current_level: "compliant"
+        gap_analysis: []
+        action_items: []
+      audit_requirements:
+        frequency: "annual"
+        scope: "full"
+        responsible: "Governance Board"
+        external_auditor: "required"
+      related_documents:
+        - "gl/00-strategic/artifacts/governance-charter.yaml"
+        - "gl/00-strategic/artifacts/org-structure.yaml"
+        - "gl/10-operational/audit-requirements.yaml"
+    - standard_id: "ISO-27001"
+      name: "ISO/IEC 27001"
+      full_name: "Information Security Management Systems"
+      category: "security"
+      relevance: "critical"
+      applicability: "global"
+      year: 2022
+      description: |
+        ISO/IEC 27001 是國際資訊安全管理標準，提供建立、實施、維護和持續改進
+        資訊安全管理系統（ISMS）的要求。
+      control_domains:
+        - domain: "Information Security Policies"
+          controls: 2
+          implementation: "安全政策已定義"
+        - domain: "Organization of Information Security"
+          controls: 7
+          implementation: "組織架構已建立"
+        - domain: "Human Resource Security"
+          controls: 6
+          implementation: "人資安全流程已建立"
+        - domain: "Asset Management"
+          controls: 10
+          implementation: "資產管理流程已建立"
+        - domain: "Access Control"
+          controls: 14
+          implementation: "訪問控制已實施"
+        - domain: "Cryptography"
+          controls: 2
+          implementation: "加密措施已實施"
+        - domain: "Physical and Environmental Security"
+          controls: 15
+          implementation: "物理安全措施已實施"
+        - domain: "Operations Security"
+          controls: 14
+          implementation: "運營安全措施已實施"
+        - domain: "Communications Security"
+          controls: 7
+          implementation: "通信安全措施已實施"
+        - domain: "System Acquisition, Development and Maintenance"
+          controls: 13
+          implementation: "系統開發安全已實施"
+        - domain: "Supplier Relationships"
+          controls: 5
+          implementation: "供應商安全管理已實施"
+        - domain: "Information Security Incident Management"
+          controls: 7
+          implementation: "事故管理流程已建立"
+        - domain: "Information Security Aspects of Business Continuity"
+          controls: 4
+          implementation: "業務連續性計劃已建立"
+        - domain: "Compliance"
+          controls: 8
+          implementation: "合規監控已實施"
+      compliance_status:
+        current_level: "in_progress"
+        gap_analysis:
+          - "第三方風險管理需要加強"
+          - "加密策略需要更新"
+        action_items:
+          - "更新加密策略文檔"
+          - "加強供應商安全評估"
+      audit_requirements:
+        frequency: "annual"
+        scope: "full"
+        responsible: "CTO + Compliance Officer"
+        external_auditor: "required"
+      certification:
+        status: "pursuing"
+        target_date: "2025-12-31"
+        certification_body: "tbd"
+    - standard_id: "ISO-27701"
+      name: "ISO/IEC 27701"
+      full_name: "Privacy Information Management"
+      category: "privacy"
+      relevance: "high"
+      applicability: "global"
+      year: 2019
+      description: |
+        ISO/IEC 27701 是隱私信息管理標準，為組織提供建立、實施、維護和持續改進
+        隱私信息管理系統（PIMS）的要求。
+      compliance_status:
+        current_level: "planned"
+        gap_analysis:
+          - "隱私影響評估流程未建立"
+          - "數據主體權利流程未完善"
+        action_items:
+          - "建立隱私影響評估流程"
+          - "完善數據主體權利處理流程"
+      audit_requirements:
+        frequency: "annual"
+        scope: "full"
+        responsible: "Compliance Officer"
+        external_auditor: "required"
+  regional_regulations:
+    - regulation_id: "GDPR"
+      name: "General Data Protection Regulation"
+      full_name: "General Data Protection Regulation"
+      category: "privacy"
+      region: "European Union"
+      relevance: "critical"
+      year: 2018
+      description: |
+        GDPR 是歐盟的數據保護法規，適用於所有處理歐盟公民數據的組織。
+        主要原則包括：合法性、公平性、透明性、目的限制、數據最小化、準確性、
+        存儲限制、完整性和機密性。
+      key_principles:
+        - principle: "Lawfulness, Fairness and Transparency"
+          description_zh: "合法性、公平性和透明性"
+          implementation:
+            - "獲得數據主體明確同意"
+            - "提供清晰的隱私聲明"
+            - "記錄處理活動"
+          reference_artifact: "gl/00-strategic/artifacts/ethical-guidelines.yaml"
+        - principle: "Purpose Limitation"
+          description_zh: "目的限制"
+          implementation:
+            - "明確定義數據處理目的"
+            - "不進行與目的不符的處理"
+        - principle: "Data Minimization"
+          description_zh: "數據最小化"
+          implementation:
+            - "只收集必要的數據"
+            - "定期清理不必要數據"
+        - principle: "Accuracy"
+          description_zh: "準確性"
+          implementation:
+            - "確保數據準確"
+            - "及时更新過時數據"
+        - principle: "Storage Limitation"
+          description_zh: "存儲限制"
+          implementation:
+            - "定義數據保留期限"
+            - "到期刪除數據"
+        - principle: "Integrity and Confidentiality"
+          description_zh: "完整性和機密性"
+          implementation:
+            - "實施加密措施"
+            - "訪問控制"
+            - "數據備份"
+        - principle: "Accountability"
+          description_zh: "問責制"
+          implementation:
+            - "建立問責機制"
+            - "記錄合規措施"
+            - "指定 DPO"
+      data_subject_rights:
+        - right: "Right to Access"
+          description_zh: "訪問權"
+          implementation: "數據主體訪問請求處理流程"
+        - right: "Right to Rectification"
+          description_zh: "更正權"
+          implementation: "數據更正請求處理流程"
+        - right: "Right to Erasure (Right to be Forgotten)"
+          description_zh: "刪除權"
+          implementation: "數據刪除請求處理流程"
+        - right: "Right to Restrict Processing"
+          description_zh: "限制處理權"
+          implementation: "處理限制請求處理流程"
+        - right: "Right to Data Portability"
+          description_zh: "數據可移植權"
+          implementation: "數據導出請求處理流程"
+        - right: "Right to Object"
+          description_zh: "反對權"
+          implementation: "反對請求處理流程"
+      compliance_status:
+        current_level: "in_progress"
+        gap_analysis:
+          - "DPIA 自動化工具未部署"
+          - "同意管理系統未完善"
+        action_items:
+          - "部署 DPIA 工具"
+          - "完善同意管理系統"
+      audit_requirements:
+        frequency: "continuous"
+        scope: "all data processing"
+        responsible: "Data Protection Officer (DPO)"
+        notification: "required within 72 hours for breaches"
+      penalties:
+        - "最高罰款：2000 萬歐元或全球營業額的 4%"
+        - "監管調查和審計"
+        - "法律訴訟和賠償"
+    - regulation_id: "CCPA"
+      name: "California Consumer Privacy Act"
+      full_name: "California Consumer Privacy Act"
+      category: "privacy"
+      region: "California, USA"
+      relevance: "high"
+      year: 2020
+      description: |
+        CCPA 是加州的隱私法規，賦予加州居民對其個人信息的控制權。
+        主要權利包括：知情權、刪除權、選擇退出權和非歧視權。
+      key_rights:
+        - right: "Right to Know"
+          description_zh: "知情權"
+          implementation: "提供數據收集和使用信息"
+        - right: "Right to Delete"
+          description_zh: "刪除權"
+          implementation: "刪除請求處理流程"
+        - right: "Right to Opt-Out"
+          description_zh: "選擇退出權"
+          implementation: "不出售選項"
+        - right: "Right to Non-Discrimination"
+          description_zh: "非歧視權"
+          implementation: "不因行使權利而歧視"
+      compliance_status:
+        current_level: "in_progress"
+        gap_analysis:
+          - "Do Not Sell 我的數據按鈕未實施"
+          - "數據出售記錄未建立"
+        action_items:
+          - "實施 Do Not Sell 按鈕"
+          - "建立數據出售記錄"
+      audit_requirements:
+        frequency: "annual"
+        scope: "all data processing for CA residents"
+        responsible: "Compliance Officer"
+  industry_standards:
+    - standard_id: "COBIT-2019"
+      name: "COBIT 2019"
+      full_name: "Control Objectives for Information and Related Technologies"
+      category: "governance"
+      relevance: "high"
+      applicability: "global"
+      year: 2019
+      description: |
+        COBIT 是 IT 治理和管理框架，提供最佳實踐和指導原則。
+        2019 版本更強調治理和管理的區分，以及靈活性和可定制性。
+      governance_components:
+        - component: "Governance System"
+          description: "治理系統"
+          principles:
+            - "為利益相關者創造價值"
+            - "整體方法"
+            - "治理與管理動態關聯"
+            - "定制治理系統"
+            - "端到端治理系統"
+            - "採用整體方法"
+        - component: "Governance Components"
+          description: "治理組件"
+          elements:
+            - "流程"
+            - "組織結構"
+            - "政策、程序和工作指令"
+            - "信息流"
+            - "文化、道德和行為"
+            - "人員、技能和能力"
+            - "服務、基礎設施和應用"
+      management_objectives:
+        - objective: "Align, Plan and Organise"
+          processes:
+            - "EG01: Ensure Governance Framework Setting and Maintenance"
+            - "EDM01: Ensure Governance Framework Setting and Maintenance"
+        - objective: "Build, Acquire and Implement"
+          processes:
+            - "BAI01: Manage Programs and Projects"
+            - "BAI02: Manage Requirements Definition"
+            - "BAI03: Manage Solutions Identification and Build"
+        - objective: "Deliver, Service and Support"
+          processes:
+            - "DSS01: Manage Operations"
+            - "DSS02: Manage Service Requests and Incidents"
+            - "DSS03: Manage Problems"
+        - objective: "Monitor, Evaluate and Assess"
+          processes:
+            - "MEA01: Monitor, Evaluate and Assess Performance and Conformance"
+            - "MEA02: Monitor, Evaluate and Assess the System of Internal Control"
+      compliance_status:
+        current_level: "partial"
+        gap_analysis:
+          - "治理框架需要進一步對齊 COBIT"
+          - "管理目標需要完善"
+        action_items:
+          - "對齊治理框架與 COBIT"
+          - "完善管理目標文檔"
+      audit_requirements:
+        frequency: "annual"
+        scope: "IT governance and management"
+        responsible: "Governance Board + IT Management"
+    - standard_id: "ITIL-4"
+      name: "ITIL 4"
+      full_name: "Information Technology Infrastructure Library"
+      category: "service_management"
+      relevance: "medium"
+      applicability: "global"
+      year: 2019
+      description: |
+        ITIL 4 是 IT 服務管理框架，提供最佳實踐和指導原則。
+        4 版本更加靈活，整合了敏捷、DevOps 和精益方法。
+      service_value_system:
+        - component: "Guiding Principles"
+          principles:
+            - "Focus on value"
+            - "Start where you are"
+            - "Progress iteratively with feedback"
+            - "Collaborate and promote visibility"
+            - "Think and work holistically"
+            - "Keep it simple and practical"
+            - "Optimize and automate"
+        - component: "Governance"
+          description: "確保組織方向與策略一致"
+        - component: "Service Value Chain"
+          activities:
+            - "Plan"
+            - "Improve"
+            - "Engage"
+            - "Design & Transition"
+            - "Obtain/Build"
+            - "Deliver & Support"
+        - component: "Practices"
+          practices:
+            - "Service Level Management"
+            - "Incident Management"
+            - "Problem Management"
+            - "Change Management"
+            - "Release Management"
+      compliance_status:
+        current_level: "partial"
+        gap_analysis:
+          - "服務價值鏈需要完善"
+          - "ITIL 4 實踐需要整合"
+        action_items:
+          - "完善服務價值鏈"
+          - "整合 ITIL 4 實踐"
+      audit_requirements:
+        frequency: "annual"
+        scope: "IT service management"
+        responsible: "Operational Council"
+  ai_ethics_frameworks:
+    - framework_id: "AI4People"
+      name: "AI4People"
+      full_name: "AI Ethical Framework"
+      category: "ai_ethics"
+      relevance: "high"
+      applicability: "european"
+      year: 2018
+      description: |
+        AI4People 是 AI 倫理框架，提供 AI 系統的倫理原則和實施指導。
+        主要原則包括：有益性、無害性、自主性、公正性、可解釋性。
+      principles:
+        - principle: "Beneficiality"
+          description_zh: "有益性"
+          description: "AI 應該造福人類"
+          implementation:
+            - "評估 AI 的社會效益"
+            - "確保 AI 的正面影響"
+        - principle: "Non-Maleficence"
+          description_zh: "無害性"
+          description: "AI 不應傷害人類"
+          implementation:
+            - "識別和緩解 AI 風險"
+            - "建立安全機制"
+        - principle: "Autonomy"
+          description_zh: "自主性"
+          description: "尊重人類的自主權"
+          implementation:
+            - "人類最終決策權"
+            - "可覆蓋的 AI 決策"
+        - principle: "Justice"
+          description_zh: "公正性"
+          description: "AI 應該公平公正"
+          implementation:
+            - "公平性約束"
+            - "偏見檢測和緩解"
+        - principle: "Explicability"
+          description_zh: "可解釋性"
+          description: "AI 決策應該可解釋"
+          implementation:
+            - "可解釋的 AI 模型"
+            - "決策理由說明"
+      compliance_status:
+        current_level: "in_progress"
+        gap_analysis:
+          - "可解釋性工具未部署"
+          - "公平性度量指標未建立"
+        action_items:
+          - "部署可解釋性工具"
+          - "建立公平性度量指標"
+      audit_requirements:
+        frequency: "quarterly"
+        scope: "all AI systems"
+        responsible: "AI Ethics Committee"
+  compliance_mapping:
+    governance_layers:
+      - layer: "GL00-09"
+        applicable_standards:
+          - "ISO-38500"
+          - "COBIT-2019"
+          - "GDPR (governance aspects)"
+      - layer: "GL10-29"
+        applicable_standards:
+          - "ISO-27001 (operations)"
+          - "ITIL-4"
+          - "COBIT-2019 (management)"
+      - layer: "GL30-49"
+        applicable_standards:
+          - "ISO-27001 (development)"
+          - "GDPR (data processing)"
+          - "AI4People"
+      - layer: "GL50-59"
+        applicable_standards:
+          - "ISO-27001 (monitoring)"
+          - "GDPR (data protection)"
+      - layer: "GL60-80"
+        applicable_standards:
+          - "AI4People"
+          - "ISO-27001 (analytics)"
+      - layer: "GL90-99"
+        applicable_standards:
+          - "ISO-38500 (meta-governance)"
+          - "COBIT-2019 (governance)"
+  compliance_dashboard:
+    metrics:
+      - metric: "overall_compliance_score"
+        target: ">= 90%"
+        current: "75%"
+        trend: "improving"
+      - metric: "critical_standards_compliance"
+        target: "100%"
+        current: "85%"
+        trend: "stable"
+      - metric: "audit_findings_resolved"
+        target: ">= 95%"
+        current: "80%"
+        trend: "improving"
+      - metric: "training_completion_rate"
+        target: "100%"
+        current: "70%"
+        trend: "improving"
+  compliance_calendar:
+    - event: "ISO 27001 Annual Audit"
+      date: "Q4"
+      duration: "2 weeks"
+      responsible: "CTO + Compliance Officer"
+    - event: "GDPR Compliance Review"
+      date: "Q2"
+      duration: "1 week"
+      responsible: "Data Protection Officer"
+    - event: "COBIT Alignment Review"
+      date: "Q1"
+      duration: "1 week"
+      responsible: "Governance Board"
+    - event: "AI Ethics Review"
+      date: "Quarterly"
+      duration: "2 days"
+      responsible: "AI Ethics Committee"
+status:
+  version: "1.0.0"
+  last_review: "2025-01-18"
+  next_review: "2025-04-18"
+  approved_by: "Governance Board"
+  change_history:
+    - version: "1.0.0"
+      date: "2025-01-18"
+      author: "Governance Committee"
+      changes: "Initial compliance standards reference"

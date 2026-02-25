@@ -1,0 +1,189 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: multi-region-dr
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Multi-Region Disaster Recovery Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:multi-region-dr.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/multi-region-dr.yaml"
+  name: multi-region-dr-config
+  namespace: production
+data:
+  dr-policy.yaml: |
+    # Multi-region disaster recovery policy
+    disasterRecovery:
+      enabled: true
+      
+      # Regional infrastructure
+      regions:
+        primary:
+          name: us-east-1
+          role: active
+          datacenters:
+            - name: us-east-1a
+              zone: a
+              role: primary
+            - name: us-east-1b
+              zone: b
+              role: secondary
+            - name: us-east-1c
+              zone: c
+              role: secondary
+          resources:
+            replicas: 9  # 3 per zone
+            storage: regional
+            database: active-active
+        
+        dr1:
+          name: us-west-2
+          role: hot-standby
+          datacenters:
+            - name: us-west-2a
+              zone: a
+              role: primary
+            - name: us-west-2b
+              zone: b
+              role: secondary
+            - name: us-west-2c
+              zone: c
+              role: secondary
+          resources:
+            replicas: 6  # 2 per zone
+            storage: regional
+            database: active-standby
+          failoverPriority: 1
+        
+        dr2:
+          name: eu-west-1
+          role: warm-standby
+          datacenters:
+            - name: eu-west-1a
+              zone: a
+              role: primary
+            - name: eu-west-1b
+              zone: b
+              role: secondary
+            - name: eu-west-1c
+              zone: c
+              role: secondary
+          resources:
+            replicas: 3  # 1 per zone
+            storage: standard
+            database: stand-alone
+          failoverPriority: 2
+      
+      # Active-Active deployment configuration
+      activeActive:
+        enabled: true
+        regions:
+          - us-east-1
+          - us-west-2
+        trafficDistribution:
+          us-east-1: 70  # 70% to primary
+          us-west-2: 30  # 30% to DR1
+        dataConsistency:
+          mode: eventual
+          syncInterval: 5s
+          conflictResolution: timestamp-based
+        healthChecks:
+          enabled: true
+          interval: 10s
+          timeout: 5s
+          unhealthyThreshold: 3
+      
+      # Failover configuration
+      failover:
+        enabled: true
+        mode: automatic  # automatic | manual
+        triggers:
+          - name: regional-failure
+            type: regional
+            enabled: true
+            criteria:
+              unhealthyZones: 2  # Failover if 2+ zones are unhealthy
+              unhealthyDuration: 5m
+            action:
+              type: traffic-redirect
+              targetRegion: dr1
+          - name: database-failure
+            type: database
+            enabled: true
+            criteria:
+              unhealthyReplicas: 2
+              unhealthyDuration: 3m
+            action:
+              type: database-failover
+              targetRegion: dr1
+          - name: health-check-failure
+            type: health
+            enabled: true
+            criteria:
+              failureRate: 50  # 50% failure rate
+              duration: 5m
+            action:
+              type: traffic-redirect
+              targetRegion: dr1
+        coolDown: 300s  # 5 minutes cooldown between failovers
+        maxFailoversPerHour: 1
+      
+      # Failback configuration
+      failback:
+        enabled: true
+        mode: manual  # Require manual approval
+        prerequisites:
+          - sourceRegionHealthy: true
+          - duration: 4h  # Wait 4 hours before failback
+          - manualApproval: true
+        notification:
+          channels:
+            - slack
+            - email
+            - pagerduty
+      
+      # Cross-region replication
+      replication:
+        enabled: true
+        mode: async
+        latency: 5s
+        compression: true
+        encryption: true
+        consistency:
+          mode: eventual
+          conflictResolution: last-write-wins
+        resources:
+          database:
+            enabled: true
+            type: postgresql-logical
+            slotNames:
+              - machine_native_ops_replication_slot
+          storage:
+            enabled: true
+            type: s3-replication
+            bucketPrefix: replicated-data/
+          cache:
+            enabled: true
+            type: redis-replication
+            mode: master-slave
+      
+      # Disaster recovery testing
+      testing:
+        enabled: true
+        schedule:
+          failoverDrill: "0 3 * * 1"  # Weekly on Monday at 3 AM UTC
+          fullDrTest: "0 3 1 * *"  # Monthly on 1st at 3 AM UTC
+        notification:
+          before: 24h
+          after: 1h
+          channels:
+            - slack
+            - email
+        results:
+          retention: 365d
+          storage: s3
+          bucket: dr-test-results/

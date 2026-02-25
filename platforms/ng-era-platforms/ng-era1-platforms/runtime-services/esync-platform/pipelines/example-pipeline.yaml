@@ -1,0 +1,64 @@
+# @ECO-governed: "true"
+# @ECO-layer: "application"
+# @ECO-semantic: "data-sync-pipeline"
+# @ECO-ownership: "Data-Engineering-Team"
+# @ECO-audit-trail: ".governance/event-stream.jsonl"
+
+pipeline:
+  id: example-sync-pipeline
+  version: "1.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:esync-platform:pipelines:example-pipeline.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/esync-platform/pipelines/example-pipeline.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+  description: |
+    Example pipeline demonstrating multi-source data synchronization
+    to central data lake with conflict resolution and GL governance integration.
+
+  sources:
+    - id: source-github
+      type: github
+      config:
+        repository: "org/repo"
+        branch: "main"
+
+    - id: source-mysql
+      type: mysql
+      config:
+        host: "${MYSQL_HOST}"
+        port: 3306
+        database: "${MYSQL_DATABASE}"
+
+  target:
+    type: postgres
+    config:
+      host: "${POSTGRES_HOST}"
+      port: 5432
+      database: "${POSTGRES_DATABASE}"
+
+  strategy:
+    mode: incremental
+    cursor_field: updated_at
+
+  schedule:
+    interval: 300
+    cron: "0 2 * * *"
+    realtime: false
+
+  validation:
+    enabled: true
+
+  monitoring:
+    alerts:
+      webhook: "${SLACK_WEBHOOK_URL}"
+      on_failure: true
+
+  tags:
+    project: data-unification
+    environment: production

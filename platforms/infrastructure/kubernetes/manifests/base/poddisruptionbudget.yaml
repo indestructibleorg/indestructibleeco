@@ -1,0 +1,27 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: kubernetes-poddisruptionbudget
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+#
+# GL Unified Architecture Governance Framework Activated
+# Kubernetes Base PodDisruptionBudget Manifest
+
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:kubernetes:manifests:base:poddisruptionbudget.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/kubernetes/manifests/base/poddisruptionbudget.yaml"
+  name: aep-engine-pdb
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: aep-engine
+    app.kubernetes.io/app.kubernetes.io/component: disruption-budget
+    governance.machinenativeops.io/charter-version: "2.0.0"
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: aep-engine

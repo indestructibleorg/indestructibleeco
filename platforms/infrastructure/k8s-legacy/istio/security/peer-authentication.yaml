@@ -1,0 +1,235 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: peer-authentication
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+---
+# Peer Authentication - mTLS Configuration
+# Enforces mutual TLS between services
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:istio:security:peer-authentication.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/istio/security/peer-authentication.yaml"
+  name: default
+  namespace: platform-03
+spec:
+  selector:
+    matchLabels:
+      istio-injection: enabled
+  mtls:
+    mode: STRICT  # Enforce mTLS for all services
+---
+# Peer Authentication for Workloads Without Sidecar
+# Allows permissive mode for legacy services
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:istio:security:peer-authentication.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/istio/security/peer-authentication.yaml"
+  name: permissive
+  namespace: platform-03
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: legacy-service
+  mtls:
+    mode: PERMISSIVE  # Allow both mTLS and plain text
+---
+# Request Authentication - JWT/OIDC Configuration
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:istio:security:peer-authentication.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/istio/security/peer-authentication.yaml"
+  name: jwt-auth
+  namespace: platform-03
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: machine-native-ops
+  jwtRules:
+  - issuer: "https://auth.example.com/realms/machine-native-ops"
+    jwksUri: https://auth.example.com/realms/machine-native-ops/protocol/openid-connect/certs
+    audiences:
+    - "machine-native-ops-api"
+    - "machine-native-ops-ui"
+    from:
+    - source:
+        requestPrincipals: ["*"]
+  - issuer: "https://accounts.google.com"
+    jwksUri: https://www.googleapis.com/oauth2/v3/certs
+    audiences:
+    - "machine-native-ops.google-client-id"
+    from:
+    - source:
+        requestPrincipals: ["*"]
+---
+# Request Authentication for API Keys
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:istio:security:peer-authentication.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/istio/security/peer-authentication.yaml"
+  name: apikey-auth
+  namespace: platform-03
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: machine-native-ops-api
+  jwtRules:
+  - issuer: "api-key-issuer@machine-native-ops"
+    from:
+    - source:
+        requestPrincipals: ["*"]
+---
+# Authorization Policy - Deny All by Default
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:istio:security:peer-authentication.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/istio/security/peer-authentication.yaml"
+  name: deny-all
+  namespace: platform-03
+spec:
+  selector:
+    matchLabels:
+      istio-injection: enabled
+  action: DENY
+---
+# Authorization Policy - Allow Health Checks
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:istio:security:peer-authentication.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/istio/security/peer-authentication.yaml"
+  name: allow-health-checks
+  namespace: platform-03
+spec:
+  selector:
+    matchLabels:
+      istio-injection: enabled
+  action: ALLOW
+  rules:
+  - to:
+    - operation:
+        paths: ["/health", "/ready", "/live"]
+        methods: ["GET"]
+  when:
+  - key: source.namespace
+    values: ["istio-system", "machine-native-ops"]
+---
+# Authorization Policy - Allow Metrics Access
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:istio:security:peer-authentication.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/istio/security/peer-authentication.yaml"
+  name: allow-metrics
+  namespace: platform-03
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: machine-native-ops
+  action: ALLOW
+  rules:
+  - to:
+    - operation:
+        paths: ["/metrics"]
+        methods: ["GET"]
+  when:
+  - key: source.namespace
+    values: ["istio-system", "monitoring"]
+---
+# Authorization Policy - API Access Control
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:istio:security:peer-authentication.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/istio/security/peer-authentication.yaml"
+  name: allow-api-access
+  namespace: platform-03
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: machine-native-ops-api
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        namespaces: ["machine-native-ops", "istio-system"]
+    - source:
+        requestPrincipals: ["*@auth.example.com"]
+  - to:
+    - operation:
+        paths: ["/api/*"]
+        methods: ["GET", "POST", "PUT", "DELETE"]
+  when:
+  - key: request.headers[authorization]
+    values: ["Bearer *"]
+---
+# Authorization Policy - Admin Access Control
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:istio:security:peer-authentication.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/istio/security/peer-authentication.yaml"
+  name: allow-admin-access
+  namespace: platform-03
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: machine-native-ops-admin
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        requestPrincipals: ["*@auth.example.com"]
+    - source:
+        namespaces: ["machine-native-ops"]
+  - to:
+    - operation:
+        paths: ["/admin/*"]
+        methods: ["GET", "POST", "PUT", "DELETE"]
+  when:
+  - key: request.auth.claims[role]
+    values: ["admin", "operator"]
+---
+# Authorization Policy - Read-Only Access
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:istio:security:peer-authentication.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/istio/security/peer-authentication.yaml"
+  name: allow-readonly-access
+  namespace: platform-03
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: machine-native-ops-api
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        namespaces: ["machine-native-ops", "istio-system"]
+    - source:
+        requestPrincipals: ["*@auth.example.com"]
+  - to:
+    - operation:
+        paths: ["/api/v1/*"]
+        methods: ["GET"]
+  when:
+  - key: request.auth.claims[role]
+    values: ["readonly", "user", "admin", "operator"]

@@ -1,0 +1,84 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: alerting.machinenativeops.io/v1
+kind: AlertingConfig
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:monitoring:alerts:alerting-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/monitoring/alerts/alerting-config.yaml"
+  name: gl-quantum-alerting
+  namespace: monitoring
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-monitoring
+spec:
+  global:
+    evaluationInterval: 30s
+    timeout: 10s
+    externalLabels:
+      cluster: gl-quantum
+      environment: production
+      
+  alertmanager:
+    enabled: true
+    retention: 90d
+    
+  routes:
+    - name: naming-governance
+      match:
+        severity: critical
+      receiver: platform-team-critical
+      continue: false
+      
+    - name: naming-governance-warning
+      match:
+        severity: warning
+      receiver: platform-team-warning
+      continue: false
+      
+  receivers:
+    - name: platform-team-critical
+      slackConfigs:
+        - channel: "#platform-alerts-critical"
+          sendResolved: true
+          iconEmoji: "🚨"
+          username: "GL Quantum Alert"
+          apiURL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          
+      emailConfigs:
+        - to: platform-team@machinenativeops.com
+          sendResolved: true
+          
+      pagerDutyConfigs:
+        - serviceKey: ${{ secrets.PAGERDUTY_SERVICE_KEY }}
+          severity: critical
+          
+    - name: platform-team-warning
+      slackConfigs:
+        - channel: "#platform-alerts-warning"
+          sendResolved: true
+          iconEmoji: "⚠️"
+          username: "GL Quantum Alert"
+          apiURL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          
+      emailConfigs:
+        - to: platform-team@machinenativeops.com
+          sendResolved: true
+          
+  inhibitionRules:
+    - sourceMatch:
+        severity: critical
+      targetMatch:
+        severity: warning
+      equal: ["namespace", "alertname"]

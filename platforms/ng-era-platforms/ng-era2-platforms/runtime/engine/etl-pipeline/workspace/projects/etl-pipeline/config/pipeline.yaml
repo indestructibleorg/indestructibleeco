@@ -1,0 +1,214 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: pipeline
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# ETL Pipeline Configuration
+# ECO-Layer: GL30-49 (Execution)
+# Closure-Signal: manifest
+
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:etl-pipeline:workspace:projects:etl-pipeline:config:pipeline.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/workspace/projects/etl-pipeline/config/pipeline.yaml"
+  pipeline-name: user-analytics-etl
+  version: "1.0.0"
+  layer: "GL30-49"
+  last-updated: "2024-01-01T00:00:00Z"
+  responsible: "data-engineering-team"
+
+pipeline:
+  name: user-analytics-etl
+  id: "etl-001"
+  target-table: "user_analytics_processed"
+  
+  extractors:
+    - name: postgres-user-extractor
+      type: database
+      source-type: postgres
+      config:
+        host: postgres.example.com
+        port: 5432
+        database: analytics_db
+        user: etl_user
+        password: ${POSTGRES_PASSWORD}
+        default-query: "SELECT * FROM user_analytics WHERE updated_at > NOW() - INTERVAL '1 hour' LIMIT 10000"
+    
+    - name: api-user-extractor
+      type: api
+      source-type: rest
+      config:
+        base-url: https://api.example.com/v1
+        api-key: ${API_KEY}
+        timeout: 30
+        default-endpoint: /users/analytics
+  
+  transformers:
+    - name: data-cleaner
+      type: cleaner
+      config:
+        remove-nulls: true
+        remove-duplicates: true
+        trim-strings: true
+        cleaning-rules:
+          email:
+            pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+            action: "validate"
+  
+    - name: schema-normalizer
+      type: normalizer
+      config:
+        target-schema:
+          user_id:
+            type: string
+            required: true
+          email:
+            type: string
+            required: true
+          created_at:
+            type: datetime
+            required: true
+          updated_at:
+            type: datetime
+            required: true
+          is_active:
+            type: boolean
+            required: false
+            default: true
+        rename-fields:
+          id: user_id
+          createdAt: created_at
+          updatedAt: updated_at
+          active: is_active
+        type-conversions:
+          user_id: string
+          is_active: boolean
+          created_at: datetime
+          updated_at: datetime
+        default-values:
+          is_active: true
+  
+  loaders:
+    - name: data-warehouse-loader
+      type: database
+      target-type: snowflake
+      config:
+        account: xy12345.us-east-1
+        user: etl_loader
+        password: ${SNOWFLAKE_PASSWORD}
+        warehouse: analytics_wh
+        database: analytics_db
+        schema: processed
+        role: etl_role
+
+  synchronization:
+    name: user-analytics-sync
+    id: "sync-001"
+    sync-mode: scheduled
+    conflict-resolution: last-write-wins
+    enable-incremental: true
+    retry-attempts: 5
+    retry-backoff: exponential
+    
+    source-system:
+      type: postgres
+      connection:
+        host: postgres.example.com
+        port: 5432
+        database: analytics_db
+    
+    target-system:
+      type: snowflake
+      connection:
+        account: xy12345.us-east-1
+        warehouse: analytics_wh
+        database: analytics_db
+    
+    change-tracking:
+      mechanism: cdc
+      record-id-field: user_id
+      timestamp-field: updated_at
+      enable-hashing: true
+
+monitoring:
+  name: etl-monitoring
+  id: "mon-001"
+  alert-channels:
+    - log
+    - slack
+    - email
+  
+  thresholds:
+    max-latency-seconds: 30
+    min-throughput: 1000
+    completeness: 99.9
+    accuracy: 99.9
+    max-conflicts: 10
+  
+  performance:
+    collection-interval: 60
+    retention-days: 90
+  
+  quality:
+    validation-rules:
+      completeness:
+        threshold: 99.9
+        action: alert
+      accuracy:
+        threshold: 99.9
+        action: alert
+      consistency:
+        threshold: 100.0
+        action: reject
+
+data-quality:
+  validation:
+    enabled: true
+    strict-mode: false
+  
+  rules:
+    - field: email
+      type: format
+      pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+      severity: error
+    
+    - field: user_id
+      type: not-null
+      severity: error
+    
+    - field: created_at
+      type: not-null
+      severity: error
+    
+    - field: updated_at
+      type: not-null
+      severity: error
+
+error-handling:
+  strategy: stop-on-error
+  max-retries: 3
+  retry-backoff: exponential
+  dead-letter-queue: true
+  dead-letter-table: etl_errors
+
+evidence-generation:
+  enabled: true
+  format: json
+  retention-days: 2555
+  storage: /var/evidence/etl-pipeline
+
+governance:
+  gl-layers:
+    - GL00-09
+    - GL10-29
+    - GL30-49
+    - GL50-59
+  
+  compliance:
+    - gdpr
+    - soc2
+  
+  audit-logging: true
+  change-management: true

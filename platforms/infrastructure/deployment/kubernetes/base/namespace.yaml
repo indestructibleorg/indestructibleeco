@@ -1,0 +1,20 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: namespace
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:deployment:kubernetes:base:namespace.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/deployment/kubernetes/base/namespace.yaml"
+  name: machine-native-ops
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    name: machine-native-ops
+    environment: production
+    tier: infrastructure

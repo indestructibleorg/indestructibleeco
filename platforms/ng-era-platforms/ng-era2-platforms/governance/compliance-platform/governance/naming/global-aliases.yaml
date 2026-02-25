@@ -1,0 +1,9 @@
+global_aliases:
+  version: "1.0"
+  locales:
+    en:
+      aliases: []
+    zh:
+      aliases: []
+  normalization_rules:
+    - "Use ASCII for canonical namespace identifiers"

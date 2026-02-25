@@ -1,0 +1,91 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLLayerDefinition
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:DEFINITION.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/DEFINITION.yaml"
+  layer_id: GL90-99
+  name: Meta-Specification Layer
+  version: "1.0.0"
+spec:
+  range: "90-99"
+  description: "Naming conventions, meta-governance"
+  dimensions:
+    - id: "99-naming-convention"
+      purpose: "Unified naming convention governance"
+      artifacts:
+        - "naming-convention-spec.yaml"
+        - "urn-format-spec.yaml"
+        - "directory-naming-spec.yaml"
+        - "file-naming-spec.yaml"
+        - "key-naming-spec.yaml"
+  meta_specifications:
+    urn_format:
+      pattern: "urn:machinenativeops:{domain}:{resource}:{version}"
+      registered_domains:
+        - governance
+        - ai
+        - core
+        - autonomous
+        - config
+        - dimension
+        - gl
+    naming_standards:
+      directories: "kebab-case"
+      yaml_keys: "snake_case"
+      json_api: "camelCase"
+    sub_specifications:
+      - "directory"
+      - "file"
+      - "extension"
+      - "key"
+      - "value"
+      - "mapping"
+      - "reference"
+      - "dependency"
+      - "uri-urn"
+  meta_governance:
+    - id: "layer-management"
+      purpose: "Manage GL layer lifecycle"
+      functions:
+        - "create_layer"
+        - "update_layer"
+        - "deprecate_layer"
+        - "validate_layer"
+    - id: "dimension-management"
+      purpose: "Manage dimension lifecycle"
+      functions:
+        - "create_dimension"
+        - "update_dimension"
+        - "move_dimension"
+        - "validate_dimension"
+    - id: "semantic-stability"
+      purpose: "Ensure semantic stability"
+      functions:
+        - "check_conflicts"
+        - "check_duplicates"
+        - "check_boundaries"
+        - "check_dependencies"
+  interfaces:
+    input:
+      - "governance_requirements"
+      - "naming_requests"
+    output:
+      - "validated_names"
+      - "meta_policies"
+      - "governance_standards"
+  dependencies:
+    upstream:
+      - "GL81-83"
+    downstream: []
+  capstone: true
+  validation:
+    semantic_boundary: "Meta-specification - naming conventions, meta-governance"
+    no_conflicts: true
+    no_duplicates: true
+    clear_boundaries: true

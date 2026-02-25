@@ -1,0 +1,286 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLDirectedAcyclicGraph
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-dag.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-dag.yaml"
+  name: gl-dag
+  version: "1.0.0"
+  status: SEALED
+  created_at: "2025-01-18T00:00:00Z"
+  owner: governance-committee
+nodes:
+  - node_id: "GL90-99"
+    name: "Meta-Specification Layer"
+    name_zh: "元規範層"
+    range: "90-99"
+    level: 0
+    type: "meta"
+    color: "#9333EA"
+  - node_id: "GL00-09"
+    name: "Strategic Layer"
+    name_zh: "戰略層"
+    range: "00-09"
+    level: 1
+    type: "strategic"
+    color: "#1E3A8A"
+  - node_id: "GL10-29"
+    name: "Operational Layer"
+    name_zh: "運營層"
+    range: "10-29"
+    level: 2
+    type: "operational"
+    color: "#065F46"
+  - node_id: "GL30-49"
+    name: "Execution Layer"
+    name_zh: "執行層"
+    range: "30-49"
+    level: 3
+    type: "execution"
+    color: "#92400E"
+  - node_id: "GL50-59"
+    name: "Observability Layer"
+    name_zh: "觀測層"
+    range: "50-59"
+    level: 4
+    type: "observability"
+    color: "#0891B2"
+  - node_id: "GL60-80"
+    name: "Advanced/Feedback Layer"
+    name_zh: "進階/回饋層"
+    range: "60-80"
+    level: 5
+    type: "feedback"
+    color: "#BE185D"
+  - node_id: "GL81-83"
+    name: "Extended Layer"
+    name_zh: "擴展層"
+    range: "81-83"
+    level: 6
+    type: "extended"
+    color: "#7C3AED"
+edges:
+  # GL90-99 Meta → 所有層級 (元規範治理)
+  - edge_id: "E001"
+    from: "GL90-99"
+    to: "GL00-09"
+    type: "meta_governance"
+    label: "規範治理"
+  - edge_id: "E002"
+    from: "GL90-99"
+    to: "GL10-29"
+    type: "meta_governance"
+    label: "規範治理"
+  - edge_id: "E003"
+    from: "GL90-99"
+    to: "GL30-49"
+    type: "meta_governance"
+    label: "規範治理"
+  - edge_id: "E004"
+    from: "GL90-99"
+    to: "GL50-59"
+    type: "meta_governance"
+    label: "規範治理"
+  - edge_id: "E005"
+    from: "GL90-99"
+    to: "GL60-80"
+    type: "meta_governance"
+    label: "規範治理"
+  - edge_id: "E006"
+    from: "GL90-99"
+    to: "GL81-83"
+    type: "meta_governance"
+    label: "規範治理"
+  # GL00-09 Strategic → 下游層級 (戰略指導)
+  - edge_id: "E007"
+    from: "GL00-09"
+    to: "GL10-29"
+    type: "strategic_guidance"
+    label: "戰略指導"
+  - edge_id: "E008"
+    from: "GL00-09"
+    to: "GL30-49"
+    type: "strategic_guidance"
+    label: "戰略指導"
+  # GL10-29 Operational → 下游層級 (運營指導)
+  - edge_id: "E009"
+    from: "GL10-29"
+    to: "GL30-49"
+    type: "operational_direction"
+    label: "運營指導"
+  # GL30-49 Execution → 下游層級 (執行輸出)
+  - edge_id: "E010"
+    from: "GL30-49"
+    to: "GL50-59"
+    type: "execution_output"
+    label: "執行輸出"
+  # GL50-59 Observability → 下游層級 (觀測數據)
+  - edge_id: "E011"
+    from: "GL50-59"
+    to: "GL60-80"
+    type: "observability_data"
+    label: "觀測數據"
+  # GL60-80 Feedback → 下游層級 (回饋洞察)
+  - edge_id: "E012"
+    from: "GL60-80"
+    to: "GL81-83"
+    type: "feedback_insights"
+    label: "回饋洞察"
+  # 回饋迴路 (不形成循環，僅為資訊流)
+  - edge_id: "E013"
+    from: "GL50-59"
+    to: "GL00-09"
+    type: "feedback_loop"
+    label: "驗證回饋"
+    style: "dashed"
+  - edge_id: "E014"
+    from: "GL60-80"
+    to: "GL10-29"
+    type: "feedback_loop"
+    label: "優化回饋"
+    style: "dashed"
+  - edge_id: "E015"
+    from: "GL81-83"
+    to: "GL10-29"
+    type: "feedback_loop"
+    label: "整合回饋"
+    style: "dashed"
+topological_order:
+  - order: 1
+    node: "GL90-99"
+    description: "元規範優先"
+  - order: 2
+    node: "GL00-09"
+    description: "戰略決策"
+  - order: 3
+    node: "GL10-29"
+    description: "運營規劃"
+  - order: 4
+    node: "GL30-49"
+    description: "執行實現"
+  - order: 5
+    node: "GL50-59"
+    description: "觀測驗證"
+  - order: 6
+    node: "GL60-80"
+    description: "回饋優化"
+  - order: 7
+    node: "GL81-83"
+    description: "外部整合"
+dag_validation:
+  acyclic: true
+  connected: true
+  single_root: false
+  rules:
+    - rule_id: "DAG-001"
+      name: "無循環驗證"
+      description: "DAG 不得形成循環依賴"
+      status: PASS
+    - rule_id: "DAG-002"
+      name: "層級完整性"
+      description: "所有 GL 層級必須包含在 DAG 中"
+      status: PASS
+    - rule_id: "DAG-003"
+      name: "依賴方向性"
+      description: "所有邊必須為有向邊，方向為上游→下游"
+      status: PASS
+    - rule_id: "DAG-004"
+      name: "節點唯一性"
+      description: "每個節點代表唯一的 GL 層級區段"
+      status: PASS
+adjacency_matrix:
+  #           GL90-99  GL00-09  GL10-29  GL30-49  GL50-59  GL60-80  GL81-83
+  GL90-99: [0, 1, 1, 1, 1, 1, 1]
+  GL00-09: [0, 0, 1, 1, 0, 0, 0]
+  GL10-29: [0, 0, 0, 1, 0, 0, 0]
+  GL30-49: [0, 0, 0, 0, 1, 0, 0]
+  GL50-59: [0, 0, 0, 0, 0, 1, 0]
+  GL60-80: [0, 0, 0, 0, 0, 0, 1]
+  GL81-83: [0, 0, 0, 0, 0, 0, 0]
+mermaid_diagram: |
+  graph TD
+    subgraph Meta["GL90-99 元規範層"]
+      GL90[GL90-99<br/>Meta-Specification]
+    end
+    subgraph Strategic["GL00-09 戰略層"]
+      GL00[GL00-09<br/>Strategic]
+    end
+    subgraph Operational["GL10-29 運營層"]
+      GL10[GL10-29<br/>Operational]
+    end
+    subgraph Execution["GL30-49 執行層"]
+      GL30[GL30-49<br/>Execution]
+    end
+    subgraph Observability["GL50-59 觀測層"]
+      GL50[GL50-59<br/>Observability]
+    end
+    subgraph Feedback["GL60-80 回饋層"]
+      GL60[GL60-80<br/>Advanced/Feedback]
+    end
+    subgraph Extended["GL81-83 擴展層"]
+      GL81[GL81-83<br/>Extended]
+    end
+    GL90 -->|規範治理| GL00
+    GL90 -->|規範治理| GL10
+    GL90 -->|規範治理| GL30
+    GL90 -->|規範治理| GL50
+    GL90 -->|規範治理| GL60
+    GL90 -->|規範治理| GL81
+    GL00 -->|戰略指導| GL10
+    GL00 -->|戰略指導| GL30
+    GL10 -->|運營指導| GL30
+    GL30 -->|執行輸出| GL50
+    GL50 -->|觀測數據| GL60
+    GL60 -->|回饋洞察| GL81
+    GL50 -.->|驗證回饋| GL00
+    GL60 -.->|優化回饋| GL10
+    GL81 -.->|整合回饋| GL10
+    style GL90 fill:#9333EA,color:#fff
+    style GL00 fill:#1E3A8A,color:#fff
+    style GL10 fill:#065F46,color:#fff
+    style GL30 fill:#92400E,color:#fff
+    style GL50 fill:#0891B2,color:#fff
+    style GL60 fill:#BE185D,color:#fff
+    style GL81 fill:#7C3AED,color:#fff
+dot_diagram: |
+  digraph GL_DAG {
+    rankdir=TB;
+    node [shape=box, style=filled, fontname="Arial"];
+    // 節點定義
+    "GL90-99" [label="GL90-99\nMeta-Specification", fillcolor="#9333EA", fontcolor="white"];
+    "GL00-09" [label="GL00-09\nStrategic", fillcolor="#1E3A8A", fontcolor="white"];
+    "GL10-29" [label="GL10-29\nOperational", fillcolor="#065F46", fontcolor="white"];
+    "GL30-49" [label="GL30-49\nExecution", fillcolor="#92400E", fontcolor="white"];
+    "GL50-59" [label="GL50-59\nObservability", fillcolor="#0891B2", fontcolor="white"];
+    "GL60-80" [label="GL60-80\nAdvanced/Feedback", fillcolor="#BE185D", fontcolor="white"];
+    "GL81-83" [label="GL81-83\nExtended", fillcolor="#7C3AED", fontcolor="white"];
+    // 主要依賴邊
+    "GL90-99" -> "GL00-09" [label="規範治理"];
+    "GL90-99" -> "GL10-29" [label="規範治理"];
+    "GL90-99" -> "GL30-49" [label="規範治理"];
+    "GL90-99" -> "GL50-59" [label="規範治理"];
+    "GL90-99" -> "GL60-80" [label="規範治理"];
+    "GL90-99" -> "GL81-83" [label="規範治理"];
+    "GL00-09" -> "GL10-29" [label="戰略指導"];
+    "GL00-09" -> "GL30-49" [label="戰略指導"];
+    "GL10-29" -> "GL30-49" [label="運營指導"];
+    "GL30-49" -> "GL50-59" [label="執行輸出"];
+    "GL50-59" -> "GL60-80" [label="觀測數據"];
+    "GL60-80" -> "GL81-83" [label="回饋洞察"];
+    // 回饋迴路 (虛線)
+    "GL50-59" -> "GL00-09" [label="驗證回饋", style=dashed];
+    "GL60-80" -> "GL10-29" [label="優化回饋", style=dashed];
+    "GL81-83" -> "GL10-29" [label="整合回饋", style=dashed];
+  }
+dag_signature:
+  dag_id: "ECO-DAG-001"
+  version: "1.0.0"
+  nodes_count: 7
+  edges_count: 15
+  acyclic_verified: true
+  sealed_at: "2025-01-18T00:00:00Z"

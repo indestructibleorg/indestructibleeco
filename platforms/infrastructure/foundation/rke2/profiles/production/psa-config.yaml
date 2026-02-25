@@ -1,0 +1,138 @@
+# @ECO-governed
+# @ECO-layer: GL20-29
+# @ECO-semantic: pod-security-admission
+# @ECO-audit-trail: ../../../engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# RKE2 Pod Security Admission Configuration
+# Replaces deprecated Pod Security Policies (PSP)
+# Enforces restricted mode for pod security standards
+
+# ============================================================================
+# Pod Security Standards Levels
+# ============================================================================
+# privileged: Unrestricted policy, providing the widest possible level of
+#   permissions. This policy allows known privilege escalations.
+#
+# baseline: Allows the minimum amount of privilege required to be usable.
+#   Feature-specific additions include: host process, host network, host
+#   ports, restricted volume types.
+#
+# restricted: Extremely restrictive policy, following current best practices
+#   for pod security. Feature-specific additions include: dropping all
+#   capabilities, restricting volume types, requiring non-root users.
+
+# ============================================================================
+# Configuration
+# ============================================================================
+apiVersion: apiserver.config.k8s.io/v1
+kind: PodSecurityConfiguration
+
+# Default policy for all namespaces
+defaults:
+  # Enforce restricted mode
+  enforce: restricted
+  enforce-version: latest
+  
+  # Audit restricted mode
+  audit: restricted
+  audit-version: latest
+  
+  # Warn restricted mode
+  warn: restricted
+  warn-version: latest
+
+# Exempt system namespaces
+exemptions:
+  # Service accounts exempt from PSA
+  usernames: []
+  
+  # Runtime classes exempt from PSA
+  runtimeClasses: []
+  
+  # Namespaces exempt from PSA (system namespaces only)
+  namespaces:
+    - kube-system
+    - cis-operator-system
+    - tigera-operator
+    - calico-system
+    - rke2-ingress-nginx
+
+# ============================================================================
+# Security Standards Enforced
+# ============================================================================
+# By default, restricted mode enforces:
+#
+# 1. Process:
+#    - Containers must run as non-root
+#    - Containers must set securityContext.runAsNonRoot
+#    - Containers must drop all capabilities
+#
+# 2. Volumes:
+#    - Only allowed volume types: configMap, downwardAPI, emptyDir,
+#      projected, secret, persistentVolumeClaim, ephemeral
+#    - Disallowed: hostPath
+#
+# 3. Networking:
+#    - HostNetwork must be false
+#    - HostPort must not be set
+#
+# 4. Privilege:
+#    - Privileged must be false
+#    - All capabilities must be dropped
+#
+# 5. Host namespaces:
+#    - HostPID must be false
+#    - HostIPC must be false
+
+# ============================================================================
+# GL Compliance
+# ============================================================================
+# - GL20-29: Resource & Standards - Pod security standards
+# - GL30-39: Process & Control - Admission control
+# - GL40-49: Monitoring & Optimization - Security monitoring
+# - GL50-59: Observability Layer - Audit logging
+
+# ============================================================================
+# Monitoring and Alerts
+# ============================================================================
+# Monitor PSA violations using:
+# kubectl get events --field-selector reason=FailedScheduling -A
+#
+# Set up alerts for PSA violations in Prometheus:
+# - alert: PodSecurityViolation
+#   expr: kube_pod_status_phase{phase="Failed"} > 0
+#   annotations:
+#     summary: "Pod rejected due to security policy violation"
+
+# ============================================================================
+# Troubleshooting
+# ============================================================================
+# If pods are rejected due to PSA violations:
+#
+# 1. Check pod security context:
+#    kubectl describe pod <pod-name> -n <namespace>
+#
+# 2. Review PSA events:
+#    kubectl get events -n <namespace> --sort-by='.lastTimestamp'
+#
+# 3. Verify security requirements:
+#    - Run as non-root
+#    - Drop capabilities
+#    - Use allowed volume types
+#    - Disable host networking
+#
+# 4. For legacy workloads, consider:
+#    - Creating a dedicated namespace with baseline mode
+#    - Updating pod manifests to meet restricted mode
+#    - Using pod annotations for temporary exemptions
+
+# ============================================================================
+# Namespace-Specific Configuration
+# ============================================================================
+# To configure different PSA modes for specific namespaces, add labels:
+#
+# kubectl label ns <namespace> pod-security.kubernetes.io/enforce=restricted
+# kubectl label ns <namespace> pod-security.kubernetes.io/audit=baseline
+# kubectl label ns <namespace> pod-security.kubernetes.io/warn=privileged
+#
+# Label precedence: namespace > cluster-wide default

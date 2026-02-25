@@ -1,0 +1,103 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLRootSemanticAnchor
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:GL-ROOT-SEMANTIC-ANCHOR.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/GL-ROOT-SEMANTIC-ANCHOR.yaml"
+  name: gl-root-semantic-anchor
+  version: "1.0.0"
+  created: "2026-01-21"
+  status: active
+# GL Root Semantic Anchor - The single source of truth for all governance
+# All child nodes must map back to this root anchor
+semantic_root:
+  urn: "urn:machinenativeops:gl:root:semantic-anchor:1.0.0"
+  type: "ROOT_ANCHOR"
+  description: "The unified semantic root for all GL governance layers"
+governance_baseline:
+  charter_version: "ECO-UNIFIED-1.0"
+  activated_date: "2026-01-21"
+  activation_status: "ACTIVE"
+layer_hierarchy:
+  - id: "GL00-09"
+    name: "Strategic Layer"
+    semantic_urn: "urn:machinenativeops:gl:strategic:layer:1.0.0"
+    parent_urn: "urn:machinenativeops:gl:root:semantic-anchor:1.0.0"
+  - id: "GL20-29"
+    name: "Data Science / Data Access Layer"
+    semantic_urn: "urn:machinenativeops:gl:data:layer:1.0.0"
+    parent_urn: "urn:machinenativeops:gl:root:semantic-anchor:1.0.0"
+    sub_layers:
+      - id: "GL20"
+        name: "Data Ingestion"
+        path: "ingestion"
+      - id: "GL21"
+        name: "Data Catalog"
+        path: "catalog"
+      - id: "GL22"
+        name: "Metadata"
+        path: "metadata"
+      - id: "GL23"
+        name: "Data Assets"
+        path: "assets"
+  - id: "GL40-49"
+    name: "Algorithm Layer"
+    semantic_urn: "urn:machinenativeops:gl:algorithms:layer:1.0.0"
+    parent_urn: "urn:machinenativeops:gl:root:semantic-anchor:1.0.0"
+    sub_layers:
+      - id: "GL40"
+        name: "Model Registry"
+        path: "models"
+      - id: "GL41"
+        name: "Pipelines"
+        path: "pipelines"
+      - id: "GL42"
+        name: "Feature Engineering"
+        path: "feature_engineering"
+  - id: "GL50-59"
+    name: "CUDA / GPU Acceleration Layer"
+    semantic_urn: "urn:machinenativeops:gl:gpu:layer:1.0.0"
+    parent_urn: "urn:machinenativeops:gl:root:semantic-anchor:1.0.0"
+    sub_layers:
+      - id: "GL50"
+        name: "CUDA Kernels"
+        path: "cuda_kernels"
+      - id: "GL51"
+        name: "GPU Scheduler"
+        path: "gpu_scheduler"
+      - id: "GL52"
+        name: "Accelerators"
+        path: "accelerators"
+validation_rules:
+  - rule: "MAPPING_REQUIRED"
+    description: "All artifacts must map to a GL layer"
+    enforcement: "BLOCKING"
+  - rule: "SEMANTIC_URN_REQUIRED"
+    description: "All artifacts must have a semantic URN"
+    enforcement: "BLOCKING"
+  - rule: "PARENT_VALIDATION"
+    description: "All child nodes must have valid parent URN"
+    enforcement: "BLOCKING"
+quantum_validation:
+  enabled: true
+  consistency_check: true
+  reversibility_check: true
+  reproducibility_check: true
+  provability_check: true
+event_flows:
+  governance_events:
+    - trigger: "ARTIFACT_CREATED"
+      action: "VALIDATE_SEMANTIC_MAPPING"
+      handler: "gl-semantics-validator"
+    - trigger: "LAYER_MODIFIED"
+      action: "UPDATE_SEMANTIC_INDEX"
+      handler: "gl-index-updater"
+    - trigger: "VALIDATION_FAILED"
+      action: "BLOCK_AND_NOTIFY"
+      handler: "gl-governance-enforcer"
+activation_status: "GL Unified Architecture Governance Framework Activated"

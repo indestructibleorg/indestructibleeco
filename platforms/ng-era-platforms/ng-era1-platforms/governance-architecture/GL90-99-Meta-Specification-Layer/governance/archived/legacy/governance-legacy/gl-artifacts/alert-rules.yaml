@@ -1,0 +1,429 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# =============================================================================
+# GL50-59 Observability Layer - Alert Rules
+# MachineNativeOps Governance Artifact
+# =============================================================================
+apiVersion: governance.machinenativeops.io/v2
+kind: AlertRules
+metadata:
+  name: gl-governance-alerts
+  version: "1.0.0"
+  created_at: "2025-01-18T00:00:00Z"
+  updated_at: "2025-01-18T00:00:00Z"
+  owner: observability-team
+  layer: "GL50-59"
+  tags:
+    - observability
+    - alerts
+    - monitoring
+  annotations:
+    governance.machinenativeops.io/alertmanager-compatible: "true"
+    governance.machinenativeops.io/pagerduty-integration: "enabled"
+spec:
+  # Required fields for GL50-59 compliance
+  metrics:
+    - "gl_layer_health_score"
+    - "gl_compliance_rate"
+    - "gl_workflow_success_rate"
+  thresholds:
+    critical: 50
+    warning: 70
+    healthy: 85
+  notification:
+    channels:
+      - type: "slack"
+        channel: "#governance-alerts"
+      - type: "pagerduty"
+        service: "governance-critical"
+  alert_configuration:
+    default_receiver: "governance-team"
+    group_by: ["alertname", "layer_id", "severity"]
+    group_wait: "30s"
+    group_interval: "5m"
+    repeat_interval: "4h"
+  # ===========================================================================
+  # 嚴重告警 (Critical Alerts)
+  # ===========================================================================
+  critical_alerts:
+    - alert_id: "GL_CRITICAL_001"
+      name: "GLLayerHealthCritical"
+      description: "GL層級健康分數低於臨界值，需要立即處理"
+      severity: "critical"
+      condition:
+        metric: "gl_layer_health_score"
+        operator: "<"
+        threshold: 50
+        for: "5m"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        team: "governance"
+        priority: "P1"
+        runbook: "https://docs.machinenativeops.io/runbooks/gl-health-critical"
+      annotations:
+        summary: "GL層級 {{ $labels.layer_id }} 健康分數嚴重偏低"
+        description: |
+          層級: {{ $labels.layer_id }} ({{ $labels.layer_name }})
+          當前分數: {{ $value }}
+          臨界值: 50
+          持續時間: 5分鐘
+          請立即檢查該層級的Artifact狀態與合規情況。
+        impact: "治理體系可能無法正常運作"
+        action: "立即檢查並修復問題Artifact"
+      notification:
+        channels:
+          - type: "pagerduty"
+            service: "governance-critical"
+          - type: "slack"
+            channel: "#governance-alerts"
+          - type: "email"
+            recipients: ["governance-team@machinenativeops.io"]
+        escalation:
+          - level: 1
+            delay: "0m"
+            contacts: ["on-call-governance"]
+          - level: 2
+            delay: "15m"
+            contacts: ["governance-lead"]
+          - level: 3
+            delay: "30m"
+            contacts: ["cgo"]
+    - alert_id: "GL_CRITICAL_002"
+      name: "GLComplianceCritical"
+      description: "GL層級合規率低於臨界值"
+      severity: "critical"
+      condition:
+        metric: "gl_layer_compliance_rate"
+        operator: "<"
+        threshold: 70
+        for: "15m"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        team: "governance"
+        priority: "P1"
+        runbook: "https://docs.machinenativeops.io/runbooks/gl-compliance-critical"
+      annotations:
+        summary: "GL層級 {{ $labels.layer_id }} 合規率嚴重偏低"
+        description: |
+          層級: {{ $labels.layer_id }}
+          當前合規率: {{ $value }}%
+          臨界值: 70%
+          大量Artifact不符合治理政策要求。
+        impact: "治理政策執行失效"
+        action: "審查並修復不合規Artifact"
+      notification:
+        channels:
+          - type: "pagerduty"
+            service: "governance-critical"
+          - type: "slack"
+            channel: "#governance-alerts"
+    - alert_id: "GL_CRITICAL_003"
+      name: "GLWorkflowFailureCritical"
+      description: "關鍵治理工作流程連續失敗"
+      severity: "critical"
+      condition:
+        metric: "gl_workflow_success_rate"
+        operator: "<"
+        threshold: 50
+        for: "10m"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          workflow_name: "gl-layer-validation|gl-compliance-check"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        team: "platform"
+        priority: "P1"
+        runbook: "https://docs.machinenativeops.io/runbooks/gl-workflow-failure"
+      annotations:
+        summary: "關鍵工作流程 {{ $labels.workflow_name }} 失敗率過高"
+        description: |
+          工作流程: {{ $labels.workflow_name }}
+          當前成功率: {{ $value }}%
+          臨界值: 50%
+          治理自動化流程可能已中斷。
+        impact: "自動化治理流程中斷"
+        action: "檢查工作流程日誌並修復問題"
+      notification:
+        channels:
+          - type: "pagerduty"
+            service: "platform-critical"
+          - type: "slack"
+            channel: "#platform-alerts"
+  # ===========================================================================
+  # 警告告警 (Warning Alerts)
+  # ===========================================================================
+  warning_alerts:
+    - alert_id: "GL_WARNING_001"
+      name: "GLLayerHealthWarning"
+      description: "GL層級健康分數偏低"
+      severity: "warning"
+      condition:
+        metric: "gl_layer_health_score"
+        operator: "<"
+        threshold: 70
+        for: "15m"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        team: "governance"
+        priority: "P2"
+      annotations:
+        summary: "GL層級 {{ $labels.layer_id }} 健康分數偏低"
+        description: |
+          層級: {{ $labels.layer_id }}
+          當前分數: {{ $value }}
+          警告值: 70
+          建議檢查該層級的Artifact狀態。
+        action: "在24小時內檢查並改善"
+      notification:
+        channels:
+          - type: "slack"
+            channel: "#governance-alerts"
+          - type: "email"
+            recipients: ["governance-team@machinenativeops.io"]
+    - alert_id: "GL_WARNING_002"
+      name: "GLComplianceWarning"
+      description: "GL層級合規率偏低"
+      severity: "warning"
+      condition:
+        metric: "gl_layer_compliance_rate"
+        operator: "<"
+        threshold: 85
+        for: "30m"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        team: "governance"
+        priority: "P2"
+      annotations:
+        summary: "GL層級 {{ $labels.layer_id }} 合規率偏低"
+        description: |
+          層級: {{ $labels.layer_id }}
+          當前合規率: {{ $value }}%
+          警告值: 85%
+        action: "在48小時內審查不合規Artifact"
+      notification:
+        channels:
+          - type: "slack"
+            channel: "#governance-alerts"
+    - alert_id: "GL_WARNING_003"
+      name: "GLArtifactStale"
+      description: "Artifact長時間未更新"
+      severity: "warning"
+      condition:
+        metric: "gl_artifact_age_days"
+        operator: ">"
+        threshold: 180
+        for: "1d"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        team: "governance"
+        priority: "P3"
+      annotations:
+        summary: "Artifact {{ $labels.artifact_name }} 已過期"
+        description: |
+          Artifact: {{ $labels.artifact_name }}
+          層級: {{ $labels.layer_id }}
+          年齡: {{ $value }} 天
+          該Artifact已超過180天未更新，可能需要審查。
+        action: "審查Artifact是否仍然有效"
+      notification:
+        channels:
+          - type: "slack"
+            channel: "#governance-alerts"
+    - alert_id: "GL_WARNING_004"
+      name: "GLWorkflowSlowdown"
+      description: "工作流程執行時間過長"
+      severity: "warning"
+      condition:
+        metric: "gl_workflow_duration_seconds"
+        operator: ">"
+        threshold: 600
+        for: "5m"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        team: "platform"
+        priority: "P3"
+      annotations:
+        summary: "工作流程 {{ $labels.workflow_name }} 執行緩慢"
+        description: |
+          工作流程: {{ $labels.workflow_name }}
+          執行時間: {{ $value }} 秒
+          閾值: 600 秒
+        action: "檢查工作流程效能"
+      notification:
+        channels:
+          - type: "slack"
+            channel: "#platform-alerts"
+    - alert_id: "GL_WARNING_005"
+      name: "GLValidationErrorsHigh"
+      description: "驗證錯誤數量偏高"
+      severity: "warning"
+      condition:
+        metric: "increase(gl_artifact_validation_errors[1h])"
+        operator: ">"
+        threshold: 10
+        for: "5m"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        team: "governance"
+        priority: "P2"
+      annotations:
+        summary: "層級 {{ $labels.layer_id }} 驗證錯誤增加"
+        description: |
+          層級: {{ $labels.layer_id }}
+          過去1小時錯誤數: {{ $value }}
+          閾值: 10
+        action: "檢查最近的Artifact變更"
+      notification:
+        channels:
+          - type: "slack"
+            channel: "#governance-alerts"
+  # ===========================================================================
+  # 資訊告警 (Info Alerts)
+  # ===========================================================================
+  info_alerts:
+    - alert_id: "GL_INFO_001"
+      name: "GLNewArtifactCreated"
+      description: "新Artifact已創建"
+      severity: "info"
+      condition:
+        metric: "increase(gl_artifact_total[1h])"
+        operator: ">"
+        threshold: 0
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        team: "governance"
+      annotations:
+        summary: "新Artifact已創建於層級 {{ $labels.layer_id }}"
+        description: |
+          層級: {{ $labels.layer_id }}
+          類型: {{ $labels.kind }}
+          數量: {{ $value }}
+      notification:
+        channels:
+          - type: "slack"
+            channel: "#governance-activity"
+    - alert_id: "GL_INFO_002"
+      name: "GLComplianceCheckCompleted"
+      description: "合規檢查已完成"
+      severity: "info"
+      condition:
+        metric: "increase(gl_compliance_check_total{result=&quot;success&quot;}[1h])"
+        operator: ">"
+        threshold: 0
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        team: "governance"
+      annotations:
+        summary: "合規檢查已完成"
+        description: "過去1小時完成 {{ $value }} 次合規檢查"
+      notification:
+        channels:
+          - type: "slack"
+            channel: "#governance-activity"
+  # ===========================================================================
+  # 告警抑制規則
+  # ===========================================================================
+  inhibit_rules:
+    - source_match:
+        severity: "critical"
+      target_match:
+        severity: "warning"
+      equal: ["layer_id"]
+      description: "當存在critical告警時，抑制同層級的warning告警"
+    - source_match:
+        alertname: "GLWorkflowFailureCritical"
+      target_match:
+        alertname: "GLValidationErrorsHigh"
+      equal: ["layer_id"]
+      description: "當工作流程失敗時，抑制驗證錯誤告警"
+  # ===========================================================================
+  # 靜默規則
+  # ===========================================================================
+  silence_rules:
+    - name: "maintenance-window"
+      description: "維護窗口期間靜默所有非critical告警"
+      matchers:
+        - name: "severity"
+          value: "warning|info"
+          isRegex: true
+      schedule:
+        type: "recurring"
+        day_of_week: "sunday"
+        start_time: "02:00"
+        end_time: "06:00"
+        timezone: "UTC"
+    - name: "known-issue-gl30"
+      description: "已知問題：GL30-49層級暫時性健康分數下降"
+      matchers:
+        - name: "layer_id"
+          value: "GL30-49"
+        - name: "alertname"
+          value: "GLLayerHealthWarning"
+      schedule:
+        type: "fixed"
+        start: "2025-01-18T00:00:00Z"
+        end: "2025-01-25T00:00:00Z"
+  # ===========================================================================
+  # 通知模板
+  # ===========================================================================
+  notification_templates:
+    slack:
+      critical: |
+        :rotating_light: *CRITICAL ALERT*
+        *Alert:* {{ .AlertName }}
+        *Severity:* {{ .Severity }}
+        *Layer:* {{ .Labels.layer_id }}
+        *Summary:* {{ .Annotations.summary }}
+        *Description:*
+        {{ .Annotations.description }}
+        *Action Required:* {{ .Annotations.action }}
+        <{{ .Runbook }}|View Runbook>
+      warning: |
+        :warning: *WARNING ALERT*
+        *Alert:* {{ .AlertName }}
+        *Layer:* {{ .Labels.layer_id }}
+        *Summary:* {{ .Annotations.summary }}
+        *Action:* {{ .Annotations.action }}
+      info: |
+        :information_source: *INFO*
+        {{ .Annotations.summary }}
+    email:
+      subject: "[{{ .Severity | toUpper }}] {{ .AlertName }} - {{ .Labels.layer_id }}"
+      body: |
+        GL Governance Alert
+        Alert: {{ .AlertName }}
+        Severity: {{ .Severity }}
+        Layer: {{ .Labels.layer_id }}
+        Summary:
+        {{ .Annotations.summary }}
+        Description:
+        {{ .Annotations.description }}
+        Recommended Action:
+        {{ .Annotations.action }}
+        ---
+        MachineNativeOps Governance System
+status:
+  phase: "active"
+  approved_by: "observability-lead"
+  approved_at: "2025-01-18T00:00:00Z"
+  last_review: "2025-01-18T00:00:00Z"
+  next_review: "2025-04-18T00:00:00Z"
+  change_history:
+    - version: "1.0.0"
+      date: "2025-01-18"
+      author: "observability-team"
+      changes: "Initial alert rules definition"

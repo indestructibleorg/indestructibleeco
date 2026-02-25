@@ -1,0 +1,31 @@
+ngera1namespace_governance:
+  version: "1.0"
+  categories:
+    code_level:
+      - NG10100
+      - NG10200
+      - NG10300
+      - NG10400
+      - NG10500
+      - NG10600
+      - NG10700
+      - NG10800
+      - NG10900
+      - NG11000
+
+    architecture_level:
+      - NG20100
+      - NG20200
+      - NG20300
+      - NG20400
+      - NG20500
+      - NG20600
+      - NG20700
+      - NG20800
+      - NG20900
+      - NG21000
+
+  validation_rules:
+    - "所有 Era-1 命名空間必須具有唯一前綴"
+    - "所有命名空間必須對應到一個模塊或組件"
+    - "所有命名空間必須可映射到 Era-2 命名空間"

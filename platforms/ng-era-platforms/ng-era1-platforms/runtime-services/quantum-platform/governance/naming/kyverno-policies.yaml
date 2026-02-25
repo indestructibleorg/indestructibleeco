@@ -1,0 +1,115 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: naming-governance
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL90_99-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:naming:kyverno-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/naming/kyverno-policies.yaml"
+  name: gl-quantum-naming-policy
+  namespace: governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-naming
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+    - name: enforce-deployment-naming
+      match:
+        resources:
+          kinds:
+            - Deployment
+      validate:
+        message: "Deployment name must follow pattern: (dev|staging|prod)-[a-z0-9-]+-deploy-vX.Y.Z"
+        pattern:
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:naming:kyverno-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/naming/kyverno-policies.yaml"
+            name: "^(dev|staging|prod)-[a-z0-9-]+-deploy-v[0-9]+\\.[0-9]+\\.[0-9]+"
+            
+    - name: enforce-service-naming
+      match:
+        resources:
+          kinds:
+            - Service
+      validate:
+        message: "Service name must follow pattern: (dev|staging|prod)-[a-z0-9-]+-svc-vX.Y.Z"
+        pattern:
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:naming:kyverno-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/naming/kyverno-policies.yaml"
+            name: "^(dev|staging|prod)-[a-z0-9-]+-svc-v[0-9]+\\.[0-9]+\\.[0-9]+"
+            
+    - name: enforce-ingress-naming
+      match:
+        resources:
+          kinds:
+            - Ingress
+      validate:
+        message: "Ingress name must follow pattern: (dev|staging|prod)-[a-z0-9-]+-ing-vX.Y.Z"
+        pattern:
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:naming:kyverno-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/naming/kyverno-policies.yaml"
+            name: "^(dev|staging|prod)-[a-z0-9-]+-ing-v[0-9]+\\.[0-9]+\\.[0-9]+"
+            
+    - name: require-standard-labels
+      match:
+        resources:
+          kinds:
+            - Deployment
+            - Service
+            - Ingress
+            - ConfigMap
+            - Secret
+      validate:
+        message: "Missing required standard labels"
+        pattern:
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:naming:kyverno-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/naming/kyverno-policies.yaml"
+            labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+              app.kubernetes.io/name: ".*"
+              app.kubernetes.io/version: ".*"
+              app.kubernetes.io/managed-by: ".*"
+              machinenativeops.gl/environment: ".*"
+              machinenativeops.gl/tier: ".*"
+              
+    - name: enforce-environment-values
+      match:
+        resources:
+          kinds:
+            - Deployment
+            - Service
+            - Ingress
+            - ConfigMap
+            - Secret
+      validate:
+        message: "machinenativeops.gl/environment label must be one of: dev, staging, prod"
+        pattern:
+          metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:governance:naming:kyverno-policies.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/governance/naming/kyverno-policies.yaml"
+            labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+              machinenativeops.gl/environment: "^(dev|staging|prod)$"

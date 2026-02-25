@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  @apply box-border;
+}
+
+html {
+  @apply scroll-smooth;
+}
+
+body {
+  @apply bg-white dark:bg-slate-950 text-foreground dark:text-foreground-dark transition-colors;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  @apply w-2 h-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-surface dark:bg-surface-dark;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-border dark:bg-border-dark rounded-full hover:bg-muted dark:hover:bg-muted-dark;
+}

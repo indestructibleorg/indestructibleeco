@@ -1,0 +1,89 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: generation-request.schema
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+---
+$schema: "http://json-schema.org/draft-07/schema#"
+title: "Name Generation Request"
+description: "Request schema for generating compliant resource names"
+type: object
+required:
+  - resource_type
+  - environment
+properties:
+  resource_type:
+    type: string
+    description: "Type of resource to name"
+    enum:
+      - "k8s-deployment"
+      - "k8s-service"
+      - "k8s-ingress"
+      - "k8s-configmap"
+      - "k8s-secret"
+      - "k8s-pvc"
+      - "k8s-pv"
+      - "aws-s3-bucket"
+      - "aws-lambda"
+      - "azure-storage-account"
+      - "gcp-storage-bucket"
+      - "docker-image"
+      - "git-branch"
+      - "environment-variable"
+      - "config-file"
+  
+  environment:
+    type: string
+    description: "Deployment environment"
+    enum:
+      - "dev"
+      - "staging"
+      - "prod"
+  
+  team:
+    type: string
+    description: "Team or department owning the resource"
+    pattern: "^[a-z0-9-]{2,20}$"
+  
+  service:
+    type: string
+    description: "Service or application name"
+    pattern: "^[a-z0-9-]{2,30}$"
+  
+  version:
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:schemas:generation-request.schema.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/schemas/generation-request.schema.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+    type: string
+    description: "Version identifier"
+    pattern: "^v?\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9]+)?$"
+  
+  options:
+    type: object
+    description: "Generation options"
+    properties:
+      include_timestamp:
+        type: boolean
+        default: false
+      
+      include_suffix:
+        type: string
+      
+      generate_multiple:
+        type: boolean
+        default: false
+      
+      count:
+        type: integer
+        minimum: 1
+        maximum: 10
+        default: 1

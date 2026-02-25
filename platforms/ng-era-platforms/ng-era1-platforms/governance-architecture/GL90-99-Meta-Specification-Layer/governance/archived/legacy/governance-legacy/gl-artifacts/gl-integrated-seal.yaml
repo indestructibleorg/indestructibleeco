@@ -1,0 +1,689 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLIntegratedSeal
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-integrated-seal.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-integrated-seal.yaml"
+  name: gl-integrated-seal
+  version: "1.0.0"
+  status: SEALED
+  created_at: "2025-01-19T00:00:00Z"
+  sealed_at: "2025-01-19T00:00:00Z"
+  owner: governance-committee
+  authority: SUPREME
+seal_declaration:
+  statement: |
+    本文件為 GL00–99 語意與 Filesystem 映射的最終整合封存。
+    自本封存生效之時起，所有語意、邊界、責任、技能、能力與 filesystem 結構完全固定。
+    任何修改、擴張、重寫或漂移均屬違規。
+  authority: SUPREME
+  immutable: true
+  effective_immediately: true
+seal_scope:
+  - scope_id: "SCOPE-01"
+    name: "GL00–99 全層級語意"
+    reference: "ECO-SEMANTIC-BOUNDARIES.yaml"
+    status: SEALED
+  - scope_id: "SCOPE-02"
+    name: "GL 層級責任、技能、能力模型"
+    reference: "ECO-SKILLS-MATRIX.yaml"
+    status: SEALED
+  - scope_id: "SCOPE-03"
+    name: "GL 層級 artifacts 產物模型"
+    reference: "ECO-ARTIFACTS-MATRIX.yaml"
+    status: SEALED
+  - scope_id: "SCOPE-04"
+    name: "GL → filesystem 映射"
+    reference: "ECO-FILESYSTEM-MAPPING.yaml"
+    status: SEALED
+  - scope_id: "SCOPE-05"
+    name: "GL 上下游依賴"
+    reference: "ECO-DAG.yaml"
+    status: SEALED
+  - scope_id: "SCOPE-06"
+    name: "GL 治理生命週期"
+    reference: "ECO-TASK-LIFECYCLE.yaml"
+    status: SEALED
+  - scope_id: "SCOPE-07"
+    name: "GL 治理閉環"
+    reference: "ECO-GOVERNANCE-LOOP.yaml"
+    status: SEALED
+GL00-09:
+  seal_id: "SEAL-GL00-09"
+  layer_id: "GL00-09"
+  name: "Strategic Layer"
+  name_zh: "戰略層"
+  status: SEALED
+  semantic_seal:
+    core_purpose: "組織願景、方向、原則、風險與治理根基"
+    immutable: true
+    expansion_prohibited: true
+    rewrite_prohibited: true
+    drift_prohibited: true
+  filesystem_seal:
+    root_path: "workspace/layers/GL00-09-strategic"
+    directories:
+      - path: "00-vision-strategy"
+        artifacts: ["vision-statement", "strategic-objectives"]
+        sealed: true
+      - path: "01-architecture"
+        artifacts: ["architecture-decision-record"]
+        sealed: true
+      - path: "02-governance"
+        artifacts: ["governance-charter"]
+        sealed: true
+      - path: "03-risk"
+        artifacts: ["risk-assessment"]
+        sealed: true
+      - path: "04-compliance"
+        artifacts: ["compliance-policy"]
+        sealed: true
+      - path: "05-security"
+        artifacts: ["security-policy"]
+        sealed: true
+  skills_seal:
+    skills: ["strategic_thinking", "vision_formulation", "risk_assessment", "compliance_management", "architecture_design", "stakeholder_engagement"]
+    sealed: true
+  capabilities_seal:
+    capabilities: ["define_organizational_vision", "establish_governance_charter", "approve_strategic_decisions", "manage_enterprise_risk", "ensure_regulatory_compliance"]
+    sealed: true
+  responsibilities_seal:
+    responsibilities:
+      - "vision_mission_ownership"
+      - "governance_charter_ownership"
+      - "resource_allocation_decision"
+      - "governance_committee_establishment"
+      - "downstream_governance_oversight"
+      - "risk_strategy_approval"
+    sealed: true
+  dependencies_seal:
+    upstream: []
+    downstream: ["GL10-29", "GL30-49"]
+    sealed: true
+GL10-29:
+  seal_id: "SEAL-GL10-29"
+  layer_id: "GL10-29"
+  name: "Operational Layer"
+  name_zh: "運營層"
+  status: SEALED
+  semantic_seal:
+    core_purpose: "政策、流程、標準、工具與品質管理"
+    immutable: true
+    expansion_prohibited: true
+    rewrite_prohibited: true
+    drift_prohibited: true
+  filesystem_seal:
+    root_path: "workspace/layers/GL10-29-operational"
+    directories:
+      - path: "10-policy"
+        artifacts: ["policy-document"]
+        sealed: true
+      - path: "11-process"
+        artifacts: ["process-definition"]
+        sealed: true
+      - path: "12-planning"
+        artifacts: ["operational-plan"]
+        sealed: true
+      - path: "13-resources"
+        artifacts: ["resource-allocation"]
+        sealed: true
+      - path: "14-capability"
+        artifacts: ["capability-matrix"]
+        sealed: true
+      - path: "15-quality"
+        artifacts: ["quality-standard"]
+        sealed: true
+      - path: "16-tools"
+        artifacts: ["tool-configuration"]
+        sealed: true
+  skills_seal:
+    skills: ["policy_development", "process_optimization", "resource_management", "quality_assurance", "team_coordination", "capability_development"]
+    sealed: true
+  capabilities_seal:
+    capabilities: ["implement_governance_policies", "manage_operational_processes", "allocate_resources", "monitor_quality_metrics", "develop_team_capabilities"]
+    sealed: true
+  responsibilities_seal:
+    responsibilities: ["policy_implementation", "daily_operations_management", "cross_team_coordination", "quality_standard_maintenance", "capability_cultivation"]
+    sealed: true
+  dependencies_seal:
+    upstream: ["GL00-09"]
+    downstream: ["GL30-49"]
+    sealed: true
+GL30-49:
+  seal_id: "SEAL-GL30-49"
+  layer_id: "GL30-49"
+  name: "Execution Layer"
+  name_zh: "執行層"
+  status: SEALED
+  semantic_seal:
+    core_purpose: "模板、契約、schema、自動化產物"
+    immutable: true
+    expansion_prohibited: true
+    rewrite_prohibited: true
+    drift_prohibited: true
+  filesystem_seal:
+    root_path: "workspace/layers/GL30-49-execution"
+    directories:
+      - path: "27-templates"
+        artifacts: ["template-file"]
+        sealed: true
+      - path: "31-schemas"
+        artifacts: ["schema-definition"]
+        sealed: true
+      - path: "32-rules"
+        artifacts: ["rule-definition"]
+        sealed: true
+      - path: "34-config"
+        artifacts: ["config-file"]
+        sealed: true
+      - path: "37-behavior-contracts"
+        artifacts: ["behavior-contract"]
+        sealed: true
+      - path: "39-automation"
+        artifacts: ["automation-script"]
+        sealed: true
+  skills_seal:
+    skills: ["template_design", "schema_definition", "automation_scripting", "configuration_management", "contract_specification", "rule_engine_design"]
+    sealed: true
+  capabilities_seal:
+    capabilities: ["create_execution_templates", "define_data_schemas", "implement_automation", "manage_configurations", "specify_behavior_contracts"]
+    sealed: true
+  responsibilities_seal:
+    responsibilities: ["template_creation", "schema_management", "automation_implementation", "configuration_control", "contract_enforcement"]
+    sealed: true
+  dependencies_seal:
+    upstream: ["GL10-29"]
+    downstream: ["GL50-59"]
+    sealed: true
+GL50-59:
+  seal_id: "SEAL-GL50-59"
+  layer_id: "GL50-59"
+  name: "Observability Layer"
+  name_zh: "觀測層"
+  status: SEALED
+  semantic_seal:
+    core_purpose: "監控、指標、洞察與可觀測性"
+    immutable: true
+    expansion_prohibited: true
+    rewrite_prohibited: true
+    drift_prohibited: true
+  filesystem_seal:
+    root_path: "workspace/layers/GL50-59-observability"
+    directories:
+      - path: "50-monitoring"
+        artifacts: ["monitoring-config", "metric-definition"]
+        sealed: true
+      - path: "51-alerting"
+        artifacts: ["alert-rule"]
+        sealed: true
+      - path: "52-logging"
+        artifacts: ["logging-config"]
+        sealed: true
+      - path: "53-tracing"
+        artifacts: ["tracing-config"]
+        sealed: true
+      - path: "54-dashboards"
+        artifacts: ["dashboard-definition"]
+        sealed: true
+      - path: "55-insights"
+        artifacts: ["insight-report"]
+        sealed: true
+  skills_seal:
+    skills: ["monitoring_design", "metric_definition", "alert_configuration", "log_analysis", "trace_correlation", "dashboard_design"]
+    sealed: true
+  capabilities_seal:
+    capabilities: ["configure_monitoring_systems", "define_metrics_and_kpis", "setup_alerting_rules", "aggregate_logs", "correlate_traces", "generate_insights"]
+    sealed: true
+  responsibilities_seal:
+    responsibilities: ["monitoring_configuration", "metric_management", "alerting_management", "log_management", "tracing_management", "insight_generation"]
+    sealed: true
+  dependencies_seal:
+    upstream: ["GL30-49"]
+    downstream: ["GL60-80"]
+    sealed: true
+GL60-80:
+  seal_id: "SEAL-GL60-80"
+  layer_id: "GL60-80"
+  name: "Advanced/Feedback Layer"
+  name_zh: "進階/回饋層"
+  status: SEALED
+  semantic_seal:
+    core_purpose: "AI、優化、回饋與強化"
+    immutable: true
+    expansion_prohibited: true
+    rewrite_prohibited: true
+    drift_prohibited: true
+  filesystem_seal:
+    root_path: "workspace/layers/GL60-80-advanced"
+    directories:
+      - path: "60-ai-optimization"
+        artifacts: ["ai-model-config", "optimization-rule"]
+        sealed: true
+      - path: "62-feedback"
+        artifacts: ["feedback-mechanism"]
+        sealed: true
+      - path: "63-audit"
+        artifacts: ["audit-trail"]
+        sealed: true
+      - path: "64-innovation"
+        artifacts: ["innovation-registry"]
+        sealed: true
+      - path: "65-improvement"
+        artifacts: ["improvement-plan"]
+        sealed: true
+  skills_seal:
+    skills: ["ai_optimization", "feedback_analysis", "audit_management", "innovation_tracking", "continuous_improvement", "pattern_recognition"]
+    sealed: true
+  capabilities_seal:
+    capabilities: ["implement_ai_optimization", "analyze_feedback_loops", "manage_audit_trails", "track_innovations", "drive_continuous_improvement"]
+    sealed: true
+  responsibilities_seal:
+    responsibilities: ["ai_optimization_implementation", "feedback_loop_analysis", "audit_trail_management", "innovation_tracking", "continuous_improvement_drive"]
+    sealed: true
+  dependencies_seal:
+    upstream: ["GL50-59"]
+    downstream: ["GL81-83"]
+    sealed: true
+GL81-83:
+  seal_id: "SEAL-GL81-83"
+  layer_id: "GL81-83"
+  name: "Extended Layer"
+  name_zh: "擴展層"
+  status: SEALED
+  semantic_seal:
+    core_purpose: "外部整合、橋接與自動評論"
+    immutable: true
+    expansion_prohibited: true
+    rewrite_prohibited: true
+    drift_prohibited: true
+  filesystem_seal:
+    root_path: "workspace/layers/GL81-83-extended"
+    directories:
+      - path: "81-integration"
+        artifacts: ["integration-config", "external-integration-config", "webhook-config"]
+        sealed: true
+      - path: "82-auto-comment"
+        artifacts: ["auto-comment-rule"]
+        sealed: true
+      - path: "83-notification"
+        artifacts: ["notification-channel", "stakeholder-bridge"]
+        sealed: true
+  skills_seal:
+    skills: ["external_integration", "stakeholder_management", "automated_documentation", "api_management", "cross_system_collaboration"]
+    sealed: true
+  capabilities_seal:
+    capabilities: ["integrate_external_systems", "manage_stakeholder_communication", "automate_commenting", "bridge_external_apis"]
+    sealed: true
+  responsibilities_seal:
+    responsibilities: ["external_system_integration", "stakeholder_communication", "auto_commenting", "api_bridging"]
+    sealed: true
+  dependencies_seal:
+    upstream: ["GL60-80"]
+    downstream: ["GL90-99"]
+    sealed: true
+GL90-99:
+  seal_id: "SEAL-GL90-99"
+  layer_id: "GL90-99"
+  name: "Meta-Specification Layer"
+  name_zh: "元規範層"
+  status: SEALED
+  semantic_seal:
+    core_purpose: "命名、語意規範與治理規則"
+    immutable: true
+    expansion_prohibited: true
+    rewrite_prohibited: true
+    drift_prohibited: true
+  filesystem_seal:
+    root_path: "workspace/layers/GL90-99-meta"
+    directories:
+      - path: "90-naming"
+        artifacts: ["naming-convention"]
+        sealed: true
+      - path: "91-semantic"
+        artifacts: ["semantic-definition"]
+        sealed: true
+      - path: "92-governance-spec"
+        artifacts: ["governance-spec", "governance-standards"]
+        sealed: true
+      - path: "93-metadata"
+        artifacts: ["metadata-schema"]
+        sealed: true
+      - path: "99-layer-definition"
+        artifacts: ["layer-definition"]
+        sealed: true
+  skills_seal:
+    skills: ["specification_design", "naming_convention_management", "semantic_definition", "governance_standardization", "metadata_management"]
+    sealed: true
+  capabilities_seal:
+    capabilities: ["define_naming_conventions", "establish_semantic_standards", "manage_governance_specifications", "maintain_metadata_schemas", "govern_all_layers"]
+    sealed: true
+  responsibilities_seal:
+    responsibilities: ["naming_convention_ownership", "semantic_standard_ownership", "governance_spec_management", "metadata_schema_maintenance", "cross_layer_governance"]
+    sealed: true
+  dependencies_seal:
+    upstream: ["GL81-83"]
+    downstream: []
+    provides_governance_to: ["GL00-09", "GL10-29", "GL30-49", "GL50-59", "GL60-80", "GL81-83"]
+    sealed: true
+bidirectional_mapping_seal:
+  seal_id: "SEAL-BIDIR-MAP"
+  status: SEALED
+  gl_to_filesystem:
+    - gl_layer: "GL00-09"
+      filesystem_root: "workspace/layers/GL00-09-strategic"
+      directories: 6
+      artifacts: 7
+      sealed: true
+    - gl_layer: "GL10-29"
+      filesystem_root: "workspace/layers/GL10-29-operational"
+      directories: 7
+      artifacts: 7
+      sealed: true
+    - gl_layer: "GL30-49"
+      filesystem_root: "workspace/layers/GL30-49-execution"
+      directories: 6
+      artifacts: 6
+      sealed: true
+    - gl_layer: "GL50-59"
+      filesystem_root: "workspace/layers/GL50-59-observability"
+      directories: 6
+      artifacts: 7
+      sealed: true
+    - gl_layer: "GL60-80"
+      filesystem_root: "workspace/layers/GL60-80-advanced"
+      directories: 5
+      artifacts: 6
+      sealed: true
+    - gl_layer: "GL81-83"
+      filesystem_root: "workspace/layers/GL81-83-extended"
+      directories: 3
+      artifacts: 6
+      sealed: true
+    - gl_layer: "GL90-99"
+      filesystem_root: "workspace/layers/GL90-99-meta"
+      directories: 5
+      artifacts: 6
+      sealed: true
+  filesystem_to_gl:
+    - filesystem_root: "workspace/layers/GL00-09-strategic"
+      gl_layer: "GL00-09"
+      cross_layer_prohibited: true
+      sealed: true
+    - filesystem_root: "workspace/layers/GL10-29-operational"
+      gl_layer: "GL10-29"
+      cross_layer_prohibited: true
+      sealed: true
+    - filesystem_root: "workspace/layers/GL30-49-execution"
+      gl_layer: "GL30-49"
+      cross_layer_prohibited: true
+      sealed: true
+    - filesystem_root: "workspace/layers/GL50-59-observability"
+      gl_layer: "GL50-59"
+      cross_layer_prohibited: true
+      sealed: true
+    - filesystem_root: "workspace/layers/GL60-80-advanced"
+      gl_layer: "GL60-80"
+      cross_layer_prohibited: true
+      sealed: true
+    - filesystem_root: "workspace/layers/GL81-83-extended"
+      gl_layer: "GL81-83"
+      cross_layer_prohibited: true
+      sealed: true
+    - filesystem_root: "workspace/layers/GL90-99-meta"
+      gl_layer: "GL90-99"
+      cross_layer_prohibited: true
+      sealed: true
+artifacts_flow_seal:
+  seal_id: "SEAL-ARTIFACTS-FLOW"
+  status: SEALED
+  flow_direction: "TOP_DOWN_WITH_FEEDBACK"
+  primary_flow:
+    - from: "GL00-09"
+      to: "GL10-29"
+      artifacts: ["vision-statement → policy-document", "governance-charter → process-definition", "strategic-objectives → operational-plan"]
+      sealed: true
+    - from: "GL10-29"
+      to: "GL30-49"
+      artifacts: ["policy-document → behavior-contract", "process-definition → automation-script", "quality-standard → schema-definition"]
+      sealed: true
+    - from: "GL30-49"
+      to: "GL50-59"
+      artifacts: ["config-file → monitoring-config", "schema-definition → metric-definition", "rule-definition → alert-rule"]
+      sealed: true
+    - from: "GL50-59"
+      to: "GL60-80"
+      artifacts: ["monitoring-config → feedback-mechanism", "metric-definition → optimization-rule", "insight-report → improvement-plan"]
+      sealed: true
+    - from: "GL60-80"
+      to: "GL81-83"
+      artifacts: ["feedback-mechanism → integration-config", "audit-trail → auto-comment-rule", "improvement-plan → stakeholder-bridge"]
+      sealed: true
+    - from: "GL81-83"
+      to: "GL90-99"
+      artifacts: ["integration-config → governance-spec"]
+      sealed: true
+  feedback_flow:
+    - from: "GL50-59"
+      to: "GL00-09"
+      type: "validation_feedback"
+      sealed: true
+    - from: "GL60-80"
+      to: "GL10-29"
+      type: "optimization_feedback"
+      sealed: true
+    - from: "GL81-83"
+      to: "GL10-29"
+      type: "integration_feedback"
+      sealed: true
+    - from: "GL90-99"
+      to: "ALL"
+      type: "meta_governance"
+      sealed: true
+dependency_dag_seal:
+  seal_id: "SEAL-DEP-DAG"
+  status: SEALED
+  dag_properties:
+    is_acyclic: true
+    verified: true
+    cycle_detection_passed: true
+  nodes:
+    - "GL00-09"
+    - "GL10-29"
+    - "GL30-49"
+    - "GL50-59"
+    - "GL60-80"
+    - "GL81-83"
+    - "GL90-99"
+  edges:
+    - from: "GL00-09"
+      to: "GL10-29"
+      type: "strategic_guidance"
+      sealed: true
+    - from: "GL00-09"
+      to: "GL30-49"
+      type: "strategic_direction"
+      sealed: true
+    - from: "GL10-29"
+      to: "GL30-49"
+      type: "operational_direction"
+      sealed: true
+    - from: "GL30-49"
+      to: "GL50-59"
+      type: "execution_output"
+      sealed: true
+    - from: "GL50-59"
+      to: "GL00-09"
+      type: "validation_feedback"
+      sealed: true
+    - from: "GL50-59"
+      to: "GL60-80"
+      type: "observability_data"
+      sealed: true
+    - from: "GL60-80"
+      to: "GL10-29"
+      type: "optimization_feedback"
+      sealed: true
+    - from: "GL60-80"
+      to: "GL81-83"
+      type: "feedback_insights"
+      sealed: true
+    - from: "GL81-83"
+      to: "GL10-29"
+      type: "integration_feedback"
+      sealed: true
+    - from: "GL90-99"
+      to: "GL00-09"
+      type: "meta_governance"
+      sealed: true
+    - from: "GL90-99"
+      to: "GL10-29"
+      type: "meta_governance"
+      sealed: true
+    - from: "GL90-99"
+      to: "GL30-49"
+      type: "meta_governance"
+      sealed: true
+    - from: "GL90-99"
+      to: "GL50-59"
+      type: "meta_governance"
+      sealed: true
+    - from: "GL90-99"
+      to: "GL60-80"
+      type: "meta_governance"
+      sealed: true
+    - from: "GL90-99"
+      to: "GL81-83"
+      type: "meta_governance"
+      sealed: true
+seal_statistics:
+  total_layers: 7
+  total_directories: 38
+  total_artifacts: 45
+  total_skills: 39
+  total_capabilities: 34
+  total_responsibilities: 36
+  total_dag_nodes: 7
+  total_dag_edges: 15
+  per_layer:
+    GL00-09:
+      directories: 6
+      artifacts: 7
+      skills: 6
+      capabilities: 5
+      responsibilities: 6
+    GL10-29:
+      directories: 7
+      artifacts: 7
+      skills: 6
+      capabilities: 5
+      responsibilities: 5
+    GL30-49:
+      directories: 6
+      artifacts: 6
+      skills: 6
+      capabilities: 5
+      responsibilities: 5
+    GL50-59:
+      directories: 6
+      artifacts: 7
+      skills: 6
+      capabilities: 6
+      responsibilities: 6
+    GL60-80:
+      directories: 5
+      artifacts: 6
+      skills: 6
+      capabilities: 5
+      responsibilities: 5
+    GL81-83:
+      directories: 3
+      artifacts: 6
+      skills: 5
+      capabilities: 4
+      responsibilities: 4
+    GL90-99:
+      directories: 5
+      artifacts: 6
+      skills: 5
+      capabilities: 5
+      responsibilities: 5
+seal_validation:
+  rules:
+    - rule_id: "SEAL-VAL-01"
+      name: "語意不可變性"
+      description: "所有 GL 層級語意不得修改"
+      enforcement: STRICT
+      status: VERIFIED
+    - rule_id: "SEAL-VAL-02"
+      name: "語意不擴張"
+      description: "所有 GL 層級語意不得擴張"
+      enforcement: STRICT
+      status: VERIFIED
+    - rule_id: "SEAL-VAL-03"
+      name: "語意不重寫"
+      description: "所有 GL 層級語意不得重寫"
+      enforcement: STRICT
+      status: VERIFIED
+    - rule_id: "SEAL-VAL-04"
+      name: "語意不漂移"
+      description: "所有 GL 層級語意不得漂移"
+      enforcement: STRICT
+      status: VERIFIED
+    - rule_id: "SEAL-VAL-05"
+      name: "Filesystem 不跨層"
+      description: "所有 filesystem 目錄不得跨層"
+      enforcement: STRICT
+      status: VERIFIED
+    - rule_id: "SEAL-VAL-06"
+      name: "Filesystem 不混層"
+      description: "所有 filesystem 目錄不得混層"
+      enforcement: STRICT
+      status: VERIFIED
+    - rule_id: "SEAL-VAL-07"
+      name: "Filesystem 不跳層"
+      description: "所有 filesystem 目錄不得跳層"
+      enforcement: STRICT
+      status: VERIFIED
+    - rule_id: "SEAL-VAL-08"
+      name: "雙向映射固定"
+      description: "GL ↔ Filesystem 雙向映射已固定"
+      enforcement: STRICT
+      status: VERIFIED
+    - rule_id: "SEAL-VAL-09"
+      name: "Artifacts 流向固定"
+      description: "所有 artifacts 流向已固定"
+      enforcement: STRICT
+      status: VERIFIED
+    - rule_id: "SEAL-VAL-10"
+      name: "依賴關係 DAG"
+      description: "所有依賴關係為 DAG，無循環"
+      enforcement: STRICT
+      status: VERIFIED
+seal_completion:
+  checklist:
+    - item: "GL 語意封存完成"
+      status: COMPLETED
+    - item: "Filesystem 映射封存完成"
+      status: COMPLETED
+    - item: "GL ↔ Filesystem 雙向映射固定"
+      status: COMPLETED
+    - item: "所有 artifacts 流向固定"
+      status: COMPLETED
+    - item: "所有層級邊界固定"
+      status: COMPLETED
+    - item: "所有依賴關係固定"
+      status: COMPLETED
+  final_status: SEALED
+  sealed_at: "2025-01-19T00:00:00Z"
+seal_signature:
+  seal_id: "ECO-INTEGRATED-SEAL-001"
+  version: "1.0.0"
+  status: SEALED
+  sealed_at: "2025-01-19T00:00:00Z"
+  integrity_hash: "sha256:gl-integrated-seal-v1"
+  authority: SUPREME

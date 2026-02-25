@@ -1,0 +1,155 @@
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gl-semantic-core
+  namespace: gl-platform-semantic-core
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: semantic-core
+    platform: gl-platform-services
+    version: v1.0.0
+    gl.platform/semantic.core: "true"
+    gl.governance/layer: "L1"
+    gl.semantic/component-type: "semantic-engine"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: semantic-core
+      version: v1.0.0
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        app.kubernetes.io/name: semantic-core
+        version: v1.0.0
+        gl.platform/semantic.core: "true"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: semantic-core-serviceaccount
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+        runAsNonRoot: true
+      containers:
+      - name: semantic-folding-engine
+        image: gl-platform/semantic-core:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        - name: grpc
+          containerPort: 9090
+          protocol: TCP
+        - name: metrics
+          containerPort: 9091
+          protocol: TCP
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: LOG_LEVEL
+          value: "info"
+        - name: FOLDING_STRATEGY
+          value: "hybrid-folding"
+        - name: VECTOR_DIMENSIONS
+          value: "768"
+        - name: CACHE_SIZE_GB
+          value: "10"
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "2"
+            ephemeral-storage: "10Gi"
+          limits:
+            memory: "16Gi"
+            cpu: "4"
+            ephemeral-storage: "20Gi"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/configs
+          readOnly: true
+        - name: data-volume
+          mountPath: /data
+        - name: cache-volume
+          mountPath: /cache
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /startup
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 30
+      volumes:
+      - name: config-volume
+        configMap:
+          name: semantic-core-config
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: semantic-data-pvc
+      - name: cache-volume
+        emptyDir:
+          sizeLimit: 10Gi
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - semantic-core
+              topologyKey: kubernetes.io/hostname
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: node-type
+                operator: In
+                values:
+                - compute-optimized

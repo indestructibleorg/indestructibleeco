@@ -1,0 +1,32 @@
+# @ECO-layer: GL60-80
+# @ECO-governed
+version: "1.0.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:governance:compliance:data:evolution:gl-evolution-data:reports:cycle-ce140863-b63f-4094-a82c-ebc7ab1274b6.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/governance/compliance/data/evolution/gl-evolution-data/reports/cycle-ce140863-b63f-4094-a82c-ebc7ab1274b6.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+analysis:
+  evidence_coverage: 1.0
+  learnings_count: 1
+  reasoning_quality: 0.9166666666666666
+cycle_completed: true
+delta:
+  exists: true
+  improvements: 0
+  regressions: 0
+evolution_metrics:
+  analysis_count: 3
+  execution_count: 3
+  upgrade_count: 1
+execution_id: ce140863-b63f-4094-a82c-ebc7ab1274b6
+timestamp: '2026-02-01T11:30:39.150343'
+upgrade:
+  executed: true
+  learnings: 1
+  success: true

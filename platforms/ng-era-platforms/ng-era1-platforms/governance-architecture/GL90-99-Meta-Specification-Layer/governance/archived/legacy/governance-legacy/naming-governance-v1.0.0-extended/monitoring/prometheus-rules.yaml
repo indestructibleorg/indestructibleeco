@@ -1,0 +1,664 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# monitoring/prometheus-rules.yaml.txt
+# MachineNativeOps 命名治理 Prometheus 規則配置
+# 版本: v1.0.0
+# 狀態: 生產就緒
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: naming-governance-rules
+  namespace: platform-03
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: naming-governance
+    app.kubernetes.io/component: monitoring
+    version: v1.0.0
+  annotations:
+    description: "MachineNativeOps 命名治理監控規則"
+    prometheus: "prometheus-k8s"
+spec:
+  groups:
+    # 命名合規性監控組 - Naming Compliance Monitoring Group
+    - name: naming-governance.rules.compliance
+      rules:
+        # 命名一致性告警 - Naming Coherence Alert
+        - alert: NamingDecoherenceDetected
+          expr: naming_coherence_gauge < 0.95
+          for: 5m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: critical
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: compliance
+            team: platform-engineering
+          annotations:
+            summary: "命名一致性低於閾值"
+            description: |
+              命名一致性下降至 {{ $value }}，低於閾值 0.95
+              
+              影響範圍: {{ $labels.environment }} 環境
+              資源類型: {{ $labels.resource_type }}
+              
+              請立即檢查命名治理配置並執行修復流程。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/naming-governance/coherence-repair"
+            dashboard_url: "https://grafana.machinenativeops.io/d/naming-governance"
+            impact: "high"
+            action_required: "立即修復"
+        
+        # 衝突熵值告警 - Conflict Entropy Alert
+        - alert: HighConflictEntropy
+          expr: naming_conflict_entropy_gauge > 0.8
+          for: 3m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: conflict
+            team: platform-engineering
+          annotations:
+            summary: "命名衝突熵值過高"
+            description: |
+              命名衝突熵值達到 {{ $value }}，超過閾值 0.8
+              
+              環境: {{ $labels.environment }}
+              衝突類型: {{ $labels.conflict_type }}
+              影響資源數: {{ $labels.affected_resources }}
+              
+              建議執行衝突解決流程。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/naming-governance/conflict-resolution"
+            dashboard_url: "https://grafana.machinenativeops.io/d/naming-governance"
+            impact: "medium"
+            action_required: "24小時內處理"
+        
+        # 合規率告警 - Compliance Rate Alert
+        - alert: ComplianceRateBelowTarget
+          expr: naming_compliance_rate_gauge < 0.90
+          for: 10m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: critical
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: compliance
+            team: platform-engineering
+          annotations:
+            summary: "合規率低於目標值"
+            description: |
+              命名合規率 {{ $value }} 低於目標 0.90
+              
+              目標合規率: 90%
+              當前合規率: {{ $value | humanizePercentage }}
+              違規資源數: {{ $labels.violation_count }}
+              
+              這可能導致審計風險，請立即處理。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/naming-governance/compliance-improvement"
+            dashboard_url: "https://grafana.machinenativeops.io/d/naming-governance"
+            impact: "critical"
+            action_required: "立即處理"
+        
+        # 版本漂移告警 - Version Drift Alert
+        - alert: VersionDriftDetected
+          expr: naming_version_drift_gauge > 0.1
+          for: 15m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: version
+            team: platform-engineering
+          annotations:
+            summary: "檢測到版本漂移"
+            description: |
+              版本漂移達到 {{ $value }}，超過閾值 0.1
+              
+              服務: {{ $labels.service }}
+              環境: {{ $labels.environment }}
+              期望版本: {{ $labels.expected_version }}
+              實際版本: {{ $labels.actual_version }}
+              
+              可能導致相容性問題。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/naming-governance/version-alignment"
+            dashboard_url: "https://grafana.machinenativeops.io/d/naming-governance"
+            impact: "medium"
+            action_required: "48小時內處理"
+
+    # 自動修復監控組 - Auto-Repair Monitoring Group
+    - name: naming-governance.rules.repair
+      rules:
+        # 自動修復失敗告警 - Auto-Repair Failure Alert
+        - alert: AutoRepairFailureRateHigh
+          expr: rate(naming_auto_repair_failures_total[5m]) > 0.05
+          for: 5m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: repair
+            team: sre
+          annotations:
+            summary: "自動修復失敗率過高"
+            description: |
+              自動修復失敗率達到 {{ $value | humanizePercentage }}，超過閾值 5%
+              
+              修復類型: {{ $labels.repair_type }}
+              影響資源: {{ $labels.affected_resources }}
+              
+              請檢查修復日誌並調整修復策略。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/naming-governance/repair-troubleshooting"
+            dashboard_url: "https://grafana.machinenativeops.io/d/naming-governance"
+            impact: "medium"
+            action_required: "4小時內處理"
+        
+        # 修復佇列積壓告警 - Repair Queue Backlog Alert
+        - alert: RepairQueueBacklog
+          expr: naming_repair_queue_size_gauge > 100
+          for: 10m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: repair
+            team: sre
+          annotations:
+            summary: "修復佇列積壓"
+            description: |
+              修復佇列大小達到 {{ $value }}，超過閾值 100
+              
+              等待修復的資源: {{ $labels.pending_repairs }}
+              平均等待時間: {{ $labels.avg_wait_time }}
+              
+              可能需要增加修復容量。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/naming-governance/repair-scaling"
+            dashboard_url: "https://grafana.machinenativeops.io/d/naming-governance"
+            impact: "medium"
+            action_required: "2小時內處理"
+        
+        # 修復成功率低告警 - Low Repair Success Rate Alert
+        - alert: LowRepairSuccessRate
+          expr: naming_repair_success_rate_gauge < 0.95
+          for: 15m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: repair
+            team: sre
+          annotations:
+            summary: "修復成功率低"
+            description: |
+              修復成功率下降至 {{ $value }}，低於閾值 0.95
+              
+              修復類型: {{ $labels.repair_type }}
+              最近修復嘗試: {{ $labels.recent_attempts }}
+              成功修復數: {{ $labels.successful_repairs }}
+              
+              請檢查修復邏輯並調整策略。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/naming-governance/repair-optimization"
+            dashboard_url: "https://grafana.machinenativeops.io/d/naming-governance"
+            impact: "medium"
+            action_required: "4小時內處理"
+
+    # 系統效能監控組 - System Performance Monitoring Group
+    - name: naming-governance.rules.performance
+      rules:
+        # 驗證延遲告警 - Validation Latency Alert
+        - alert: ValidationLatencyHigh
+          expr: histogram_quantile(0.95, naming_validation_duration_seconds_bucket) > 1
+          for: 5m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: performance
+            team: platform-engineering
+          annotations:
+            summary: "驗證延遲過高"
+            description: |
+              95分位數驗證延遲達到 {{ $value }}秒，超過閾值 1秒
+              
+              驗證類型: {{ $labels.validation_type }}
+              資源類型: {{ $labels.resource_type }}
+              
+              可能影響部署速度。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/naming-governance/performance-tuning"
+            dashboard_url: "https://grafana.machinenativeops.io/d/naming-governance"
+            impact: "low"
+            action_required: "24小時內處理"
+        
+        # API 錯誤率告警 - API Error Rate Alert
+        - alert: HighAPIErrorRate
+          expr: rate(naming_api_requests_failed_total[5m]) / rate(naming_api_requests_total[5m]) > 0.05
+          for: 3m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: critical
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: performance
+            team: platform-engineering
+          annotations:
+            summary: "API 錯誤率過高"
+            description: |
+              API 錯誤率達到 {{ $value | humanizePercentage }}，超過閾值 5%
+              
+              API 端點: {{ $labels.endpoint }}
+              錯誤類型: {{ $labels.error_type }}
+              
+              可能影響命名治理服務可用性。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/naming-governance/api-troubleshooting"
+            dashboard_url: "https://grafana.machinenativeops.io/d/naming-governance"
+            impact: "high"
+            action_required: "立即處理"
+        
+        # 處理吞吐量低告警 - Low Processing Throughput Alert
+        - alert: LowProcessingThroughput
+          expr: rate(naming_processed_requests_total[5m]) < 10
+          for: 10m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: performance
+            team: platform-engineering
+          annotations:
+            summary: "處理吞吐量過低"
+            description: |
+              處理吞吐量下降至 {{ $value }} requests/sec，低於閾值 10
+              
+              處理器: {{ $labels.processor }}
+              佇列大小: {{ $labels.queue_size }}
+              
+              可能需要增加處理容量。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/naming-governance/scaling"
+            dashboard_url: "https://grafana.machinenativeops.io/d/naming-governance"
+            impact: "medium"
+            action_required: "4小時內處理"
+
+    # 安全監控組 - Security Monitoring Group
+    - name: naming-governance.rules.security
+      rules:
+        # 未授權訪問告警 - Unauthorized Access Alert
+        - alert: UnauthorizedAccessDetected
+          expr: increase(naming_unauthorized_access_total[5m]) > 0
+          for: 0m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: critical
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: security
+            team: security
+          annotations:
+            summary: "檢測到未授權訪問"
+            description: |
+              檢測到 {{ $value }} 次未授權訪問嘗試
+              
+              來源 IP: {{ $labels.source_ip }}
+              目標端點: {{ $labels.endpoint }}
+              用戶代理: {{ $labels.user_agent }}
+              
+              請立即調查並封鎖惡意訪問。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/security/unauthorized-access"
+            dashboard_url: "https://grafana.machinenativeops.io/d/security"
+            impact: "critical"
+            action_required: "立即處理"
+        
+        # 安全策略違反告警 - Security Policy Violation Alert
+        - alert: SecurityPolicyViolation
+          expr: increase(naming_security_violations_total[5m]) > 0
+          for: 1m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: critical
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: security
+            team: security
+          annotations:
+            summary: "安全策略違反"
+            description: |
+              檢測到 {{ $value }} 次安全策略違反
+              
+              違反類型: {{ $labels.violation_type }}
+              影響資源: {{ $labels.affected_resource }}
+              風險等級: {{ $labels.risk_level }}
+              
+              可能存在安全風險，請立即評估。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/security/policy-violation"
+            dashboard_url: "https://grafana.machinenativeops.io/d/security"
+            impact: "high"
+            action_required: "立即處理"
+        
+        # 異常行為檢測告警 - Anomaly Detection Alert
+        - alert: AnomalousBehaviorDetected
+          expr: naming_anomaly_score_gauge > 0.8
+          for: 2m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: security
+            team: security
+          annotations:
+            summary: "檢測到異常行為"
+            description: |
+              異常行為評分達到 {{ $value }}，超過閾值 0.8
+              
+              行為類型: {{ $labels.behavior_type }}
+              異常特徵: {{ $labels.anomaly_features }}
+              時間窗口: {{ $labels.time_window }}
+              
+              請進行人工審核。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/security/anomaly-detection"
+            dashboard_url: "https://grafana.machinenativeops.io/d/security"
+            impact: "medium"
+            action_required: "2小時內處理"
+
+    # 例外管理監控組 - Exception Management Monitoring Group
+    - name: naming-governance.rules.exceptions
+      rules:
+        # 例外申請激增告警 - Exception Request Spike Alert
+        - alert: ExceptionRequestSpike
+          expr: rate(naming_exception_requests_total[5m]) > 0.1
+          for: 5m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: exception
+            team: governance
+          annotations:
+            summary: "例外申請激增"
+            description: |
+              例外申請率達到 {{ $value }} requests/min，超過正常水平
+              
+              申請類型: {{ $labels.exception_type }}
+              申請部門: {{ $labels.department }}
+              
+              可能需要審查治理策略。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/governance/exception-management"
+            dashboard_url: "https://grafana.machinenativeops.io/d/naming-governance"
+            impact: "low"
+            action_required: "24小時內審核"
+        
+        # 逾期例外告警 - Overdue Exception Alert
+        - alert: OverdueExceptions
+          expr: naming_overdue_exceptions_gauge > 5
+          for: 1h
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: exception
+            team: governance
+          annotations:
+            summary: "逾期例外數量過多"
+            description: |
+              逾期例外數量達到 {{ $value }}，超過閾值 5
+              
+              最長逾期: {{ $labels.max_overdue_days }} 天
+              影響合規性: {{ $labels.compliance_impact }}
+              
+              請處理逾期例外申請。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/governance/exception-cleanup"
+            dashboard_url: "https://grafana.machinenativeops.io/d/naming-governance"
+            impact: "medium"
+            action_required: "48小時內處理"
+
+    # 基礎設施監控組 - Infrastructure Monitoring Group
+    - name: naming-governance.rules.infrastructure
+      rules:
+        # 記憶體使用率告警 - Memory Usage Alert
+        - alert: HighMemoryUsage
+          expr: container_memory_usage_bytes{pod=~"naming-governance.*"} / container_spec_memory_limit_bytes{pod=~"naming-governance.*"} > 0.85
+          for: 5m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: infrastructure
+            team: sre
+          annotations:
+            summary: "記憶體使用率過高"
+            description: |
+              Pod {{ $labels.pod }} 記憶體使用率達到 {{ $value | humanizePercentage }}
+              
+              容器: {{ $labels.container }}
+              當前使用: {{ $value | humanizeBytes }}
+              限制值: {{ $labels.limit | humanizeBytes }}
+              
+              可能導致 OOM。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/infrastructure/memory-scaling"
+            dashboard_url: "https://grafana.machinenativeops.io/d/infrastructure"
+            impact: "medium"
+            action_required: "4小時內處理"
+        
+        # CPU 使用率告警 - CPU Usage Alert
+        - alert: HighCPUUsage
+          expr: rate(container_cpu_usage_seconds_total{pod=~"naming-governance.*"}[5m]) > 0.8
+          for: 5m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: infrastructure
+            team: sre
+          annotations:
+            summary: "CPU 使用率過高"
+            description: |
+              Pod {{ $labels.pod }} CPU 使用率達到 {{ $value | humanizePercentage }}
+              
+              容器: {{ $labels.container }}
+              當前使用率: {{ $value | humanizePercentage }}
+              
+              可能影響服務響應時間。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/infrastructure/cpu-scaling"
+            dashboard_url: "https://grafana.machinenativeops.io/d/infrastructure"
+            impact: "medium"
+            action_required: "4小時內處理"
+        
+        # Pod 重啟告警 - Pod Restart Alert
+        - alert: PodRestarting
+          expr: increase(kube_pod_container_status_restarts_total{pod=~"naming-governance.*"}[15m]) > 0
+          for: 0m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: infrastructure
+            team: sre
+          annotations:
+            summary: "Pod 重啟檢測"
+            description: |
+              Pod {{ $labels.pod }} 在過去 15 分鐘內重啟了 {{ $value }} 次
+              
+              容器: {{ $labels.container }}
+              重啟原因: {{ $labels.reason }}
+              
+              請檢查 Pod 日誌。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/infrastructure/pod-troubleshooting"
+            dashboard_url: "https://grafana.machinenativeops.io/d/infrastructure"
+            impact: "medium"
+            action_required: "2小時內處理"
+        
+        # 磁碟使用率告警 - Disk Usage Alert
+        - alert: HighDiskUsage
+          expr: kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes > 0.85
+          for: 5m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: infrastructure
+            team: sre
+          annotations:
+            summary: "磁碟使用率過高"
+            description: |
+              PersistentVolume {{ $labels.persistentvolumeclaim }} 使用率達到 {{ $value | humanizePercentage }}
+              
+              當前使用: {{ $value | humanizeBytes }}
+              總容量: {{ $labels.capacity | humanizeBytes }}
+              
+              可能導致寫入失敗。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/infrastructure/disk-cleanup"
+            dashboard_url: "https://grafana.machinenativeops.io/d/infrastructure"
+            impact: "medium"
+            action_required: "4小時內處理"
+
+    # SLA 監控組 - SLA Monitoring Group
+    - name: naming-governance.rules.sla
+      rules:
+        # SLA 違反告警 - SLA Breach Alert
+        - alert: SLABreach
+          expr: naming_sla_compliance_gauge < 0.99
+          for: 5m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: critical
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: sla
+            team: sre
+          annotations:
+            summary: "SLA 違反"
+            description: |
+              SLA 合規率下降至 {{ $value }}，低於目標 0.99
+              
+              SLA 類型: {{ $labels.sla_type }}
+              測量週期: {{ $labels.measurement_period }}
+              目標值: 99.9%
+              
+              影響服務等級協議。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/sla/breach-handling"
+            dashboard_url: "https://grafana.machinenativeops.io/d/sla"
+            impact: "critical"
+            action_required: "立即處理"
+        
+        # 可用性告警 - Availability Alert
+        - alert: LowAvailability
+          expr: up{job="naming-governance"} == 0
+          for: 1m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: critical
+            namespace: platform-03
+            app.kubernetes.io/component: naming-governance
+            rule_type: availability
+            team: sre
+          annotations:
+            summary: "服務不可用"
+            description: |
+              命名治理服務 {{ $labels.instance }} 不可用
+              
+              最後檢查時間: {{ $labels.last_check }}
+              不可用持續時間: {{ $labels.downtime }}
+              
+              影響所有命名治理功能。
+            runbook_url: "https://docs.machinenativeops.io/runbooks/availability/service-restoration"
+            dashboard_url: "https://grafana.machinenativeops.io/d/availability"
+            impact: "critical"
+            action_required: "立即處理"
+
+---
+# 指標定義說明
+# Metric Definitions Description
+
+## 命名合規性指標 - Naming Compliance Metrics
+- naming_coherence_gauge: 命名一致性指標 (0-1)
+- naming_conflict_entropy_gauge: 衝突熵值指標 (0-1)
+- naming_compliance_rate_gauge: 合規率指標 (0-1)
+- naming_version_drift_gauge: 版本漂移指標 (0-1)
+
+## 自動修復指標 - Auto-Repair Metrics
+- naming_auto_repair_failures_total: 自動修復失敗計數器
+- naming_repair_queue_size_gauge: 修復佇列大小
+- naming_repair_success_rate_gauge: 修復成功率 (0-1)
+
+## 系統效能指標 - System Performance Metrics
+- naming_validation_duration_seconds: 驗證延遲直方圖
+- naming_api_requests_failed_total: API 失敗請求計數器
+- naming_processed_requests_total: 處理請求計數器
+
+## 安全指標 - Security Metrics
+- naming_unauthorized_access_total: 未授權訪問計數器
+- naming_security_violations_total: 安全策略違反計數器
+- naming_anomaly_score_gauge: 異常行為評分 (0-1)
+
+## 例外管理指標 - Exception Management Metrics
+- naming_exception_requests_total: 例外申請計數器
+- naming_overdue_exceptions_gauge: 逾期例外數量
+
+## SLA 指標 - SLA Metrics
+- naming_sla_compliance_gauge: SLA 合規率 (0-1)
+- up: 服務可用性指標 (0/1)
+
+## 基礎設施指標 - Infrastructure Metrics
+- container_memory_usage_bytes: 容器記憶體使用量
+- container_cpu_usage_seconds_total: 容器 CPU 使用時間
+- kube_pod_container_status_restarts_total: Pod 重啟計數器
+- kubelet_volume_stats_used_bytes: PV 使用量
+
+---
+# 標籤約定 - Label Conventions
+
+## 通用標籤 - Common Labels
+- environment: 環境標籤 (development, staging, production)
+- service: 服務名稱
+- app.kubernetes.io/component: 組件名稱
+- version: 版本號
+- team: 負責團隊
+
+## 命名治理專用標籤 - Naming Governance Specific Labels
+- resource_type: 資源類型
+- validation_type: 驗證類型
+- repair_type: 修復類型
+- exception_type: 例外類型
+- violation_type: 違規類型
+
+## 監控標籤 - Monitoring Labels
+- rule_type: 規則類型
+- severity: 嚴重程度
+- impact: 影響程度
+- action_required: 需要採取的行動

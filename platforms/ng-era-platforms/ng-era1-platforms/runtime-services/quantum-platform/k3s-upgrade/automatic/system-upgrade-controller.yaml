@@ -1,0 +1,157 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: upgrade.cattle.io/v1
+kind: Plan
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:k3s-upgrade:automatic:system-upgrade-controller.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/k3s-upgrade/automatic/system-upgrade-controller.yaml"
+  name: k3s-server-upgrade
+  namespace: system-upgrade
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-upgrade
+spec:
+  concurrency: 1
+  version: v1.26.0+k3s1
+  nodeSelector:
+    matchExpressions:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+  serviceAccountName: system-upgrade
+  upgrade:
+    image: rancher/k3s-upgrade
+    command:
+      - k3s
+      - upgrade-server
+  drain:
+    deleteEmptydirData: true
+    disableEviction: false
+    force: false
+    ignoreDaemonSets: false
+    podSelector: ""
+    timeout: 300
+  prepare:
+    image: rancher/k3s-upgrade
+    args:
+      - prepare
+      - server
+  cordon: true
+
+---
+apiVersion: upgrade.cattle.io/v1
+kind: Plan
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:k3s-upgrade:automatic:system-upgrade-controller.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/k3s-upgrade/automatic/system-upgrade-controller.yaml"
+  name: k3s-agent-upgrade
+  namespace: system-upgrade
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-upgrade
+spec:
+  concurrency: 2
+  version: v1.26.0+k3s1
+  nodeSelector:
+    matchExpressions:
+      - key: node-role.kubernetes.io/worker
+        operator: Exists
+  serviceAccountName: system-upgrade
+  upgrade:
+    image: rancher/k3s-upgrade
+    command:
+      - k3s
+      - upgrade-agent
+  drain:
+    deleteEmptydirData: true
+    disableEviction: false
+    force: false
+    ignoreDaemonSets: false
+    podSelector: ""
+    timeout: 300
+  prepare:
+    image: rancher/k3s-upgrade
+    args:
+      - prepare
+      - agent
+  cordon: true
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:k3s-upgrade:automatic:system-upgrade-controller.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/k3s-upgrade/automatic/system-upgrade-controller.yaml"
+  name: system-upgrade
+  namespace: system-upgrade
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-upgrade
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:k3s-upgrade:automatic:system-upgrade-controller.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/k3s-upgrade/automatic/system-upgrade-controller.yaml"
+  name: system-upgrade
+  namespace: system-upgrade
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-upgrade
+rules:
+  - apiGroups: ["upgrade.cattle.io"]
+    resources: ["plans", "upgrades"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  - apiGroups: [""]
+    resources: ["nodes", "pods"]
+    verbs: ["get", "list", "watch", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["daemonsets", "deployments", "statefulsets", "replicasets"]
+    verbs: ["get", "list", "watch", "delete"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list", "watch", "create", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:runtime-services:quantum-platform:k3s-upgrade:automatic:system-upgrade-controller.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/k3s-upgrade/automatic/system-upgrade-controller.yaml"
+  name: system-upgrade
+  namespace: system-upgrade
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    gl-version: v10.0.0
+    tier: quantum-upgrade
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system-upgrade
+subjects:
+  - kind: ServiceAccount
+    name: system-upgrade
+    namespace: system-upgrade

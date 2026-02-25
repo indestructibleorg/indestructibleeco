@@ -1,0 +1,71 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: .gl-manifest
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# GL Semantic Manifest - Renderer Subsystem
+# @gl-layer ECO-30-EXECUTION
+# @gl-semantic-anchor ECO-30-EXEC-RENDERER
+# GL Unified Architecture Governance Framework Activated
+
+gl_version: "1.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:runtime:engine:renderer:.gl-manifest.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/runtime/engine/renderer/.gl-manifest.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+manifest:
+  subsystem: "renderer"
+  module: "aep-engine"
+  layer: "ECO-30-EXECUTION"
+  semantic_anchor: "ECO-30-EXEC-RENDERER"
+  updated: "2026-01-26"
+
+components:
+  artifact_writer:
+    file: "artifact_writer.ts"
+    class: "ArtifactWriter"
+    description: "Artifact file writing with integrity verification"
+    version: "1.0.0"
+    exports:
+      - "ArtifactWriter"
+    dependencies:
+      - "fs"
+      - "path"
+      - "crypto"
+      - "../interfaces.d"
+
+  module_mapper:
+    file: "module_mapper.ts"
+    class: "ModuleMapper"
+    description: "Module configuration to artifact mapping"
+    version: "1.0.0"
+    exports:
+      - "ModuleMapper"
+    dependencies:
+      - "../interfaces.d"
+
+  template_engine:
+    file: "template_engine.ts"
+    class: "TemplateEngine"
+    description: "Nunjucks template rendering engine"
+    version: "1.0.0"
+    exports:
+      - "TemplateEngine"
+    dependencies:
+      - "nunjucks"
+      - "path"
+      - "fs"
+      - "../interfaces.d"
+
+governance:
+  charter_activated: true
+  evidence_required: true
+  audit_compliant: true

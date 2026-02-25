@@ -1,0 +1,324 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: root.specs.references
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# 🔗 Root Layer Reference Specification
+# Version: 1.0.0
+# Scope: All reference fields in root.*.yaml files
+# Enforcement: Strict (GitHub Actions gate-root-specs.yml)
+
+apiVersion: machinenativeops.io/v1
+kind: RootReferenceSpec
+metadata:
+  name: root-reference-specification
+  namespace: machinenativeops-specs
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    machinenativeops.io/tier: "specs"
+    machinenativeops.io/version: "v1.0.0"
+    machinenativeops.io/component: "reference-spec"
+  annotations:
+    machinenativeops.io/description: "Machine-verifiable reference conventions for root layer"
+    machinenativeops.io/enforcement: "strict"
+    machinenativeops.io/last-modified: "2025-12-21T02:00:00Z"
+
+spec:
+  version: 1
+  
+  # === 引用格式定義 ===
+  reference_formats:
+    # 1. URN 格式（主要引用格式）
+    urn:
+      description: "統一資源名稱，用於跨系統引用"
+      pattern: "^urn:machinenativeops:(module|service|config|policy|certificate|audit):[a-z0-9-]+(:v\\d+)?$"
+      components:
+        scheme: "urn"
+        namespace: "machinenativeops"
+        type: "module|service|config|policy|certificate|audit"
+        identifier: "[a-z0-9-]+"
+        version: "v\\d+ (optional)"
+      examples:
+        valid:
+          - "urn:machinenativeops:module:governance-engine"
+          - "urn:machinenativeops:module:governance-engine:v1"
+          - "urn:machinenativeops:service:trust-manager"
+          - "urn:machinenativeops:config:root-config"
+          - "urn:machinenativeops:policy:rbac-policy"
+          - "urn:machinenativeops:certificate:root-ca"
+          - "urn:machinenativeops:audit:governance-audit"
+        invalid:
+          - "urn:machinenativeops:module:governance-engine"  # 錯誤的 namespace
+          - "urn:machinenativeops:Module:governance-engine"  # 大寫
+          - "urn:machinenativeops:module:GovernanceEngine"  # PascalCase
+          - "machinenativeops:module:governance-engine"  # 缺少 urn: 前綴
+    
+    # 2. 模組引用格式
+    module_ref:
+      description: "模組間依賴引用"
+      pattern: "^[a-z][a-z0-9-]*[a-z0-9]$"
+      examples:
+        valid:
+          - "config-manager"
+          - "logging-service"
+          - "trust-manager"
+        invalid:
+          - "ConfigManager"
+          - "config_manager"
+          - "config.manager"
+    
+    # 3. 檔案路徑引用
+    file_path_ref:
+      description: "檔案系統路徑引用"
+      pattern: "^(/[a-z0-9_-]+)+(/[a-z0-9_.-]+)?$"
+      examples:
+        valid:
+          - "/opt/machinenativenops/modules/governance-engine/main.py"
+          - "/etc/machinenativenops/config.yaml"
+          - "/var/log/machinenativenops/audit.log"
+        invalid:
+          - "/Opt/MachineNativeOps/Main.py"  # 大寫
+          - "opt/machinenativenops/main.py"  # 缺少前導斜線
+          - "/opt/machinenativenops//main.py"  # 雙斜線
+    
+    # 4. 配置引用格式
+    config_ref:
+      description: "配置項目引用"
+      pattern: "^root\\.[a-z][a-z0-9-]*$"
+      examples:
+        valid:
+          - "root.config"
+          - "root.modules"
+          - "root.governance"
+        invalid:
+          - "config"  # 缺少 root. 前綴
+          - "root.Config"  # 大寫
+    
+    # 5. 環境變數引用
+    env_var_ref:
+      description: "環境變數引用"
+      pattern: "^[A-Z][A-Z0-9_]*$"
+      examples:
+        valid:
+          - "GOVERNANCE_MODE"
+          - "API_KEY"
+          - "DB_HOST"
+        invalid:
+          - "governance_mode"  # 小寫
+          - "GovernanceMode"  # PascalCase
+          - "GOVERNANCE-MODE"  # 連字號
+
+  # === 引用欄位規則 ===
+  reference_field_rules:
+    # 所有以 *_ref 結尾的欄位
+    - field_pattern: ".*_ref$"
+      required_format: "urn"
+      description: "所有 *_ref 欄位必須使用 URN 格式"
+      examples:
+        valid_fields:
+          - "module_ref: urn:machinenativeops:module:governance-engine"
+          - "service_ref: urn:machinenativeops:service:trust-manager"
+        invalid_fields:
+          - "module_ref: governance-engine"  # 非 URN 格式
+    
+    # 依賴項目引用
+    - field_pattern: "^dependencies\\[\\]\\.name$"
+      required_format: "module_ref"
+      description: "依賴項目名稱必須使用模組引用格式"
+      validation:
+        - "必須在 root.registry.modules.yaml 中存在"
+        - "不可引用自身"
+        - "不可形成循環依賴"
+    
+    # 入口點引用
+    - field_pattern: "^entrypoint$"
+      required_format: "file_path_ref"
+      description: "入口點必須使用絕對路徑"
+      validation:
+        - "路徑必須存在於檔案系統映射中"
+        - "必須指向可執行檔案"
+    
+    # 配置引用
+    - field_pattern: "^config_source$"
+      required_format: "config_ref"
+      description: "配置來源必須引用 root.* 配置檔"
+      validation:
+        - "引用的配置檔必須存在"
+
+  # === 引用驗證規則 ===
+  validation_rules:
+    - id: "REF-001"
+      description: "所有引用必須可解析"
+      severity: "error"
+      check: "引用的目標必須存在於註冊表中"
+      scope: ["module_ref", "service_ref", "config_ref"]
+      
+    - id: "REF-002"
+      description: "URN 格式必須正確"
+      severity: "error"
+      check: "所有 URN 必須符合定義的正則表達式"
+      scope: ["urn"]
+      
+    - id: "REF-003"
+      description: "模組依賴不可循環"
+      severity: "error"
+      check: "依賴圖必須是有向無環圖 (DAG)"
+      scope: ["dependencies"]
+      algorithm: "topological_sort"
+      
+    - id: "REF-004"
+      description: "檔案路徑必須存在"
+      severity: "warning"
+      check: "引用的檔案路徑必須在 root.fs.map 中定義"
+      scope: ["file_path_ref"]
+      
+    - id: "REF-005"
+      description: "版本引用必須相容"
+      severity: "error"
+      check: "依賴版本必須滿足 semver 相容性"
+      scope: ["dependencies[].version"]
+      
+    - id: "REF-006"
+      description: "環境變數引用必須定義"
+      severity: "warning"
+      check: "引用的環境變數必須在配置中定義"
+      scope: ["env_var_ref"]
+
+  # === 引用完整性檢查 ===
+  integrity_checks:
+    # 1. 存在性檢查
+    existence:
+      enabled: true
+      description: "驗證所有引用的目標都存在"
+      sources:
+        - "root.registry.modules.yaml"
+        - "root.registry.urns.yaml"
+        - "root.fs.map"
+      actions:
+        on_missing: "error"
+        on_ambiguous: "warning"
+    
+    # 2. 唯一性檢查
+    uniqueness:
+      enabled: true
+      description: "驗證引用目標的唯一性"
+      check:
+        - "同一 URN 不可指向多個實體"
+        - "同一模組名稱不可重複定義"
+      actions:
+        on_duplicate: "error"
+    
+    # 3. 一致性檢查
+    consistency:
+      enabled: true
+      description: "驗證引用在不同檔案間的一致性"
+      check:
+        - "同一模組在不同檔案中的引用必須一致"
+        - "版本號必須匹配"
+      actions:
+        on_mismatch: "error"
+    
+    # 4. 循環依賴檢查
+    circular_dependency:
+      enabled: true
+      description: "檢測並防止循環依賴"
+      algorithm: "depth_first_search"
+      actions:
+        on_cycle_detected: "error"
+        report_cycle_path: true
+
+  # === 引用解析策略 ===
+  resolution_strategy:
+    # URN 解析
+    urn_resolution:
+      priority: 1
+      lookup_order:
+        - "root.registry.urns.yaml"
+        - "root.registry.modules.yaml"
+      cache_enabled: true
+      cache_ttl: "300s"
+    
+    # 模組引用解析
+    module_resolution:
+      priority: 2
+      lookup_order:
+        - "root.registry.modules.yaml"
+        - "root.modules.yaml"
+      version_matching: "semver"
+    
+    # 檔案路徑解析
+    file_path_resolution:
+      priority: 3
+      lookup_order:
+        - "root.fs.map"
+        - "filesystem"
+      validate_existence: true
+
+  # === 引用最佳實踐 ===
+  best_practices:
+    - id: "BP-REF-001"
+      title: "優先使用 URN"
+      description: "跨系統引用應優先使用 URN 格式"
+      rationale: "URN 提供全域唯一性和版本控制"
+      
+    - id: "BP-REF-002"
+      title: "避免硬編碼路徑"
+      description: "使用配置引用而非硬編碼檔案路徑"
+      rationale: "提高可移植性和可維護性"
+      
+    - id: "BP-REF-003"
+      title: "明確版本依賴"
+      description: "依賴聲明應包含明確的版本範圍"
+      rationale: "避免版本衝突和不相容問題"
+      
+    - id: "BP-REF-004"
+      title: "文檔化引用關係"
+      description: "複雜引用關係應在註解中說明"
+      rationale: "提高可讀性和可維護性"
+
+  # === 驗證配置 ===
+  validation:
+    enabled: true
+    enforcement_level: "strict"
+    
+    checks:
+      - name: "format_validation"
+        enabled: true
+        description: "驗證引用格式"
+        
+      - name: "existence_validation"
+        enabled: true
+        description: "驗證引用目標存在"
+        
+      - name: "consistency_validation"
+        enabled: true
+        description: "驗證引用一致性"
+        
+      - name: "circular_dependency_detection"
+        enabled: true
+        description: "檢測循環依賴"
+    
+    error_handling:
+      on_format_error: "block_pr"
+      on_missing_reference: "block_pr"
+      on_circular_dependency: "block_pr"
+      on_version_mismatch: "warning"
+
+# === 狀態 ===
+status:
+  phase: "Active"
+  conditions:
+    - type: "Validated"
+      status: "True"
+      lastTransitionTime: "2025-12-21T02:00:00Z"
+      reason: "SpecificationComplete"
+      message: "Reference specification is complete and validated"
+  
+  statistics:
+    total_formats: 5
+    total_rules: 6
+    total_checks: 4
+    coverage: "100%"

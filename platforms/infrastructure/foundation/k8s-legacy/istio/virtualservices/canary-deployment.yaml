@@ -1,0 +1,131 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: canary-deployment
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+---
+# Canary Deployment Virtual Service
+# Enables gradual rollout of new versions
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:istio:virtualservices:canary-deployment.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/istio/virtualservices/canary-deployment.yaml"
+  name: machine-native-ops-canary
+  namespace: platform-03
+spec:
+  hosts:
+  - machine-native-ops
+  http:
+  # Canary routing based on header
+  - match:
+    - headers:
+        x-canary:
+          exact: "true"
+    route:
+    - destination:
+        host: machine-native-ops
+        subset: canary
+      weight: 100
+  # Canary routing based on percentage (10% to canary)
+  - route:
+    - destination:
+        host: machine-native-ops
+        subset: stable
+      weight: 90
+    - destination:
+        host: machine-native-ops
+        subset: canary
+      weight: 10
+---
+# A/B Testing Virtual Service
+# Routes traffic based on user characteristics
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:istio:virtualservices:canary-deployment.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/istio/virtualservices/canary-deployment.yaml"
+  name: machine-native-ops-ab-test
+  namespace: platform-03
+spec:
+  hosts:
+  - machine-native-ops
+  http:
+  # Route to experiment A for specific users
+  - match:
+    - headers:
+        x-experiment:
+          exact: "A"
+    route:
+    - destination:
+        host: machine-native-ops
+        subset: experiment-a
+  # Route to experiment B for specific users
+  - match:
+    - headers:
+        x-experiment:
+          exact: "B"
+    route:
+    - destination:
+        host: machine-native-ops
+        subset: experiment-b
+  # Default route
+  - route:
+    - destination:
+        host: machine-native-ops
+        subset: stable
+---
+# Blue-Green Deployment Virtual Service
+# Instant switch between blue and green versions
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:istio:virtualservices:canary-deployment.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/istio/virtualservices/canary-deployment.yaml"
+  name: machine-native-ops-blue-green
+  namespace: platform-03
+spec:
+  hosts:
+  - machine-native-ops
+  http:
+  # All traffic to blue version
+  - route:
+    - destination:
+        host: machine-native-ops
+        subset: blue
+      weight: 100
+    # Uncomment to switch to green
+    # - destination:
+    #     host: machine-native-ops
+    #     subset: green
+    #   weight: 100
+---
+# Shadow/Mirror Traffic Virtual Service
+# Mirrors production traffic to test environment
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:istio:virtualservices:canary-deployment.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/istio/virtualservices/canary-deployment.yaml"
+  name: machine-native-ops-shadow
+  namespace: platform-03
+spec:
+  hosts:
+  - machine-native-ops
+  http:
+  - route:
+    - destination:
+        host: machine-native-ops
+        subset: stable
+      weight: 100
+    mirror:
+      host: machine-native-ops
+      subset: canary
+    mirrorPercentage:
+      value: 100

@@ -1,0 +1,155 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: virtualservice
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:virtualservice.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/virtualservice.yaml"
+  name: machine-native-ops
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: machine-native-ops
+    environment: production
+spec:
+  hosts:
+  - "api.machinenativeops.com"
+  - "machinenativeops.com"
+  gateways:
+  - machine-native-ops-gateway
+  http:
+  - match:
+    - uri:
+        prefix: "/api/v1/"
+    route:
+    - destination:
+        host: machine-native-ops.production.svc.cluster.local
+        port:
+          number: 8000
+        subset: v1
+      weight: 100
+    timeout: 30s
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+      retryOn: 5xx,connect-failure,refused-stream
+    fault:
+      delay:
+        percentage:
+          value: 0
+        fixedDelay: 0s
+      abort:
+        percentage:
+          value: 0
+        httpStatus: 503
+  
+  - match:
+    - uri:
+        prefix: "/health"
+    route:
+    - destination:
+        host: machine-native-ops.production.svc.cluster.local
+        port:
+          number: 8000
+    timeout: 5s
+  
+  - match:
+    - uri:
+        prefix: "/ready"
+    route:
+    - destination:
+        host: machine-native-ops.production.svc.cluster.local
+        port:
+          number: 8000
+    timeout: 5s
+  
+  - match:
+    - uri:
+        prefix: "/metrics"
+    route:
+    - destination:
+        host: machine-native-ops.production.svc.cluster.local
+        port:
+          number: 8000
+    timeout: 10s
+  
+  - match:
+    - uri:
+        prefix: "/"
+    route:
+    - destination:
+        host: machine-native-ops.production.svc.cluster.local
+        port:
+          number: 8000
+        subset: v1
+      weight: 100
+    timeout: 30s
+    retries:
+      attempts: 2
+      perTryTimeout: 15s
+      retryOn: 5xx,connect-failure,refused-stream,gateway-error
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:virtualservice.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/virtualservice.yaml"
+  name: machine-native-ops
+  namespace: production
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: machine-native-ops
+    environment: production
+spec:
+  host: machine-native-ops.production.svc.cluster.local
+  trafficPolicy:
+    loadBalancer:
+      simple: LEAST_CONN
+    connectionPool:
+      tcp:
+        maxConnections: 100
+        connectTimeout: 30s
+        keepAlive:
+          time: 7200s
+          interval: 75s
+      http:
+        http1MaxPendingRequests: 50
+        http2MaxRequests: 100
+        maxRequestsPerConnection: 10
+        maxRetries: 3
+        idleTimeout: 300s
+        h2UpgradePolicy: UPGRADE
+    circuitBreaker:
+      consecutiveErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+      detectFailures:
+        consecutiveErrors: true
+        failures:
+          - 5xx
+          - reset
+          - connect-failure
+          - refused-stream
+          - retriable-4xx
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+  - name: v1
+    labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+      version: v1
+    trafficPolicy:
+      loadBalancer:
+        simple: ROUND_ROBIN

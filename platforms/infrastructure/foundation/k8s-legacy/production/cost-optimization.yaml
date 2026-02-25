@@ -1,0 +1,271 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: cost-optimization
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Cost Optimization Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:cost-optimization.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/cost-optimization.yaml"
+  name: cost-optimization-config
+  namespace: production
+data:
+  cost-optimization-policy.yaml: |
+    # Cost optimization configuration
+    costOptimization:
+      enabled: true
+      
+      # Budget management
+      budgets:
+        enabled: true
+        currency: USD
+        
+        # Monthly budget targets
+        monthly:
+          total:
+            target: 100000  # $100,000/month
+            threshold: 80  # Alert at 80%
+            actionThreshold: 90  # Take action at 90%
+          
+          byService:
+            machine-native-ops:
+              target: 40000
+              threshold: 80
+            infrastructure:
+              target: 30000
+              threshold: 80
+            monitoring:
+              target: 15000
+              threshold: 80
+            backup:
+              target: 10000
+              threshold: 80
+            logging:
+              target: 5000
+              threshold: 80
+          
+          byResource:
+            compute:
+              target: 50000
+              threshold: 75
+            storage:
+              target: 20000
+              threshold: 80
+            network:
+              target: 15000
+              threshold: 85
+            database:
+              target: 15000
+              threshold: 80
+      
+      # Right-sizing recommendations
+      rightSizing:
+        enabled: true
+        interval: 1h
+        cpuThreshold: 30
+        memoryThreshold: 40
+        lookbackPeriod: 7d
+        
+        recommendations:
+          - type: downsize
+            condition: cpu < 30% AND memory < 40%
+            action: reduce-replicas
+            maxReduction: 50%
+          
+          - type: downsize
+            condition: cpu < 30% AND memory < 40%
+            action: reduce-resources
+            maxReduction: 30%
+          
+          - type: rightsize
+            condition: 30% < cpu < 70% AND 40% < memory < 80%
+            action: optimize-resources
+            adjustment: proportional
+      
+      # Instance optimization
+      instanceOptimization:
+        enabled: true
+        strategy: cost-performance
+        
+        # Compute instances
+        compute:
+          current:
+            type: m5.large
+            vcpus: 2
+            memory: 8Gi
+            cost: 0.096  # $0.096/hour
+          recommendations:
+            - type: spot-instance
+              savings: 70
+              risk: medium
+              requirements:
+                - stateless
+                - fault-tolerant
+            - type: reserved-instance
+              savings: 40
+              risk: low
+              commitment: 1y
+        
+        # Storage optimization
+        storage:
+          enabled: true
+          policies:
+            - name: lifecycle-policy
+              rules:
+                - transition: standard-to-ia
+                  days: 30
+                  savings: 50
+                - transition: ia-to-glacier
+                  days: 90
+                  savings: 80
+                - expiration
+                  days: 365
+            
+            - name: compression
+              enabled: true
+              algorithm: gzip
+              savings: 30
+            
+            - name: deduplication
+              enabled: true
+              savings: 25
+            
+            - name: tiered-storage
+              enabled: true
+              tiers:
+                - name: hot
+                  storageClass: gp3
+                  cost: 0.08  # $0.08/GB/month
+                - name: warm
+                  storageClass: standard
+                  cost: 0.025  # $0.025/GB/month
+                - name: cold
+                  storageClass: glacier
+                  cost: 0.004  # $0.004/GB/month
+      
+      # Network cost optimization
+      network:
+        enabled: true
+        
+        # Data transfer optimization
+        dataTransfer:
+          enabled: true
+          policies:
+            - name: compress-data
+              enabled: true
+              savings: 30
+              applyTo:
+                - api-responses
+                - logs
+                - backups
+            
+            - name: cdn-caching
+              enabled: true
+              savings: 40
+              applyTo:
+                - static-assets
+                - api-responses
+                - documentation
+            
+            - name: regional-traffic
+              enabled: true
+              policy: local-preference
+              savings: 20
+        
+        # Inter-region data transfer
+        interRegion:
+          enabled: true
+          optimization:
+            - name: batch-transfers
+              schedule: off-peak
+              savings: 25
+            - name: compression
+              enabled: true
+              savings: 30
+      
+      # Database cost optimization
+      database:
+        enabled: true
+        
+        # PostgreSQL optimization
+        postgresql:
+          enabled: true
+          policies:
+            - name: connection-pooling
+              enabled: true
+              savings: 15
+            
+            - name: read-replicas
+              enabled: true
+              strategy: demand-based
+              minReplicas: 1
+              maxReplicas: 3
+              savings: 20
+            
+            - name: query-optimization
+              enabled: true
+              savings: 25
+              interval: 1d
+            
+            - name: storage-optimization
+              enabled: true
+              policies:
+                - vacuum-regular
+                  savings: 10
+                - archive-old-data
+                  savings: 30
+                  retention: 90d
+        
+        # Redis optimization
+        redis:
+          enabled: true
+          policies:
+            - name: maxmemory-policy
+              policy: allkeys-lru
+              savings: 20
+            
+            - name: key-expiration
+              enabled: true
+              defaultTTL: 3600  # 1 hour
+              savings: 30
+            
+            - name: compression
+              enabled: true
+              savings: 25
+      
+      # Monitoring and alerting
+      monitoring:
+        enabled: true
+        interval: 1h
+        metrics:
+          - total-cost
+          - cost-by-service
+          - cost-by-resource
+          - savings-achieved
+          - optimization-recommendations
+        alerting:
+          - budget-exceeded
+          - high-cost-anomaly
+          - cost-spike
+      
+      # Reporting
+      reporting:
+        enabled: true
+        schedule: weekly
+        formats:
+          - html
+          - pdf
+          - csv
+        recipients:
+          - finance@machine-native-ops.com
+          - ops@machine-native-ops.com
+        content:
+          - cost-summary
+          - savings-achieved
+          - recommendations
+          - trends

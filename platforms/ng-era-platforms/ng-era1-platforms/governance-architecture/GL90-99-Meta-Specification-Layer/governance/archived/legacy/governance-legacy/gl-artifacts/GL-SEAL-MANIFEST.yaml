@@ -1,0 +1,75 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v2
+kind: SealManifest
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:GL-SEAL-MANIFEST.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-SEAL-MANIFEST.yaml"
+  name: gl-seal-manifest
+  version: "1.0.0"
+  created_at: "2025-01-18T00:00:00Z"
+  owner: governance-committee
+  layer: "GL90-99"
+  immutable: true
+spec:
+  # Required fields for GL90-99 compliance
+  specification:
+    name: "GL Seal Manifest"
+    version: "1.0.0"
+    scope: "Seal tracking"
+  governance:
+    authority: "governance-committee"
+    seal_status: "ACTIVE"
+manifest:
+  seal_document: "ECO-SEMANTIC-SEAL.yaml"
+  seal_version: "1.0.0"
+  seal_date: "2025-01-18"
+  seal_authority: "governance-committee"
+  seal_status: "ACTIVE"
+sealed_layers:
+  - layer_id: "GL00-09"
+    name: "Strategic Layer"
+    seal_status: "SEALED"
+  - layer_id: "GL10-29"
+    name: "Operational Layer"
+    seal_status: "SEALED"
+  - layer_id: "GL30-49"
+    name: "Execution Layer"
+    seal_status: "SEALED"
+  - layer_id: "GL50-59"
+    name: "Observability Layer"
+    seal_status: "SEALED"
+  - layer_id: "GL60-80"
+    name: "Advanced/Feedback Layer"
+    seal_status: "SEALED"
+  - layer_id: "GL81-83"
+    name: "Extended Layer"
+    seal_status: "SEALED"
+  - layer_id: "GL90-99"
+    name: "Meta-Specification Layer"
+    seal_status: "SEALED"
+sealed_components:
+  - component: "semantic_boundaries"
+    status: "SEALED"
+  - component: "skills"
+    status: "SEALED"
+  - component: "capabilities"
+    status: "SEALED"
+  - component: "responsibilities"
+    status: "SEALED"
+  - component: "artifacts"
+    status: "SEALED"
+  - component: "governance_rules"
+    status: "SEALED"
+  - component: "layer_dependencies"
+    status: "SEALED"
+  - component: "data_flow_rules"
+    status: "SEALED"
+verification:
+  seal_coverage: "100%"
+  seal_integrity: "VERIFIED"
+  last_verified: "2025-01-18T00:00:00Z"

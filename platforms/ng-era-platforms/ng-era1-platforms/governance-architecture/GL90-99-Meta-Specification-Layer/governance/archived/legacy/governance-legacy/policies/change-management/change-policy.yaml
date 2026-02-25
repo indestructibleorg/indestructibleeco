@@ -1,0 +1,288 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1alpha1
+kind: GovernancePolicy
+metadata:
+  name: change-management-policy
+  description: "变更管理流程与规范"
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    category: "process"
+    domain: "change-management"
+  annotations:
+    version: "v1.0.0"
+    lastReviewed: "2025-12-17"
+
+spec:
+  # 变更分类
+  changeTypes:
+    - type: "标准变更"
+      description: "低风险、预先批准、可自动执行的变更"
+      characteristics:
+        - "经过充分测试和文档化"
+        - "风险低、影响小"
+        - "有明确的回滚方案"
+      examples:
+        - "应用配置更新（非关键参数）"
+        - "定期补丁更新"
+        - "预先批准的基础设施扩容"
+      approval:
+        method: "Auto"
+        requiredApprovers: 0
+        sla: "即时"
+      monitoring:
+        required: true
+        alertThreshold: "medium"
+
+    - type: "常规变更"
+      description: "需要评估和批准的常规变更"
+      characteristics:
+        - "中等风险和影响"
+        - "需要 CAB 或技术负责人审批"
+        - "需要详细的实施和回滚计划"
+      examples:
+        - "应用版本升级"
+        - "数据库 schema 变更"
+        - "网络配置调整"
+      approval:
+        method: "CAB"  # Change Advisory Board
+        requiredApprovers: 2
+        sla: "2 business days"
+      testing:
+        required: true
+        environments: ["dev", "staging"]
+      monitoring:
+        required: true
+        alertThreshold: "high"
+
+    - type: "紧急变更"
+      description: "紧急情况下的快速变更"
+      characteristics:
+        - "用于解决生产事故"
+        - "简化审批流程"
+        - "事后追溯审查"
+      examples:
+        - "生产故障修复"
+        - "安全漏洞紧急补丁"
+        - "性能问题紧急优化"
+      approval:
+        method: "Manager"
+        requiredApprovers: 1
+        sla: "1 hour"
+      postImplementation:
+        reviewRequired: true
+        reviewWithin: "24 hours"
+      monitoring:
+        required: true
+        alertThreshold: "critical"
+
+  # 风险等级定义
+  riskLevels:
+    - level: "低"
+      criteria:
+        - "影响范围小（< 100 用户）"
+        - "有完整的回滚方案"
+        - "在非高峰时段执行"
+        - "在预发布环境充分测试"
+      approvalRequired: "TechLead"
+      testingRequirements:
+        - "单元测试覆盖率 > 80%"
+        - "集成测试通过"
+
+    - level: "中"
+      criteria:
+        - "影响范围中等（100-1000 用户）"
+        - "可能需要短暂停机（< 5 分钟）"
+        - "涉及多个服务"
+      approvalRequired: "CAB"
+      testingRequirements:
+        - "单元测试 + 集成测试"
+        - "预发布环境验证"
+        - "性能测试"
+
+    - level: "高"
+      criteria:
+        - "影响范围大（> 1000 用户）"
+        - "需要停机或服务降级"
+        - "涉及数据迁移"
+        - "架构级别变更"
+      approvalRequired: "CAB + Manager"
+      testingRequirements:
+        - "全面测试（单元、集成、E2E）"
+        - "预发布环境完整验证"
+        - "性能和压力测试"
+        - "灾难恢复演练"
+
+  # 变更窗口
+  changeWindows:
+    production:
+      allowed:
+        - day: "Tuesday"
+          time: "02:00-04:00 UTC"
+          description: "常规维护窗口"
+        - day: "Thursday"
+          time: "02:00-04:00 UTC"
+          description: "常规维护窗口"
+      blackout:
+        - period: "Black Friday Week"
+          dates: "Nov 20-30"
+        - period: "Year End Holiday"
+          dates: "Dec 20 - Jan 5"
+        - period: "Major Sales Events"
+          description: "根据业务日历确定"
+
+    staging:
+      allowed:
+        - day: "Any"
+          time: "08:00-18:00 UTC"
+          description: "工作时间"
+
+    dev:
+      allowed:
+        - day: "Any"
+          time: "Any"
+          description: "无限制"
+
+  # 审批流程
+  approvalProcess:
+    CAB:  # Change Advisory Board
+      description: "变更咨询委员会"
+      members:
+        required:
+          - role: "Change Manager"
+            count: 1
+          - role: "Tech Lead"
+            count: 1
+          - role: "Security Lead"
+            count: 1
+        optional:
+          - role: "Product Manager"
+          - role: "Customer Support Lead"
+      meetingSchedule:
+        frequency: "Weekly"
+        day: "Monday"
+        time: "10:00 UTC"
+      decisionCriteria:
+        - "风险评估合理"
+        - "测试充分"
+        - "回滚方案明确"
+        - "影响评估完整"
+        - "资源准备就绪"
+
+  # 实施要求
+  implementationRequirements:
+    preChecks:
+      - "备份关键数据"
+      - "验证回滚方案可用"
+      - "确认监控和告警正常"
+      - "通知相关团队和利益相关者"
+      - "准备沟通模板"
+
+    duringImplementation:
+      - "实时监控关键指标"
+      - "保持沟通渠道畅通"
+      - "按步骤执行实施计划"
+      - "记录实施过程"
+
+    postChecks:
+      - "验证变更成功"
+      - "检查服务健康状态"
+      - "验证关键业务流程"
+      - "监控错误率和性能指标"
+      - "更新文档"
+      - "通知变更完成"
+
+  # 回滚标准
+  rollbackCriteria:
+    automatic:
+      - "健康检查连续失败 3 次"
+      - "错误率超过 5%"
+      - "响应时间超过基线 200%"
+      - "可用性低于 99%"
+
+    manual:
+      - "关键业务流程失败"
+      - "数据一致性问题"
+      - "安全漏洞发现"
+      - "预期之外的副作用"
+
+  # 指标和 KPI
+  metrics:
+    - name: "变更成功率"
+      target: "> 95%"
+      calculation: "成功变更数 / 总变更数"
+
+    - name: "平均交付时间"
+      target: "< 3 天"
+      calculation: "从申请到完成的平均时间"
+
+    - name: "紧急变更比例"
+      target: "< 5%"
+      calculation: "紧急变更数 / 总变更数"
+
+    - name: "回滚率"
+      target: "< 2%"
+      calculation: "需要回滚的变更数 / 总变更数"
+
+  # 沟通要求
+  communication:
+    stakeholderNotification:
+      advance: "24 hours"
+      channels:
+        - "Slack (#engineering, #operations)"
+        - "Email (team distribution lists)"
+        - "Status Page (external)"
+      template: "templates/forms/change-notification.template.md"
+
+    statusUpdates:
+      frequency: "Every 30 minutes during implementation"
+      channels:
+        - "Slack (#change-status)"
+
+  # 审计和合规
+  audit:
+    retention: "3 years"
+    logFormat: "JSON"
+    requiredFields:
+      - "changeId"
+      - "requester"
+      - "approver"
+      - "implementationDate"
+      - "outcome"
+      - "rollbackStatus"
+
+  # 培训要求
+  training:
+    requiredFor:
+      - "All engineers"
+      - "Product managers"
+      - "Operations team"
+    frequency: "Annually"
+    certification: "Change Management Certification"
+
+  enforcement:
+    level: "error"
+    violations:
+      penalties:
+        - "First offense: Warning"
+        - "Second offense: Mandatory retraining"
+        - "Third offense: Escalation to management"
+
+  metadata:
+    version: "v1.0.0"
+    owner: "change-management-board"
+    approvers:
+      - "cto@example.com"
+      - "vp-engineering@example.com"
+    reviewDate: "2025-12-17"
+    nextReviewDate: "2026-06-17"
+
+  references:
+    - title: "ITIL Change Management"
+      url: "https://www.axelos.com/certifications/itil-service-management"
+    - title: "Google SRE Book - Managing Change"
+      url: "https://sre.google/sre-book/managing-change/"

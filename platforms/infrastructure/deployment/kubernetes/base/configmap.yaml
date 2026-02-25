@@ -1,0 +1,53 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: configmap
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:deployment:kubernetes:base:configmap.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/deployment/kubernetes/base/configmap.yaml"
+  name: machine-native-ops-config
+  namespace: platform-03
+data:
+  LOG_LEVEL: "INFO"
+  ENVIRONMENT: "production"
+  METRICS_ENABLED: "true"
+  TRACING_ENABLED: "true"
+  DEBUG_MODE: "false"
+  MAX_WORKERS: "4"
+  TIMEOUT_SECONDS: "30"
+  RETRY_COUNT: "3"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:deployment:kubernetes:base:configmap.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/deployment/kubernetes/base/configmap.yaml"
+  name: monitoring-config
+  namespace: platform-03
+data:
+  prometheus-retention: "15d"
+  scrape-interval: "15s"
+  evaluation-interval: "15s"
+  alertmanager-enabled: "true"
+  grafana-replicas: "2"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:deployment:kubernetes:base:configmap.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/deployment/kubernetes/base/configmap.yaml"
+  name: secrets-config
+  namespace: platform-03
+data:
+  encryption-enabled: "true"
+  rotation-interval: "30d"
+  auto-rotation: "true"
+  backup-enabled: "true"

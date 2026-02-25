@@ -1,0 +1,29 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLDimensionTemplate
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:dimension-template.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/dimension-template.yaml"
+  name: gl-dimension-template
+  version: "1.0.0"
+spec:
+  dimension_id: "00-dimension-name"  # Replace with actual dimension ID
+  layer: "GL00-00"                   # Replace with parent layer
+  name: "Dimension Name"              # Replace with actual name
+  description: "Dimension description"  # Replace with actual description
+  artifacts:
+    schemas: []      # List schema files
+    configs: []      # List config files
+    scripts: []      # List script files
+    docs: []         # List documentation files
+  functions:
+    - "function_name"  # List exposed functions
+  validation:
+    layer_alignment: true
+    no_conflicts: true
+    semantic_coherence: true

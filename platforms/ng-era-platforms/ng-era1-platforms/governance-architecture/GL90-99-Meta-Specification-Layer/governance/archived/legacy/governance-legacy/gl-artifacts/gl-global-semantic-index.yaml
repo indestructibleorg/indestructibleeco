@@ -1,0 +1,1562 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLGlobalSemanticIndex
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-global-semantic-index.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-global-semantic-index.yaml"
+  name: gl-global-semantic-index
+  version: "1.0.0"
+  status: SEALED
+  created_at: "2025-01-19T00:00:00Z"
+  sealed_at: "2025-01-19T00:00:00Z"
+  owner: governance-committee
+index_seal:
+  status: SEALED
+  immutable: true
+  cross_layer_prohibited: true
+  mix_layer_prohibited: true
+  skip_layer_prohibited: true
+  expansion_prohibited: true
+  rewrite_prohibited: true
+  drift_prohibited: true
+index_scope:
+  coverage:
+    - "GL00-99 全層級語意定義"
+    - "GL 層級語意邊界"
+    - "GL 層級責任"
+    - "GL 層級技能"
+    - "GL 層級能力"
+    - "GL 層級 Artifacts 產物模型"
+    - "GL 層級依賴關係 (DAG)"
+    - "GL 任務生命週期"
+    - "GL 治理閉環"
+    - "GL → Filesystem 映射"
+    - "GL 語意封存"
+    - "GL 全域治理框架"
+  total_layers: 7
+  total_directories: 38
+  total_artifacts: 45
+  total_skills: 39
+  total_capabilities: 34
+  total_responsibilities: 36
+GL00-09:
+  index_node_id: "INDEX-GL00-09"
+  layer_id: "GL00-09"
+  name: "Strategic Layer"
+  name_zh: "戰略層"
+  range: "00-09"
+  status: SEALED
+  # 語意定義 (Semantic Definition)
+  semantic_definition:
+    core_purpose: "組織願景、方向、原則、風險與治理根基"
+    scope_includes:
+      - "願景與使命定義"
+      - "戰略方向制定"
+      - "治理原則建立"
+      - "風險管理策略"
+      - "合規治理框架"
+      - "安全策略制定"
+      - "架構決策"
+      - "變更管理策略"
+      - "績效管理框架"
+    scope_excludes:
+      - "日常運營細節"
+      - "具體技術執行"
+      - "即時操作決策"
+      - "模板與腳本實現"
+      - "監控配置細節"
+      - "外部系統整合"
+    boundary_keywords:
+      - "vision"
+      - "mission"
+      - "strategy"
+      - "charter"
+      - "architecture"
+      - "risk"
+      - "compliance"
+      - "security"
+      - "governance"
+      - "principle"
+  # 邊界 (Boundaries)
+  boundaries:
+    semantic_scope: "組織長期方向與核心價值"
+    layer_constraint: "GL00-09 ONLY"
+    prohibited_content:
+      - "運營細節"
+      - "技術實現"
+      - "監控配置"
+    cross_layer_prohibited: true
+    mix_layer_prohibited: true
+    skip_layer_prohibited: true
+  # 責任 (Responsibilities)
+  responsibilities:
+    - responsibility_id: "RESP-00-01"
+      name: "vision_mission_ownership"
+      name_zh: "願景使命所有權"
+      description: "制定與維護組織願景、使命、價值觀"
+      accountability: "governance-committee"
+    - responsibility_id: "RESP-00-02"
+      name: "governance_charter_ownership"
+      name_zh: "治理框架所有權"
+      description: "設計與審核治理框架、戰略目標（OKR）、政策總則"
+      accountability: "governance-committee"
+    - responsibility_id: "RESP-00-03"
+      name: "resource_allocation_decision"
+      name_zh: "資源分配決策"
+      description: "決定資源分配與重大投資方向"
+      accountability: "executive-board"
+    - responsibility_id: "RESP-00-04"
+      name: "governance_committee_establishment"
+      name_zh: "治理委員會設立"
+      description: "設立高階治理委員會（如董事會、戰略委員會）"
+      accountability: "executive-board"
+    - responsibility_id: "RESP-00-05"
+      name: "downstream_governance_oversight"
+      name_zh: "下層治理監督"
+      description: "監督下層治理執行情況，確保戰略落地"
+      accountability: "governance-committee"
+    - responsibility_id: "RESP-00-06"
+      name: "risk_strategy_approval"
+      name_zh: "風險策略審批"
+      description: "審查與批准重大風險管理策略"
+      accountability: "risk-committee"
+  # 技能 (Skills)
+  skills:
+    - skill_id: "SK-00-01"
+      name: "strategic_thinking"
+      name_zh: "戰略思維"
+      level: "expert"
+    - skill_id: "SK-00-02"
+      name: "vision_formulation"
+      name_zh: "願景制定"
+      level: "expert"
+    - skill_id: "SK-00-03"
+      name: "risk_assessment"
+      name_zh: "風險評估"
+      level: "expert"
+    - skill_id: "SK-00-04"
+      name: "compliance_management"
+      name_zh: "合規管理"
+      level: "expert"
+    - skill_id: "SK-00-05"
+      name: "architecture_design"
+      name_zh: "架構設計"
+      level: "expert"
+    - skill_id: "SK-00-06"
+      name: "stakeholder_engagement"
+      name_zh: "利害關係人管理"
+      level: "advanced"
+  # 能力 (Capabilities)
+  capabilities:
+    - capability_id: "CAP-00-01"
+      name: "define_organizational_vision"
+      name_zh: "定義組織願景"
+    - capability_id: "CAP-00-02"
+      name: "establish_governance_charter"
+      name_zh: "建立治理框架"
+    - capability_id: "CAP-00-03"
+      name: "approve_strategic_decisions"
+      name_zh: "審批戰略決策"
+    - capability_id: "CAP-00-04"
+      name: "manage_enterprise_risk"
+      name_zh: "管理企業風險"
+    - capability_id: "CAP-00-05"
+      name: "ensure_regulatory_compliance"
+      name_zh: "確保法規合規"
+  # 產物類型 (Artifact Types)
+  artifact_types:
+    - type: "vision-statement"
+      type_zh: "願景聲明"
+      format: ["yaml", "markdown"]
+    - type: "governance-charter"
+      type_zh: "治理框架"
+      format: ["yaml"]
+    - type: "strategic-objectives"
+      type_zh: "戰略目標"
+      format: ["yaml"]
+    - type: "architecture-decision-record"
+      type_zh: "架構決策記錄"
+      format: ["yaml", "markdown"]
+    - type: "risk-assessment"
+      type_zh: "風險評估"
+      format: ["yaml"]
+    - type: "compliance-policy"
+      type_zh: "合規政策"
+      format: ["yaml"]
+    - type: "security-policy"
+      type_zh: "安全政策"
+      format: ["yaml"]
+  # 上游依賴 (Upstream Dependencies)
+  upstream_dependencies: []
+  # 下游使用者 (Downstream Consumers)
+  downstream_consumers:
+    - layer: "GL10-29"
+      relationship: "strategic_guidance"
+      description: "提供戰略指導"
+    - layer: "GL30-49"
+      relationship: "strategic_direction"
+      description: "提供戰略方向"
+  # 接收來源 (Receives From)
+  receives_from:
+    - layer: "GL50-59"
+      type: "validation_feedback"
+      description: "接收驗證反饋"
+    - layer: "GL90-99"
+      type: "meta_governance"
+      description: "接收元規範治理"
+  # Filesystem 映射 (Filesystem Mapping)
+  filesystem_mapping:
+    root_path: "workspace/layers/GL00-09-strategic"
+    directories:
+      - path: "00-vision-strategy"
+        purpose: "組織願景、使命與戰略方向"
+        artifact_types: ["vision-statement", "strategic-objectives"]
+      - path: "01-architecture"
+        purpose: "架構決策與設計原則"
+        artifact_types: ["architecture-decision-record"]
+      - path: "02-governance"
+        purpose: "治理框架與決策權限"
+        artifact_types: ["governance-charter"]
+      - path: "03-risk"
+        purpose: "企業風險識別與管理"
+        artifact_types: ["risk-assessment"]
+      - path: "04-compliance"
+        purpose: "法規合規與政策要求"
+        artifact_types: ["compliance-policy"]
+      - path: "05-security"
+        purpose: "安全策略與標準"
+        artifact_types: ["security-policy"]
+    total_directories: 6
+GL10-29:
+  index_node_id: "INDEX-GL10-29"
+  layer_id: "GL10-29"
+  name: "Operational Layer"
+  name_zh: "運營層"
+  range: "10-29"
+  status: SEALED
+  # 語意定義 (Semantic Definition)
+  semantic_definition:
+    core_purpose: "政策、流程、標準、工具與品質管理"
+    scope_includes:
+      - "政策制定與落地"
+      - "流程設計與優化"
+      - "標準建立與維護"
+      - "工具選型與配置"
+      - "品質管理體系"
+      - "能力發展規劃"
+      - "資源調度管理"
+      - "團隊協作規範"
+    scope_excludes:
+      - "戰略決策"
+      - "具體代碼實現"
+      - "即時監控告警"
+      - "AI 模型優化"
+      - "外部系統整合"
+      - "元規範定義"
+    boundary_keywords:
+      - "policy"
+      - "process"
+      - "standard"
+      - "tool"
+      - "quality"
+      - "capability"
+      - "resource"
+      - "culture"
+      - "metrics"
+      - "improvement"
+  # 邊界 (Boundaries)
+  boundaries:
+    semantic_scope: "運營政策、流程、標準、工具與品質管理"
+    layer_constraint: "GL10-29 ONLY"
+    prohibited_content:
+      - "戰略願景定義"
+      - "具體技術實現"
+      - "監控配置"
+    cross_layer_prohibited: true
+    mix_layer_prohibited: true
+    skip_layer_prohibited: true
+  # 責任 (Responsibilities)
+  responsibilities:
+    - responsibility_id: "RESP-10-01"
+      name: "policy_implementation"
+      name_zh: "政策實施"
+      description: "將戰略層政策轉化為可執行流程"
+      accountability: "operations-team"
+    - responsibility_id: "RESP-10-02"
+      name: "daily_operations_management"
+      name_zh: "日常運營管理"
+      description: "管理日常運營活動"
+      accountability: "operations-manager"
+    - responsibility_id: "RESP-10-03"
+      name: "cross_team_coordination"
+      name_zh: "跨團隊協調"
+      description: "協調跨團隊資源"
+      accountability: "resource-coordinator"
+    - responsibility_id: "RESP-10-04"
+      name: "quality_standard_maintenance"
+      name_zh: "品質標準維護"
+      description: "維護品質標準"
+      accountability: "quality-team"
+    - responsibility_id: "RESP-10-05"
+      name: "capability_cultivation"
+      name_zh: "能力培養"
+      description: "培養組織能力"
+      accountability: "hr-team"
+  # 技能 (Skills)
+  skills:
+    - skill_id: "SK-10-01"
+      name: "policy_development"
+      name_zh: "政策制定"
+      level: "advanced"
+    - skill_id: "SK-10-02"
+      name: "process_optimization"
+      name_zh: "流程優化"
+      level: "advanced"
+    - skill_id: "SK-10-03"
+      name: "resource_management"
+      name_zh: "資源管理"
+      level: "advanced"
+    - skill_id: "SK-10-04"
+      name: "quality_assurance"
+      name_zh: "品質保證"
+      level: "advanced"
+    - skill_id: "SK-10-05"
+      name: "team_coordination"
+      name_zh: "團隊協調"
+      level: "intermediate"
+    - skill_id: "SK-10-06"
+      name: "capability_development"
+      name_zh: "能力發展"
+      level: "advanced"
+  # 能力 (Capabilities)
+  capabilities:
+    - capability_id: "CAP-10-01"
+      name: "implement_governance_policies"
+      name_zh: "實施治理政策"
+    - capability_id: "CAP-10-02"
+      name: "manage_operational_processes"
+      name_zh: "管理運營流程"
+    - capability_id: "CAP-10-03"
+      name: "allocate_resources"
+      name_zh: "分配資源"
+    - capability_id: "CAP-10-04"
+      name: "monitor_quality_metrics"
+      name_zh: "監控品質指標"
+    - capability_id: "CAP-10-05"
+      name: "develop_team_capabilities"
+      name_zh: "發展團隊能力"
+  # 產物類型 (Artifact Types)
+  artifact_types:
+    - type: "policy-document"
+      type_zh: "政策文件"
+      format: ["yaml", "markdown"]
+    - type: "process-definition"
+      type_zh: "流程定義"
+      format: ["yaml"]
+    - type: "operational-plan"
+      type_zh: "運營計劃"
+      format: ["yaml"]
+    - type: "resource-allocation"
+      type_zh: "資源分配"
+      format: ["yaml"]
+    - type: "capability-matrix"
+      type_zh: "能力矩陣"
+      format: ["yaml"]
+    - type: "quality-standard"
+      type_zh: "品質標準"
+      format: ["yaml"]
+    - type: "tool-configuration"
+      type_zh: "工具配置"
+      format: ["yaml"]
+  # 上游依賴 (Upstream Dependencies)
+  upstream_dependencies:
+    - layer: "GL00-09"
+      relationship: "strategic_guidance"
+      description: "接收戰略指導"
+  # 下游使用者 (Downstream Consumers)
+  downstream_consumers:
+    - layer: "GL30-49"
+      relationship: "operational_direction"
+      description: "提供運營指導"
+  # 接收來源 (Receives From)
+  receives_from:
+    - layer: "GL00-09"
+      type: "strategic_guidance"
+      description: "接收戰略指導"
+    - layer: "GL60-80"
+      type: "optimization_feedback"
+      description: "接收優化反饋"
+    - layer: "GL81-83"
+      type: "integration_feedback"
+      description: "接收整合反饋"
+    - layer: "GL90-99"
+      type: "meta_governance"
+      description: "接收元規範治理"
+  # Filesystem 映射 (Filesystem Mapping)
+  filesystem_mapping:
+    root_path: "workspace/layers/GL10-29-operational"
+    directories:
+      - path: "10-policy"
+        purpose: "運營政策與行為準則"
+        artifact_types: ["policy-document"]
+      - path: "11-process"
+        purpose: "運營流程設計與優化"
+        artifact_types: ["process-definition"]
+      - path: "12-planning"
+        purpose: "運營計劃與時間表"
+        artifact_types: ["operational-plan"]
+      - path: "13-resources"
+        purpose: "資源分配與協調"
+        artifact_types: ["resource-allocation"]
+      - path: "14-capability"
+        purpose: "團隊能力與技能要求"
+        artifact_types: ["capability-matrix"]
+      - path: "15-quality"
+        purpose: "品質標準與驗收標準"
+        artifact_types: ["quality-standard"]
+      - path: "16-tools"
+        purpose: "工具選型與配置標準"
+        artifact_types: ["tool-configuration"]
+    total_directories: 7
+GL30-49:
+  index_node_id: "INDEX-GL30-49"
+  layer_id: "GL30-49"
+  name: "Execution Layer"
+  name_zh: "執行層"
+  range: "30-49"
+  status: SEALED
+  # 語意定義 (Semantic Definition)
+  semantic_definition:
+    core_purpose: "模板、契約、schema、自動化產物"
+    scope_includes:
+      - "模板設計與維護"
+      - "行為契約定義"
+      - "Schema 規格制定"
+      - "自動化腳本開發"
+      - "配置檔案管理"
+      - "代理執行邏輯"
+      - "規則引擎配置"
+    scope_excludes:
+      - "戰略決策"
+      - "政策制定"
+      - "即時監控"
+      - "AI 優化"
+      - "外部整合"
+      - "元規範定義"
+    boundary_keywords:
+      - "template"
+      - "contract"
+      - "schema"
+      - "automation"
+      - "config"
+      - "script"
+      - "agent"
+      - "rule"
+      - "module"
+  # 邊界 (Boundaries)
+  boundaries:
+    semantic_scope: "模板、契約、schema、自動化產物"
+    layer_constraint: "GL30-49 ONLY"
+    prohibited_content:
+      - "戰略定義"
+      - "政策制定"
+      - "監控配置"
+    cross_layer_prohibited: true
+    mix_layer_prohibited: true
+    skip_layer_prohibited: true
+  # 責任 (Responsibilities)
+  responsibilities:
+    - responsibility_id: "RESP-30-01"
+      name: "template_creation"
+      name_zh: "模板創建"
+      description: "創建可重用模板"
+      accountability: "dev-team"
+    - responsibility_id: "RESP-30-02"
+      name: "schema_management"
+      name_zh: "Schema 管理"
+      description: "定義數據結構與驗證規則"
+      accountability: "dev-team"
+    - responsibility_id: "RESP-30-03"
+      name: "automation_implementation"
+      name_zh: "自動化實現"
+      description: "實現自動化流程"
+      accountability: "devops-team"
+    - responsibility_id: "RESP-30-04"
+      name: "configuration_control"
+      name_zh: "配置控制"
+      description: "管理系統配置"
+      accountability: "devops-team"
+    - responsibility_id: "RESP-30-05"
+      name: "contract_enforcement"
+      name_zh: "契約執行"
+      description: "規範行為契約"
+      accountability: "dev-team"
+  # 技能 (Skills)
+  skills:
+    - skill_id: "SK-30-01"
+      name: "template_design"
+      name_zh: "模板設計"
+      level: "intermediate"
+    - skill_id: "SK-30-02"
+      name: "schema_definition"
+      name_zh: "Schema 定義"
+      level: "intermediate"
+    - skill_id: "SK-30-03"
+      name: "automation_scripting"
+      name_zh: "自動化腳本"
+      level: "intermediate"
+    - skill_id: "SK-30-04"
+      name: "configuration_management"
+      name_zh: "配置管理"
+      level: "intermediate"
+    - skill_id: "SK-30-05"
+      name: "contract_specification"
+      name_zh: "契約規範"
+      level: "intermediate"
+    - skill_id: "SK-30-06"
+      name: "rule_engine_design"
+      name_zh: "規則引擎設計"
+      level: "advanced"
+  # 能力 (Capabilities)
+  capabilities:
+    - capability_id: "CAP-30-01"
+      name: "create_execution_templates"
+      name_zh: "創建執行模板"
+    - capability_id: "CAP-30-02"
+      name: "define_data_schemas"
+      name_zh: "定義數據 Schema"
+    - capability_id: "CAP-30-03"
+      name: "implement_automation"
+      name_zh: "實現自動化"
+    - capability_id: "CAP-30-04"
+      name: "manage_configurations"
+      name_zh: "管理配置"
+    - capability_id: "CAP-30-05"
+      name: "specify_behavior_contracts"
+      name_zh: "規範行為契約"
+  # 產物類型 (Artifact Types)
+  artifact_types:
+    - type: "template-file"
+      type_zh: "模板文件"
+      format: ["yaml", "json", "markdown"]
+    - type: "schema-definition"
+      type_zh: "Schema 定義"
+      format: ["yaml", "json"]
+    - type: "automation-script"
+      type_zh: "自動化腳本"
+      format: ["yaml", "sh", "py"]
+    - type: "config-file"
+      type_zh: "配置文件"
+      format: ["yaml", "json"]
+    - type: "behavior-contract"
+      type_zh: "行為契約"
+      format: ["yaml"]
+    - type: "rule-definition"
+      type_zh: "規則定義"
+      format: ["yaml"]
+  # 上游依賴 (Upstream Dependencies)
+  upstream_dependencies:
+    - layer: "GL10-29"
+      relationship: "operational_direction"
+      description: "接收運營指導"
+  # 下游使用者 (Downstream Consumers)
+  downstream_consumers:
+    - layer: "GL50-59"
+      relationship: "execution_output"
+      description: "提供執行輸出"
+  # 接收來源 (Receives From)
+  receives_from:
+    - layer: "GL00-09"
+      type: "strategic_direction"
+      description: "接收戰略方向"
+    - layer: "GL10-29"
+      type: "operational_direction"
+      description: "接收運營指導"
+    - layer: "GL90-99"
+      type: "meta_governance"
+      description: "接收元規範治理"
+  # Filesystem 映射 (Filesystem Mapping)
+  filesystem_mapping:
+    root_path: "workspace/layers/GL30-49-execution"
+    directories:
+      - path: "27-templates"
+        purpose: "可重用模板文件"
+        artifact_types: ["template-file"]
+      - path: "31-schemas"
+        purpose: "數據結構與驗證規則"
+        artifact_types: ["schema-definition"]
+      - path: "32-rules"
+        purpose: "規則引擎規則定義"
+        artifact_types: ["rule-definition"]
+      - path: "34-config"
+        purpose: "系統配置文件"
+        artifact_types: ["config-file"]
+      - path: "37-behavior-contracts"
+        purpose: "行為契約規範"
+        artifact_types: ["behavior-contract"]
+      - path: "39-automation"
+        purpose: "自動化腳本與流程"
+        artifact_types: ["automation-script"]
+    total_directories: 6
+GL50-59:
+  index_node_id: "INDEX-GL50-59"
+  layer_id: "GL50-59"
+  name: "Observability Layer"
+  name_zh: "觀測層"
+  range: "50-59"
+  status: SEALED
+  # 語意定義 (Semantic Definition)
+  semantic_definition:
+    core_purpose: "監控、指標、洞察與可觀測性"
+    scope_includes:
+      - "監控系統配置"
+      - "指標定義與收集"
+      - "告警規則設定"
+      - "日誌收集與分析"
+      - "分散式追蹤"
+      - "儀表板設計"
+      - "洞察報告生成"
+    scope_excludes:
+      - "戰略決策"
+      - "政策制定"
+      - "執行實現"
+      - "AI 優化"
+      - "外部整合"
+      - "元規範定義"
+    boundary_keywords:
+      - "monitoring"
+      - "metrics"
+      - "alerting"
+      - "logging"
+      - "tracing"
+      - "dashboard"
+      - "insight"
+      - "observability"
+  # 邊界 (Boundaries)
+  boundaries:
+    semantic_scope: "監控、指標、洞察與可觀測性"
+    layer_constraint: "GL50-59 ONLY"
+    prohibited_content:
+      - "戰略監控目標"
+      - "政策定義"
+      - "自動化腳本"
+    cross_layer_prohibited: true
+    mix_layer_prohibited: true
+    skip_layer_prohibited: true
+  # 責任 (Responsibilities)
+  responsibilities:
+    - responsibility_id: "RESP-50-01"
+      name: "monitoring_configuration"
+      name_zh: "監控配置"
+      description: "配置監控系統"
+      accountability: "sre-team"
+    - responsibility_id: "RESP-50-02"
+      name: "metric_management"
+      name_zh: "指標管理"
+      description: "定義關鍵指標"
+      accountability: "sre-team"
+    - responsibility_id: "RESP-50-03"
+      name: "alerting_management"
+      name_zh: "告警管理"
+      description: "設置告警規則"
+      accountability: "sre-team"
+    - responsibility_id: "RESP-50-04"
+      name: "log_management"
+      name_zh: "日誌管理"
+      description: "收集與分析日誌"
+      accountability: "sre-team"
+    - responsibility_id: "RESP-50-05"
+      name: "tracing_management"
+      name_zh: "追蹤管理"
+      description: "追蹤分散式請求"
+      accountability: "sre-team"
+    - responsibility_id: "RESP-50-06"
+      name: "insight_generation"
+      name_zh: "洞察生成"
+      description: "生成洞察報告"
+      accountability: "analytics-team"
+  # 技能 (Skills)
+  skills:
+    - skill_id: "SK-50-01"
+      name: "monitoring_design"
+      name_zh: "監控設計"
+      level: "intermediate"
+    - skill_id: "SK-50-02"
+      name: "metric_definition"
+      name_zh: "指標定義"
+      level: "intermediate"
+    - skill_id: "SK-50-03"
+      name: "alert_configuration"
+      name_zh: "告警配置"
+      level: "intermediate"
+    - skill_id: "SK-50-04"
+      name: "log_analysis"
+      name_zh: "日誌分析"
+      level: "intermediate"
+    - skill_id: "SK-50-05"
+      name: "trace_correlation"
+      name_zh: "追蹤關聯"
+      level: "advanced"
+    - skill_id: "SK-50-06"
+      name: "dashboard_design"
+      name_zh: "儀表板設計"
+      level: "intermediate"
+  # 能力 (Capabilities)
+  capabilities:
+    - capability_id: "CAP-50-01"
+      name: "configure_monitoring_systems"
+      name_zh: "配置監控系統"
+    - capability_id: "CAP-50-02"
+      name: "define_metrics_and_kpis"
+      name_zh: "定義指標與 KPI"
+    - capability_id: "CAP-50-03"
+      name: "setup_alerting_rules"
+      name_zh: "設置告警規則"
+    - capability_id: "CAP-50-04"
+      name: "aggregate_logs"
+      name_zh: "聚合日誌"
+    - capability_id: "CAP-50-05"
+      name: "correlate_traces"
+      name_zh: "關聯追蹤"
+    - capability_id: "CAP-50-06"
+      name: "generate_insights"
+      name_zh: "生成洞察"
+  # 產物類型 (Artifact Types)
+  artifact_types:
+    - type: "monitoring-config"
+      type_zh: "監控配置"
+      format: ["yaml"]
+    - type: "metric-definition"
+      type_zh: "指標定義"
+      format: ["yaml"]
+    - type: "alert-rule"
+      type_zh: "告警規則"
+      format: ["yaml"]
+    - type: "logging-config"
+      type_zh: "日誌配置"
+      format: ["yaml"]
+    - type: "tracing-config"
+      type_zh: "追蹤配置"
+      format: ["yaml"]
+    - type: "dashboard-definition"
+      type_zh: "儀表板定義"
+      format: ["yaml", "json"]
+    - type: "insight-report"
+      type_zh: "洞察報告"
+      format: ["yaml", "markdown"]
+  # 上游依賴 (Upstream Dependencies)
+  upstream_dependencies:
+    - layer: "GL30-49"
+      relationship: "execution_output"
+      description: "接收執行輸出"
+  # 下游使用者 (Downstream Consumers)
+  downstream_consumers:
+    - layer: "GL60-80"
+      relationship: "observability_data"
+      description: "提供觀測數據"
+  # 接收來源 (Receives From)
+  receives_from:
+    - layer: "GL30-49"
+      type: "execution_output"
+      description: "接收執行輸出"
+    - layer: "GL90-99"
+      type: "meta_governance"
+      description: "接收元規範治理"
+  # Filesystem 映射 (Filesystem Mapping)
+  filesystem_mapping:
+    root_path: "workspace/layers/GL50-59-observability"
+    directories:
+      - path: "50-monitoring"
+        purpose: "監控系統配置"
+        artifact_types: ["monitoring-config", "metric-definition"]
+      - path: "51-alerting"
+        purpose: "告警規則配置"
+        artifact_types: ["alert-rule"]
+      - path: "52-logging"
+        purpose: "日誌收集與分析"
+        artifact_types: ["logging-config"]
+      - path: "53-tracing"
+        purpose: "分散式追蹤配置"
+        artifact_types: ["tracing-config"]
+      - path: "54-dashboards"
+        purpose: "儀表板設計與定義"
+        artifact_types: ["dashboard-definition"]
+      - path: "55-insights"
+        purpose: "洞察報告生成"
+        artifact_types: ["insight-report"]
+    total_directories: 6
+GL60-80:
+  index_node_id: "INDEX-GL60-80"
+  layer_id: "GL60-80"
+  name: "Advanced/Feedback Layer"
+  name_zh: "進階/回饋層"
+  range: "60-80"
+  status: SEALED
+  # 語意定義 (Semantic Definition)
+  semantic_definition:
+    core_purpose: "AI、優化、回饋與強化"
+    scope_includes:
+      - "AI 模型配置"
+      - "智能優化規則"
+      - "回饋機制設計"
+      - "審計追蹤"
+      - "創新登錄"
+      - "持續改進"
+      - "A/B 測試"
+    scope_excludes:
+      - "戰略決策"
+      - "政策制定"
+      - "執行實現"
+      - "基礎監控"
+      - "外部整合"
+      - "元規範定義"
+    boundary_keywords:
+      - "ai"
+      - "ml"
+      - "optimization"
+      - "feedback"
+      - "audit"
+      - "innovation"
+      - "improvement"
+      - "analysis"
+  # 邊界 (Boundaries)
+  boundaries:
+    semantic_scope: "AI、優化、回饋與強化"
+    layer_constraint: "GL60-80 ONLY"
+    prohibited_content:
+      - "戰略 AI 策略"
+      - "政策定義"
+      - "基礎監控配置"
+    cross_layer_prohibited: true
+    mix_layer_prohibited: true
+    skip_layer_prohibited: true
+  # 責任 (Responsibilities)
+  responsibilities:
+    - responsibility_id: "RESP-60-01"
+      name: "ai_optimization_implementation"
+      name_zh: "AI 優化實施"
+      description: "實施 AI 驅動優化"
+      accountability: "ai-team"
+    - responsibility_id: "RESP-60-02"
+      name: "feedback_loop_analysis"
+      name_zh: "回饋循環分析"
+      description: "分析回饋循環"
+      accountability: "analytics-team"
+    - responsibility_id: "RESP-60-03"
+      name: "audit_trail_management"
+      name_zh: "審計追蹤管理"
+      description: "管理審計追蹤"
+      accountability: "compliance-team"
+    - responsibility_id: "RESP-60-04"
+      name: "innovation_tracking"
+      name_zh: "創新追蹤"
+      description: "追蹤創新項目"
+      accountability: "innovation-team"
+    - responsibility_id: "RESP-60-05"
+      name: "continuous_improvement_drive"
+      name_zh: "持續改進推動"
+      description: "推動持續改進"
+      accountability: "improvement-team"
+  # 技能 (Skills)
+  skills:
+    - skill_id: "SK-60-01"
+      name: "ai_optimization"
+      name_zh: "AI 優化"
+      level: "expert"
+    - skill_id: "SK-60-02"
+      name: "feedback_analysis"
+      name_zh: "回饋分析"
+      level: "advanced"
+    - skill_id: "SK-60-03"
+      name: "audit_management"
+      name_zh: "審計管理"
+      level: "advanced"
+    - skill_id: "SK-60-04"
+      name: "innovation_tracking"
+      name_zh: "創新追蹤"
+      level: "intermediate"
+    - skill_id: "SK-60-05"
+      name: "continuous_improvement"
+      name_zh: "持續改進"
+      level: "advanced"
+    - skill_id: "SK-60-06"
+      name: "pattern_recognition"
+      name_zh: "模式識別"
+      level: "expert"
+  # 能力 (Capabilities)
+  capabilities:
+    - capability_id: "CAP-60-01"
+      name: "implement_ai_optimization"
+      name_zh: "實施 AI 優化"
+    - capability_id: "CAP-60-02"
+      name: "analyze_feedback_loops"
+      name_zh: "分析回饋循環"
+    - capability_id: "CAP-60-03"
+      name: "manage_audit_trails"
+      name_zh: "管理審計追蹤"
+    - capability_id: "CAP-60-04"
+      name: "track_innovations"
+      name_zh: "追蹤創新"
+    - capability_id: "CAP-60-05"
+      name: "drive_continuous_improvement"
+      name_zh: "推動持續改進"
+  # 產物類型 (Artifact Types)
+  artifact_types:
+    - type: "ai-model-config"
+      type_zh: "AI 模型配置"
+      format: ["yaml"]
+    - type: "optimization-rule"
+      type_zh: "優化規則"
+      format: ["yaml"]
+    - type: "feedback-mechanism"
+      type_zh: "回饋機制"
+      format: ["yaml"]
+    - type: "audit-trail"
+      type_zh: "審計追蹤"
+      format: ["yaml"]
+    - type: "innovation-registry"
+      type_zh: "創新登錄"
+      format: ["yaml"]
+    - type: "improvement-plan"
+      type_zh: "改進計劃"
+      format: ["yaml", "markdown"]
+  # 上游依賴 (Upstream Dependencies)
+  upstream_dependencies:
+    - layer: "GL50-59"
+      relationship: "observability_data"
+      description: "接收觀測數據"
+  # 下游使用者 (Downstream Consumers)
+  downstream_consumers:
+    - layer: "GL81-83"
+      relationship: "feedback_insights"
+      description: "提供回饋洞察"
+  # 接收來源 (Receives From)
+  receives_from:
+    - layer: "GL50-59"
+      type: "observability_data"
+      description: "接收觀測數據"
+    - layer: "GL90-99"
+      type: "meta_governance"
+      description: "接收元規範治理"
+  # Filesystem 映射 (Filesystem Mapping)
+  filesystem_mapping:
+    root_path: "workspace/layers/GL60-80-advanced"
+    directories:
+      - path: "60-ai-optimization"
+        purpose: "AI 模型配置與優化"
+        artifact_types: ["ai-model-config", "optimization-rule"]
+      - path: "62-feedback"
+        purpose: "回饋機制設計"
+        artifact_types: ["feedback-mechanism"]
+      - path: "63-audit"
+        purpose: "審計追蹤管理"
+        artifact_types: ["audit-trail"]
+      - path: "64-innovation"
+        purpose: "創新項目追蹤"
+        artifact_types: ["innovation-registry"]
+      - path: "65-improvement"
+        purpose: "持續改進計劃"
+        artifact_types: ["improvement-plan"]
+    total_directories: 5
+GL81-83:
+  index_node_id: "INDEX-GL81-83"
+  layer_id: "GL81-83"
+  name: "Extended Layer"
+  name_zh: "擴展層"
+  range: "81-83"
+  status: SEALED
+  # 語意定義 (Semantic Definition)
+  semantic_definition:
+    core_purpose: "外部整合、橋接與自動評論"
+    scope_includes:
+      - "外部系統整合"
+      - "利害關係人橋接"
+      - "自動評論生成"
+      - "API 管理"
+      - "跨系統協作"
+      - "通知渠道配置"
+    scope_excludes:
+      - "戰略決策"
+      - "政策制定"
+      - "執行實現"
+      - "基礎監控"
+      - "AI 優化"
+      - "元規範定義"
+    boundary_keywords:
+      - "integration"
+      - "external"
+      - "stakeholder"
+      - "bridge"
+      - "auto-comment"
+      - "api"
+      - "webhook"
+  # 邊界 (Boundaries)
+  boundaries:
+    semantic_scope: "外部整合、橋接與自動評論"
+    layer_constraint: "GL81-83 ONLY"
+    prohibited_content:
+      - "戰略整合策略"
+      - "政策定義"
+      - "基礎監控配置"
+    cross_layer_prohibited: true
+    mix_layer_prohibited: true
+    skip_layer_prohibited: true
+  # 責任 (Responsibilities)
+  responsibilities:
+    - responsibility_id: "RESP-81-01"
+      name: "external_system_integration"
+      name_zh: "外部系統整合"
+      description: "整合外部系統"
+      accountability: "integration-team"
+    - responsibility_id: "RESP-81-02"
+      name: "stakeholder_communication"
+      name_zh: "利害關係人溝通"
+      description: "管理利害關係人溝通"
+      accountability: "communication-team"
+    - responsibility_id: "RESP-81-03"
+      name: "auto_commenting"
+      name_zh: "自動評論"
+      description: "自動化評論與文檔"
+      accountability: "dev-team"
+    - responsibility_id: "RESP-81-04"
+      name: "api_bridging"
+      name_zh: "API 橋接"
+      description: "橋接外部 API"
+      accountability: "integration-team"
+  # 技能 (Skills)
+  skills:
+    - skill_id: "SK-81-01"
+      name: "external_integration"
+      name_zh: "外部整合"
+      level: "advanced"
+    - skill_id: "SK-81-02"
+      name: "stakeholder_management"
+      name_zh: "利害關係人管理"
+      level: "intermediate"
+    - skill_id: "SK-81-03"
+      name: "automated_documentation"
+      name_zh: "自動化文檔"
+      level: "intermediate"
+    - skill_id: "SK-81-04"
+      name: "api_management"
+      name_zh: "API 管理"
+      level: "advanced"
+    - skill_id: "SK-81-05"
+      name: "cross_system_collaboration"
+      name_zh: "跨系統協作"
+      level: "advanced"
+  # 能力 (Capabilities)
+  capabilities:
+    - capability_id: "CAP-81-01"
+      name: "integrate_external_systems"
+      name_zh: "整合外部系統"
+    - capability_id: "CAP-81-02"
+      name: "manage_stakeholder_communication"
+      name_zh: "管理利害關係人溝通"
+    - capability_id: "CAP-81-03"
+      name: "automate_commenting"
+      name_zh: "自動化評論"
+    - capability_id: "CAP-81-04"
+      name: "bridge_external_apis"
+      name_zh: "橋接外部 API"
+  # 產物類型 (Artifact Types)
+  artifact_types:
+    - type: "integration-config"
+      type_zh: "整合配置"
+      format: ["yaml"]
+    - type: "auto-comment-rule"
+      type_zh: "自動評論規則"
+      format: ["yaml"]
+    - type: "stakeholder-bridge"
+      type_zh: "利害關係人橋接"
+      format: ["yaml"]
+    - type: "external-integration-config"
+      type_zh: "外部整合配置"
+      format: ["yaml"]
+    - type: "webhook-config"
+      type_zh: "Webhook 配置"
+      format: ["yaml"]
+    - type: "notification-channel"
+      type_zh: "通知渠道"
+      format: ["yaml"]
+  # 上游依賴 (Upstream Dependencies)
+  upstream_dependencies:
+    - layer: "GL60-80"
+      relationship: "feedback_insights"
+      description: "接收回饋洞察"
+  # 下游使用者 (Downstream Consumers)
+  downstream_consumers:
+    - layer: "GL90-99"
+      relationship: "integration_data"
+      description: "提供整合數據"
+  # 接收來源 (Receives From)
+  receives_from:
+    - layer: "GL60-80"
+      type: "feedback_insights"
+      description: "接收回饋洞察"
+    - layer: "GL90-99"
+      type: "meta_governance"
+      description: "接收元規範治理"
+  # Filesystem 映射 (Filesystem Mapping)
+  filesystem_mapping:
+    root_path: "workspace/layers/GL81-83-extended"
+    directories:
+      - path: "81-integration"
+        purpose: "外部系統整合配置"
+        artifact_types: ["integration-config", "external-integration-config", "webhook-config"]
+      - path: "82-auto-comment"
+        purpose: "自動評論與文檔生成"
+        artifact_types: ["auto-comment-rule"]
+      - path: "83-notification"
+        purpose: "通知渠道與利害關係人橋接"
+        artifact_types: ["notification-channel", "stakeholder-bridge"]
+    total_directories: 3
+GL90-99:
+  index_node_id: "INDEX-GL90-99"
+  layer_id: "GL90-99"
+  name: "Meta-Specification Layer"
+  name_zh: "元規範層"
+  range: "90-99"
+  status: SEALED
+  # 語意定義 (Semantic Definition)
+  semantic_definition:
+    core_purpose: "命名、語意規範與治理規則"
+    scope_includes:
+      - "命名規範定義"
+      - "語意標準建立"
+      - "治理規則制定"
+      - "元數據管理"
+      - "規格版本控制"
+      - "層級定義維護"
+    scope_excludes:
+      - "具體執行"
+      - "日常運營"
+      - "監控配置"
+      - "AI 優化"
+      - "外部整合"
+    boundary_keywords:
+      - "naming"
+      - "semantic"
+      - "specification"
+      - "meta"
+      - "standard"
+      - "convention"
+      - "governance"
+      - "rule"
+  # 邊界 (Boundaries)
+  boundaries:
+    semantic_scope: "命名、語意規範與治理規則"
+    layer_constraint: "GL90-99 ONLY"
+    prohibited_content:
+      - "具體執行實現"
+      - "運營政策"
+      - "監控配置"
+    cross_layer_prohibited: true
+    mix_layer_prohibited: true
+    skip_layer_prohibited: true
+  # 責任 (Responsibilities)
+  responsibilities:
+    - responsibility_id: "RESP-90-01"
+      name: "naming_convention_ownership"
+      name_zh: "命名規範所有權"
+      description: "定義命名規範"
+      accountability: "governance-committee"
+    - responsibility_id: "RESP-90-02"
+      name: "semantic_standard_ownership"
+      name_zh: "語意標準所有權"
+      description: "建立語意標準"
+      accountability: "governance-committee"
+    - responsibility_id: "RESP-90-03"
+      name: "governance_spec_management"
+      name_zh: "治理規格管理"
+      description: "管理治理規格"
+      accountability: "governance-committee"
+    - responsibility_id: "RESP-90-04"
+      name: "metadata_schema_maintenance"
+      name_zh: "元數據架構維護"
+      description: "維護元數據架構"
+      accountability: "architecture-team"
+    - responsibility_id: "RESP-90-05"
+      name: "cross_layer_governance"
+      name_zh: "跨層級治理"
+      description: "治理所有其他層級"
+      accountability: "governance-committee"
+  # 技能 (Skills)
+  skills:
+    - skill_id: "SK-90-01"
+      name: "specification_design"
+      name_zh: "規範設計"
+      level: "expert"
+    - skill_id: "SK-90-02"
+      name: "naming_convention_management"
+      name_zh: "命名規範管理"
+      level: "expert"
+    - skill_id: "SK-90-03"
+      name: "semantic_definition"
+      name_zh: "語意定義"
+      level: "expert"
+    - skill_id: "SK-90-04"
+      name: "governance_standardization"
+      name_zh: "治理標準化"
+      level: "expert"
+    - skill_id: "SK-90-05"
+      name: "metadata_management"
+      name_zh: "元數據管理"
+      level: "advanced"
+  # 能力 (Capabilities)
+  capabilities:
+    - capability_id: "CAP-90-01"
+      name: "define_naming_conventions"
+      name_zh: "定義命名規範"
+    - capability_id: "CAP-90-02"
+      name: "establish_semantic_standards"
+      name_zh: "建立語意標準"
+    - capability_id: "CAP-90-03"
+      name: "manage_governance_specifications"
+      name_zh: "管理治理規格"
+    - capability_id: "CAP-90-04"
+      name: "maintain_metadata_schemas"
+      name_zh: "維護元數據架構"
+    - capability_id: "CAP-90-05"
+      name: "govern_all_layers"
+      name_zh: "治理所有層級"
+  # 產物類型 (Artifact Types)
+  artifact_types:
+    - type: "naming-convention"
+      type_zh: "命名規範"
+      format: ["yaml"]
+    - type: "semantic-definition"
+      type_zh: "語意定義"
+      format: ["yaml"]
+    - type: "governance-spec"
+      type_zh: "治理規格"
+      format: ["yaml"]
+    - type: "metadata-schema"
+      type_zh: "元數據架構"
+      format: ["yaml", "json"]
+    - type: "governance-standards"
+      type_zh: "治理標準"
+      format: ["yaml"]
+    - type: "layer-definition"
+      type_zh: "層級定義"
+      format: ["yaml"]
+  # 上游依賴 (Upstream Dependencies)
+  upstream_dependencies:
+    - layer: "GL81-83"
+      relationship: "integration_data"
+      description: "接收整合數據"
+  # 下游使用者 (Downstream Consumers)
+  downstream_consumers: []
+  # 提供至 (Provides To)
+  provides_to:
+    - layer: "GL00-09"
+      type: "meta_governance"
+      description: "提供元規範治理"
+    - layer: "GL10-29"
+      type: "meta_governance"
+      description: "提供元規範治理"
+    - layer: "GL30-49"
+      type: "meta_governance"
+      description: "提供元規範治理"
+    - layer: "GL50-59"
+      type: "meta_governance"
+      description: "提供元規範治理"
+    - layer: "GL60-80"
+      type: "meta_governance"
+      description: "提供元規範治理"
+    - layer: "GL81-83"
+      type: "meta_governance"
+      description: "提供元規範治理"
+  # Filesystem 映射 (Filesystem Mapping)
+  filesystem_mapping:
+    root_path: "workspace/layers/GL90-99-meta"
+    directories:
+      - path: "90-naming"
+        purpose: "命名規範定義"
+        artifact_types: ["naming-convention"]
+      - path: "91-semantic"
+        purpose: "語意標準定義"
+        artifact_types: ["semantic-definition"]
+      - path: "92-governance-spec"
+        purpose: "治理規格管理"
+        artifact_types: ["governance-spec", "governance-standards"]
+      - path: "93-metadata"
+        purpose: "元數據架構維護"
+        artifact_types: ["metadata-schema"]
+      - path: "99-layer-definition"
+        purpose: "層級定義與治理"
+        artifact_types: ["layer-definition"]
+    total_directories: 5
+dag_index:
+  dag_id: "ECO-DAG-INDEX"
+  status: SEALED
+  nodes:
+    - node_id: "GL90-99"
+      level: 0
+      type: "meta"
+    - node_id: "GL00-09"
+      level: 1
+      type: "strategic"
+    - node_id: "GL10-29"
+      level: 2
+      type: "operational"
+    - node_id: "GL30-49"
+      level: 3
+      type: "execution"
+    - node_id: "GL50-59"
+      level: 4
+      type: "observability"
+    - node_id: "GL60-80"
+      level: 5
+      type: "feedback"
+    - node_id: "GL81-83"
+      level: 6
+      type: "extended"
+  edges:
+    # Meta Governance Edges
+    - from: "GL90-99"
+      to: "GL00-09"
+      type: "meta_governance"
+    - from: "GL90-99"
+      to: "GL10-29"
+      type: "meta_governance"
+    - from: "GL90-99"
+      to: "GL30-49"
+      type: "meta_governance"
+    - from: "GL90-99"
+      to: "GL50-59"
+      type: "meta_governance"
+    - from: "GL90-99"
+      to: "GL60-80"
+      type: "meta_governance"
+    - from: "GL90-99"
+      to: "GL81-83"
+      type: "meta_governance"
+    # Strategic Guidance Edges
+    - from: "GL00-09"
+      to: "GL10-29"
+      type: "strategic_guidance"
+    - from: "GL00-09"
+      to: "GL30-49"
+      type: "strategic_guidance"
+    # Operational Direction Edges
+    - from: "GL10-29"
+      to: "GL30-49"
+      type: "operational_direction"
+    # Execution Output Edges
+    - from: "GL30-49"
+      to: "GL50-59"
+      type: "execution_output"
+    # Observability Data Edges
+    - from: "GL50-59"
+      to: "GL60-80"
+      type: "observability_data"
+    # Feedback Insights Edges
+    - from: "GL60-80"
+      to: "GL81-83"
+      type: "feedback_insights"
+    # Feedback Loop Edges (dashed)
+    - from: "GL50-59"
+      to: "GL00-09"
+      type: "feedback_loop"
+      style: "dashed"
+    - from: "GL60-80"
+      to: "GL10-29"
+      type: "feedback_loop"
+      style: "dashed"
+    - from: "GL81-83"
+      to: "GL10-29"
+      type: "feedback_loop"
+      style: "dashed"
+  topological_order:
+    - order: 1
+      node: "GL90-99"
+    - order: 2
+      node: "GL00-09"
+    - order: 3
+      node: "GL10-29"
+    - order: 4
+      node: "GL30-49"
+    - order: 5
+      node: "GL50-59"
+    - order: 6
+      node: "GL60-80"
+    - order: 7
+      node: "GL81-83"
+  statistics:
+    total_nodes: 7
+    total_edges: 15
+    acyclic_verified: true
+task_lifecycle_index:
+  lifecycle_id: "ECO-LIFECYCLE-INDEX"
+  status: ACTIVE
+  phases:
+    - phase_id: "LIFECYCLE-PHASE-1"
+      name: "Task Intake"
+      name_zh: "任務接收"
+      gl_layer: "GL00-09"
+    - phase_id: "LIFECYCLE-PHASE-2"
+      name: "GL Layer Classification"
+      name_zh: "任務分層"
+      gl_layer: "GL10-29"
+    - phase_id: "LIFECYCLE-PHASE-3"
+      name: "Layered Decomposition"
+      name_zh: "任務拆解"
+      gl_layer: "GL10-29"
+    - phase_id: "LIFECYCLE-PHASE-4"
+      name: "Layered Execution"
+      name_zh: "任務執行"
+      gl_layer: "GL30-49"
+    - phase_id: "LIFECYCLE-PHASE-5"
+      name: "Validation Layer"
+      name_zh: "任務驗證"
+      gl_layer: "GL50-59"
+    - phase_id: "LIFECYCLE-PHASE-6"
+      name: "Semantic Sealing"
+      name_zh: "語意封存"
+      gl_layer: "GL90-99"
+    - phase_id: "LIFECYCLE-PHASE-7"
+      name: "Feedback Integration"
+      name_zh: "回饋整合"
+      gl_layer: "GL60-80"
+    - phase_id: "LIFECYCLE-PHASE-8"
+      name: "Task Closure"
+      name_zh: "任務閉環"
+      gl_layer: "GL00-09"
+    - phase_id: "LIFECYCLE-PHASE-9"
+      name: "Next-Cycle Continuation"
+      name_zh: "進入下一輪"
+      gl_layer: "GL00-09"
+  total_phases: 9
+governance_loop_index:
+  loop_id: "ECO-GOVERNANCE-LOOP-INDEX"
+  status: ACTIVE
+  phases:
+    - phase: "Task Intake"
+      gl_layer: "GL00-09"
+    - phase: "Layer Classification"
+      gl_layer: "GL10-29"
+    - phase: "Layered Execution"
+      gl_layer: "GL30-49"
+    - phase: "Validation"
+      gl_layer: "GL50-59"
+    - phase: "Semantic Sealing"
+      gl_layer: "GL90-99"
+    - phase: "Feedback Integration"
+      gl_layer: "GL60-80"
+    - phase: "Next-Cycle Continuation"
+      gl_layer: "GL00-09"
+  total_phases: 7
+index_validation:
+  rules:
+    - rule_id: "INDEX-VAL-001"
+      name: "跨層禁止"
+      description: "任何操作不得跨越層級邊界"
+      enforcement: STRICT
+    - rule_id: "INDEX-VAL-002"
+      name: "混層禁止"
+      description: "任何操作不得混合多個層級"
+      enforcement: STRICT
+    - rule_id: "INDEX-VAL-003"
+      name: "跳層禁止"
+      description: "任何操作不得跳過中間層級"
+      enforcement: STRICT
+    - rule_id: "INDEX-VAL-004"
+      name: "語意擴張禁止"
+      description: "不得擴張已封存的語意定義"
+      enforcement: STRICT
+    - rule_id: "INDEX-VAL-005"
+      name: "語意重寫禁止"
+      description: "不得重寫已封存的語意定義"
+      enforcement: STRICT
+    - rule_id: "INDEX-VAL-006"
+      name: "語意漂移禁止"
+      description: "不得產生語意漂移"
+      enforcement: STRICT
+    - rule_id: "INDEX-VAL-007"
+      name: "索引完整性"
+      description: "索引必須包含所有 GL 層級"
+      enforcement: STRICT
+    - rule_id: "INDEX-VAL-008"
+      name: "依賴方向驗證"
+      description: "依賴關係必須符合定義方向"
+      enforcement: STRICT
+index_statistics:
+  total_index_nodes: 7
+  total_layers: 7
+  total_directories: 38
+  total_artifacts: 45
+  total_skills: 39
+  total_capabilities: 34
+  total_responsibilities: 36
+  total_dag_nodes: 7
+  total_dag_edges: 15
+  total_lifecycle_phases: 9
+  total_governance_loop_phases: 7
+  per_layer:
+    GL00-09:
+      directories: 6
+      artifact_types: 7
+      skills: 6
+      capabilities: 5
+      responsibilities: 6
+    GL10-29:
+      directories: 7
+      artifact_types: 7
+      skills: 6
+      capabilities: 5
+      responsibilities: 5
+    GL30-49:
+      directories: 6
+      artifact_types: 6
+      skills: 6
+      capabilities: 5
+      responsibilities: 5
+    GL50-59:
+      directories: 6
+      artifact_types: 7
+      skills: 6
+      capabilities: 6
+      responsibilities: 6
+    GL60-80:
+      directories: 5
+      artifact_types: 6
+      skills: 6
+      capabilities: 5
+      responsibilities: 5
+    GL81-83:
+      directories: 3
+      artifact_types: 6
+      skills: 5
+      capabilities: 4
+      responsibilities: 4
+    GL90-99:
+      directories: 5
+      artifact_types: 6
+      skills: 5
+      capabilities: 5
+      responsibilities: 5
+index_signature:
+  index_id: "ECO-GLOBAL-SEMANTIC-INDEX-001"
+  version: "1.0.0"
+  status: SEALED
+  sealed_at: "2025-01-19T00:00:00Z"
+  integrity_hash: "sha256:gl-global-semantic-index-v1"
+  coverage_verification:
+    semantic_definitions: VERIFIED
+    boundaries: VERIFIED
+    responsibilities: VERIFIED
+    skills: VERIFIED
+    capabilities: VERIFIED
+    artifact_types: VERIFIED
+    dependencies: VERIFIED
+    filesystem_mapping: VERIFIED
+    task_lifecycle: VERIFIED
+    governance_loop: VERIFIED
+    semantic_sealing: VERIFIED
+    constitution: VERIFIED

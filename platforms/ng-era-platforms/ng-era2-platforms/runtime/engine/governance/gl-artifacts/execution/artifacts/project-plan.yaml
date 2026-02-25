@@ -1,0 +1,395 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: project-plan
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# =============================================================================
+# GL30-49 Execution Layer - Project Plan
+# MachineNativeOps Governance Artifact
+# =============================================================================
+apiVersion: governance.machinenativeops.io/v2
+kind: ProjectPlan
+metadata:
+  name: gl-engine-development-project
+  version: "1.0.0"
+  created_at: "2025-01-18T00:00:00Z"
+  updated_at: "2025-01-18T00:00:00Z"
+  owner: engineering-team
+  layer: "GL30-49"
+  tags:
+    - execution
+    - project
+    - development
+  annotations:
+    governance.machinenativeops.io/initiative: "INIT-2025-Q1-003"
+    governance.machinenativeops.io/priority: "P1"
+spec:
+  # Required fields for GL30-49 compliance
+  deliverables:
+    - name: "GL Executor"
+      type: "code"
+    - name: "GL Validator"
+      type: "code"
+    - name: "GL Reporter"
+      type: "code"
+  project:
+    title: "GL執行引擎開發專案"
+    title_en: "GL Execution Engine Development Project"
+    code: "PROJ-2025-001"
+    description: |
+      開發完整的GL執行引擎，包含核心執行器、Artifact驗證器、
+      報告生成器與CLI工具，支援自動化治理流程。
+  timeline:
+    start_date: "2025-01-15"
+    end_date: "2025-04-30"
+    duration_weeks: 15
+    phases:
+      - phase: "Phase 1: 設計與規劃"
+        start: "2025-01-15"
+        end: "2025-01-31"
+        duration_weeks: 2
+        status: "completed"
+        deliverables:
+          - "技術設計文件"
+          - "架構圖"
+          - "API規格"
+      - phase: "Phase 2: 核心開發"
+        start: "2025-02-01"
+        end: "2025-03-15"
+        duration_weeks: 6
+        status: "in_progress"
+        deliverables:
+          - "gl_executor.py"
+          - "gl_validator.py"
+          - "gl_reporter.py"
+      - phase: "Phase 3: 測試與優化"
+        start: "2025-03-16"
+        end: "2025-04-15"
+        duration_weeks: 4
+        status: "planned"
+        deliverables:
+          - "單元測試套件"
+          - "整合測試套件"
+          - "效能測試報告"
+      - phase: "Phase 4: 部署與文件"
+        start: "2025-04-16"
+        end: "2025-04-30"
+        duration_weeks: 2
+        status: "planned"
+        deliverables:
+          - "部署腳本"
+          - "使用者文件"
+          - "API文件"
+  team:
+    project_manager:
+      name: "Project Manager"
+      allocation: "50%"
+    tech_lead:
+      name: "Technical Lead"
+      allocation: "100%"
+    members:
+      - role: "Senior Governance Engineer"
+        count: 2
+        allocation: "100%"
+        responsibilities:
+          - "核心模組開發"
+          - "架構設計"
+          - "程式碼審查"
+      - role: "Governance Engineer"
+        count: 2
+        allocation: "100%"
+        responsibilities:
+          - "功能開發"
+          - "單元測試"
+          - "文件撰寫"
+      - role: "QA Engineer"
+        count: 1
+        allocation: "50%"
+        responsibilities:
+          - "測試計劃"
+          - "測試執行"
+          - "缺陷追蹤"
+      - role: "Technical Writer"
+        count: 1
+        allocation: "25%"
+        responsibilities:
+          - "使用者文件"
+          - "API文件"
+          - "教學指南"
+  work_breakdown:
+    - wbs_id: "1.0"
+      title: "專案管理"
+      tasks:
+        - task_id: "1.1"
+          title: "專案啟動"
+          status: "completed"
+          effort_hours: 8
+        - task_id: "1.2"
+          title: "進度追蹤"
+          status: "in_progress"
+          effort_hours: 40
+        - task_id: "1.3"
+          title: "風險管理"
+          status: "in_progress"
+          effort_hours: 20
+    - wbs_id: "2.0"
+      title: "設計與架構"
+      tasks:
+        - task_id: "2.1"
+          title: "需求分析"
+          status: "completed"
+          effort_hours: 24
+        - task_id: "2.2"
+          title: "架構設計"
+          status: "completed"
+          effort_hours: 40
+        - task_id: "2.3"
+          title: "API設計"
+          status: "completed"
+          effort_hours: 24
+        - task_id: "2.4"
+          title: "資料模型設計"
+          status: "completed"
+          effort_hours: 16
+    - wbs_id: "3.0"
+      title: "核心模組開發"
+      tasks:
+        - task_id: "3.1"
+          title: "GLExecutor開發"
+          status: "completed"
+          effort_hours: 80
+          subtasks:
+            - "基礎架構"
+            - "命令處理"
+            - "Artifact管理"
+            - "層級操作"
+        - task_id: "3.2"
+          title: "GLValidator開發"
+          status: "completed"
+          effort_hours: 60
+          subtasks:
+            - "驗證規則引擎"
+            - "Schema驗證"
+            - "政策合規檢查"
+            - "安全驗證"
+        - task_id: "3.3"
+          title: "GLReporter開發"
+          status: "completed"
+          effort_hours: 60
+          subtasks:
+            - "報告生成引擎"
+            - "多格式輸出"
+            - "儀表板生成"
+            - "趨勢分析"
+        - task_id: "3.4"
+          title: "CLI工具開發"
+          status: "in_progress"
+          effort_hours: 40
+          subtasks:
+            - "命令解析"
+            - "互動模式"
+            - "輸出格式化"
+    - wbs_id: "4.0"
+      title: "CI/CD整合"
+      tasks:
+        - task_id: "4.1"
+          title: "驗證工作流程"
+          status: "completed"
+          effort_hours: 24
+        - task_id: "4.2"
+          title: "生成工作流程"
+          status: "completed"
+          effort_hours: 24
+        - task_id: "4.3"
+          title: "合規工作流程"
+          status: "completed"
+          effort_hours: 24
+    - wbs_id: "5.0"
+      title: "測試"
+      tasks:
+        - task_id: "5.1"
+          title: "單元測試"
+          status: "planned"
+          effort_hours: 60
+        - task_id: "5.2"
+          title: "整合測試"
+          status: "planned"
+          effort_hours: 40
+        - task_id: "5.3"
+          title: "效能測試"
+          status: "planned"
+          effort_hours: 24
+        - task_id: "5.4"
+          title: "安全測試"
+          status: "planned"
+          effort_hours: 16
+    - wbs_id: "6.0"
+      title: "文件與部署"
+      tasks:
+        - task_id: "6.1"
+          title: "使用者文件"
+          status: "planned"
+          effort_hours: 40
+        - task_id: "6.2"
+          title: "API文件"
+          status: "planned"
+          effort_hours: 24
+        - task_id: "6.3"
+          title: "部署腳本"
+          status: "planned"
+          effort_hours: 16
+        - task_id: "6.4"
+          title: "發布準備"
+          status: "planned"
+          effort_hours: 8
+  milestones:
+    - id: "M1"
+      name: "設計完成"
+      date: "2025-01-31"
+      status: "completed"
+      criteria:
+        - "技術設計文件審核通過"
+        - "架構圖完成"
+        - "API規格確認"
+    - id: "M2"
+      name: "核心模組完成"
+      date: "2025-03-15"
+      status: "in_progress"
+      criteria:
+        - "GLExecutor功能完成"
+        - "GLValidator功能完成"
+        - "GLReporter功能完成"
+        - "基礎測試通過"
+    - id: "M3"
+      name: "測試完成"
+      date: "2025-04-15"
+      status: "planned"
+      criteria:
+        - "單元測試覆蓋率>80%"
+        - "整合測試通過"
+        - "效能測試達標"
+        - "安全測試通過"
+    - id: "M4"
+      name: "專案完成"
+      date: "2025-04-30"
+      status: "planned"
+      criteria:
+        - "所有功能完成"
+        - "文件完成"
+        - "部署成功"
+        - "驗收通過"
+  risks:
+    - risk_id: "R1"
+      title: "技術複雜度超出預期"
+      probability: "medium"
+      impact: "high"
+      risk_score: 12
+      status: "active"
+      mitigation:
+        - "採用漸進式開發"
+        - "優先實現核心功能"
+        - "定期技術審查"
+      contingency: "調整範圍或延長時程"
+      owner: "tech_lead"
+    - risk_id: "R2"
+      title: "人員異動"
+      probability: "low"
+      impact: "high"
+      risk_score: 8
+      status: "monitoring"
+      mitigation:
+        - "知識分享與文件化"
+        - "交叉培訓"
+        - "關鍵人員備援"
+      contingency: "緊急招聘或外包"
+      owner: "project_manager"
+    - risk_id: "R3"
+      title: "需求變更"
+      probability: "medium"
+      impact: "medium"
+      risk_score: 9
+      status: "active"
+      mitigation:
+        - "明確需求凍結點"
+        - "變更控制流程"
+        - "預留緩衝時間"
+      contingency: "評估影響並調整計劃"
+      owner: "project_manager"
+    - risk_id: "R4"
+      title: "整合問題"
+      probability: "medium"
+      impact: "medium"
+      risk_score: 9
+      status: "monitoring"
+      mitigation:
+        - "早期整合測試"
+        - "標準化介面"
+        - "持續整合"
+      contingency: "增加整合測試時間"
+      owner: "tech_lead"
+  quality_criteria:
+    code_quality:
+      - metric: "程式碼覆蓋率"
+        target: ">80%"
+      - metric: "靜態分析通過"
+        target: "無高風險問題"
+      - metric: "程式碼審查"
+        target: "100%審查"
+    performance:
+      - metric: "Artifact驗證時間"
+        target: "<1秒/檔案"
+      - metric: "報告生成時間"
+        target: "<5秒"
+      - metric: "記憶體使用"
+        target: "<500MB"
+    documentation:
+      - metric: "API文件覆蓋率"
+        target: "100%"
+      - metric: "使用者指南完整度"
+        target: "100%"
+  dependencies:
+    internal:
+      - dependency: "GL規範文件"
+        status: "resolved"
+        owner: "architecture-team"
+      - dependency: "CI/CD基礎設施"
+        status: "resolved"
+        owner: "platform-team"
+    external:
+      - dependency: "Python 3.11+"
+        status: "resolved"
+      - dependency: "PyYAML庫"
+        status: "resolved"
+  budget:
+    estimated_cost: 150000
+    currency: "USD"
+    breakdown:
+      - category: "人力成本"
+        amount: 130000
+        percentage: 87
+      - category: "工具與授權"
+        amount: 10000
+        percentage: 7
+      - category: "基礎設施"
+        amount: 5000
+        percentage: 3
+      - category: "預備金"
+        amount: 5000
+        percentage: 3
+status:
+  phase: "active"
+  current_phase: "Phase 2: 核心開發"
+  overall_progress: 55
+  schedule_status: "on_track"
+  budget_status: "on_track"
+  approved_by: "engineering-director"
+  approved_at: "2025-01-15T00:00:00Z"
+  last_review: "2025-01-18T00:00:00Z"
+  next_review: "2025-02-01T00:00:00Z"
+  change_history:
+    - version: "1.0.0"
+      date: "2025-01-18"
+      author: "engineering-team"
+      changes: "Initial project plan creation"

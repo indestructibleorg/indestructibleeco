@@ -1,0 +1,123 @@
+# @ECO-governed
+# @ECO-layer: search
+# @ECO-semantic: search-config
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Search Configuration
+# ECO-Layer: GL30-49 (Execution)
+# Closure-Signal: manifest
+
+version: "1.0.0"
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era2-platforms:data-processing:search:workspace:projects:search-system:config:search-config.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era2-platforms/data-processing/search/workspace/projects/search-system/config/search-config.yaml"
+  name: ""
+  description: ""
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned {}
+
+full-text-search:
+  default-fields:
+    - title
+    - description
+    - content
+  
+  search-settings:
+    min-score: 0.5
+    default-page-size: 20
+    max-page-size: 100
+    enable-highlighting: true
+  
+  highlighting:
+    pre-tags: ['<mark>']
+    post-tags: ['</mark>']
+    fragment-size: 150
+    number-of-fragments: 3
+
+faceted-search:
+  facet-fields:
+    - category
+    - tags
+    - author
+    - status
+  
+  facet-settings:
+    max-facets: 10
+    min-doc-count: 1
+
+autocomplete:
+  suggestion-fields:
+    - title
+    - tags
+  
+  settings:
+    max-suggestions: 10
+    min-query-length: 2
+    fuzzy-search: true
+    edit-distance: 2
+
+relevance-tuning:
+  field-weights:
+    title: 2.0
+    description: 1.0
+    content: 0.5
+  
+  boost-functions:
+    - field-value:
+        field: priority
+        factor: 1.5
+        modifier: square
+    
+    - gauss:
+        updated_at:
+          scale: 30d
+          offset: 7d
+          decay: 0.5
+
+analytics:
+  enabled: true
+  analytics-index: search_analytics
+  
+  metrics:
+    - query-logging
+    - click-tracking
+    - search-trends
+    - zero-result-queries
+    - query-performance
+  
+  retention:
+    days: 90
+
+indexing:
+  bulk-indexing:
+    batch-size: 1000
+    max-retries: 3
+    retry-backoff: exponential
+  
+  incremental-updates:
+    enabled: true
+    change-detection-field: updated_at
+    enable-hashing: true
+  
+  optimization:
+    enabled: true
+    schedule: daily
+    force-merge-segments: 1
+
+monitoring:
+  cluster-health:
+    enabled: true
+    check-interval: 60
+  
+  index-health:
+    enabled: true
+    check-interval: 300
+  
+  alert-thresholds:
+    cluster-status: yellow
+    query-latency-ms: 1000
+    error-rate: 0.05

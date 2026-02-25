@@ -1,0 +1,414 @@
+# @GL-governed
+# @GL-layer: GL90-99
+# @GL-semantic: governed-configuration
+# @GL-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# ==============================================================================
+# MachineNativeOps Naming Governance CI/CD Pipeline
+# ==============================================================================
+# Metadata:
+#   version: v1.0.0
+metadata:
+  name: ""
+  description: ""
+  labels: {}
+
+#   description: CI/CD pipeline for naming governance validation and compliance
+#   author: MachineNativeOps DevOps Team
+#   last_updated: 2026-01-23
+#   review_date: 2027-01-23
+# ==============================================================================
+
+name: 命名治理 CI/CD 管道 v1.0.0
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'k8s/**'
+      - 'helm/**'
+      - 'templates/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'k8s/**'
+      - 'helm/**'
+      - 'templates/**'
+  schedule:
+    # 每日 UTC 02:00 執行定期稽核
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      scan_type:
+        description: '掃描類型'
+        required: true
+        type: choice
+        options:
+          - validation
+          - compliance
+          - full
+
+env:
+  PYTHON_VERSION: '3.11'
+  SPEC_VERSION: 'v1.0.0'
+
+jobs:
+  # Job 1: 命名規範驗證
+  naming-validation:
+    name: 命名規範驗證
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: 檢出代碼
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 設置 Python 環境
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: 安裝依賴
+        run: |
+          pip install pyyaml jsonschema
+          chmod +x naming-governance-v1.0.0/scripts/validation/naming_validator.py
+      
+      - name: 執行命名驗證
+        run: |
+          python naming-governance-v1.0.0/scripts/validation/naming_validator.py \
+            --spec naming-governance-v1.0.0/config/machine-spec.yaml \
+            --directory k8s \
+            --pattern "*.yaml" \
+            --format json \
+            --output validation-report.json \
+            --strict
+      
+      - name: 上傳驗證報告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: naming-validation-report
+          path: validation-report.json
+          retention-days: 30
+      
+      - name: 發布驗證結果摘要
+        if: always()
+        run: |
+          if [ -f validation-report.json ]; then
+            echo "## 命名驗證結果" >> $GITHUB_STEP_SUMMARY
+            echo '```json' >> $GITHUB_STEP_SUMMARY
+            cat validation-report.json >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # Job 2: 合規性檢查
+  compliance-check:
+    name: 合規性檢查
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: naming-validation
+    
+    steps:
+      - name: 檢出代碼
+        uses: actions/checkout@v4
+      
+      - name: 設置 Python 環境
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: 安裝依賴
+        run: |
+          pip install pyyaml requests
+          chmod +x naming-governance-v1.0.0/scripts/validation/naming_validator.py
+      
+      - name: 執行合規性檢查
+        run: |
+          python naming-governance-v1.0.0/scripts/validation/naming_validator.py \
+            --spec naming-governance-v1.0.0/config/machine-spec.yaml \
+            --directory helm \
+            --pattern "*.yaml" \
+            --format yaml \
+            --output compliance-report.yaml
+      
+      - name: 生成合規性指標
+        run: |
+          python << 'EOF'
+          import yaml
+          import json
+          
+          try:
+            with open('compliance-report.yaml', 'r') as f:
+              report = yaml.safe_load(f)
+            
+            if report and 'violations' in report:
+              total = len(report['violations'])
+              critical = sum(1 for v in report['violations'] if v['severity'] == 'critical')
+              high = sum(1 for v in report['violations'] if v['severity'] == 'high')
+              
+              compliance_rate = ((total - critical - high) / max(total, 1)) * 100
+              
+              metrics = {
+                "compliance_rate": round(compliance_rate, 2),
+                "total_violations": total,
+                "critical_violations": critical,
+                "high_violations": high,
+                "status": "compliant" if compliance_rate >= 95 else "non-compliant"
+              }
+              
+              with open('compliance-metrics.json', 'w') as f:
+                json.dump(metrics, f, indent=2)
+              
+              print(f"合規率: {metrics['compliance_rate']}%")
+              print(f"狀態: {metrics['status']}")
+              
+              if compliance_rate < 95:
+                exit(1)
+          except Exception as e:
+            print(f"錯誤: {e}")
+            exit(1)
+          EOF
+      
+      - name: 上傳合規性報告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compliance-report
+          path: |
+            compliance-report.yaml
+            compliance-metrics.json
+          retention-days: 30
+
+  # Job 3: 標籤驗證
+  labels-validation:
+    name: 標籤驗證
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: naming-validation
+    
+    steps:
+      - name: 檢出代碼
+        uses: actions/checkout@v4
+      
+      - name: 設置 Python 環境
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: 安裝依賴
+        run: pip install pyyaml kubernetes
+      
+      - name: 驗證必要標籤
+        run: |
+          python << 'EOF'
+          import yaml
+          import sys
+          from pathlib import Path
+          
+          required_labels = [
+            'app.kubernetes.io/name',
+            'app.kubernetes.io/managed-by',
+            'environment',
+            'tenant',
+            'version'
+          ]
+          
+          violations = []
+          
+          for yaml_file in Path('k8s').rglob('*.yaml'):
+            try:
+              with open(yaml_file, 'r') as f:
+                docs = list(yaml.safe_load_all(f))
+              
+              for doc in docs:
+                if not doc or 'metadata' not in doc:
+                  continue
+                
+                metadata = doc['metadata']
+                labels = metadata.get('labels', {})
+                name = metadata.get('name', 'unknown')
+                
+                missing = [label for label in required_labels if label not in labels]
+                if missing:
+                  violations.append({
+                    'file': str(yaml_file),
+                    'resource': name,
+                    'missing_labels': missing
+                  })
+            except Exception as e:
+              print(f"警告: 無法解析 {yaml_file}: {e}")
+          
+          if violations:
+            print("❌ 標籤驗證失敗:")
+            for v in violations:
+              print(f"  {v['file']} - {v['resource']}: 缺少 {', '.join(v['missing_labels'])}")
+            sys.exit(1)
+          else:
+            print("✅ 標籤驗證通過")
+          EOF
+
+  # Job 4: 生成命名報告
+  generate-report:
+    name: 生成治理報告
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [compliance-check, labels-validation]
+    if: always()
+    
+    steps:
+      - name: 檢出代碼
+        uses: actions/checkout@v4
+      
+      - name: 下載所有報告
+        uses: actions/download-artifact@v4
+        with:
+          path: reports
+      
+      - name: 生成綜合報告
+        run: |
+          cat << 'EOF' > governance-report.md
+          # 命名治理報告
+          
+          **生成時間**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          **規範版本**: ${{ env.SPEC_VERSION }}
+          **觸發方式**: ${{ github.event_name }}
+          
+          ## 驗證摘要
+          
+          - 命名驗證: ${{ needs.naming-validation.result }}
+          - 合規性檢查: ${{ needs.compliance-check.result }}
+          - 標籤驗證: ${{ needs.labels-validation.result }}
+          
+          ## 詳細報告
+          
+          請查看下載的報告文件以獲取詳細資訊。
+          EOF
+      
+      - name: 上傳綜合報告
+        uses: actions/upload-artifact@v4
+        with:
+          name: governance-report
+          path: governance-report.md
+          retention-days: 90
+
+  # Job 5: 安全掃描
+  security-scan:
+    name: 安全掃描
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: 檢出代碼
+        uses: actions/checkout@v4
+      
+      - name: 運行 Trivy 掃描
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scan-ref: 'k8s'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      
+      - name: 上傳掃描結果
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # Job 6: 定期稽核 (僅在定時觸發時執行)
+  scheduled-audit:
+    name: 定期稽核
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name == 'schedule'
+    
+    steps:
+      - name: 檢出代碼
+        uses: actions/checkout@v4
+      
+      - name: 設置 Python 環境
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: 安裝依賴
+        run: |
+          pip install pyyaml requests
+          chmod +x naming-governance-v1.0.0/scripts/validation/naming_validator.py
+      
+      - name: 執行完整稽核
+        run: |
+          python naming-governance-v1.0.0/scripts/validation/naming_validator.py \
+            --spec naming-governance-v1.0.0/config/machine-spec.yaml \
+            --directory . \
+            --pattern "*.yaml" \
+            --format json \
+            --output scheduled-audit-report.json
+      
+      - name: 創建稽核 Issue
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = JSON.parse(fs.readFileSync('scheduled-audit-report.json', 'utf8'));
+            
+            const body = `## 定期命名稽核報告
+            
+            **執行時間**: ${new Date().toISOString()}
+            **違規數量**: ${report.summary.total_violations}
+            
+            ### 嚴重程度分布
+            - 🔴 CRITICAL: ${report.summary.critical}
+            - 🟠 HIGH: ${report.summary.high}
+            - 🟡 MEDIUM: ${report.summary.medium}
+            - 🟢 LOW: ${report.summary.low}
+            
+            ### 違規詳情
+            
+            ${report.violations.slice(0, 10).map((v, i) => `
+            ${i + 1}. **${v.resource_name}** (${v.resource_type})
+               - 規則: ${v.rule}
+               - 描述: ${v.description}
+               - 建議: ${v.suggested_fix}
+            `).join('\n')}
+            `;
+            
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `命名稽核報告 - ${new Date().toISOString().split('T')[0]}`,
+              body: body,
+              labels: ['audit', 'naming-governance', 'compliance']
+            });
+
+  # Job 7: 通知
+  notify:
+    name: 發送通知
+    runs-on: ubuntu-latest
+    needs: [generate-report, security-scan]
+    if: always()
+    
+    steps:
+      - name: 發送失敗通知
+        if: |
+          needs.generate-report.result == 'failure' ||
+          needs.security-scan.result == 'failure'
+        run: |
+          echo "❌ CI/CD 管道執行失敗"
+          echo "請檢查日誌以獲取詳細資訊"
+          exit 1
+      
+      - name: 發送成功通知
+        if: |
+          needs.generate-report.result == 'success' &&
+          needs.security-scan.result == 'success'
+        run: |
+          echo "✅ CI/CD 管道執行成功"
+          echo "所有檢查均已通過"

@@ -1,0 +1,117 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: service-entry
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+---
+# Service Entry - External Services
+# Allows external services to be accessed via Istio mesh
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:istio:security:service-entry.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/istio/security/service-entry.yaml"
+  name: external-database
+  namespace: platform-03
+spec:
+  hosts:
+  - external-db.example.com
+  location: MESH_EXTERNAL
+  ports:
+  - number: 5432
+    name: postgres
+    protocol: TCP
+  resolution: DNS
+---
+# Service Entry - External API
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:istio:security:service-entry.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/istio/security/service-entry.yaml"
+  name: external-api
+  namespace: platform-03
+spec:
+  hosts:
+  - api.openai.com
+  - api.anthropic.com
+  - api.cohere.ai
+  location: MESH_EXTERNAL
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  resolution: DNS
+---
+# Service Entry - Redis Cloud
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:istio:security:service-entry.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/istio/security/service-entry.yaml"
+  name: redis-cloud
+  namespace: platform-03
+spec:
+  hosts:
+  - redis-12345.c1.us-east-1-1.ec2.cloud.redislabs.com
+  location: MESH_EXTERNAL
+  ports:
+  - number: 6379
+    name: redis
+    protocol: TCP
+  resolution: DNS
+---
+# Service Entry - Observability Stack
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:istio:security:service-entry.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/istio/security/service-entry.yaml"
+  name: observability-external
+  namespace: platform-03
+spec:
+  hosts:
+  - jaeger.example.com
+  - prometheus.example.com
+  - grafana.example.com
+  location: MESH_EXTERNAL
+  ports:
+  - number: 16686
+    name: jaeger-query
+    protocol: HTTP
+  - number: 9090
+    name: prometheus
+    protocol: HTTP
+  - number: 3000
+    name: grafana
+    protocol: HTTP
+  resolution: DNS
+---
+# Destination Rule for External Services
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:istio:security:service-entry.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/foundation/k8s-legacy/istio/security/service-entry.yaml"
+  name: external-services-dr
+  namespace: platform-03
+spec:
+  host: api.openai.com
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 50
+        connectTimeout: 10s
+      http:
+        http1MaxPendingRequests: 25
+        maxRequestsPerConnection: 2
+        idleTimeout: 120s
+    loadBalancer:
+      simple: ROUND_ROBIN

@@ -1,0 +1,598 @@
+# @ECO-layer: GQS-L0
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# MachineNativeOps Quantum Naming Governance Deployment Manifest
+# Version: v4.0.0-quantum
+# Kubernetes deployment with quantum resource management
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: quantum-governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    name: quantum-governance
+    app.kubernetes.io/part-of: "machine-native-ops"
+    app.kubernetes.io/version: "v4.0.0-quantum"
+
+---
+# Quantum Service Account with RBAC
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: quantum-governance-sa
+  namespace: quantum-governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: "quantum-governance"
+    app.kubernetes.io/component: "service-account"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: quantum-governance-role
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: "quantum-governance"
+    app.kubernetes.io/component: "rbac"
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "configmaps", "secrets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["batch"]
+    resources: ["jobs", "cronjobs"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["monitoring.coreos.com"]
+    resources: ["prometheusrules", "servicemonitors"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: quantum-governance-binding
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: "quantum-governance"
+    app.kubernetes.io/component: "rbac"
+subjects:
+  - kind: ServiceAccount
+    name: quantum-governance-sa
+    namespace: quantum-governance
+roleRef:
+  kind: ClusterRole
+  name: quantum-governance-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Quantum ConfigMap with governance policies
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: quantum-governance-config
+  namespace: quantum-governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: "quantum-governance"
+    app.kubernetes.io/component: "config"
+data:
+  quantum-config.yaml: |
+    quantum:
+      backend: "ibm_quantum_falcon"
+      entanglement_depth: 7
+      coherence_threshold: 0.9999
+      error_correction: "surface_code_v5"
+      measurement_basis: "bell_states"
+      qubits: 256
+      shots: 1024
+    
+    governance:
+      naming_scheme:
+        hierarchy: "env/app/resource/version/quantum-id"
+        separators:
+          primary: "-"
+          secondary: "."
+          tertiary: "_"
+        validation_regex: "^[a-z0-9]+(-[a-z0-9]+)*(\\.[a-z0-9]+)*(\\_[a-z0-9]+)*$"
+      
+      layers:
+        strategic:
+          adoption_phases: ["planning", "pilot", "rollout", "optimization"]
+          decision_matrix:
+            risk_model: "quantum-entropy-v4"
+            approval_gates: ["CAB-Quantum", "AI-Governor-v7", "Security-Council-Quantum"]
+        
+        operational:
+          version_control:
+            semver_quantum: true
+            coherence_checker: "qsvm-validator@0.8.2"
+        
+        technical:
+          automation_pipeline:
+            stages:
+              - "quantum-canonicalization"
+              - "cross-layer-quantum-validation"
+              - "observability-quantum-injection"
+              - "quantum-auto-repair"
+    
+    observability:
+      prometheus:
+        enabled: true
+        port: 9090
+      grafana:
+        enabled: true
+        port: 3000
+      jaeger:
+        enabled: true
+        port: 16686
+
+  naming-policies.yaml: |
+    policies:
+      - name: "quantum-naming-convention"
+        description: "Quantum-enhanced naming convention validation"
+        rules:
+          - name: "pattern-validation"
+            regex: "^[a-z0-9]+(-[a-z0-9]+)*(\\.[a-z0-9]+)*(\\_[a-z0-9]+)*$"
+            description: "Valid naming pattern with quantum support"
+          - name: "length-validation"
+            max_length: 63
+            description: "Maximum length for DNS compatibility"
+          - name: "quantum-coherence"
+            threshold: 0.9999
+            description: "Quantum coherence threshold"
+      
+      - name: "quantum-entanglement-policy"
+        description: "Quantum entanglement validation rules"
+        rules:
+          - name: "entanglement-strength"
+            threshold: 0.95
+            description: "Minimum entanglement strength"
+          - name: "bell-inequality"
+            threshold: 2.0
+            description: "Bell inequality minimum value"
+
+---
+# Quantum Secrets for secure operations
+apiVersion: v1
+kind: Secret
+metadata:
+  name: quantum-governance-secrets
+  namespace: quantum-governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: "quantum-governance"
+    app.kubernetes.io/component: "secrets"
+type: Opaque
+data:
+  quantum-api-token: ""
+  # PLACEHOLDER: Replace with actual secret from vault # base64 encoded
+  quantum-signature-key: ""
+  # PLACEHOLDER: Replace with actual secret from vault # base64 encoded
+  qkd-secret: ""
+  # PLACEHOLDER: Replace with actual secret from vault # base64 encoded
+
+---
+# Quantum Governance Service Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quantum-governance-service
+  namespace: quantum-governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: "quantum-governance"
+    app.kubernetes.io/component: "service"
+    app.kubernetes.io/version: "v4.0.0-quantum"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "quantum-governance"
+      app.kubernetes.io/component: "service"
+  template:
+    metadata:
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        app.kubernetes.io/name: "quantum-governance"
+        app.kubernetes.io/component: "service"
+        app.kubernetes.io/version: "v4.0.0-quantum"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: quantum-governance-sa
+      containers:
+        - name: quantum-governance
+          image: "machinenativeops/quantum-governance:v4.0.0"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 9090
+              name: metrics
+              protocol: TCP
+            - containerPort: 16686
+              name: jaeger
+              protocol: TCP
+          env:
+            - name: QUANTUM_BACKEND
+              value: "ibm_quantum_falcon"
+            - name: COHERENCE_THRESHOLD
+              value: "0.9999"
+            - name: ENTANGLEMENT_DEPTH
+              value: "7"
+            - name: QUANTUM_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: quantum-governance-secrets
+                  key: quantum-api-token
+            - name: QUANTUM_SIGNATURE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: quantum-governance-secrets
+                  key: quantum-signature-key
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/quantum-governance
+              readOnly: true
+            - name: policies-volume
+              mountPath: /etc/policies
+              readOnly: true
+          resources:
+            requests:
+              cpu: "2vQuantum"
+              memory: "4GiQuantum"
+              ephemeral-storage: "10Gi"
+            limits:
+              cpu: "4vQuantum"
+              memory: "8GiQuantum"
+              ephemeral-storage: "20Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+      volumes:
+        - name: config-volume
+          configMap:
+            name: quantum-governance-config
+            items:
+              - key: quantum-config.yaml
+                path: quantum-config.yaml
+        - name: policies-volume
+          configMap:
+            name: quantum-governance-config
+            items:
+              - key: naming-policies.yaml
+                path: naming-policies.yaml
+
+---
+# Quantum Service LoadBalancer
+apiVersion: v1
+kind: Service
+metadata:
+  name: quantum-governance-service
+  namespace: quantum-governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: "quantum-governance"
+    app.kubernetes.io/component: "service"
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 8080
+      name: http
+      protocol: TCP
+    - port: 9090
+      targetPort: 9090
+      name: metrics
+      protocol: TCP
+    - port: 16686
+      targetPort: 16686
+      name: jaeger
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: "quantum-governance"
+    app.kubernetes.io/component: "service"
+
+---
+# Quantum HorizontalPodAutoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: quantum-governance-hpa
+  namespace: quantum-governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: "quantum-governance"
+    app.kubernetes.io/component: "autoscaler"
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: quantum-governance-service
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Pods
+      pods:
+        metric:
+          name: quantum_coherence
+        target:
+          type: AverageValue
+          averageValue: "0.999"
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+        - type: Pods
+          value: 4
+          periodSeconds: 15
+      selectPolicy: Max
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 10
+          periodSeconds: 60
+      selectPolicy: Min
+
+---
+# Prometheus ServiceMonitor for Quantum Metrics
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: quantum-governance-monitor
+  namespace: quantum-governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: "quantum-governance"
+    app.kubernetes.io/component: "monitoring"
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "quantum-governance"
+      app.kubernetes.io/component: "service"
+  endpoints:
+    - port: metrics
+      interval: 15s
+      path: /metrics
+      honorLabels: true
+      metricRelabelings:
+        - sourceLabels: [__name__]
+          regex: 'quantum_(.+)'
+          targetLabel: __name__
+          replacement: 'quantum_$1'
+
+---
+# PrometheusRule for Quantum Alerts
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: quantum-governance-rules
+  namespace: quantum-governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: "quantum-governance"
+    app.kubernetes.io/component: "monitoring"
+    release: prometheus
+spec:
+  groups:
+    - name: quantum-naming-governance
+      rules:
+        - alert: QuantumCoherenceLow
+          expr: quantum_coherence < 0.999
+          for: 2m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: critical
+          annotations:
+            summary: "Quantum coherence below threshold"
+            description: "Quantum coherence {{ $value }} below 0.999"
+        
+        - alert: QuantumEntanglementWeak
+          expr: quantum_entanglement_strength < 0.95
+          for: 3m
+          labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+            severity: warning
+          annotations:
+            summary: "Quantum entanglement weak"
+            description: "Entanglement strength {{ $value }} below 0.95"
+
+---
+# Quantum NetworkPolicy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: quantum-governance-netpol
+  namespace: quantum-governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: "quantum-governance"
+    app.kubernetes.io/component: "network"
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: "quantum-governance"
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 9090
+  egress:
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: "prometheus"
+      ports:
+        - protocol: TCP
+          port: 9090
+
+---
+# Quantum PodDisruptionBudget
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: quantum-governance-pdb
+  namespace: quantum-governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: "quantum-governance"
+    app.kubernetes.io/component: "availability"
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "quantum-governance"
+      app.kubernetes.io/component: "service"
+
+---
+# Quantum Certificate for TLS
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: quantum-governance-tls
+  namespace: quantum-governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: "quantum-governance"
+    app.kubernetes.io/component: "certificate"
+spec:
+  secretName: quantum-governance-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - "gov.quantum.machinenativeops.io"
+  secretTemplate:
+    annotations:
+      kubernetes.io/tls-acme: "true"
+
+---
+# Quantum Ingress with TLS
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: quantum-governance-ingress
+  namespace: quantum-governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: "quantum-governance"
+    app.kubernetes.io/component: "ingress"
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+spec:
+  tls:
+    - hosts:
+        - "gov.quantum.machinenativeops.io"
+      secretName: quantum-governance-tls
+  rules:
+    - host: "gov.quantum.machinenativeops.io"
+      http:
+        paths:
+          - path: /api/v4/validate
+            pathType: Prefix
+            backend:
+              service:
+                name: quantum-governance-service
+                port:
+                  number: 8080
+          - path: /api/v4/repair
+            pathType: Prefix
+            backend:
+              service:
+                name: quantum-governance-service
+                port:
+                  number: 8080
+          - path: /metrics
+            pathType: Prefix
+            backend:
+              service:
+                name: quantum-governance-service
+                port:
+                  number: 9090

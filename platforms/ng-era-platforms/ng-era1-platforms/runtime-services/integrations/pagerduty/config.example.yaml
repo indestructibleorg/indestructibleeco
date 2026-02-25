@@ -1,0 +1,193 @@
+# @ECO-governed
+# @ECO-layer: GL90-95 (Integration Layer)
+# @ECO-semantic: pagerduty-integration-configuration
+# @ECO-charter-version: 5.0.0
+# @ECO-audit-trail: Created for GL Platform v5.0 deployment
+
+apiVersion: integrations.machinenativeops.io/v1
+kind: PagerDutyIntegration
+metadata:
+  name: gl-platform-pagerduty
+  namespace: gl-platform
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    app.kubernetes.io/name: gl-platform
+    app.kubernetes.io/component: pagerduty-integration
+    tier: notifications
+  annotations:
+    governance.machinenativeops.io/charter: "GL Unified Architecture Governance Framework v5.0"
+    governance.machinenativeops.io/layer: "Integration"
+    governance.machinenativeops.io/version: "5.0.0"
+
+spec:
+  enabled: true
+  pagerduty:
+    apiUrl: "https://api.pagerduty.com"
+    integrationKey: "YOUR_PAGERDUTY_INTEGRATION_KEY"
+    routingKey: "YOUR_PAGERDUTY_ROUTING_KEY"
+    serviceName: "GL Platform"
+    serviceId: "PXXXXXX"
+  
+  serviceMapping:
+    - name: "gl-platform-critical"
+      serviceKey: "CRITICAL_SERVICE_KEY"
+      escalationPolicy: "gl-platform-critical-escalation"
+      urgency: "high"
+    
+    - name: "gl-platform-high"
+      serviceKey: "HIGH_SERVICE_KEY"
+      escalationPolicy: "gl-platform-high-escalation"
+      urgency: "high"
+    
+    - name: "gl-platform-medium"
+      serviceKey: "MEDIUM_SERVICE_KEY"
+      escalationPolicy: "gl-platform-standard-escalation"
+      urgency: "low"
+    
+    - name: "gl-platform-low"
+      serviceKey: "LOW_SERVICE_KEY"
+      escalationPolicy: "gl-platform-standard-escalation"
+      urgency: "low"
+  
+  escalationPolicies:
+    - name: "gl-platform-critical-escalation"
+      levels:
+        - level: 1
+          timeoutMinutes: 5
+          targets:
+            - type: "user"
+              id: "USER_ID"
+              name: "Primary SRE"
+        - level: 2
+          timeoutMinutes: 10
+          targets:
+            - type: "user"
+              id: "USER_ID"
+              name: "Secondary SRE"
+        - level: 3
+          timeoutMinutes: 15
+          targets:
+            - type: "schedule"
+              id: "SCHEDULE_ID"
+              name: "On-call SRE Team"
+        - level: 4
+          timeoutMinutes: 30
+          targets:
+            - type: "schedule"
+              id: "SCHEDULE_ID"
+              name: "Engineering Manager On-call"
+    
+    - name: "gl-platform-high-escalation"
+      levels:
+        - level: 1
+          timeoutMinutes: 15
+          targets:
+            - type: "schedule"
+              id: "SCHEDULE_ID"
+              name: "On-call SRE Team"
+        - level: 2
+          timeoutMinutes: 30
+          targets:
+            - type: "schedule"
+              id: "SCHEDULE_ID"
+              name: "Platform Engineering Lead"
+    
+    - name: "gl-platform-standard-escalation"
+      levels:
+        - level: 1
+          timeoutMinutes: 60
+          targets:
+            - type: "schedule"
+              id: "SCHEDULE_ID"
+              name: "Daytime Platform Team"
+  
+  alertDeduplication:
+    enabled: true
+    dedupKeyFormat: "{{ .AlertName }}-{{ .Environment }}-{{ .Resource }}"
+    aggregationWindow: 300
+    maxAlertsPerIncident: 5
+  
+  severityMapping:
+    critical:
+      severity: "critical"
+      urgency: "high"
+      autoAcknowledge: false
+      autoResolve: false
+      notes: "Immediate attention required - system or service is down"
+    
+    high:
+      severity: "error"
+      urgency: "high"
+      autoAcknowledge: false
+      autoResolve: false
+      notes: "Urgent attention required - service degradation or high error rate"
+    
+    medium:
+      severity: "warning"
+      urgency: "low"
+      autoAcknowledge: true
+      acknowledgeTimeout: 900
+      autoResolve: false
+      notes: "Attention required - potential issue detected"
+    
+    low:
+      severity: "info"
+      urgency: "low"
+      autoAcknowledge: true
+      acknowledgeTimeout: 3600
+      autoResolve: true
+      resolveTimeout: 86400
+      notes: "Informational alert - for awareness only"
+  
+  eventPayload:
+    eventAction: "trigger"
+    client: "GL Platform"
+    clientUrl: "https://gl-platform.machinenativeops.io"
+    
+    payload:
+      summary: "{{ .Summary }}"
+      timestamp: "{{ .Timestamp }}"
+      severity: "{{ .Severity }}"
+      source: "{{ .Source }}"
+      component: "{{ .Component }}"
+      group: "{{ .Group }}"
+      class: "{{ .AlertClass }}"
+      
+      customDetails:
+        environment: "{{ .Environment }}"
+        service: "{{ .Service }}"
+        namespace: "{{ .Namespace }}"
+        resource: "{{ .Resource }}"
+        description: "{{ .Description }}"
+        runbook: "{{ .RunbookURL }}"
+        metrics:
+          "{{ range .Metrics }}{{ .Name }}": "{{ .Value }}"
+          {{ end }}"
+        labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+          "{{ range $key, $value := .Labels }}{{ $key }}": "{{ $value }}"
+          {{ end }}"
+  
+  maintenanceWindows:
+    - name: "planned-maintenance"
+      description: "Planned maintenance window"
+      startTime: "2024-01-01T00:00:00Z"
+      endTime: "2024-01-01T04:00:00Z"
+      suppressAlerts: true
+      notifyOnStart: true
+      notifyOnEnd: true
+  
+  rateLimiting:
+    maxEventsPerSecond: 10
+    burstSize: 50
+    backoffStrategy: "exponential"
+  
+  security:
+    enableEventValidation: true
+    validatePayloadSignature: true
+    allowedIPRanges:
+      - "10.0.0.0/8"
+      - "172.16.0.0/12"
+      - "192.168.0.0/16"

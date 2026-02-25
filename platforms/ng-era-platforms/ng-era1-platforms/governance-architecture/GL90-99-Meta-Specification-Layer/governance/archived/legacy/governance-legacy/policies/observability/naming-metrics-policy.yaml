@@ -1,0 +1,219 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+# 命名可观测性指标策略
+# 定义必须收集的命名相关指标和告警规则
+
+apiVersion: governance.machinenativeops.io/v1alpha1
+kind: NamingObservability
+metadata:
+  name: naming-compliance-monitoring
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    category: observability
+    module: naming-governance
+
+spec:
+  # 必须收集的 Prometheus 指标
+  metrics:
+    naming_compliance_good:
+      name: naming_compliance_good
+      type: gauge
+      help: "Number of resources compliant with naming standards"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned ["environment", "resource_type", "namespace", "team"]
+      required: true
+
+    naming_compliance_bad:
+      name: naming_compliance_bad
+      type: gauge
+      help: "Number of resources violating naming standards"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned ["environment", "resource_type", "namespace", "team", "violation_type"]
+      required: true
+
+    naming_compliance_rate:
+      name: naming_compliance_rate
+      type: gauge
+      help: "Naming compliance rate percentage"
+      calculation: "naming_compliance_good / (naming_compliance_good + naming_compliance_bad) * 100"
+      required: true
+
+    naming_violation_total:
+      name: naming_violation_total
+      type: counter
+      help: "Total count of naming violations detected"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned ["severity", "resource_type", "violation_type"]
+      required: true
+
+    naming_remediation_success:
+      name: naming_remediation_success
+      type: counter
+      help: "Successful naming remediations"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned ["remediation_type", "resource_type"]
+      required: false
+
+    naming_remediation_failure:
+      name: naming_remediation_failure
+      type: counter
+      help: "Failed naming remediations"
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned ["remediation_type", "resource_type", "error_type"]
+      required: false
+
+  # 必须配置的告警规则
+  alerts:
+    - name: NamingPolicyViolation
+      expr: 'count(naming_compliance_violation_total{severity="critical"}) by (app, env) > 0'
+      for: 5m
+      severity: critical
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        category: governance
+        app.kubernetes.io/component: naming
+      annotations:
+        summary: "命名规范违反 (critical)"
+        description: |
+          在环境 {{ $labels.env }}, 应用 {{ $labels.app }} 检测到命名规范违反。
+          请于 5 分钟内检查并修正。
+          违规资源: {{ $labels.resource_type }}
+        runbook_url: "https://wiki.example.com/runbooks/naming-violation"
+
+    - name: NamingComplianceRateLow
+      expr: |
+        (
+          sum(naming_compliance_good) /
+          (sum(naming_compliance_good) + sum(naming_compliance_bad))
+        ) * 100 < 95
+      for: 15m
+      severity: warning
+      labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+        category: governance
+        app.kubernetes.io/component: naming
+      annotations:
+        summary: "命名合规率低于阈值"
+        description: |
+          当前命名合规率为 {{ $value | humanizePercentage }}，
+          低于 95% 的目标阈值。
+          请检查并修复不合规资源。
+
+    - name: HighNamingViolationRate
+      expr: |
+        rate(naming_violation_total{severity=~"critical|high"}[1h]) > 10
+      for: 10m
+      severity: warning
+      annotations:
+        summary: "命名违规率异常升高"
+        description: |
+          过去 1 小时内检测到 {{ $value }} 个高严重性命名违规。
+          可能存在批量配置错误或自动化问题。
+
+    - name: RemediationFailureRate
+      expr: |
+        (
+          rate(naming_remediation_failure[1h]) /
+          (rate(naming_remediation_success[1h]) + rate(naming_remediation_failure[1h]))
+        ) > 0.2
+      for: 30m
+      severity: warning
+      annotations:
+        summary: "自动修复失败率过高"
+        description: |
+          自动修复失败率为 {{ $value | humanizePercentage }}，
+          超过 20% 阈值，需要检查自动化流程。
+
+  # Grafana 仪表板配置
+  dashboards:
+    - name: "Naming Compliance Overview"
+      uid: "naming-compliance-overview"
+      tags: ["governance", "naming", "compliance"]
+      panels:
+        - title: "命名合规率"
+          type: "stat"
+          targets:
+            - expr: |
+                (
+                  sum(naming_compliance_good) /
+                  (sum(naming_compliance_good) + sum(naming_compliance_bad))
+                ) * 100
+              legendFormat: "合规率"
+
+        - title: "违规资源数量（按环境）"
+          type: "graph"
+          targets:
+            - expr: "sum(naming_compliance_bad) by (environment)"
+              legendFormat: "{{ environment }}"
+
+        - title: "违规类型分布"
+          type: "piechart"
+          targets:
+            - expr: "sum(naming_violation_total) by (violation_type)"
+
+        - title: "自动修复成功率"
+          type: "stat"
+          targets:
+            - expr: |
+                (
+                  sum(rate(naming_remediation_success[1h])) /
+                  (sum(rate(naming_remediation_success[1h])) + sum(rate(naming_remediation_failure[1h])))
+                ) * 100
+
+  # SLA 指标目标
+  sla:
+    naming_compliance_rate:
+      target: 99.9
+      description: "命名合规率目标"
+      alertThreshold: 95.0
+
+    validation_failure_threshold:
+      max_count: 10
+      description: "单位时间内最大验证失败数"
+      timeWindow: "1h"
+
+    migration_failure_rate:
+      max_rate: 5.0
+      description: "最大迁移失败率 (%)"
+
+    auto_remediation_success_rate:
+      min_rate: 95.0
+      description: "最小自动修复成功率 (%)"
+
+  # 数据保留策略
+  retention:
+    metrics: "30d"
+    logs: "90d"
+    traces: "7d"
+
+  # 通知配置
+  notifications:
+    - name: "Slack 通知"
+      channel: "slack"
+      config:
+        webhook_url: "${SLACK_WEBHOOK_URL}"
+        channel: "#governance-alerts"
+        severity_levels: ["critical", "warning"]
+
+    - name: "Email 通知"
+      channel: "email"
+      config:
+        recipients: ["governance-team@example.com", "sre-team@example.com"]
+        severity_levels: ["critical"]
+
+    - name: "PagerDuty"
+      channel: "pagerduty"
+      config:
+        service_key: "${PAGERDUTY_SERVICE_KEY}"
+        severity_levels: ["critical"]

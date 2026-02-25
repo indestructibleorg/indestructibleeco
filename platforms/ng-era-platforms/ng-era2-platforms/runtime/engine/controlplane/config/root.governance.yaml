@@ -1,0 +1,505 @@
+# @ECO-governed
+# @ECO-layer: governance
+# @ECO-semantic: root.governance
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# 🏛️ Root 治理/權限/策略配置
+# MachineNativeOps Root Layer Governance Configuration
+# Version: 1.0.0
+
+apiVersion: machinenativeops.io/v1
+kind: RootGovernanceConfig
+metadata:
+  name: governance-framework-baseline-config
+  namespace: machinenativenops-governance
+  labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+    machinenativeops.io/tier: "governance"
+    machinenativeops.io/version: "v1.0.0"
+    machinenativeops.io/component: "governance-configuration"
+  annotations:
+    machinenativeops.io/description: "Root layer governance, permissions and policies configuration"
+    machinenativeops.io/last-modified: "2025-12-20T22:00:00Z"
+
+spec:
+  # === 角色定義 (RBAC) ===
+  roles:
+    - name: "system-administrator"
+      description: "Complete system administration privileges"
+      permissions:
+        - "system:*"
+        - "governance:*"
+        - "modules:*"
+        - "trust:*"
+        - "provenance:*"
+        - "execution:*"
+        - "integrity:*"
+      constraints:
+        - "audit_required: true"
+        - "mfa_required: true"
+        - "time_window: business_hours"
+        
+    - name: "security-administrator"
+      description: "Security and trust management privileges"
+      permissions:
+        - "trust:*"
+        - "integrity:*"
+        - "governance:read"
+        - "provenance:read"
+        - "system:read"
+      constraints:
+        - "audit_required: true"
+        - "mfa_required: true"
+        
+    - name: "module-developer"
+      description: "Module development and management privileges"
+      permissions:
+        - "modules:*"
+        - "execution:read"
+        - "governance:read"
+        - "provenance:read"
+        - "trust:read"
+      constraints:
+        - "audit_required: false"
+        - "approval_required: true"
+        
+    - name: "auditor"
+      description: "Audit and compliance verification privileges"
+      permissions:
+        - "governance:read"
+        - "provenance:*"
+        - "trust:read"
+        - "integrity:read"
+        - "system:read"
+        - "modules:read"
+        - "execution:read"
+      constraints:
+        - "audit_required: true"
+        - "read_only: true"
+        
+    - name: "operator"
+      description: "System operation and monitoring privileges"
+      permissions:
+        - "execution:read"
+        - "execution:execute"
+        - "governance:read"
+        - "system:read"
+        - "modules:read"
+      constraints:
+        - "audit_required: true"
+        - "approval_required: false"
+
+  # === 策略定義 ===
+  policies:
+    - name: "access-control-policy"
+      description: "Access control and permission management"
+      rules:
+        - id: "ACL-001"
+          name: "require-mfa-admin"
+          description: "Require MFA for administrative operations"
+          condition: "user.roles contains 'system-administrator' OR user.roles contains 'security-administrator'"
+          action: "require_mfa"
+          effect: "allow"
+          priority: 100
+          
+        - id: "ACL-002"
+          name: "audit-sensitive-operations"
+          description: "Audit all sensitive operations"
+          condition: "operation.sensitivity >= 'high'"
+          action: "audit_log"
+          effect: "allow"
+          priority: 90
+          
+        - id: "ACL-003"
+          name: "time-restricted-access"
+          description: "Restrict critical operations to business hours"
+          condition: "operation.criticality = 'high' AND time.now not in business_hours"
+          action: "deny"
+          effect: "deny"
+          priority: 80
+          
+    - name: "data-protection-policy"
+      description: "Data protection and privacy controls"
+      rules:
+        - id: "DPP-001"
+          name: "encrypt-sensitive-data"
+          description: "Encrypt all sensitive data at rest and in transit"
+          condition: "data.sensitivity >= 'high'"
+          action: "encrypt"
+          effect: "require"
+          priority: 100
+          
+        - id: "DPP-002"
+          name: "data-retention-policy"
+          description: "Enforce data retention periods"
+          condition: "data.type = 'audit_log'"
+          action: "retention_period: 7_years"
+          effect: "require"
+          priority: 90
+          
+    - name: "change-management-policy"
+      description: "Change management and approval workflow"
+      rules:
+        - id: "CMP-001"
+          name: "require-change-approval"
+          description: "Require approval for production changes"
+          condition: "environment = 'production' AND change.type in ['config', 'code', 'infrastructure']"
+          action: "require_approval"
+          effect: "require"
+          priority: 100
+          
+        - id: "CMP-002"
+          name: "change-validation"
+          description: "Validate all changes before deployment"
+          condition: "change.status = 'pending'"
+          action: "validate_change"
+          effect: "require"
+          priority: 90
+
+  # === 審核規則 ===
+  audit_rules:
+    - name: "system-access-audit"
+      description: "Audit all system access attempts"
+      enabled: true
+      scope:
+        - "authentication"
+        - "authorization"
+        - "session_management"
+      events:
+        - "login_success"
+        - "login_failure"
+        - "permission_granted"
+        - "permission_denied"
+        - "session_created"
+        - "session_terminated"
+      retention: "2_years"
+      alert_threshold: 10  # Alert after 10 failed attempts
+      alert_actions:
+        - "notify_security_team"
+        - "lock_account_temporarily"
+        
+    - name: "data-access-audit"
+      description: "Audit all sensitive data access"
+      enabled: true
+      scope:
+        - "data_access"
+        - "data_modification"
+        - "data_export"
+      events:
+        - "sensitive_data_read"
+        - "sensitive_data_write"
+        - "data_export"
+        - "data_deletion"
+      retention: "7_years"
+      alert_threshold: 5
+      alert_actions:
+        - "notify_data_protection_officer"
+        - "create_incident_ticket"
+        
+    - name: "configuration-change-audit"
+      description: "Audit all configuration changes"
+      enabled: true
+      scope:
+        - "system_configuration"
+        - "policy_configuration"
+        - "role_configuration"
+      events:
+        - "config_modified"
+        - "policy_created"
+        - "policy_modified"
+        - "policy_deleted"
+        - "role_assigned"
+        - "role_revoked"
+      retention: "5_years"
+      alert_threshold: 1  # Alert on any change
+      alert_actions:
+        - "notify_system_administrator"
+        - "create_change_record"
+
+  # === 委派機制 ===
+  delegation_map:
+    - name: "emergency-access-delegation"
+      description: "Emergency access delegation for critical situations"
+      enabled: true
+      conditions:
+        - "emergency_declared = true"
+        - "delegator_role in ['system-administrator', 'security-administrator']"
+        - "delegatee_trust_level >= 'high'"
+      delegatable_permissions:
+        - "system:read"
+        - "system:execute_emergency_operations"
+        - "execution:read"
+        - "execution:execute_critical"
+      duration: "24h"
+      approval_required: false
+      audit_level: "detailed"
+      
+    - name: "temporary-admin-delegation"
+      description: "Temporary administrative privileges delegation"
+      enabled: true
+      conditions:
+        - "business_justification_provided = true"
+        - "delegator_role = 'system-administrator'"
+        - "delegatee_background_check_passed = true"
+      delegatable_permissions:
+        - "modules:*"
+        - "execution:read"
+        - "execution:execute"
+      duration: "72h"
+      approval_required: true
+      approvers:
+        - "security-administrator"
+        - "audit-committee"
+      audit_level: "comprehensive"
+
+  # === 合規性要求 ===
+  compliance_requirements:
+    - name: "GDPR"
+      description: "General Data Protection Regulation compliance"
+      enabled: true
+      controls:
+        - "data_protection_impact_assessment"
+        - "data_subject_rights_implementation"
+        - "data_breach_notification_procedure"
+        - "privacy_by_design"
+        - "data_protection_officer_designation"
+      audit_frequency: "quarterly"
+      reporting_requirements:
+        - "annual_compliance_report"
+        - "data_protection_impact_assessment_report"
+        
+    - name: "SOC2-Type2"
+      description: "SOC2 Type II compliance"
+      enabled: true
+      controls:
+        - "security_controls"
+        - "availability_controls"
+        - "processing_integrity_controls"
+        - "confidentiality_controls"
+        - "privacy_controls"
+      audit_frequency: "annual"
+      external_auditor: true
+      reporting_requirements:
+        - "soc2_type2_report"
+        - "management_assertion_letter"
+        
+    - name: "ISO27001"
+      description: "ISO 27001 Information Security Management"
+      enabled: true
+      controls:
+        - "information_security_policy"
+        - "risk_assessment_and_treatment"
+        - "security_objectives"
+        - "competence_and_training"
+        - "incident_management"
+      audit_frequency: "annual"
+      certification_body: "accredited_certification_body"
+      reporting_requirements:
+        - "iso27001_certificate"
+        - "statement_of_applicability"
+
+  # === 風險管理 ===
+  risk_management:
+    - name: "operational_risk"
+      description: "Operational risk management"
+      categories:
+        - "human_error"
+        - "system_failure"
+        - "process_failure"
+        - "external_events"
+      assessment_frequency: "monthly"
+      mitigation_strategies:
+        - "automation"
+        - "redundancy"
+        - "training"
+        - "monitoring"
+        
+    - name: "security_risk"
+      description: "Security risk management"
+      categories:
+        - "malicious_attacks"
+        - "data_breaches"
+        - "unauthorized_access"
+        - "vulnerabilities"
+      assessment_frequency: "weekly"
+      mitigation_strategies:
+        - "security_controls"
+        - "threat_intelligence"
+        - "vulnerability_management"
+        - "incident_response"
+
+  # === 治理工作流程 ===
+  governance_workflows:
+    - name: "access-request-workflow"
+      description: "Access request approval workflow"
+      triggers:
+        - "new_access_request_submitted"
+      steps:
+        - name: "initial_review"
+          assignee: "team_lead"
+          timeout: "24h"
+        - name: "security_review"
+          assignee: "security_administrator"
+          timeout: "48h"
+        - name: "final_approval"
+          assignee: "system_administrator"
+          timeout: "24h"
+      escalation_policy:
+        - "timeout_escalation_to: director"
+        - "rejection_threshold: 3_denials"
+        
+    - name: "policy-change-workflow"
+      description: "Policy change approval workflow"
+      triggers:
+        - "policy_change_requested"
+      steps:
+        - name: "impact_assessment"
+          assignee: "policy_analyst"
+          timeout: "72h"
+        - name: "stakeholder_review"
+          assignee: "affected_stakeholders"
+          timeout: "1_week"
+        - name: "governance_board_approval"
+          assignee: "governance_board"
+          timeout: "2_weeks"
+      escalation_policy:
+        - "timeout_escalation_to: executive_committee"
+        - "consensus_required: true"
+
+    - name: "evidence-chain-policy"
+      description: "Evidence chain and documentation requirements"
+      rules:
+        - id: "EVP-001"
+          name: "require-four-core-evidences"
+          description: "Require four core evidences: repo, branch, commit, PR"
+          condition: "change.type in ['code', 'config', 'governance']"
+          action: "validate_four_core_evidences"
+          effect: "require"
+          priority: 100
+
+        - id: "EVP-002"
+          name: "require-agents-compliance"
+          description: "Require AGENTS.md compliance for AI-related changes"
+          condition: "change.ai_related = true"
+          action: "validate_agents_documentation"
+          effect: "require"
+          priority: 95
+
+        - id: "EVP-003"
+          name: "require-status-consistency"
+          description: "Require status and checklist logical consistency"
+          condition: "change.source = 'pull_request'"
+          action: "validate_status_consistency"
+          effect: "require"
+          priority: 90
+
+    - name: "evidence-chain-policy"
+      description: "Evidence chain and documentation requirements"
+      rules:
+        - id: "EVP-001"
+          name: "require-four-core-evidences"
+          description: "Require four core evidences: repo, branch, commit, PR"
+          condition: "change.type in ['code', 'config', 'governance']"
+          action: "validate_four_core_evidences"
+          effect: "require"
+          priority: 100
+
+        - id: "EVP-002"
+          name: "require-agents-compliance"
+          description: "Require AGENTS.md compliance for AI-related changes"
+          condition: "change.ai_related = true"
+          action: "validate_agents_documentation"
+          effect: "require"
+          priority: 95
+
+        - id: "EVP-003"
+          name: "require-status-consistency"
+          description: "Require status and checklist logical consistency"
+          condition: "change.source = 'pull_request'"
+          action: "validate_status_consistency"
+          effect: "require"
+          priority: 90
+status:
+  phase: "Active"
+  conditions:
+    - type: "RolesConfigured"
+      status: "True"
+      lastTransitionTime: "2025-12-20T22:00:00Z"
+      reason: "RolesSetupComplete"
+      message: "All governance roles configured successfully"
+    - type: "PoliciesActive"
+      status: "True"
+      lastTransitionTime: "2025-12-20T22:00:00Z"
+      reason: "PoliciesEnabled"
+      message: "All governance policies are active and enforced"
+    - type: "AuditEnabled"
+      status: "True"
+      lastTransitionTime: "2025-12-20T22:00:00Z"
+      reason: "AuditSystemOperational"
+      message: "Audit system is operational and collecting events"
+
+---
+# Governance Schema 定義
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: governance-schema
+  namespace: machinenativenops-governance
+data:
+  schema.yaml: |
+    # Root Governance Configuration Schema
+    type: object
+    properties:
+      roles:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+              pattern: "^[a-z0-9-]+$"
+            description:
+              type: string
+            permissions:
+              type: array
+              items:
+                type: string
+            constraints:
+              type: array
+              items:
+                type: string
+          required: ["name", "description", "permissions", "constraints"]
+      policies:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            rules:
+              type: array
+          required: ["name", "description", "rules"]
+      audit_rules:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            enabled:
+              type: boolean
+            scope:
+              type: array
+            events:
+              type: array
+            retention:
+              type: string
+          required: ["name", "description", "enabled", "scope", "events"]
+    required: ["roles", "policies", "audit_rules"]

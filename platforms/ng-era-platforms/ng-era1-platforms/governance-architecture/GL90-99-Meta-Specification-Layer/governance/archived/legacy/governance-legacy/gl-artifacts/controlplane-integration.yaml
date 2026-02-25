@@ -1,0 +1,23 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLIntegration
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:controlplane-integration.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/controlplane-integration.yaml"
+  name: controlplane-gl-integration
+  version: "1.0.0"
+spec:
+  target: controlplane
+  gl_architecture_ref: "governance/gl-architecture/GL_LAYERS.yaml"
+  layer_mappings:
+    GL00-09:
+      source: "controlplane/config/root.governance.yaml"
+      extends: "workspace/governance/gl-architecture/gl-extended/GL00-09-strategic"
+    GL10-29:
+      source: "controlplane/baseline/modules/03-governance"
+      extends: "workspace/governance/gl-architecture/gl-extended/GL10-29-operational"

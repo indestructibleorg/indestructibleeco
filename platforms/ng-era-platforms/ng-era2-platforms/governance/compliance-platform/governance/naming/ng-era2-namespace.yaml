@@ -1,0 +1,40 @@
+ngera2namespace_governance:
+  version: "2.0"
+  categories:
+    microservice_level:
+      - NG30100
+      - NG30200
+      - NG30300
+      - NG30400
+      - NG30500
+      - NG30600
+      - NG30700
+      - NG30800
+      - NG30900
+      - NG31000
+    data_level:
+      - NG40100
+      - NG40200
+      - NG40300
+      - NG40400
+      - NG40500
+      - NG40600
+      - NG40700
+      - NG40800
+      - NG40900
+      - NG41000
+    security_level:
+      - NG50100
+      - NG50200
+      - NG50300
+      - NG50400
+      - NG50500
+      - NG50600
+      - NG50700
+      - NG50800
+      - NG50900
+      - NG51000
+  validation_rules:
+    - "all Era-2 namespaces must support dynamic adjustment"
+    - "all namespaces must support cross-node consistency"
+    - "all namespaces must be mappable to Era-3 intent namespaces"

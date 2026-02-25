@@ -1,0 +1,39 @@
+# @GL-governed
+# @GL-layer: GL00-09
+# @GL-semantic: general-component
+# @GL-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Charter Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/GL-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/GL-UNIFIED-NAMING-CHARTER.yaml
+
+
+version: "1.0.0"
+metadata:
+  name: ""
+  description: ""
+  labels: {}
+
+name: 'Convert DOCX to Artifact'
+description: 'Convert DOCX documents to structured artifacts (YAML/JSON/Markdown)'
+
+inputs:
+  source-path:
+    description: 'Path to DOCX file'
+    required: true
+  output-path:
+    description: 'Path for output artifact'
+    required: false
+    default: 'artifacts/modules'
+  format:
+    description: 'Output format (yaml/json/markdown)'
+    required: false
+    default: 'yaml'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.source-path }}
+    - ${{ inputs.output-path }}
+    - ${{ inputs.format }}

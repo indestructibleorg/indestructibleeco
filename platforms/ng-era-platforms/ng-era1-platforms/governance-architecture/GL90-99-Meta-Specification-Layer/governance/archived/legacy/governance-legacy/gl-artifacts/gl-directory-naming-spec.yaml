@@ -1,0 +1,89 @@
+# @ECO-governed
+# @ECO-layer: GL90-99
+# @ECO-semantic: governed-configuration
+# @ECO-audit-trail: engine/governance/GL_SEMANTIC_ANCHOR.json
+
+apiVersion: governance.machinenativeops.io/v1
+kind: GLDirectoryNamingSpecification
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:ng-era-platforms:ng-era1-platforms:governance-architecture:GL90-99-Meta-Specification-Layer:governance:archived:legacy:governance-legacy:gl-artifacts:gl-directory-naming-spec.yaml"
+    eco-base/uri: "eco-base://platform/resource/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-directory-naming-spec.yaml"
+  name: gl-directory-naming-spec
+  version: "1.0.0"
+  created: "2026-01-18"
+spec:
+  description: "Official directory naming specification for GL (Governance Layers) architecture"
+  naming_principles:
+    - "Directory names must reflect GL semantic layer boundaries"
+    - "Use kebab-case for all directory names"
+    - "Prefix with 'gl-' to indicate GL architecture components"
+    - "Layer-specific directories use gl-{layer-semantic-name}"
+    - "Avoid generic terms like 'extensions', 'plugins', 'modules'"
+  official_directories:
+    root:
+      path: "workspace/governance/gl-architecture"
+      semantic: "GL architecture root - centralized GL management"
+    gl_extended:
+      path: "workspace/governance/gl-architecture/gl-extended"
+      semantic: "GL81-83 Extended Layer - auto-comment, stakeholder, integration"
+      rationale: "Reflects GL Extended Layer semantic boundary, not generic extensions"
+    templates:
+      path: "workspace/governance/gl-architecture/templates"
+      semantic: "GL templates for creating new layers and dimensions"
+    integrations:
+      path: "workspace/governance/gl-architecture/integrations"
+      semantic: "GL integration configurations for workspace, controlplane, tools"
+  layer_directories:
+    GL00-09:
+      path: "workspace/governance/gl-architecture/gl-extended/GL00-09-strategic"
+      semantic: "Strategic Layer implementations"
+      naming_pattern: "GL{range}-{semantic-name}"
+    GL10-29:
+      path: "workspace/governance/gl-architecture/gl-extended/GL10-29-operational"
+      semantic: "Operational Layer implementations"
+      naming_pattern: "GL{range}-{semantic-name}"
+    GL30-49:
+      path: "workspace/governance/gl-architecture/gl-extended/GL30-49-execution"
+      semantic: "Execution Layer implementations"
+      naming_pattern: "GL{range}-{semantic-name}"
+    GL50-59:
+      path: "workspace/governance/gl-architecture/gl-extended/GL50-59-observability"
+      semantic: "Observability Layer implementations"
+      naming_pattern: "GL{range}-{semantic-name}"
+    GL60-80:
+      path: "workspace/governance/gl-architecture/gl-extended/GL60-80-advanced"
+      semantic: "Advanced/Feedback Layer implementations"
+      naming_pattern: "GL{range}-{semantic-name}"
+    GL81-83:
+      path: "workspace/governance/gl-architecture/gl-extended/GL81-83-extended"
+      semantic: "Extended Layer implementations"
+      naming_pattern: "GL{range}-{semantic-name}"
+      note: "This is the core Extended Layer, parent directory is gl-extended"
+    GL90-99:
+      path: "workspace/governance/gl-architecture/gl-extended/GL90-99-meta"
+      semantic: "Meta-Specification Layer implementations"
+      naming_pattern: "GL{range}-{semantic-name}"
+  anti_patterns:
+    avoid:
+      - name: "extensions"
+        reason: "Too ambiguous - could mean plugins, add-ons, non-core features"
+        use_instead: "gl-extended"
+      - name: "modules"
+        reason: "Generic software term, doesn't reflect GL semantic"
+        use_instead: "gl-{layer-name}"
+      - name: "plugins"
+        reason: "Implies optional add-ons, but GL layers are core governance"
+        use_instead: "gl-{layer-name}"
+      - name: "extras"
+        reason: "Implies non-essential, but all GL layers are essential"
+        use_instead: "gl-extended"
+  validation_rules:
+    - rule: "All GL layer directories must be under gl-extended/"
+      check: "path.startswith('workspace/governance/gl-architecture/gl-extended/GL')"
+    - rule: "Directory names must use kebab-case"
+      check: "is_kebab_case(dirname)"
+    - rule: "GL layer directories must follow GL{range}-{name} pattern"
+      check: "re.match(r'GL[0-9]{2}-[0-9]{2}-[a-z-]+', dirname)"
+    - rule: "No spaces or special characters except hyphen"
+      check: "re.match(r'^[a-z0-9-]+$', dirname)"

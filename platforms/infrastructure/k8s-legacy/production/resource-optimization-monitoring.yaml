@@ -1,0 +1,390 @@
+# @ECO-governed
+# @ECO-layer: infrastructure
+# @ECO-semantic: resource-optimization-monitoring
+# @ECO-audit-trail: ../../engine/governance/GL_SEMANTIC_ANCHOR.json
+# 
+# GL Unified Architecture Governance Framework Activated
+
+# Resource Utilization Monitoring Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    eco-base/urn: "urn:eco-base:platform:resource:infrastructure:k8s-legacy:production:resource-optimization-monitoring.yaml"
+    eco-base/uri: "eco-base://platform/resource/infrastructure/k8s-legacy/production/resource-optimization-monitoring.yaml"
+  name: resource-optimization-config
+  namespace: production
+data:
+  resource-optimization.yaml: |
+    # Resource utilization monitoring configuration
+    resourceOptimization:
+      enabled: true
+      
+      # CPU optimization
+      cpu:
+        enabled: true
+        interval: 1m
+        
+        monitoring:
+          - name: cpu-utilization
+            metric: container_cpu_usage_seconds_total
+            labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+              - pod
+              - container
+              - namespace
+            aggregation: rate
+            window: 5m
+          
+          - name: cpu-throttling
+            metric: container_cpu_cfs_throttled_seconds_total
+            labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+              - pod
+              - container
+            aggregation: rate
+            window: 5m
+          
+          - name: cpu-request-utilization
+            metric: container_cpu_usage_seconds_total / kube_pod_container_resource_requests{resource="cpu"}
+            aggregation: rate
+            window: 5m
+        
+        thresholds:
+          optimal:
+            min: 60
+            max: 80
+          warning:
+            min: 40
+            max: 90
+          critical:
+            min: 20
+            max: 95
+        
+        actions:
+          - condition: cpu < 40%
+            action: scale-down
+            maxReduction: 20%
+            cooldown: 10m
+          
+          - condition: cpu > 90%
+            action: scale-up
+            maxIncrease: 50%
+            cooldown: 5m
+          
+          - condition: cpu-throttling > 10%
+            action: increase-limits
+            minIncrease: 10%
+            maxIncrease: 50%
+      
+      # Memory optimization
+      memory:
+        enabled: true
+        interval: 1m
+        
+        monitoring:
+          - name: memory-utilization
+            metric: container_memory_working_set_bytes
+            labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+              - pod
+              - container
+              - namespace
+            aggregation: avg
+            window: 5m
+          
+          - name: memory-request-utilization
+            metric: container_memory_working_set_bytes / kube_pod_container_resource_requests{resource="memory"}
+            aggregation: avg
+            window: 5m
+          
+          - name: memory-usage-by-component
+            metric: go_memstats_heap_inuse_bytes
+            labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+              - pod
+              - component
+            aggregation: avg
+            window: 5m
+        
+        thresholds:
+          optimal:
+            min: 70
+            max: 90
+          warning:
+            min: 50
+            max: 95
+          critical:
+            min: 30
+            max: 98
+        
+        actions:
+          - condition: memory < 50%
+            action: scale-down
+            maxReduction: 20%
+            cooldown: 10m
+          
+          - condition: memory > 95%
+            action: scale-up
+            maxIncrease: 50%
+            cooldown: 5m
+          
+          - condition: memory-oom > 5
+            action: increase-limits
+            minIncrease: 20%
+            maxIncrease: 100%
+      
+      # Storage optimization
+      storage:
+        enabled: true
+        interval: 5m
+        
+        monitoring:
+          - name: disk-utilization
+            metric: kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes
+            labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+              - pod
+              - namespace
+              - persistentvolumeclaim
+            aggregation: avg
+            window: 5m
+          
+          - name: disk-io
+            metric: node_disk_io_time_seconds_total
+            labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+              - node
+              - device
+            aggregation: rate
+            window: 5m
+          
+          - name: disk-throughput
+            metric: node_disk_io_time_seconds_total
+            labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+              - node
+              - device
+            aggregation: rate
+            window: 5m
+        
+        thresholds:
+          optimal:
+            min: 40
+            max: 80
+          warning:
+            min: 30
+            max: 85
+          critical:
+            min: 20
+            max: 90
+        
+        actions:
+          - condition: disk < 30%
+            action: downsize-pvc
+            minReduction: 10%
+            maxReduction: 30%
+            cooldown: 1h
+          
+          - condition: disk > 85%
+            action: expand-pvc
+            minIncrease: 20%
+            maxIncrease: 100%
+            cooldown: 5m
+          
+          - condition: disk-io > 80%
+            action: optimize-io
+            strategies:
+              - increase-iops
+              - enable-caching
+              - distribute-io
+      
+      # Network optimization
+      network:
+        enabled: true
+        interval: 1m
+        
+        monitoring:
+          - name: network-inbound
+            metric: container_network_receive_bytes_total
+            labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+              - pod
+              - namespace
+              - interface
+            aggregation: rate
+            window: 5m
+          
+          - name: network-outbound
+            metric: container_network_transmit_bytes_total
+            labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+              - pod
+              - namespace
+              - interface
+            aggregation: rate
+            window: 5m
+          
+          - name: network-connections
+            metric: net_conntrack_bytes
+            labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+              - node
+            aggregation: avg
+            window: 5m
+        
+        thresholds:
+          optimal:
+            min: 10
+            max: 70
+            unit: Mbps
+          warning:
+            min: 5
+            max: 85
+            unit: Mbps
+          critical:
+            min: 0
+            max: 95
+            unit: Mbps
+        
+        actions:
+          - condition: network < 5Mbps
+            action: optimize-routing
+            strategies:
+              - reduce-latency
+              - enable-compression
+              - batch-requests
+          
+          - condition: network > 85Mbps
+            action: scale-network
+            strategies:
+              - increase-bandwidth
+              - distribute-load
+              - enable-cdn
+      
+      # Pod optimization
+      pods:
+        enabled: true
+        interval: 2m
+        
+        monitoring:
+          - name: pod-count
+            metric: kube_pod_status_phase{phase="Running"}
+            labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+              - namespace
+            aggregation: count
+            window: 5m
+          
+          - name: pod-restart-rate
+            metric: increase(kube_pod_container_status_restarts_total[1h])
+            labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+              - pod
+              - namespace
+            aggregation: sum
+            window: 1h
+          
+          - name: pod-age
+            metric: kube_pod_created
+            labels:
+    eco-base/part-of: eco-base
+    eco-base/governance: aligned
+              - pod
+              - namespace
+            aggregation: avg
+            window: 24h
+        
+        thresholds:
+          optimal:
+            minPods: 9
+            maxPods: 30
+            maxRestarts: 5
+          warning:
+            minPods: 6
+            maxPods: 40
+            maxRestarts: 10
+          critical:
+            minPods: 3
+            maxPods: 50
+            maxRestarts: 20
+        
+        actions:
+          - condition: pods < 6
+            action: scale-up
+            minPods: 9
+            maxPods: 30
+            cooldown: 2m
+          
+          - condition: pods > 40
+            action: scale-down
+            minPods: 9
+            maxPods: 30
+            cooldown: 10m
+          
+          - condition: restarts > 10
+            action: investigate
+            strategies:
+              - check-logs
+              - analyze-crashes
+              - update-image
+              - increase-resources
+      
+      # Alerting
+      alerting:
+        enabled: true
+        
+        rules:
+          - name: HighCPUUtilization
+            condition: cpu > 90%
+            duration: 10m
+            severity: warning
+            message: "High CPU utilization detected: {{ value }}%"
+          
+          - name: LowCPUUtilization
+            condition: cpu < 40%
+            duration: 30m
+            severity: info
+            message: "Low CPU utilization detected: {{ value }}% - consider scaling down"
+          
+          - name: HighMemoryUtilization
+            condition: memory > 95%
+            duration: 5m
+            severity: critical
+            message: "High memory utilization detected: {{ value }}%"
+          
+          - name: LowMemoryUtilization
+            condition: memory < 50%
+            duration: 30m
+            severity: info
+            message: "Low memory utilization detected: {{ value }}% - consider scaling down"
+          
+          - name: HighDiskUtilization
+            condition: disk > 85%
+            duration: 5m
+            severity: critical
+            message: "High disk utilization detected: {{ value }}%"
+          
+          - name: HighNetworkUtilization
+            condition: network > 85Mbps
+            duration: 10m
+            severity: warning
+            message: "High network utilization detected: {{ value }}Mbps"
+          
+          - name: HighPodRestartRate
+            condition: restarts > 10
+            duration: 30m
+            severity: warning
+            message: "High pod restart rate detected: {{ value }} restarts"

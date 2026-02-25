@@ -1,0 +1,50 @@
+# @ECO-governed
+# @ECO-layer: GL00-09
+# @ECO-semantic: general-component
+# @ECO-audit-trail: gl-enterprise-architecture/governance/audit-trails/GL00_09-audit.json
+#
+# GL Unified Architecture Governance Framework Activated
+# GL Root Semantic Anchor: gl-enterprise-architecture/governance/ECO-ROOT-SEMANTIC-ANCHOR.yaml
+# GL Unified Naming Charter: gl-enterprise-architecture/governance/ECO-UNIFIED-NAMING-CHARTER.yaml
+
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-image-signature
+  annotations:
+    policies.kyverno.io/title: Verify Container Image Signatures
+    policies.kyverno.io/category: Supply Chain Security
+    policies.kyverno.io/severity: high
+spec:
+  validationFailureAction: enforce
+  background: true
+  webhookTimeoutSeconds: 30
+  failurePolicy: Fail
+  rules:
+    - name: verify-esync-images
+      match:
+        resources:
+          kinds:
+            - Pod
+          namespaces:
+            - dev
+            - staging
+            - prod
+      verifyImages:
+        - imageReferences:
+            - "*"
+          attestors:
+            - entries:
+                - keys:
+                    publicKeys: |-
+                      -----BEGIN PUBLIC KEY-----
+                      MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8sJv7z0r5Y5Jb6L4Z3vQ5Jb6L4Z3vQ
+                      5Jb6L4Z3vQ5Jb6L4Z3vQ5Jb6L4Z3vQ5Jb6L4Z3vQ==
+                      -----END PUBLIC KEY-----
+          attestations:
+            - predicateType: cosign.sigstore.dev/attestation/v1
+              conditions:
+                - all:
+                    - key: "{{ regexMatch('^esync', prefix) }}"
+                      operator: Equals

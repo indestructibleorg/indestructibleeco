@@ -4,9 +4,13 @@ on:
 permissions:
   contents: read
   security-events: write
+  pull-requests: write
+concurrency:
+  group: security-gates-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      - run: echo "Security Gates test with security-events write"
+      - run: echo "Test with all permissions and concurrency"

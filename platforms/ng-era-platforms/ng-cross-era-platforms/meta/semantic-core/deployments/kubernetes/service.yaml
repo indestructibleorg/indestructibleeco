@@ -3,8 +3,8 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/service/gl-semantic-core-service
-    eco-base/urn: urn:eco-base:k8s:unknown:service:gl-semantic-core-service:sha256-9b8aa2386d6a738ba188714b2627a2eaae21ef5166be5e08d3fa98d0a6472e32
+    eco-base/uri: eco-base://k8s/core/service/gl-semantic-core-service
+    eco-base/urn: urn:eco-base:k8s:core:service:gl-semantic-core-service:sha256-91b6576f6dbe8c8a976f4fddad06d452bc9f5de52c3f7236b9c825cd4d22958f
     prometheus.io/port: '9091'
     prometheus.io/scrape: 'true'
   labels:
@@ -38,8 +38,8 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/service/gl-semantic-core-external
-    eco-base/urn: urn:eco-base:k8s:unknown:service:gl-semantic-core-external:sha256-674e8112dd8aa97bfb2600f0878e6713c4fa88327d1af4cbc4635ca830d360d0
+    eco-base/uri: eco-base://k8s/core/service/gl-semantic-core-external
+    eco-base/urn: urn:eco-base:k8s:core:service:gl-semantic-core-external:sha256-7fd192b4a1053c3de27fc730ebddfe7ae72701e953d9c5ceed3bcd2787794575
     service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
     service.beta.kubernetes.io/aws-load-balancer-type: alb
   labels:

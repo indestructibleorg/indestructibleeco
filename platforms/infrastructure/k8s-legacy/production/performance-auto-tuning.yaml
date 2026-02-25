@@ -81,8 +81,8 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/configmap/performance-auto-tuning-config
-    eco-base/urn: urn:eco-base:k8s:unknown:configmap:performance-auto-tuning-config:sha256-50718b282d378cba8166600b17da3e097608ceaa338d0dbd96d8dc4d439dbee9
+    eco-base/uri: eco-base://k8s/core/configmap/performance-auto-tuning-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:performance-auto-tuning-config:sha256-0fda37377eaf83892fc38d54f97367c5f97868b9c2c4a10ed6bae8855af413f8
   labels: {}
   name: performance-auto-tuning-config
   namespace: production

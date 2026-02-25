@@ -165,8 +165,8 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/configmap/automation-config
-    eco-base/urn: urn:eco-base:k8s:unknown:configmap:automation-config:sha256-b9a9cdcb717c399e0311502e79ff2eb6e42322accba41f0e983aa888f489e4c4
+    eco-base/uri: eco-base://k8s/core/configmap/automation-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:automation-config:sha256-ae378128d8a4eb97f59770f9895fcab950bdc9dba66dc1b4f7e7e17cdab4dca1
   labels:
     app.kubernetes.io/name: automation
     eco-base/governance: aligned

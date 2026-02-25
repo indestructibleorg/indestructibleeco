@@ -64,7 +64,11 @@ jobs:
             echo "No supply chain drift detected."
           fi
 
-      - name: Verify Hashlock (Push to main or PR check)
+      - name: Verify Supply Chain Integrity (Push to main or PR check)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          python tools/eco-supplychain/hashlock.py --mode verify --paths platforms/ k8s/ manifests/
+          echo "Step 1: Verify Attestation (Source & Binding)"
+          python tools/eco-supplychain/verify_attestation.py --hashlock supplychain/hashlock.json --attestation supplychain/hashlock.attestation.intoto.json
+          
+          echo "Step 2: Verify Hashlock Drift (Manifests vs SoT)"
+          python tools/eco-supplychain/hashlock.py --mode verify --paths platforms/ k8s/ manifests/ --hashlock supplychain/hashlock.json

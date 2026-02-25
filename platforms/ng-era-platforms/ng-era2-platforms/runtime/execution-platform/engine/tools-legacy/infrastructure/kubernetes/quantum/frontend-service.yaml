@@ -3,8 +3,8 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/service/quantumflow-frontend
-    eco-base/urn: urn:eco-base:k8s:unknown:service:quantumflow-frontend:sha256-76c55d7c262c492fe5881aba74e8cd1221326aa45f8344cdc99943e85656e9f3
+    eco-base/uri: eco-base://k8s/core/service/quantumflow-frontend
+    eco-base/urn: urn:eco-base:k8s:core:service:quantumflow-frontend:sha256-af37b0683549d16a27f6c0041732f877052a1a247d2956637fa2fb428cd003a1
   labels:
     app.kubernetes.io/component: frontend
     app.kubernetes.io/name: quantumflow

@@ -3,8 +3,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/deployment/machine-native-ops
-    eco-base/urn: urn:eco-base:k8s:unknown:deployment:machine-native-ops:sha256-dee13939200a21a02bf33a8f2f2289177406193fdeb17539e5a692c3575d1b68
+    eco-base/uri: eco-base://k8s/core/deployment/machine-native-ops
+    eco-base/urn: urn:eco-base:k8s:core:deployment:machine-native-ops:sha256-c228cfcc0fd06852e1a2c0033cf4454300c8361e5885576a1d75db86ef335e8e
     sidecar.istio.io/interceptionMode: TPROXY
     sidecar.istio.io/proxyConfig: "proxyStatsMatcher:\n  inclusionRegexps:\n  - \"\
       .*_outbound.*\"\n  - \".*_inbound.*\"\n"

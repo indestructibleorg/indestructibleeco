@@ -3,8 +3,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/ingress/machine-native-ops-ingress
-    eco-base/urn: urn:eco-base:k8s:unknown:ingress:machine-native-ops-ingress:sha256-9da0a64225e066034f2d71196d5572f2cb4e50caaf1e29474af2270629f310a8
+    eco-base/uri: eco-base://k8s/core/ingress/machine-native-ops-ingress
+    eco-base/urn: urn:eco-base:k8s:core:ingress:machine-native-ops-ingress:sha256-b25789be0abe1b84dc43dbf3f1b7497ad5c141d70c58e9d8ba85806d5a032de9
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-redirect: 'true'
   labels:

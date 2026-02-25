@@ -13,8 +13,8 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/configmap/circleci-agent-config
-    eco-base/urn: urn:eco-base:k8s:unknown:configmap:circleci-agent-config:sha256-a00de141333a07e41b3784dc30882fb8ad139e392d3114d695fdb9da15d2ac15
+    eco-base/uri: eco-base://k8s/core/configmap/circleci-agent-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:circleci-agent-config:sha256-540020a57e1b567b946f369e9124d67e9f825626089ecb9503f8c68e678ccdc2
   labels:
     app: circleci-runner
   name: circleci-agent-config

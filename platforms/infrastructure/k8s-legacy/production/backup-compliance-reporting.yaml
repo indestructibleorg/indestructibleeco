@@ -50,8 +50,8 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/configmap/backup-compliance-config
-    eco-base/urn: urn:eco-base:k8s:unknown:configmap:backup-compliance-config:sha256-16d5046b3ce23bf2eac21cc8a71a8910fd6f820e746bfb38ce62086a9c41a751
+    eco-base/uri: eco-base://k8s/core/configmap/backup-compliance-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:backup-compliance-config:sha256-154623e7261428c416b741be5eb4dd1f60ce80e8b61a4309573924676f4bf094
   labels: {}
   name: backup-compliance-config
   namespace: velero
@@ -60,8 +60,8 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/cronjob/backup-compliance-report
-    eco-base/urn: urn:eco-base:k8s:unknown:cronjob:backup-compliance-report:sha256-579386f7fea4d065368b50eaa171b5d88f68d33717733490a2e815858203cf52
+    eco-base/uri: eco-base://k8s/core/cronjob/backup-compliance-report
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:backup-compliance-report:sha256-9107d1cd0949736381de5989a519151fa0bf8a0775a068a3566e203fdee3ed3e
   labels: {}
   name: backup-compliance-report
   namespace: velero

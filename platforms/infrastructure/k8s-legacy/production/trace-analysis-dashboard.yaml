@@ -49,8 +49,8 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/configmap/trace-analysis-dashboard
-    eco-base/urn: urn:eco-base:k8s:unknown:configmap:trace-analysis-dashboard:sha256-78ad195b28ee9fdc29c564348c0cfcf43362a29443ef266e03a80593f90c2184
+    eco-base/uri: eco-base://k8s/core/configmap/trace-analysis-dashboard
+    eco-base/urn: urn:eco-base:k8s:core:configmap:trace-analysis-dashboard:sha256-c7cace59abcc00f02f93098752cf8a85616c0ba2f45bd02231eff1c0a15cfc4e
   labels:
     eco-base/governance: aligned
     eco-base/part-of: eco-base
@@ -87,8 +87,8 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/configmap/trace-analysis-alerts
-    eco-base/urn: urn:eco-base:k8s:unknown:configmap:trace-analysis-alerts:sha256-fd00a6b502693ad89042e3d89000c062e56a37d886f7c043aa36a56fa96a67c9
+    eco-base/uri: eco-base://k8s/core/configmap/trace-analysis-alerts
+    eco-base/urn: urn:eco-base:k8s:core:configmap:trace-analysis-alerts:sha256-26c479503ff700959f6fd04fe086e9b7270434eaa7853d11567d49b52b2015dc
   labels: {}
   name: trace-analysis-alerts
   namespace: istio-system
@@ -97,8 +97,8 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/cronjob/trace-analysis-report
-    eco-base/urn: urn:eco-base:k8s:unknown:cronjob:trace-analysis-report:sha256-aa9d5eb96b9cd1f0e78df7badb960a922777367521c9f98872396b8ea6627e13
+    eco-base/uri: eco-base://k8s/core/cronjob/trace-analysis-report
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:trace-analysis-report:sha256-73cbac2c3c1d81774299d72070d8471cab2e05849db70098417266b5a5a012e4
   labels: {}
   name: trace-analysis-report
   namespace: istio-system

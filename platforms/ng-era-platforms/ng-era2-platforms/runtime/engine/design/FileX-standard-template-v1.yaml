@@ -264,8 +264,8 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/configmap/filex-template-schema
-    eco-base/urn: urn:eco-base:k8s:unknown:configmap:filex-template-schema:sha256-04ee3b6369ecba2e7459f4e2c3bc7b4d7c378cef88a5be1507daaf4839ec5519
+    eco-base/uri: eco-base://k8s/core/configmap/filex-template-schema
+    eco-base/urn: urn:eco-base:k8s:core:configmap:filex-template-schema:sha256-0bdf0c30ffac501b0487b8ae25dfed12452b33603452d229d7821f2be86f4755
   labels: {}
   name: filex-template-schema
   namespace: machinenativeops-artifacts

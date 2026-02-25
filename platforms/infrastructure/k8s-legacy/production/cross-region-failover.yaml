@@ -64,8 +64,8 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/configmap/cross-region-failover-config
-    eco-base/urn: urn:eco-base:k8s:unknown:configmap:cross-region-failover-config:sha256-fe8657aa387c3ab2aa87ae1e4caec25373430a635cd5659f6b43bae3b188a601
+    eco-base/uri: eco-base://k8s/core/configmap/cross-region-failover-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:cross-region-failover-config:sha256-3a64b3604bed68b6219ecf35196c02cdc1876714b9db2b1d53b4a3698692aa5a
   labels: {}
   name: cross-region-failover-config
   namespace: production

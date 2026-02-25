@@ -9,8 +9,8 @@ def sha256_file(path):
     return h.hexdigest()
 
 def main():
-    hashlock_path = "hashlock.json"
-    attestation_path = "hashlock.attestation.intoto.json"
+    hashlock_path = "supplychain/hashlock.json"
+    attestation_path = "supplychain/hashlock.attestation.intoto.json"
     
     if not os.path.exists(hashlock_path):
         print(f"Error: {hashlock_path} not found")

@@ -3,8 +3,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/ingress/gl-semantic-core-ingress
-    eco-base/urn: urn:eco-base:k8s:unknown:ingress:gl-semantic-core-ingress:sha256-856d2959bd53232969f51b41fa20836acfa58d47ff60a69ce49e116b923f45ed
+    eco-base/uri: eco-base://k8s/core/ingress/gl-semantic-core-ingress
+    eco-base/urn: urn:eco-base:k8s:core:ingress:gl-semantic-core-ingress:sha256-08feaf48daadd6c61e804de50390641116dded3046e34568be31d4e161359d71
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/configuration-snippet: 'more_set_headers "ECO-Platform:
       semantic-core";

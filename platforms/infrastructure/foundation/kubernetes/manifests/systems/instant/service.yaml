@@ -3,8 +3,8 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/service/instant-service
-    eco-base/urn: urn:eco-base:k8s:unknown:service:instant-service:sha256-dab5a9bcad1a4bd18aa245237b28c5c743897f3b91a9f29d4d5d73ea4c4ad1b7
+    eco-base/uri: eco-base://k8s/core/service/instant-service
+    eco-base/urn: urn:eco-base:k8s:core:service:instant-service:sha256-02cc49729149037c29b936e448c7c05fb4db5ba1a9801f5a9253b14f7a683589
   labels:
     app.kubernetes.io/app.kubernetes.io/component: data
     app.kubernetes.io/name: instant-system

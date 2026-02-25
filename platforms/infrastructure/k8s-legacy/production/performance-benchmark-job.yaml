@@ -3,8 +3,8 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/cronjob/performance-benchmark-smoke
-    eco-base/urn: urn:eco-base:k8s:unknown:cronjob:performance-benchmark-smoke:sha256-ef00e9e8cde96f6f6e58189d658eecdebc6b76bce12201f656bef84d027c3649
+    eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-smoke
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-smoke:sha256-6109b1ef698a2a5025fc7f8ebef62debc7d769b07e5bcbde87b7c206b4e1fd36
   labels:
     app.kubernetes.io/name: performance-benchmark
     eco-base/governance: aligned
@@ -63,8 +63,8 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/cronjob/performance-benchmark-load
-    eco-base/urn: urn:eco-base:k8s:unknown:cronjob:performance-benchmark-load:sha256-0d9cda775d55a6cf2219482256ea51fbba1a73a9f8df09fba5c8dcda6379717f
+    eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-load
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-load:sha256-35dd942bc9e267da5d5d4080e053c55ba39b7f09b33547b7bd0bd46e7191a269
   labels:
     app.kubernetes.io/name: performance-benchmark
     eco-base/governance: aligned
@@ -123,8 +123,8 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/cronjob/performance-benchmark-stress
-    eco-base/urn: urn:eco-base:k8s:unknown:cronjob:performance-benchmark-stress:sha256-aa6b2bc33990a4a5e5e869f89c6fab9df03cdee8c8211fd3ead5c5ba02e8dbe5
+    eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-stress
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-stress:sha256-19e04a8fb9a40503ae7c5263d0bd385c6c5fb5e3058f816714ebf18249c5a5f2
   labels:
     app.kubernetes.io/name: performance-benchmark
     eco-base/governance: aligned
@@ -183,8 +183,8 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/cronjob/performance-benchmark-endurance
-    eco-base/urn: urn:eco-base:k8s:unknown:cronjob:performance-benchmark-endurance:sha256-d3b006bef3c1f4ebd9bb9d0d559e51ac4fe53a16e08cf34bdfbff50f31ae9992
+    eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-endurance
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-endurance:sha256-d634aa5f6f56b99bea1a521e7e43b36063788d1f93aed4002c8691d4d6c82550
   labels:
     app.kubernetes.io/name: performance-benchmark
     eco-base/governance: aligned

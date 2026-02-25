@@ -70,8 +70,8 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/configmap/argocd-notifications-cm
-    eco-base/urn: urn:eco-base:k8s:unknown:configmap:argocd-notifications-cm:sha256-2134000d2fc2b888693fc188b137caa0661725ff0f4781e972e5202051349938
+    eco-base/uri: eco-base://k8s/core/configmap/argocd-notifications-cm
+    eco-base/urn: urn:eco-base:k8s:core:configmap:argocd-notifications-cm:sha256-d0b47a3f6f9b06599210af8c0848c88e63369ea592a65c75c4cdee05722d0745
   labels:
     app.kubernetes.io/name: argocd-notifications
     app.kubernetes.io/part-of: eco-base

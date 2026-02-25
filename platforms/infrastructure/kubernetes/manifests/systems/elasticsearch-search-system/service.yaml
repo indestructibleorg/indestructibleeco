@@ -3,8 +3,8 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/service/elasticsearch-search-service
-    eco-base/urn: urn:eco-base:k8s:unknown:service:elasticsearch-search-service:sha256-b6e5cc1217d05a6e37ec2239aeabe7abdabddc141d4f9ca352d4b98528c076c1
+    eco-base/uri: eco-base://k8s/core/service/elasticsearch-search-service
+    eco-base/urn: urn:eco-base:k8s:core:service:elasticsearch-search-service:sha256-e93ccf866a4be4b928eba20d47d3e92c3ee80b178d8a7d96df026839955ce128
   labels:
     app.kubernetes.io/app.kubernetes.io/component: search
     app.kubernetes.io/name: elasticsearch-search-system

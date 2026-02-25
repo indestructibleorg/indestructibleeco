@@ -3,8 +3,8 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/service/aep-engine-service
-    eco-base/urn: urn:eco-base:k8s:unknown:service:aep-engine-service:sha256-d2118744be2d6c2dce72847fc7dcc92e3044356a3c1e12ede8bc134f0c03d0fe
+    eco-base/uri: eco-base://k8s/core/service/aep-engine-service
+    eco-base/urn: urn:eco-base:k8s:core:service:aep-engine-service:sha256-fea9ba79d739ebac4ba7edcd2e46689bf55a9ac6c4d93acc0431b81cde34f53e
   labels:
     app.kubernetes.io/app.kubernetes.io/component: engine
     app.kubernetes.io/name: aep-engine

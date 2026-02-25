@@ -3,8 +3,8 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/cronjob/dr-health-check
-    eco-base/urn: urn:eco-base:k8s:unknown:cronjob:dr-health-check:sha256-f9736f47da1e1cd8e6d0e5c6d8be097644059eb40aeaea9e35da7e4c7d00543c
+    eco-base/uri: eco-base://k8s/core/cronjob/dr-health-check
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:dr-health-check:sha256-b9a766f15ea01d87b13e91684270b3b83c4fa916a5cb9ce0ec17c50a44bf3975
   labels:
     app.kubernetes.io/name: disaster-recovery
     eco-base/governance: aligned
@@ -81,8 +81,8 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/cronjob/dr-backup-verification
-    eco-base/urn: urn:eco-base:k8s:unknown:cronjob:dr-backup-verification:sha256-abf1fc546c1756a2e5616256825dd4573573535a9d5fa70219d1734519ca851d
+    eco-base/uri: eco-base://k8s/core/cronjob/dr-backup-verification
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:dr-backup-verification:sha256-5ae6fcde86e08e72671efe267f63220ad8041f1c42d25fa4a2ad0d0dded330ab
   labels:
     app.kubernetes.io/name: disaster-recovery
     eco-base/governance: aligned

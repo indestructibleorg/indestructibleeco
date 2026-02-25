@@ -10,8 +10,8 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/configmap/machine-native-ops-config
-    eco-base/urn: urn:eco-base:k8s:unknown:configmap:machine-native-ops-config:sha256-7db320e36479f636235f7575311046f14306d2732aed17d47e6bd87e3ab49e51
+    eco-base/uri: eco-base://k8s/core/configmap/machine-native-ops-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:machine-native-ops-config:sha256-eb01977a70c5c53cd6a83f573b502d0f0d1283601019ecb444018685529895af
   labels:
     app.kubernetes.io/app.kubernetes.io/component: config
     app.kubernetes.io/name: machine-native-ops

@@ -34,8 +34,8 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/unknown/configmap/velero-enhanced-backup-config
-    eco-base/urn: urn:eco-base:k8s:unknown:configmap:velero-enhanced-backup-config:sha256-171ff17f2fcf6e4a4d58dbdc59726354c76ccb7ecee156e3e3acd5ea0895b760
+    eco-base/uri: eco-base://k8s/core/configmap/velero-enhanced-backup-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:velero-enhanced-backup-config:sha256-97e9fcf71c73121d4c1625aea2da8f8aba06f4c7a58656b7c74dea367dc09c5b
   labels: {}
   name: velero-enhanced-backup-config
   namespace: velero

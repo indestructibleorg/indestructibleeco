@@ -12,6 +12,10 @@ permissions:
   pull-requests: write
   issues: write
 
+concurrency:
+  group: pr-blocked-response-recovery-${{ github.repository }}
+  cancel-in-progress: false
+
 jobs:
   redispatch:
     name: Re-dispatch blocked response on action_required
@@ -165,8 +169,49 @@ jobs:
               const artifactPath = path.join(artifactDir, `pr-${prNumber}-run-${run.id}.json`);
               fs.writeFileSync(artifactPath, JSON.stringify(metrics, null, 2));
               core.info(`Wrote recovery metrics artifact: ${artifactPath}`);
+              const summaryPath = path.join(artifactDir, 'recovery-summary.json');
+              let summary = {
+                generated_at: new Date().toISOString(),
+                total_events: 0,
+                prs: {},
+              };
+              if (fs.existsSync(summaryPath)) {
+                try {
+                  summary = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
+                } catch (_e) {
+                  core.info('Failed to parse existing recovery-summary.json, regenerating.');
+                }
+              }
+              const prKey = String(prNumber);
+              const previous = summary.prs?.[prKey] || {};
+              const history = Array.isArray(previous.recent_runs) ? previous.recent_runs.slice(-19) : [];
+              history.push({
+                run_id: run.id,
+                generated_at: metrics.generated_at,
+                redispatch_result: metrics.redispatch_result,
+                approve_result: metrics.approve_result,
+                warning_summary: metrics.warning_summary,
+                error_summary: metrics.error_summary,
+              });
+              summary.generated_at = metrics.generated_at;
+              summary.total_events = Number(summary.total_events || 0) + 1;
+              summary.prs[prKey] = {
+                pr_number: prNumber,
+                latest_run_id: run.id,
+                latest_head_sha: metrics.head_sha,
+                latest_status: metrics.status,
+                latest_conclusion: metrics.conclusion,
+                cumulative_recovery_count: metrics.cumulative_recovery_count,
+                last_successful_recovery_time: metrics.last_successful_recovery_time,
+                warning_summary: metrics.warning_summary,
+                error_summary: metrics.error_summary,
+                recent_runs: history,
+              };
+              fs.writeFileSync(summaryPath, JSON.stringify(summary, null, 2));
+              core.info(`Wrote rolling recovery summary: ${summaryPath}`);
             } catch (e) {
-              core.info(`Failed to write recovery metrics artifact: ${e.message}`);
+              core.setFailed(`Failed to write recovery metrics artifact: ${e.message}`);
+              throw e;
             }
             core.info(`Recovery flow completed for PR #${prNumber} on ${headBranch} with ${dispatchResult}`);
 

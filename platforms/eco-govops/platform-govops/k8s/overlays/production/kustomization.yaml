@@ -1,0 +1,76 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: eco-govops
+
+resources:
+  - ../../base
+
+patches:
+  # --- Engine: 3 replicas, production resources, zone spreading ---
+  - target:
+      kind: Deployment
+      name: govops-engine
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 3
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 500m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 1Gi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "2"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: 2Gi
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: GOVOPS_ENV
+          value: production
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: GOVOPS_LOG_LEVEL
+          value: WARNING
+      - op: add
+        path: /spec/template/spec/topologySpreadConstraints
+        value:
+          - maxSkew: 1
+            topologyKey: topology.kubernetes.io/zone
+            whenUnsatisfiable: DoNotSchedule
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: govops-engine
+
+  # --- HPA: 3-10 replicas ---
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: govops-engine-hpa
+    patch: |
+      - op: replace
+        path: /spec/minReplicas
+        value: 3
+      - op: replace
+        path: /spec/maxReplicas
+        value: 10
+
+  # --- PodDisruptionBudget ---
+  - target:
+      kind: Deployment
+      name: govops-engine
+    patch: |
+      - op: add
+        path: /metadata/annotations/pdb.kubernetes.io~1min-available
+        value: "2"
+
+configMapGenerator:
+  - name: govops-env-override
+    literals:
+      - GOVOPS_ENV=production
+      - GOVOPS_LOG_LEVEL=WARNING
+      - GOVOPS_WORKERS=4

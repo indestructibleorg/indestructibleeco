@@ -1,0 +1,1 @@
+"""SecCompOps API — FastAPI application."""

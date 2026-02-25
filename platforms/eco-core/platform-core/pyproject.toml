@@ -1,0 +1,68 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "platform-core"
+version = "1.0.0"
+description = "Shared Kernel — Auth Service, Memory Hub, Event Bus, Policy & Audit, Infra Manager. ECO Namespace: eco-core."
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+authors = [{ name = "Platform Engineering Team" }]
+dependencies = [
+    # === Core Web Framework ===
+    "fastapi>=0.115,<1",
+    "uvicorn[standard]>=0.32,<1",
+    "pydantic>=2.10,<3",
+    "pydantic-settings>=2.6,<3",
+    "httpx>=0.27,<1",
+    # === Database & ORM ===
+    "sqlalchemy[asyncio]>=2.0,<3",
+    "asyncpg>=0.30,<1",
+    # === Caching ===
+    "redis>=5.2,<6",
+    # === Auth ===
+    "pyjwt>=2.9,<3",
+    "cryptography>=44.0,<45",
+    # === Monitoring & Logging ===
+    "prometheus-client>=0.21,<1",
+    "structlog>=24.4,<25",
+    # === Configuration ===
+    "pyyaml>=6.0,<7",
+    # === Utilities ===
+    "typer>=0.14,<1",
+    "rich>=13.9,<14",
+    "tenacity>=9.0,<10",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3,<9",
+    "pytest-asyncio>=0.24,<1",
+    "pytest-cov>=6.0,<7",
+    "ruff>=0.8,<1",
+    "mypy>=1.13,<2",
+]
+
+[project.scripts]
+platform-core = "presentation.api.main:run"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "SIM", "TCH"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true

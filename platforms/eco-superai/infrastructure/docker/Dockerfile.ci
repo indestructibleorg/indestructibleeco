@@ -1,0 +1,47 @@
+# ============================================================================
+# SuperAI Platform — CI Pipeline Image
+# ============================================================================
+# Optimized for fast CI: lint, type-check, test, security scan
+# ============================================================================
+
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH="/app/src:${PYTHONPATH}" \
+    APP_ENV=testing \
+    PIP_NO_CACHE_DIR=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY pyproject.toml ./
+RUN pip install --upgrade pip setuptools wheel \
+    && pip install \
+        fastapi uvicorn[standard] sqlalchemy[asyncio] asyncpg \
+        alembic pydantic pydantic-settings python-jose[cryptography] \
+        passlib[bcrypt] redis celery structlog prometheus-client \
+        python-dotenv httpx orjson pyyaml tenacity aiofiles \
+        numpy pandas scipy scikit-learn \
+        pytest pytest-asyncio pytest-cov pytest-mock pytest-xdist \
+        httpx factory-boy faker black isort mypy ruff \
+        bandit safety pip-audit rich
+
+COPY . .
+
+# Default: run full CI pipeline
+CMD ["bash", "-c", "\
+    echo '=== Lint ===' && ruff check src/ tests/ && \
+    echo '=== Format ===' && black --check src/ tests/ && \
+    echo '=== Import Sort ===' && isort --check-only src/ tests/ && \
+    echo '=== Type Check ===' && mypy src/ --ignore-missing-imports && \
+    echo '=== Security ===' && bandit -r src/ -ll --skip B101 && \
+    echo '=== Unit Tests ===' && pytest tests/unit/ -v --cov=src --cov-report=xml -x && \
+    echo '=== Integration Tests ===' && pytest tests/integration/ -v --cov=src --cov-append -x && \
+    echo '=== CI PASSED ==='"]

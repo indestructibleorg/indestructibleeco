@@ -1,0 +1,53 @@
+# =============================================================================
+# DataOps Platform — Standalone Extraction Manifest
+# =============================================================================
+apiVersion: gl.platform.v1
+kind: ExtractionManifest
+metadata:
+  name: dataops-platform-extraction
+  version: "1.0.0"
+
+spec:
+  source:
+    monorepo: "indestructibleautoops"
+    path: "dataops-platform/"
+
+  target:
+    repository: "https://github.com/indestructibleorg/indestructibleeco"
+    path: "platforms/dataops-platform"
+    branch: "main"
+
+  extraction_steps:
+    - step: 1
+      action: "Copy platform directory"
+      command: "cp -r dataops-platform/ <target>/platforms/dataops-platform/"
+
+    - step: 2
+      action: "Verify no cross-platform imports"
+      command: "grep -r 'from seccompops' src/ || grep -r 'from govops' src/ || grep -r 'from superai' src/ || echo 'CLEAN: No cross-platform dependencies'"
+
+    - step: 3
+      action: "Initialize standalone git"
+      command: "cd <target>/platforms/dataops-platform && git init"
+
+    - step: 4
+      action: "Install dependencies"
+      command: "pip install -e '.[dev]'"
+
+    - step: 5
+      action: "Run tests"
+      command: "pytest tests/"
+
+    - step: 6
+      action: "Build container"
+      command: "docker build -f Dockerfile.prod -t dataops-platform:latest ."
+
+  verification:
+    - "All tests pass independently"
+    - "Docker image builds successfully"
+    - "No references to sibling platforms"
+    - "All registries validate with 100% score"
+    - "API endpoints respond correctly"
+
+  rollback:
+    strategy: "Delete extracted directory, re-extract from monorepo"

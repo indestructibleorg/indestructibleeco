@@ -1,0 +1,82 @@
+# Semantic Rules Registry — Canonicalization, narrative patterns, classification
+# DataOps Platform v1.0.0
+
+apiVersion: gl.registry.v1
+kind: SemanticRulesRegistry
+metadata:
+  name: DataOps-SemanticRules-v1.0.0
+  version: "1.0.0"
+  created: "2026-02-23T00:00:00Z"
+  governance_stage: "S5-VERIFIED"
+  status: "ENFORCED"
+
+spec:
+  canonicalization_rules:
+    - rule_id: "CANON-001"
+      name: "Whitespace normalization"
+      pattern: "\\s+"
+      replacement: " "
+      priority: 1
+
+    - rule_id: "CANON-002"
+      name: "Case normalization"
+      pattern: "[A-Z]"
+      action: "lowercase"
+      priority: 2
+
+    - rule_id: "CANON-003"
+      name: "Trailing whitespace removal"
+      pattern: "\\s+$"
+      replacement: ""
+      priority: 3
+
+    - rule_id: "CANON-004"
+      name: "Unicode normalization"
+      action: "NFC"
+      priority: 0
+
+  narrative_patterns:
+    prohibited:
+      - pattern: "(very|extremely|critically)\\s+(important|critical|urgent)"
+        severity: "CRITICAL"
+        description: "Subjective amplification"
+
+      - pattern: "(good|bad|excellent|poor)\\s+(code|fix|solution|approach)"
+        severity: "HIGH"
+        description: "Subjective quality judgment"
+
+      - pattern: "(surprisingly|unfortunately|fortunately|hopefully)"
+        severity: "HIGH"
+        description: "Emotional qualifier"
+
+      - pattern: "(obviously|clearly|simply|just)"
+        severity: "MEDIUM"
+        description: "Assumption qualifier"
+
+      - pattern: "(I think|I believe|I feel|in my opinion)"
+        severity: "MEDIUM"
+        description: "Subjective opinion"
+
+  classification_taxonomy:
+    categories:
+      - name: FACTUAL
+        description: "Objective, verifiable statements"
+        confidence_threshold: 0.8
+
+      - name: NARRATIVE
+        description: "Subjective, opinion-based content"
+        confidence_threshold: 0.7
+
+      - name: COMMAND
+        description: "Imperative instructions"
+        confidence_threshold: 0.9
+
+      - name: METADATA
+        description: "Structural or configuration data"
+        confidence_threshold: 0.85
+
+  enforcement:
+    narrative_free_required: true
+    auto_reject_narrative: true
+    classification_logging: true
+    batch_processing_enabled: true

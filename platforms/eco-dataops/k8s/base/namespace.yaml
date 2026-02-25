@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eco-dataops
+  labels:
+    app.kubernetes.io/name: dataops-platform
+    app.kubernetes.io/instance: dataops-platform-prod
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: data-evidence
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/managed-by: argocd
+    eco-base/platform: platform-dataops
+    eco-base/environment: production
+    eco-base/owner: data-evidence-operations-team
+    governance.io/managed: "true"
+  annotations:
+    eco-base/uri: "eco-base://k8s/platform-dataops/namespace/eco-dataops"
+    eco-base/urn: "urn:eco-base:k8s:platform-dataops:namespace:eco-dataops:gl.data-ops.evidence-platform"
+    eco-base/governance-policy: "eco-dataops-governance.rego"
+    eco-base/audit-log-level: "full"
+    description: "DataOps Platform — Data Operations & Evidence Management"

@@ -1,0 +1,16 @@
+__pycache__
+*.pyc
+.git
+.github
+.venv
+.env
+.mypy_cache
+.pytest_cache
+.ruff_cache
+tests/
+docs/
+k8s/
+argocd/
+security/
+.platform/
+*.md

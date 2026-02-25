@@ -1,0 +1,60 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: eco-govops-staging
+
+namePrefix: staging-
+
+resources:
+  - ../../base
+
+patches:
+  # --- Engine: 2 replicas, moderate resources ---
+  - target:
+      kind: Deployment
+      name: govops-engine
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 2
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 200m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 512Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "1"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: 1Gi
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: GOVOPS_ENV
+          value: staging
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: GOVOPS_LOG_LEVEL
+          value: INFO
+
+  # --- HPA: 2-6 replicas ---
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: govops-engine-hpa
+    patch: |
+      - op: replace
+        path: /spec/minReplicas
+        value: 2
+      - op: replace
+        path: /spec/maxReplicas
+        value: 6
+
+configMapGenerator:
+  - name: govops-env-override
+    literals:
+      - GOVOPS_ENV=staging
+      - GOVOPS_LOG_LEVEL=INFO
+      - GOVOPS_WORKERS=2

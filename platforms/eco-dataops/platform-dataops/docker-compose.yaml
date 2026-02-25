@@ -1,0 +1,283 @@
+# =============================================================================
+# DataOps Platform — Local Development Stack
+# Usage: docker compose up -d
+# =============================================================================
+
+x-common-env: &common-env
+  DATAOPS_ENV: "development"
+  DATAOPS_DB_HOST: "postgres"
+  DATAOPS_DB_PORT: "5432"
+  DATAOPS_DB_NAME: "dataops"
+  DATAOPS_DB_USER: "dataops"
+  DATAOPS_DB_PASSWORD: "dataops-dev-password"
+  DATAOPS_REDIS_URL: "redis://redis:6379/0"
+  DATAOPS_LOG_LEVEL: "DEBUG"
+  DATAOPS_LOG_FORMAT: "json"
+  PYTHONPATH: "/app/src"
+
+x-common-healthcheck: &common-healthcheck
+  interval: 15s
+  timeout: 5s
+  retries: 5
+  start_period: 10s
+
+services:
+  # ---------------------------------------------------------------------------
+  # Core API — FastAPI data & evidence operations engine
+  # ---------------------------------------------------------------------------
+  dataops-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: dataops-engine
+    ports:
+      - "8093:8093"
+    environment:
+      <<: *common-env
+      DATAOPS_COMPONENT: "engine"
+      DATAOPS_WORKERS: "2"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8093/healthz"]
+      <<: *common-healthcheck
+    volumes:
+      - ./src:/app/src:ro
+      - engine-data:/app/data
+      - engine-logs:/app/logs
+      - evidence-store:/app/evidence
+      - snapshots:/app/snapshots
+    networks:
+      - dataops-net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+
+  # ---------------------------------------------------------------------------
+  # Evidence Pipeline Worker
+  # ---------------------------------------------------------------------------
+  dataops-pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: dataops-pipeline
+    command: >
+      python -m engines.evidence_pipeline.engine
+    environment:
+      <<: *common-env
+      DATAOPS_COMPONENT: "pipeline"
+      DATAOPS_PIPELINE_MODE: "continuous"
+    depends_on:
+      dataops-engine:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      <<: *common-healthcheck
+    volumes:
+      - ./src:/app/src:ro
+      - evidence-store:/app/evidence
+    networks:
+      - dataops-net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+
+  # ---------------------------------------------------------------------------
+  # Replay Engine Worker
+  # ---------------------------------------------------------------------------
+  dataops-replay:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: dataops-replay
+    command: >
+      python -m engines.replay_engine.engine
+    environment:
+      <<: *common-env
+      DATAOPS_COMPONENT: "replay"
+      DATAOPS_REPLAY_MODE: "on_demand"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      <<: *common-healthcheck
+    volumes:
+      - ./src:/app/src:ro
+      - snapshots:/app/snapshots
+    networks:
+      - dataops-net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
+
+  # ---------------------------------------------------------------------------
+  # Anomaly Detector Worker
+  # ---------------------------------------------------------------------------
+  dataops-anomaly:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: dataops-anomaly
+    command: >
+      python -m engines.anomaly_detector.engine
+    environment:
+      <<: *common-env
+      DATAOPS_COMPONENT: "anomaly"
+      DATAOPS_ANOMALY_MODE: "real_time"
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      <<: *common-healthcheck
+    volumes:
+      - ./src:/app/src:ro
+    networks:
+      - dataops-net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+
+  # ---------------------------------------------------------------------------
+  # PostgreSQL — Evidence metadata, replay snapshots, anomaly records
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: dataops-postgres
+    environment:
+      POSTGRES_DB: "dataops"
+      POSTGRES_USER: "dataops"
+      POSTGRES_PASSWORD: "dataops-dev-password"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    ports:
+      - "5435:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dataops -d dataops"]
+      <<: *common-healthcheck
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - dataops-net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+  # ---------------------------------------------------------------------------
+  # Redis — Pipeline queue, replay cache, anomaly stream
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: dataops-redis
+    command: >
+      redis-server
+        --maxmemory 128mb
+        --maxmemory-policy allkeys-lru
+        --appendonly yes
+        --appendfsync everysec
+    ports:
+      - "6382:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      <<: *common-healthcheck
+    volumes:
+      - redis-data:/data
+    networks:
+      - dataops-net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 192M
+
+  # ---------------------------------------------------------------------------
+  # Prometheus — Metrics collection and alerting
+  # ---------------------------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: dataops-prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=7d"
+      - "--web.enable-lifecycle"
+    ports:
+      - "9094:9090"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      <<: *common-healthcheck
+    volumes:
+      - ./monitoring/prometheus:/etc/prometheus:ro
+      - prometheus-data:/prometheus
+    networks:
+      - dataops-net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+# ---------------------------------------------------------------------------
+# Named volumes
+# ---------------------------------------------------------------------------
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  engine-data:
+    driver: local
+  engine-logs:
+    driver: local
+  evidence-store:
+    driver: local
+  snapshots:
+    driver: local
+
+# ---------------------------------------------------------------------------
+# Networks — isolate dataops traffic
+# ---------------------------------------------------------------------------
+networks:
+  dataops-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.31.0.0/16

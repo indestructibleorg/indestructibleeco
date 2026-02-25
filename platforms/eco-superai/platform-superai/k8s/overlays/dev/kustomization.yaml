@@ -1,0 +1,114 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: eco-superai-dev
+
+namePrefix: dev-
+
+resources:
+  - ../../base
+
+patches:
+  # --- App: single replica, lower resources, debug logging ---
+  - target:
+      kind: Deployment
+      name: superai-app
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 1
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 100m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 256Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: 500m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: 512Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: development
+
+  # --- Worker: single replica, lower concurrency ---
+  - target:
+      kind: Deployment
+      name: superai-worker
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 1
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 100m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 256Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "1"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: 1Gi
+      - op: replace
+        path: /spec/template/spec/containers/0/command
+        value:
+          - celery
+          - -A
+          - src.infrastructure.tasks.worker:celery_app
+          - worker
+          - --loglevel=debug
+          - --concurrency=2
+          - --pool=prefork
+          - -Q
+          - default,quantum,ai,scientific
+
+  # --- HPA: disable in dev ---
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: superai-app-hpa
+    patch: |
+      - op: replace
+        path: /spec/minReplicas
+        value: 1
+      - op: replace
+        path: /spec/maxReplicas
+        value: 2
+
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: superai-worker-hpa
+    patch: |
+      - op: replace
+        path: /spec/minReplicas
+        value: 1
+      - op: replace
+        path: /spec/maxReplicas
+        value: 2
+
+  # --- Ingress: dev host ---
+  - target:
+      kind: Ingress
+      name: superai-ingress
+    patch: |
+      - op: replace
+        path: /spec/rules/0/host
+        value: api-dev.superai.example.com
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: api-dev.superai.example.com
+      - op: replace
+        path: /spec/tls/0/secretName
+        value: superai-dev-tls
+
+configMapGenerator:
+  - name: superai-config
+    behavior: merge
+    literals:
+      - APP_ENV=development
+      - LOG_LEVEL=debug
+      - APP_WORKERS=1
+      - MONITORING_TRACING_SAMPLE_RATE=1.0

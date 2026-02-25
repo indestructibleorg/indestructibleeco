@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "govops.fullname" . }}-config
+  labels:
+    {{- include "govops.labels" . | nindent 4 }}
+data:
+  APP_ENV: {{ .Values.app.env | quote }}
+  APP_PORT: {{ .Values.service.port | quote }}
+  LOG_LEVEL: {{ .Values.app.logLevel | quote }}
+  LOG_FORMAT: {{ .Values.app.logFormat | quote }}
+  SCAN_INTERVAL: {{ .Values.governance.scanInterval | quote }}
+  METRICS_ENABLED: "true"
+  METRICS_PORT: {{ .Values.service.port | quote }}
+  METRICS_PATH: {{ .Values.monitoring.prometheus.path | quote }}
+  COMPLIANCE_THRESHOLD: {{ .Values.governance.complianceThreshold | quote }}
+  GOVERNANCE_MODE: {{ .Values.governance.mode | quote }}
+  HEALTH_CHECK_INTERVAL: {{ .Values.app.healthCheckInterval | quote }}
+  CACHE_TTL: {{ .Values.governance.cacheTTL | quote }}
+  MAX_CONCURRENT_SCANS: {{ .Values.governance.maxConcurrentScans | quote }}
+  POSTGRES_HOST: {{ .Values.postgres.host | quote }}
+  POSTGRES_PORT: {{ .Values.postgres.port | quote }}
+  POSTGRES_DB: {{ .Values.postgres.database | quote }}
+  POSTGRES_SSL_MODE: {{ .Values.postgres.sslMode | quote }}
+  REDIS_HOST: {{ .Values.redis.host | quote }}
+  REDIS_PORT: {{ .Values.redis.port | quote }}
+  REDIS_DB: {{ .Values.redis.db | quote }}

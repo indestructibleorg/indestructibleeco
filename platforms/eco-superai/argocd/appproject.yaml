@@ -1,0 +1,109 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: superai
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: superai-platform
+    app.kubernetes.io/component: gitops
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: "SuperAI Platform — Quantum-AI Hybrid Cloud-Native Platform"
+
+  # Source repositories
+  sourceRepos:
+    - "https://github.com/IndestructibleAutoOps/indestructibleautoops.git"
+    - "ghcr.io/indestructibleautoops/*"
+
+  # Destination clusters and namespaces
+  destinations:
+    - server: "https://kubernetes.default.svc"
+      namespace: eco-superai
+    - server: "https://kubernetes.default.svc"
+      namespace: eco-superai-staging
+    - server: "https://kubernetes.default.svc"
+      namespace: eco-superai-dev
+
+  # Allowed cluster-scoped resources
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+    - group: scheduling.k8s.io
+      kind: PriorityClass
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRole
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
+
+  # Allowed namespace-scoped resources
+  namespaceResourceWhitelist:
+    - group: ""
+      kind: "*"
+    - group: apps
+      kind: "*"
+    - group: batch
+      kind: "*"
+    - group: autoscaling
+      kind: "*"
+    - group: policy
+      kind: "*"
+    - group: networking.k8s.io
+      kind: "*"
+    - group: rbac.authorization.k8s.io
+      kind: Role
+    - group: rbac.authorization.k8s.io
+      kind: RoleBinding
+
+  # Deny list — resources ArgoCD must not manage
+  namespaceResourceBlacklist:
+    - group: ""
+      kind: Event
+
+  # Roles for RBAC within ArgoCD
+  roles:
+    - name: admin
+      description: "Full access to SuperAI project"
+      policies:
+        - p, proj:superai:admin, applications, *, superai/*, allow
+        - p, proj:superai:admin, repositories, *, superai/*, allow
+      groups:
+        - superai-admins
+
+    - name: developer
+      description: "Read-only + sync for dev/staging"
+      policies:
+        - p, proj:superai:developer, applications, get, superai/*, allow
+        - p, proj:superai:developer, applications, sync, superai/*-dev, allow
+        - p, proj:superai:developer, applications, sync, superai/*-staging, allow
+      groups:
+        - superai-developers
+
+    - name: viewer
+      description: "Read-only access"
+      policies:
+        - p, proj:superai:viewer, applications, get, superai/*, allow
+      groups:
+        - superai-viewers
+
+  # Sync windows — restrict production deploys to business hours
+  syncWindows:
+    - kind: allow
+      schedule: "0 9 * * 1-5"
+      duration: 10h
+      applications: ["superai-prod"]
+      namespaces: ["superai"]
+      timeZone: "Asia/Taipei"
+    - kind: deny
+      schedule: "0 0 * * *"
+      duration: 24h
+      applications: ["superai-prod"]
+      namespaces: ["superai"]
+      manualSync: true
+
+  # Orphaned resources monitoring
+  orphanedResources:
+    warn: true
+    ignore:
+      - group: ""
+        kind: Event

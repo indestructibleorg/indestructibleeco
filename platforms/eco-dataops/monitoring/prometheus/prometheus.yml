@@ -1,0 +1,32 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+rule_files:
+  - "alert_rules.yml"
+
+scrape_configs:
+  - job_name: "dataops-engine"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["dataops-engine:9093"]
+        labels:
+          platform: "dataops"
+          component: "engine"
+
+  - job_name: "dataops-pipeline"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["dataops-pipeline:9094"]
+        labels:
+          platform: "dataops"
+          component: "pipeline"
+
+  - job_name: "dataops-anomaly"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["dataops-anomaly:9095"]
+        labels:
+          platform: "dataops"
+          component: "anomaly"

@@ -1,0 +1,30 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: govops-engine
+  namespace: eco-govops
+  labels:
+    app.kubernetes.io/name: govops-engine
+    app.kubernetes.io/part-of: govops-platform
+    app.kubernetes.io/component: monitoring
+    app.kubernetes.io/managed-by: argocd
+    governance.io/managed: "true"
+    release: prometheus
+spec:
+  namespaceSelector:
+    matchNames:
+      - govops
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: govops-engine
+      app.kubernetes.io/component: engine
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+      honorLabels: true
+      metricRelabelings:
+        - sourceLabels: [__name__]
+          regex: "go_.*"
+          action: drop

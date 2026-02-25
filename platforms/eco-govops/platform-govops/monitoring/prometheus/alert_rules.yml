@@ -1,0 +1,62 @@
+groups:
+  - name: govops-alerts
+    rules:
+      - alert: GovOpsHighViolationRate
+        expr: rate(govops_violations_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: critical
+          platform: govops
+        annotations:
+          summary: "High governance violation rate detected"
+          description: "GovOps is detecting more than 10 violations/sec for 5 minutes."
+
+      - alert: GovOpsEvidenceChainBroken
+        expr: govops_evidence_chain_integrity == 0
+        for: 1m
+        labels:
+          severity: critical
+          platform: govops
+        annotations:
+          summary: "Evidence chain integrity compromised"
+          description: "The cryptographic evidence chain has been broken. Immediate investigation required."
+
+      - alert: GovOpsEngineDown
+        expr: up{job="govops-engine"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          platform: govops
+        annotations:
+          summary: "GovOps engine is down"
+          description: "The GovOps API engine has been unreachable for 2 minutes."
+
+      - alert: GovOpsHighLatency
+        expr: histogram_quantile(0.95, rate(govops_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          platform: govops
+        annotations:
+          summary: "High API latency on GovOps"
+          description: "P95 latency exceeds 2 seconds."
+
+      - alert: GovOpsScanFailureRate
+        expr: rate(govops_scan_failures_total[10m]) / rate(govops_scans_total[10m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          platform: govops
+        annotations:
+          summary: "GovOps scan failure rate elevated"
+          description: "More than 10% of governance scans are failing."
+
+      - alert: GovOpsGateBlocked
+        expr: govops_gates_blocked_total > 0
+        for: 10m
+        labels:
+          severity: warning
+          platform: govops
+        annotations:
+          summary: "Governance gate blocked"
+          description: "One or more governance gates have been blocked for over 10 minutes."

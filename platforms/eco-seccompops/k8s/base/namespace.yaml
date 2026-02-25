@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eco-seccompops
+  labels:
+    app.kubernetes.io/name: seccompops-platform
+    app.kubernetes.io/instance: seccompops-platform-prod
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: security-compliance
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/managed-by: argocd
+    eco-base/platform: platform-seccompops
+    eco-base/environment: production
+    eco-base/owner: security-compliance-team
+    governance.io/managed: "true"
+  annotations:
+    eco-base/uri: "eco-base://k8s/platform-seccompops/namespace/eco-seccompops"
+    eco-base/urn: "urn:eco-base:k8s:platform-seccompops:namespace:eco-seccompops:gl.sec-ops.compliance-platform"
+    eco-base/governance-policy: "eco-seccompops-governance.rego"
+    eco-base/audit-log-level: "full"
+    description: "SecCompOps Platform — Security & Compliance Operations"

@@ -1,0 +1,74 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "govops-platform"
+version = "1.0.0"
+description = "Governance Operations Platform — autonomous closed-loop governance, ETL pipelines, IaOps engine, ecosystem enforcement, and semantic search."
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+authors = [{ name = "Machine Native Ops Team" }]
+
+dependencies = [
+    "fastapi>=0.115,<1",
+    "uvicorn[standard]>=0.32,<1",
+    "pydantic>=2.10,<3",
+    "pydantic-settings>=2.6,<3",
+    "structlog>=24.4,<25",
+    "httpx>=0.27,<1",
+    "sqlalchemy[asyncio]>=2.0,<3",
+    "asyncpg>=0.30,<1",
+    "redis>=5.2,<6",
+    "celery[redis]>=5.4,<6",
+    "prometheus-client>=0.21,<1",
+    "pyyaml>=6.0,<7",
+    "jsonschema>=4.23,<5",
+    "watchdog>=6.0,<7",
+    "networkx>=3.4,<4",
+    "jinja2>=3.1,<4",
+    "typer>=0.14,<1",
+    "rich>=13.9,<14",
+    "tenacity>=9.0,<10",
+    "cryptography>=44.0,<45",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3,<9",
+    "pytest-asyncio>=0.24,<1",
+    "pytest-cov>=6.0,<7",
+    "ruff>=0.8,<1",
+    "mypy>=1.13,<2",
+    "pre-commit>=4.0,<5",
+]
+ml = [
+    "scikit-learn>=1.5,<2",
+    "numpy>=2.1,<3",
+]
+
+[project.scripts]
+govops = "presentation.api.main:run"
+govops-engine = "engine.orchestrator.closed_loop:main"
+govops-etl = "etl.pipeline.etl_pipeline:main"
+govops-scan = "engine.scanner.module_scanner:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "SIM", "TCH"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true

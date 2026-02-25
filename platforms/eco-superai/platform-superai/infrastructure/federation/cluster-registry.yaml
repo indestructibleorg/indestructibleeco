@@ -1,0 +1,244 @@
+# Multi-Cluster Federation - Cluster Registry
+# P0 Critical: Cluster discovery and registration for fleet management
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fleet-management
+  labels:
+    app: superai-platform
+    component: federation
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-registry
+  namespace: fleet-management
+  labels:
+    app: superai-platform
+    component: federation
+data:
+  clusters.yaml: |
+    clusters:
+      - name: production-us-east-1
+        apiEndpoint: https://api.prod-useast.superai.platform
+        location: us-east-1
+        provider: AWS
+        environment: production
+        capabilities:
+          - quantum-computing
+          - ml-inference
+          - vector-database
+        capacity:
+          cpu: "1000"
+          memory: "4000Gi"
+          nodes: 50
+        status: active
+        health: healthy
+        lastSync: "2024-02-11T10:00:00Z"
+      
+      - name: production-eu-central-1
+        apiEndpoint: https://api.prod-eu.superai.platform
+        location: eu-central-1
+        provider: AWS
+        environment: production
+        capabilities:
+          - quantum-computing
+          - ml-training
+          - data-processing
+        capacity:
+          cpu: "800"
+          memory: "3200Gi"
+          nodes: 40
+        status: active
+        health: healthy
+        lastSync: "2024-02-11T10:00:00Z"
+      
+      - name: staging-us-west-2
+        apiEndpoint: https://api.staging-uswest.superai.platform
+        location: us-west-2
+        provider: AWS
+        environment: staging
+        capabilities:
+          - ml-inference
+          - data-processing
+        capacity:
+          cpu: "200"
+          memory: "800Gi"
+          nodes: 10
+        status: active
+        health: healthy
+        lastSync: "2024-02-11T10:00:00Z"
+      
+      - name: development-ap-southeast-1
+        apiEndpoint: https://api.dev-apse.superai.platform
+        location: ap-southeast-1
+        provider: AWS
+        environment: development
+        capabilities:
+          - development
+          - testing
+        capacity:
+          cpu: "100"
+          memory: "400Gi"
+          nodes: 5
+        status: active
+        health: healthy
+        lastSync: "2024-02-11T10:00:00Z"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-secrets
+  namespace: fleet-management
+  labels:
+    app: superai-platform
+    component: federation
+type: Opaque
+stringData:
+  production-us-east-1-kubeconfig: |
+    apiVersion: v1
+    kind: Config
+    clusters:
+    - cluster:
+        certificate-authority-data: BASE64_ENCODED_CA_DATA
+        server: https://api.prod-useast.superai.platform
+      name: production-us-east-1
+    contexts:
+    - context:
+        cluster: production-us-east-1
+        user: production-admin
+      name: production-us-east-1
+    users:
+    - name: production-admin
+      user:
+        token: SERVICE_ACCOUNT_TOKEN
+  
+  production-eu-central-1-kubeconfig: |
+    apiVersion: v1
+    kind: Config
+    clusters:
+    - cluster:
+        certificate-authority-data: BASE64_ENCODED_CA_DATA
+        server: https://api.prod-eu.superai.platform
+      name: production-eu-central-1
+    contexts:
+    - context:
+        cluster: production-eu-central-1
+        user: production-admin
+      name: production-eu-central-1
+    users:
+    - name: production-admin
+      user:
+        token: SERVICE_ACCOUNT_TOKEN
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cluster-registry-operator
+  namespace: fleet-management
+  labels:
+    app: superai-platform
+    component: federation
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cluster-registry-operator
+  template:
+    metadata:
+      labels:
+        app: cluster-registry-operator
+        app: superai-platform
+        component: federation
+    spec:
+      serviceAccountName: fleet-management
+      containers:
+      - name: operator
+        image: ghcr.io/superai-platform/cluster-registry-operator:latest
+        args:
+          - --config-path=/etc/registry/clusters.yaml
+          - --sync-interval=300s
+          - --health-check-interval=60s
+        ports:
+        - name: metrics
+          containerPort: 8080
+        - name: api
+          containerPort: 8443
+        volumeMounts:
+        - name: config
+          mountPath: /etc/registry
+          readOnly: true
+        - name: secrets
+          mountPath: /etc/secrets
+          readOnly: true
+        env:
+        - name: NAMESPACE
+          value: fleet-management
+        - name: LOG_LEVEL
+          value: info
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: metrics
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: metrics
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+      - name: config
+        configMap:
+          name: cluster-registry
+      - name: secrets
+        secret:
+          secretName: cluster-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cluster-registry-service
+  namespace: fleet-management
+  labels:
+    app: superai-platform
+    component: federation
+spec:
+  type: ClusterIP
+  ports:
+  - name: metrics
+    port: 8080
+    targetPort: metrics
+  - name: api
+    port: 8443
+    targetPort: api
+  selector:
+    app: cluster-registry-operator
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cluster-registry
+  namespace: fleet-management
+  labels:
+    app: superai-platform
+    component: federation
+spec:
+  selector:
+    matchLabels:
+      app: superai-platform
+      component: federation
+  endpoints:
+  - port: metrics
+    path: /metrics
+    interval: 30s

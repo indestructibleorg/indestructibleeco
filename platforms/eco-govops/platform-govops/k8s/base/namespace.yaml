@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eco-govops
+  labels:
+    app.kubernetes.io/name: govops-platform
+    app.kubernetes.io/instance: govops-platform-prod
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: governance
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/managed-by: argocd
+    eco-base/platform: platform-govops
+    eco-base/environment: production
+    eco-base/owner: governance-operations-team
+    governance.io/managed: "true"
+  annotations:
+    eco-base/uri: "eco-base://k8s/platform-govops/namespace/eco-govops"
+    eco-base/urn: "urn:eco-base:k8s:platform-govops:namespace:eco-govops:gl.gov.ops-platform"
+    eco-base/governance-policy: "eco-govops-governance.rego"
+    eco-base/audit-log-level: "full"
+    description: "GovOps Platform — Governance and Operations Management"

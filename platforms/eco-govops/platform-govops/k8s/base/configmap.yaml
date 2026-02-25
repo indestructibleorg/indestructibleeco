@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: govops-engine-config
+  namespace: eco-govops
+  labels:
+    app.kubernetes.io/name: govops-engine
+    app.kubernetes.io/part-of: govops-platform
+    app.kubernetes.io/component: engine
+    governance.io/managed: "true"
+data:
+  APP_ENV: "production"
+  APP_PORT: "8090"
+  LOG_LEVEL: "info"
+  LOG_FORMAT: "json"
+  SCAN_INTERVAL: "300"
+  METRICS_ENABLED: "true"
+  METRICS_PORT: "8090"
+  METRICS_PATH: "/metrics"
+  COMPLIANCE_THRESHOLD: "80"
+  GOVERNANCE_MODE: "enforce"
+  CACHE_TTL: "600"
+  MAX_CONCURRENT_SCANS: "10"
+  HEALTH_CHECK_INTERVAL: "30"

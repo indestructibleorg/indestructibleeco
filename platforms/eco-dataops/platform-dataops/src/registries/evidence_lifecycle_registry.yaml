@@ -1,0 +1,73 @@
+# Evidence Lifecycle Registry — States, transitions, retention, chain-of-custody
+# DataOps Platform v1.0.0
+
+apiVersion: gl.registry.v1
+kind: EvidenceLifecycleRegistry
+metadata:
+  name: DataOps-EvidenceLifecycle-v1.0.0
+  version: "1.0.0"
+  created: "2026-02-23T00:00:00Z"
+  governance_stage: "S5-VERIFIED"
+  status: "ENFORCED"
+
+spec:
+  evidence_states:
+    - state: INGESTED
+      description: "Raw evidence received and queued for processing"
+      allowed_transitions: [VALIDATING, REJECTED]
+
+    - state: VALIDATING
+      description: "Schema and integrity validation in progress"
+      allowed_transitions: [VERIFIED, REJECTED]
+
+    - state: VERIFIED
+      description: "Evidence validated, hash computed, pending chain binding"
+      allowed_transitions: [SEALED, REJECTED]
+
+    - state: SEALED
+      description: "Evidence bound to hash chain, immutable"
+      allowed_transitions: [ARCHIVED]
+
+    - state: ARCHIVED
+      description: "Evidence moved to long-term storage"
+      allowed_transitions: []
+
+    - state: REJECTED
+      description: "Evidence failed validation"
+      allowed_transitions: []
+
+  pipeline_stages:
+    - stage: INGEST
+      timeout_seconds: 30
+      retry_count: 3
+
+    - stage: VALIDATE_SCHEMA
+      timeout_seconds: 15
+      required_fields: ["source", "payload", "timestamp"]
+
+    - stage: COMPUTE_HASH
+      algorithm: "sha3_512"
+      timeout_seconds: 10
+
+    - stage: BIND_CHAIN
+      timeout_seconds: 10
+      chain_algorithm: "sha3_512"
+
+    - stage: SEAL
+      timeout_seconds: 5
+
+    - stage: ARCHIVE
+      timeout_seconds: 60
+      retention_years: 7
+
+  retention_policy:
+    default_retention: "7_years"
+    critical_retention: "10_years"
+    archive_backend: "s3_worm"
+    replication_factor: 3
+
+  chain_of_custody:
+    hash_algorithm: "sha3_512"
+    chain_verification_interval: "30_seconds"
+    integrity_check: "real_time"
+    tamper_detection: "automatic_alert"

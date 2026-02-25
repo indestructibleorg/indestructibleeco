@@ -1,0 +1,132 @@
+global:
+  resolve_timeout: 5m
+  smtp_from: "alerts@superai.example.com"
+  smtp_smarthost: "smtp.example.com:587"
+  smtp_auth_username: "alerts@superai.example.com"
+  smtp_auth_password: "CHANGE_ME"
+  smtp_require_tls: true
+  pagerduty_url: "https://events.pagerduty.com/v2/enqueue"
+  slack_api_url: "https://hooks.slack.com/services/CHANGE_ME"
+
+templates:
+  - "/etc/alertmanager/templates/*.tmpl"
+
+route:
+  receiver: "default-receiver"
+  group_by: ["alertname", "namespace", "severity"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  routes:
+    # Critical: PagerDuty immediate
+    - receiver: "pagerduty-critical"
+      match:
+        severity: critical
+      group_wait: 10s
+      repeat_interval: 1h
+      continue: true
+
+    # Critical: also Slack
+    - receiver: "slack-critical"
+      match:
+        severity: critical
+      group_wait: 10s
+      continue: false
+
+    # Warning: Slack only
+    - receiver: "slack-warning"
+      match:
+        severity: warning
+      group_wait: 1m
+      repeat_interval: 8h
+
+    # SLO burn rate alerts: PagerDuty
+    - receiver: "pagerduty-slo"
+      match_re:
+        alertname: "SuperAI(Availability|Latency)BurnRate.*"
+      group_wait: 10s
+      repeat_interval: 30m
+
+    # Security alerts: immediate
+    - receiver: "pagerduty-security"
+      match:
+        category: security
+      group_wait: 0s
+      repeat_interval: 15m
+
+receivers:
+  - name: "default-receiver"
+    slack_configs:
+      - channel: "#superai-alerts"
+        send_resolved: true
+        title: '{{ .GroupLabels.alertname }} [{{ .Status | toUpper }}]'
+        text: >-
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Severity:* {{ .Labels.severity }}
+          *Description:* {{ .Annotations.description }}
+          {{ end }}
+
+  - name: "pagerduty-critical"
+    pagerduty_configs:
+      - service_key: "CHANGE_ME_PAGERDUTY_SERVICE_KEY"
+        severity: '{{ .CommonLabels.severity }}'
+        description: '{{ .CommonAnnotations.summary }}'
+        details:
+          firing: '{{ .Alerts.Firing | len }}'
+          resolved: '{{ .Alerts.Resolved | len }}'
+          namespace: '{{ .CommonLabels.namespace }}'
+
+  - name: "pagerduty-slo"
+    pagerduty_configs:
+      - service_key: "CHANGE_ME_PAGERDUTY_SLO_KEY"
+        severity: critical
+        description: 'SLO Burn Rate Alert: {{ .CommonAnnotations.summary }}'
+
+  - name: "pagerduty-security"
+    pagerduty_configs:
+      - service_key: "CHANGE_ME_PAGERDUTY_SECURITY_KEY"
+        severity: critical
+        description: 'Security Alert: {{ .CommonAnnotations.summary }}'
+
+  - name: "slack-critical"
+    slack_configs:
+      - channel: "#superai-critical"
+        send_resolved: true
+        color: '{{ if eq .Status "firing" }}danger{{ else }}good{{ end }}'
+        title: ':rotating_light: {{ .GroupLabels.alertname }} [{{ .Status | toUpper }}]'
+        text: >-
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Severity:* `{{ .Labels.severity }}`
+          *Namespace:* {{ .Labels.namespace }}
+          *Description:* {{ .Annotations.description }}
+          *Runbook:* {{ .Annotations.runbook_url }}
+          {{ end }}
+
+  - name: "slack-warning"
+    slack_configs:
+      - channel: "#superai-alerts"
+        send_resolved: true
+        color: '{{ if eq .Status "firing" }}warning{{ else }}good{{ end }}'
+        title: ':warning: {{ .GroupLabels.alertname }} [{{ .Status | toUpper }}]'
+        text: >-
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ end }}
+
+inhibit_rules:
+  # If critical is firing, suppress warning for same alertname
+  - source_match:
+      severity: critical
+    target_match:
+      severity: warning
+    equal: ["alertname", "namespace"]
+
+  # If cluster is down, suppress all pod-level alerts
+  - source_match:
+      alertname: SuperAIClusterDown
+    target_match_re:
+      alertname: "SuperAI(Pod|Container|Deployment).*"
+    equal: ["namespace"]

@@ -1,0 +1,437 @@
+# Audit Logging Configuration
+# P0 Critical: Comprehensive audit trail for security and compliance
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: audit-config
+  namespace: default
+  labels:
+    app: superai-platform
+    component: audit
+data:
+  audit-policy.yaml: |
+    # Audit Policy for SuperAI Platform
+    # Logs all requests for security and compliance
+    
+    apiVersion: audit.k8s.io/v1
+    kind: Policy
+    rules:
+      # Log all requests at the Request level
+      - level: Request
+        
+        # Log configuration changes
+        verbs: ["create", "update", "delete", "patch"]
+        resources:
+          - group: "" # core
+            resources: ["configmaps", "secrets", "pods", "services"]
+          - group: "apps"
+            resources: ["deployments", "statefulsets", "daemonsets"]
+          - group: "rbac.authorization.k8s.io"
+            resources: ["roles", "rolebindings", "clusterroles", "clusterrolebindings"]
+          - group: "networking.k8s.io"
+            resources: ["ingresses", "networkpolicies"]
+        
+        # Log security-sensitive operations
+        verbs: ["impersonate"]
+        resources: ["*"]
+      
+      # Log failed authentication attempts
+      - level: Request
+        verbs: ["create"]
+        resources:
+          - group: "authentication.k8s.io"
+            resources: ["tokenreviews"]
+      
+      # Log admission webhooks
+      - level: Request
+        resources:
+          - group: "admissionregistration.k8s.io"
+            resources: ["validatingwebhookconfigurations", "mutatingwebhookconfigurations"]
+      
+      # Log pod exec/attach/port-forward (potential security risk)
+      - level: Request
+        verbs: ["create", "connect"]
+        resources:
+          - group: ""
+            resources: ["pods/exec", "pods/attach", "pods/portforward"]
+      
+      # Log all secrets access
+      - level: RequestResponse
+        verbs: ["get", "list", "watch"]
+        resources:
+          - group: ""
+            resources: ["secrets"]
+      
+      # Log namespace operations
+      - level: Request
+        verbs: ["create", "delete"]
+        resources:
+          - group: ""
+            resources: ["namespaces"]
+---
+# Audit Log Sidecar for Application-Level Auditing
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: audit-log-sidecar
+  namespace: default
+  labels:
+    app: superai-platform
+    component: audit
+spec:
+  selector:
+    matchLabels:
+      app: superai-platform
+  template:
+    metadata:
+      labels:
+        app: superai-platform
+        component: audit
+    spec:
+      serviceAccountName: superai-monitoring
+      containers:
+      - name: audit-collector
+        image: busybox:1.36
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            # Collect application audit logs
+            while true; do
+              if [ -f /app/logs/audit.log ]; then
+                tail -n 0 -f /app/logs/audit.log | while read line; do
+                  echo "$line" >> /var/log/audit/application.log
+                  
+                  # Send to Loki for aggregation
+                  curl -X POST http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push \
+                    -H "Content-Type: application/json" \
+                    -d "{
+                      &quot;streams&quot;: [
+                        {
+                          &quot;stream&quot;: {
+                            &quot;job&quot;: &quot;audit&quot;,
+                            &quot;app&quot;: &quot;superai-platform&quot;,
+                            &quot;level&quot;: &quot;audit&quot;
+                          },
+                          &quot;values&quot;: [
+                            [&quot;$(date +%s)000000000&quot;, &quot;$line&quot;]
+                          ]
+                        }
+                      ]
+                    }"
+                done
+              fi
+              sleep 1
+            done
+        volumeMounts:
+        - name: app-logs
+          mountPath: /app/logs
+          readOnly: true
+        - name: audit-storage
+          mountPath: /var/log/audit
+        resources:
+          requests:
+            cpu: 50m
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 200Mi
+      volumes:
+      - name: app-logs
+        hostPath:
+          path: /var/log/superai-platform
+          type: DirectoryOrCreate
+      - name: audit-storage
+        hostPath:
+          path: /var/log/audit
+          type: DirectoryOrCreate
+---
+# Audit Log Rotation
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: audit-log-rotation
+  namespace: default
+  labels:
+    app: superai-platform
+    component: audit
+spec:
+  schedule: "0 0 * * *"  # Daily at midnight
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 3
+      activeDeadlineSeconds: 600
+      template:
+        spec:
+          serviceAccountName: superai-monitoring
+          restartPolicy: OnFailure
+          containers:
+          - name: log-rotator
+            image: busybox:1.36
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                # Rotate audit logs older than 7 days
+                find /var/log/audit -name "*.log" -mtime +7 -exec gzip {} \;
+                find /var/log/audit -name "*.gz" -mtime +90 -delete
+                
+                # Keep archive of critical audit events
+                grep -E "Security|Breach|Attack|Compromise|Unauthorized" /var/log/audit/application.log > /var/log/audit/critical-$(date +%Y%m%d).log
+                gzip /var/log/audit/critical-$(date +%Y%m%d).log
+                
+                echo "Audit log rotation completed at $(date)"
+            volumeMounts:
+            - name: audit-storage
+              mountPath: /var/log/audit
+            resources:
+              requests:
+                cpu: 100m
+                memory: 100Mi
+              limits:
+                cpu: 500m
+                memory: 500Mi
+          volumes:
+          - name: audit-storage
+            hostPath:
+              path: /var/log/audit
+              type: DirectoryOrCreate
+---
+# Audit Log Analysis
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: audit-log-analyzer
+  namespace: default
+  labels:
+    app: superai-platform
+    component: audit
+spec:
+  schedule: "*/30 * * * *"  # Every 30 minutes
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 300
+      template:
+        spec:
+          serviceAccountName: superai-monitoring
+          restartPolicy: OnFailure
+          containers:
+          - name: analyzer
+            image: curlimages/curl:8.5.0
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                # Analyze recent audit logs for suspicious activity
+                
+                # Check for failed authentication attempts
+                FAILED_AUTH=$(grep -c "authentication.*failed" /var/log/audit/application.log 2>/dev/null || echo "0")
+                
+                # Check for unauthorized access attempts
+                UNAUTHORIZED=$(grep -c "401\|403" /var/log/audit/application.log 2>/dev/null || echo "0")
+                
+                # Check for security events
+                SECURITY_EVENTS=$(grep -cE "Security|Breach|Attack|Compromise" /var/log/audit/application.log 2>/dev/null || echo "0")
+                
+                # Check for privilege escalation attempts
+                PRIVILEGE_ESCALATION=$(grep -cE "privilege|escalation|sudo|root" /var/log/audit/application.log 2>/dev/null || echo "0")
+                
+                # Send metrics to Prometheus Pushgateway
+                cat <<EOF | curl --data-binary @- http://pushgateway.monitoring.svc.cluster.local:9091/metrics/job/audit_analyzer/instance/$(hostname)
+                # HELP failed_auth_attempts_total Number of failed authentication attempts
+                # TYPE failed_auth_attempts_total gauge
+                failed_auth_attempts_total ${FAILED_AUTH}
+                
+                # HELP unauthorized_access_attempts_total Number of unauthorized access attempts
+                # TYPE unauthorized_access_attempts_total gauge
+                unauthorized_access_attempts_total ${UNAUTHORIZED}
+                
+                # HELP security_events_total Number of security events detected
+                # TYPE security_events_total gauge
+                security_events_total ${SECURITY_EVENTS}
+                
+                # HELP privilege_escalation_attempts_total Number of privilege escalation attempts
+                # TYPE privilege_escalation_attempts_total gauge
+                privilege_escalation_attempts_total ${PRIVILEGE_ESCALATION}
+                EOF
+                
+                # Alert if thresholds exceeded
+                if [ ${SECURITY_EVENTS} -gt 5 ]; then
+                  echo "WARNING: High number of security events detected: ${SECURITY_EVENTS}"
+                fi
+                
+                echo "Audit log analysis completed at $(date)"
+            volumeMounts:
+            - name: audit-storage
+              mountPath: /var/log/audit
+            resources:
+              requests:
+                cpu: 100m
+                memory: 100Mi
+              limits:
+                cpu: 500m
+                memory: 500Mi
+          volumes:
+          - name: audit-storage
+            hostPath:
+              path: /var/log/audit
+              type: DirectoryOrCreate
+---
+# Audit Log Retention Policy
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: audit-retention-policy
+  namespace: default
+  labels:
+    app: superai-platform
+    component: audit
+data:
+  retention.yaml: |
+    # Audit Log Retention Policy
+    # Compliant with SOC 2, HIPAA, and GDPR requirements
+    
+    retention_rules:
+      # Critical security events - 7 years
+      - category: "security_critical"
+        severity: ["critical", "high"]
+        retention_days: 2555  # 7 years
+        archive: true
+        encryption: true
+      
+      # Security events - 3 years
+      - category: "security"
+        severity: ["warning"]
+        retention_days: 1095  # 3 years
+        archive: true
+        encryption: true
+      
+      # Operational events - 1 year
+      - category: "operational"
+        severity: ["info", "notice"]
+        retention_days: 365  # 1 year
+        archive: false
+        encryption: false
+      
+      # Debug events - 90 days
+      - category: "debug"
+        severity: ["debug"]
+        retention_days: 90
+        archive: false
+        encryption: false
+    
+    # Log compression
+    compression:
+      enabled: true
+      algorithm: gzip
+      threshold_days: 7  # Compress logs older than 7 days
+    
+    # Archive storage
+    archive:
+      enabled: true
+      location: "s3://audit-logs-backup"
+      encryption: "AES256"
+      retention_days: 2555  # 7 years
+    
+    # Compliance requirements
+    compliance:
+      soc2:
+        enabled: true
+        retention_days: 1825  # 5 years
+      
+      hipaa:
+        enabled: true
+        retention_days: 2555  # 7 years
+      
+      gdpr:
+        enabled: true
+        retention_days: 2555  # 7 years
+        data_subject_access: true
+---
+# Audit Dashboard in Grafana
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-audit
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+    app: superai-platform
+    component: audit
+data:
+  audit-dashboard.json: |
+    {
+      "dashboard": {
+        "title": "Audit Logs Dashboard",
+        "tags": ["audit", "security", "compliance"],
+        "timezone": "browser",
+        "panels": [
+          {
+            "id": 1,
+            "title": "Failed Authentication Attempts",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "failed_auth_attempts_total",
+                "legendFormat": "Failed Auth"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+          },
+          {
+            "id": 2,
+            "title": "Security Events",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "security_events_total",
+                "legendFormat": "Security Events"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+          },
+          {
+            "id": 3,
+            "title": "Unauthorized Access Attempts",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "unauthorized_access_attempts_total",
+                "legendFormat": "Unauthorized"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+          },
+          {
+            "id": 4,
+            "title": "Privilege Escalation Attempts",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "privilege_escalation_attempts_total",
+                "legendFormat": "Privilege Escalation"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+          },
+          {
+            "id": 5,
+            "title": "Recent Audit Events",
+            "type": "logs",
+            "targets": [
+              {
+                "expr": "{namespace=&quot;default&quot;, job=&quot;audit&quot;}",
+                "refId": "A"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 24, "x": 0, "y": 16}
+          }
+        ]
+      }
+    }

@@ -1,0 +1,199 @@
+# -- Number of replicas for the GovOps engine deployment
+replicaCount: 2
+
+image:
+  # -- Container image repository
+  repository: govops/govops-engine
+  # -- Container image pull policy
+  pullPolicy: IfNotPresent
+  # -- Container image tag (defaults to Chart appVersion)
+  tag: ""
+
+# -- Image pull secrets for private registries
+imagePullSecrets: []
+
+# -- Override the chart name
+nameOverride: ""
+# -- Override the full release name
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account (generated if not set)
+  name: ""
+  # -- Whether to automount the service account token
+  automountServiceAccountToken: false
+
+# -- Pod-level annotations
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8090"
+  prometheus.io/path: "/metrics"
+
+# -- Pod-level security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+# -- Container-level security context
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  # -- Kubernetes service type
+  type: ClusterIP
+  # -- Service port
+  port: 8090
+
+ingress:
+  # -- Enable ingress
+  enabled: false
+  # -- Ingress class name
+  className: nginx
+  # -- Ingress annotations
+  annotations: {}
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: govops.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  # -- TLS configuration
+  tls: []
+  #  - secretName: govops-tls
+  #    hosts:
+  #      - govops.example.com
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+# -- Liveness probe configuration
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+  initialDelaySeconds: 15
+  periodSeconds: 20
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+# -- Readiness probe configuration
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+  successThreshold: 1
+
+autoscaling:
+  # -- Enable horizontal pod autoscaling
+  enabled: true
+  # -- Minimum number of replicas
+  minReplicas: 2
+  # -- Maximum number of replicas
+  maxReplicas: 8
+  # -- Target CPU utilization percentage
+  targetCPUUtilizationPercentage: 70
+  # -- Target memory utilization percentage
+  targetMemoryUtilizationPercentage: 80
+
+# -- Node selector constraints
+nodeSelector: {}
+
+# -- Tolerations for pod scheduling
+tolerations: []
+
+# -- Affinity rules for pod scheduling
+affinity: {}
+
+# PostgreSQL connection settings
+postgresql:
+  # -- PostgreSQL host
+  host: govops-postgresql
+  # -- PostgreSQL port
+  port: 5432
+  # -- PostgreSQL database name
+  database: govops
+  # -- PostgreSQL username
+  username: govops
+  # -- Name of existing secret containing the password
+  existingSecret: ""
+  # -- Key in the secret containing the password
+  secretKey: postgresql-password
+
+# Redis connection settings
+redis:
+  # -- Redis host
+  host: govops-redis
+  # -- Redis port
+  port: 6379
+  # -- Redis database number
+  db: 0
+  # -- Name of existing secret containing the password
+  existingSecret: ""
+  # -- Key in the secret containing the password
+  secretKey: redis-password
+
+# Governance settings
+governance:
+  # -- Scan interval in seconds
+  scanInterval: 300
+  # -- Compliance threshold percentage
+  complianceThreshold: 80
+  # -- Governance mode: enforce or audit
+  mode: enforce
+  # -- Maximum concurrent scans
+  maxConcurrentScans: 10
+  # -- Cache TTL in seconds
+  cacheTTL: 600
+
+# Application settings
+app:
+  # -- Application environment
+  env: production
+  # -- Log level (debug, info, warn, error)
+  logLevel: info
+  # -- Log format (json, text)
+  logFormat: json
+
+# Monitoring configuration
+monitoring:
+  prometheus:
+    # -- Enable Prometheus ServiceMonitor
+    enabled: true
+    # -- Metrics scrape interval
+    interval: 30s
+    # -- Metrics scrape timeout
+    scrapeTimeout: 10s
+    # -- Additional labels for the ServiceMonitor
+    additionalLabels: {}
+  grafana:
+    # -- Enable Grafana dashboard ConfigMap
+    enabled: false
+    # -- Dashboard folder in Grafana
+    folder: GovOps
+
+# Network policy configuration
+networkPolicy:
+  # -- Enable network policy
+  enabled: true

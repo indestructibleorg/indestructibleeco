@@ -1,0 +1,134 @@
+# SuperAI Platform - Helm Values
+replicaCount: 3
+
+image:
+  repository: superai-platform
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: "superai"
+
+serviceAccount:
+  create: true
+  name: "superai-sa"
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+  hosts:
+    - host: api.superai.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: superai-tls
+      hosts:
+        - api.superai.example.com
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 512Mi
+  limits:
+    cpu: "2"
+    memory: 2Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+worker:
+  enabled: true
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: "2"
+      memory: 4Gi
+  queues: "default,quantum,ai,scientific"
+  concurrency: 4
+
+beat:
+  enabled: true
+
+env:
+  APP_ENV: production
+  APP_PORT: "8000"
+  APP_WORKERS: "4"
+  LOG_LEVEL: info
+  QUANTUM_BACKEND: aer_simulator
+  QUANTUM_SHOTS: "1024"
+  PROMETHEUS_ENABLED: "true"
+
+secrets:
+  secretKey: "CHANGE-ME"
+  databaseUrl: "postgresql+asyncpg://superai:CHANGE@postgres:5432/superai_db"
+  redisUrl: "redis://:CHANGE@redis:6379/0"
+  celeryBrokerUrl: "amqp://superai:CHANGE@rabbitmq:5672//"
+  jwtSecretKey: "CHANGE-ME"
+  openaiApiKey: ""
+
+probes:
+  liveness:
+    path: /api/v1/live
+    initialDelaySeconds: 30
+    periodSeconds: 15
+  readiness:
+    path: /api/v1/ready
+    initialDelaySeconds: 10
+    periodSeconds: 10
+  startup:
+    path: /api/v1/health
+    initialDelaySeconds: 5
+    failureThreshold: 30
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    path: /metrics
+
+postgresql:
+  enabled: true
+  auth:
+    database: superai_db
+    username: superai
+    password: CHANGE-ME
+  primary:
+    persistence:
+      size: 20Gi
+
+redis:
+  enabled: true
+  auth:
+    password: CHANGE-ME
+  master:
+    persistence:
+      size: 5Gi
+
+rabbitmq:
+  enabled: true
+  auth:
+    username: superai
+    password: CHANGE-ME
+  persistence:
+    size: 5Gi

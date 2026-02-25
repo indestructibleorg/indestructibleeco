@@ -1,0 +1,27 @@
+apiVersion: v2
+name: seccompops
+description: Security & Compliance Operations Platform Helm Chart
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+maintainers:
+  - name: IndestructibleAutoOps Security Team
+keywords:
+  - security
+  - compliance
+  - enforcement
+  - audit
+  - governance
+  - zero-tolerance
+home: https://github.com/indestructibleorg/indestructibleeco
+sources:
+  - https://github.com/indestructibleorg/indestructibleeco/tree/main/platforms/seccompops-platform
+dependencies:
+  - name: postgresql
+    version: "~16.0"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled
+  - name: redis
+    version: "~18.0"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: redis.enabled

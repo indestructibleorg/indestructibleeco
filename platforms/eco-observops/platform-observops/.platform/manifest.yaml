@@ -1,0 +1,78 @@
+# =============================================================================
+# ObservOps Platform — Platform Identity Manifest
+# ECO Namespace Specification v1.0 Compliant
+# =============================================================================
+apiVersion: gl.platform.v1
+kind: PlatformManifest
+metadata:
+  name: observops-platform
+  displayName: "Observability Operations Platform"
+  glName: "gl.observ-ops.platform"
+  version: "1.0.0"
+  created: "2026-02-26T00:00:00Z"
+  owner: IndestructibleAutoOps
+  team: "Observability Operations Team"
+
+spec:
+  description: |
+    Metrics collection, alert management, distributed tracing, log aggregation,
+    anomaly detection, and semantic health monitoring platform.
+
+  type: microservice
+  status: active
+  language: python
+  runtime: python3.11
+
+  isolation:
+    level: complete
+    cross_platform_dependencies: none
+    data_ownership: exclusive
+    api_boundary: strict
+
+  extraction:
+    target_repo: "https://github.com/indestructiblemachinen/ai-chatbot"
+    target_path: "platforms/observops-platform"
+    standalone_ready: true
+
+  components:
+    engines:
+      - name: metrics_collector_engine
+        language: python
+        type: metrics_collection
+        description: "Prometheus-compatible metrics collection, aggregation, and exposition"
+      - name: alert_manager_engine
+        language: python
+        type: alert_management
+        description: "Alert rule evaluation, routing, deduplication, and notification"
+      - name: health_monitor_engine
+        language: python
+        type: health_monitoring
+        description: "Service health checks, SLO tracking, and anomaly detection"
+      - name: trace_collector_engine
+        language: python
+        type: distributed_tracing
+        description: "OpenTelemetry trace collection, sampling, and storage"
+
+  ports:
+    api: 8094
+    metrics: 9094
+
+  infrastructure:
+    database: postgresql-16
+    cache: redis-7
+    monitoring: prometheus
+    container: docker
+    orchestration: kubernetes
+
+  eco_namespace:
+    k8s_namespace: eco-observops
+    eco_uri: "eco-base://k8s/platform-observops/namespace/eco-observops"
+    eco_urn: "urn:eco-base:k8s:platform-observops:namespace:eco-observops:gl.observ-ops.platform"
+    eco_env_prefix: "PLATFORM_OBSERVOPS_"
+    mandatory_labels:
+      eco-base/platform: platform-observops
+      eco-base/environment: production
+      eco-base/owner: observability-team
+    mandatory_annotations:
+      eco-base/governance-policy: "eco-observops-governance.rego"
+      eco-base/audit-log-level: "full"

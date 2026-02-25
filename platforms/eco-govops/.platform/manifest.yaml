@@ -1,0 +1,77 @@
+# =============================================================================
+# GovOps Platform — Platform Identity Manifest
+# ECO Namespace Specification v1.0 Compliant
+# =============================================================================
+apiVersion: gl.platform.v1
+kind: PlatformManifest
+metadata:
+  name: govops-platform
+  displayName: "Governance Operations Platform"
+  glName: "gl.gov.ops-platform"
+  version: "1.0.0"
+  created: "2026-02-21T00:00:00Z"
+  owner: IndestructibleAutoOps
+  team: "Governance Operations Team"
+
+spec:
+  description: |
+    Cloud-native governance workflow orchestration platform with module scanning,
+    ETL pipelines, evidence hashing, policy enforcement, and semantic search.
+
+  type: microservice
+  status: active
+  language: python
+  runtime: python3.11
+
+  # Microservice identity (decoupled, no cross-platform deps)
+  isolation:
+    level: complete
+    cross_platform_dependencies: none
+    data_ownership: exclusive
+    api_boundary: strict
+
+  # Extraction target for standalone deployment
+  extraction:
+    target_repo: "https://github.com/indestructiblemachinen/ai-chatbot"
+    target_path: "platforms/govops-platform"
+    standalone_ready: true
+
+  components:
+    core:
+      - name: govops_engine
+        type: api_service
+        description: "FastAPI governance orchestration API"
+      - name: govops_scanner
+        type: worker
+        description: "Module scanning — hash, semantic, and dependency scanning"
+      - name: govops_etl
+        type: worker
+        description: "ETL pipelines for governance data extraction and loading"
+      - name: govops_enforcer
+        type: policy_engine
+        description: "Policy enforcement with evidence-based decision making"
+
+  ports:
+    api: 8091
+    metrics: 9091
+
+  infrastructure:
+    database: postgresql-16
+    cache: redis-7
+    monitoring: prometheus
+    container: docker
+    orchestration: kubernetes
+
+  # ECO Namespace Specification v1.0 Alignment
+  eco_namespace:
+    k8s_namespace: eco-govops
+    eco_uri: "eco-base://k8s/platform-govops/namespace/eco-govops"
+    eco_urn: "urn:eco-base:k8s:platform-govops:namespace:eco-govops:gl.gov.ops-platform"
+    eco_env_prefix: "PLATFORM_GOVOPS_"
+    mandatory_labels:
+      eco-base/platform: platform-govops
+      eco-base/environment: production
+      eco-base/owner: governance-operations-team
+    mandatory_annotations:
+      eco-base/governance-policy: "eco-govops-governance.rego"
+      eco-base/audit-log-level: "full"

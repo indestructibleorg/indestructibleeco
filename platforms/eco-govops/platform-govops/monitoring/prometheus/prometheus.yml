@@ -1,0 +1,40 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+rule_files:
+  - "alert_rules.yml"
+
+scrape_configs:
+  - job_name: "govops-engine"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["govops-engine:9090"]
+        labels:
+          platform: "govops"
+          component: "engine"
+
+  - job_name: "govops-scanner"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["govops-scanner:9091"]
+        labels:
+          platform: "govops"
+          component: "scanner"
+
+  - job_name: "govops-enforcer"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["govops-enforcer:9092"]
+        labels:
+          platform: "govops"
+          component: "enforcer"
+
+  - job_name: "govops-etl"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["govops-etl:9093"]
+        labels:
+          platform: "govops"
+          component: "etl"

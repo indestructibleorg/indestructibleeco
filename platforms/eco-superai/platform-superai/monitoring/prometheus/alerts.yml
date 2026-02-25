@@ -1,0 +1,408 @@
+# SuperAI Platform - Prometheus Alerting Rules
+# Severity levels: P0 (critical), P1 (high), P2 (medium), P3 (low)
+# All alerts include service, team, and runbook annotations for operational clarity.
+
+groups:
+  # ===========================================================================
+  # API Performance Alerts
+  # ===========================================================================
+  - name: superai-api-performance
+    rules:
+      - alert: SuperAIAPIHighLatencyP95
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(superai_http_request_duration_seconds_bucket{job="superai-api"}[5m])) by (le, endpoint)
+          ) > 0.5
+        for: 5m
+        labels:
+          severity: P1
+          service: superai-api
+          team: platform
+          category: performance
+        annotations:
+          summary: "SuperAI API p95 latency exceeds 500ms on {{ $labels.endpoint }}"
+          description: >-
+            The 95th percentile request latency for endpoint {{ $labels.endpoint }}
+            is {{ $value | humanizeDuration }}, which exceeds the 500ms threshold.
+            This has persisted for more than 5 minutes.
+          impact: "Degraded user experience; SLA at risk."
+          runbook_url: "https://runbooks.superai.internal/api/high-latency"
+          dashboard_url: "https://grafana.superai.internal/d/superai-api/superai-api-performance"
+
+      - alert: SuperAIAPIHighErrorRate
+        expr: |
+          (
+            sum(rate(superai_http_requests_total{job="superai-api", status=~"5.."}[5m]))
+            /
+            sum(rate(superai_http_requests_total{job="superai-api"}[5m]))
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: P0
+          service: superai-api
+          team: platform
+          category: availability
+        annotations:
+          summary: "SuperAI API error rate exceeds 5%"
+          description: >-
+            The 5xx error rate is {{ $value | humanizePercentage }} over the last 5 minutes.
+            This indicates a significant portion of requests are failing.
+          impact: "Users are experiencing errors; immediate investigation required."
+          runbook_url: "https://runbooks.superai.internal/api/high-error-rate"
+          dashboard_url: "https://grafana.superai.internal/d/superai-api/superai-api-performance"
+
+      - alert: SuperAIAPIDown
+        expr: up{job="superai-api"} == 0
+        for: 2m
+        labels:
+          severity: P0
+          service: superai-api
+          team: platform
+          category: availability
+        annotations:
+          summary: "SuperAI API target is down"
+          description: >-
+            Prometheus has lost contact with the SuperAI API instance {{ $labels.instance }}.
+            The target has been missing for more than 2 minutes.
+          impact: "API is unreachable; all dependent services affected."
+          runbook_url: "https://runbooks.superai.internal/api/service-down"
+
+  # ===========================================================================
+  # Naming Convention & Compliance Alerts
+  # ===========================================================================
+  - name: superai-naming-compliance
+    rules:
+      - alert: NamingConventionViolationsDetected
+        expr: superai_naming_violations_total > 0
+        for: 1m
+        labels:
+          severity: P2
+          service: superai-naming-engine
+          team: platform
+          category: compliance
+        annotations:
+          summary: "Naming convention violations detected"
+          description: >-
+            {{ $value }} naming convention violation(s) detected for resource
+            {{ $labels.resource_type }} in namespace {{ $labels.namespace }}.
+            Violations should be reviewed and remediated.
+          impact: "Non-compliant resources in the cluster; governance risk."
+          runbook_url: "https://runbooks.superai.internal/naming/violations-detected"
+
+      - alert: NamingComplianceRateBelowThreshold
+        expr: |
+          (
+            superai_naming_compliant_resources_total
+            /
+            superai_naming_total_resources_evaluated
+          ) < 0.95
+        for: 10m
+        labels:
+          severity: P1
+          service: superai-naming-engine
+          team: platform
+          category: compliance
+        annotations:
+          summary: "Naming compliance rate below 95%"
+          description: >-
+            The naming compliance rate is {{ $value | humanizePercentage }},
+            which is below the 95% threshold. This indicates a systemic issue with
+            resource naming across the cluster.
+          impact: "Cluster governance SLA breach; audit risk."
+          runbook_url: "https://runbooks.superai.internal/naming/compliance-rate-low"
+
+      - alert: AutoFixFailureRateHigh
+        expr: |
+          (
+            sum(rate(superai_autofix_failures_total[15m]))
+            /
+            sum(rate(superai_autofix_attempts_total[15m]))
+          ) > 0.10
+        for: 5m
+        labels:
+          severity: P1
+          service: superai-autofix-engine
+          team: platform
+          category: compliance
+        annotations:
+          summary: "Auto-fix failure rate exceeds 10%"
+          description: >-
+            The auto-fix failure rate is {{ $value | humanizePercentage }}
+            over the last 15 minutes. Automated remediation is not functioning reliably.
+          impact: "Naming violations accumulating without automated remediation."
+          runbook_url: "https://runbooks.superai.internal/naming/autofix-failure-rate"
+
+  # ===========================================================================
+  # Quantum Processing Alerts
+  # ===========================================================================
+  - name: superai-quantum
+    rules:
+      - alert: QuantumJobFailureRateHigh
+        expr: |
+          (
+            sum(rate(superai_quantum_jobs_failed_total[15m]))
+            /
+            sum(rate(superai_quantum_jobs_total[15m]))
+          ) > 0.20
+        for: 5m
+        labels:
+          severity: P1
+          service: superai-quantum
+          team: quantum
+          category: processing
+        annotations:
+          summary: "Quantum job failure rate exceeds 20%"
+          description: >-
+            The quantum job failure rate is {{ $value | humanizePercentage }}
+            over the last 15 minutes. Backend: {{ $labels.backend }}.
+          impact: "Quantum computation pipeline degraded; scientific workloads affected."
+          runbook_url: "https://runbooks.superai.internal/quantum/high-failure-rate"
+
+  # ===========================================================================
+  # Infrastructure Alerts
+  # ===========================================================================
+  - name: superai-infrastructure
+    rules:
+      - alert: DatabaseConnectionPoolExhausted
+        expr: |
+          superai_db_pool_active_connections{job="superai-api"}
+          >=
+          superai_db_pool_max_connections{job="superai-api"}
+        for: 2m
+        labels:
+          severity: P0
+          service: superai-database
+          team: platform
+          category: infrastructure
+        annotations:
+          summary: "Database connection pool exhausted"
+          description: >-
+            Active database connections ({{ $value }}) have reached the maximum pool
+            size on instance {{ $labels.instance }}. New requests requiring database
+            access will block or fail.
+          impact: "API requests will timeout waiting for DB connections; service degradation imminent."
+          runbook_url: "https://runbooks.superai.internal/infra/db-pool-exhaustion"
+
+      - alert: DatabaseConnectionPoolNearExhaustion
+        expr: |
+          (
+            superai_db_pool_active_connections{job="superai-api"}
+            /
+            superai_db_pool_max_connections{job="superai-api"}
+          ) > 0.85
+        for: 5m
+        labels:
+          severity: P2
+          service: superai-database
+          team: platform
+          category: infrastructure
+        annotations:
+          summary: "Database connection pool is over 85% utilized"
+          description: >-
+            Database connection pool utilization is at {{ $value | humanizePercentage }}
+            on instance {{ $labels.instance }}. Pool exhaustion is approaching.
+          impact: "Risk of connection pool exhaustion under increased load."
+          runbook_url: "https://runbooks.superai.internal/infra/db-pool-near-exhaustion"
+
+      - alert: RedisConnectionFailure
+        expr: redis_up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: P0
+          service: superai-redis
+          team: platform
+          category: infrastructure
+        annotations:
+          summary: "Redis connection failure"
+          description: >-
+            Redis instance {{ $labels.instance }} is unreachable. Cache operations,
+            session management, and rate limiting are affected.
+          impact: "Cache miss storm; degraded performance across all API endpoints."
+          runbook_url: "https://runbooks.superai.internal/infra/redis-down"
+
+      - alert: RedisHighConnectionCount
+        expr: redis_connected_clients{job="redis"} > 500
+        for: 5m
+        labels:
+          severity: P2
+          service: superai-redis
+          team: platform
+          category: infrastructure
+        annotations:
+          summary: "Redis connection count is high ({{ $value }})"
+          description: >-
+            Redis instance {{ $labels.instance }} has {{ $value }} connected clients.
+            This may indicate a connection leak or misconfigured pool.
+          runbook_url: "https://runbooks.superai.internal/infra/redis-high-connections"
+
+  # ===========================================================================
+  # Security & Certificate Alerts
+  # ===========================================================================
+  - name: superai-security
+    rules:
+      - alert: CertificateExpiringIn30Days
+        expr: |
+          (
+            x509_cert_not_after{job="cert-exporter"}
+            - time()
+          ) / 86400 < 30
+        for: 1h
+        labels:
+          severity: P2
+          service: superai-certificates
+          team: security
+          category: security
+        annotations:
+          summary: "TLS certificate expires in less than 30 days"
+          description: >-
+            Certificate for {{ $labels.cn }} (secret: {{ $labels.secret_name }},
+            namespace: {{ $labels.secret_namespace }}) expires in
+            {{ $value | humanize }} days. Renew before expiration to avoid outage.
+          impact: "Service outage if certificate expires without renewal."
+          runbook_url: "https://runbooks.superai.internal/security/cert-expiry"
+
+      - alert: CertificateExpiringIn7Days
+        expr: |
+          (
+            x509_cert_not_after{job="cert-exporter"}
+            - time()
+          ) / 86400 < 7
+        for: 10m
+        labels:
+          severity: P0
+          service: superai-certificates
+          team: security
+          category: security
+        annotations:
+          summary: "TLS certificate expires in less than 7 days"
+          description: >-
+            URGENT: Certificate for {{ $labels.cn }} expires in {{ $value | humanize }} days.
+            Immediate renewal is required.
+          impact: "Imminent service outage due to certificate expiration."
+          runbook_url: "https://runbooks.superai.internal/security/cert-expiry-critical"
+
+  # ===========================================================================
+  # Pod Health Alerts
+  # ===========================================================================
+  - name: superai-pod-health
+    rules:
+      - alert: PodRestartingFrequently
+        expr: |
+          increase(kube_pod_container_status_restarts_total{
+            namespace=~"superai.*",
+            pod=~"superai-.*"
+          }[15m]) > 3
+        for: 0m
+        labels:
+          severity: P1
+          service: "{{ $labels.pod }}"
+          team: platform
+          category: reliability
+        annotations:
+          summary: "Pod {{ $labels.pod }} restarted more than 3 times in 15 minutes"
+          description: >-
+            Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has restarted
+            {{ $value }} times in the last 15 minutes. Container: {{ $labels.container }}.
+            This likely indicates a crash loop or resource exhaustion.
+          impact: "Service instability; potential data loss during restarts."
+          runbook_url: "https://runbooks.superai.internal/pods/frequent-restarts"
+
+      - alert: PodCrashLooping
+        expr: |
+          rate(kube_pod_container_status_restarts_total{
+            namespace=~"superai.*",
+            pod=~"superai-.*"
+          }[10m]) * 60 * 10 > 5
+        for: 5m
+        labels:
+          severity: P0
+          service: "{{ $labels.pod }}"
+          team: platform
+          category: reliability
+        annotations:
+          summary: "Pod {{ $labels.pod }} is crash-looping"
+          description: >-
+            Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is crash-looping
+            with a restart rate of {{ $value | humanize }} restarts per 10 minutes.
+          impact: "Service is effectively down; traffic cannot be served by this pod."
+          runbook_url: "https://runbooks.superai.internal/pods/crashloop"
+
+  # ===========================================================================
+  # AI & LLM Alerts
+  # ===========================================================================
+  - name: superai-ai
+    rules:
+      - alert: LLMHighLatency
+        expr: |
+          histogram_quantile(0.95,
+            rate(superai_llm_request_duration_seconds_bucket{job="superai-api"}[5m])
+          ) > 30
+        for: 5m
+        labels:
+          severity: P2
+          service: superai-ai
+          team: ai
+          category: performance
+        annotations:
+          summary: "LLM response time exceeds 30s (p95)"
+          description: >-
+            The 95th percentile LLM response time is {{ $value | humanizeDuration }}.
+            Model: {{ $labels.model }}.
+          runbook_url: "https://runbooks.superai.internal/ai/llm-latency"
+
+      - alert: VectorDBDown
+        expr: up{job="chromadb"} == 0
+        for: 2m
+        labels:
+          severity: P1
+          service: superai-vectordb
+          team: ai
+          category: availability
+        annotations:
+          summary: "ChromaDB vector database is down"
+          description: >-
+            ChromaDB instance {{ $labels.instance }} is unreachable.
+            AI expert queries and embedding lookups will fail.
+          runbook_url: "https://runbooks.superai.internal/ai/vectordb-down"
+
+  # ===========================================================================
+  # SLO Burn-Rate Alerts (Multi-Window)
+  # ===========================================================================
+  - name: superai-slo-burn-rate
+    rules:
+      - alert: SuperAIAvailabilityBurnRateCritical
+        expr: |
+          superai:error_budget_burn_rate:1h > 14.4
+          and
+          superai:error_budget_burn_rate:6h > 6
+        for: 2m
+        labels:
+          severity: P0
+          service: superai-api
+          team: platform
+          category: slo
+        annotations:
+          summary: "SLO burn rate critical: error budget will be exhausted within 1 hour"
+          description: >-
+            1h burn rate: {{ with printf "superai:error_budget_burn_rate:1h" | query }}{{ . | first | value | humanize }}{{ end }}x,
+            6h burn rate: {{ with printf "superai:error_budget_burn_rate:6h" | query }}{{ . | first | value | humanize }}{{ end }}x.
+            At this rate, the monthly error budget will be exhausted within an hour.
+          runbook_url: "https://runbooks.superai.internal/slo/burn-rate-critical"
+
+      - alert: SuperAIAvailabilityBurnRateHigh
+        expr: |
+          superai:error_budget_burn_rate:1h > 6
+          and
+          superai:error_budget_burn_rate:6h > 3
+        for: 5m
+        labels:
+          severity: P1
+          service: superai-api
+          team: platform
+          category: slo
+        annotations:
+          summary: "SLO burn rate high: error budget consumption accelerated"
+          description: >-
+            1h burn rate: {{ with printf "superai:error_budget_burn_rate:1h" | query }}{{ . | first | value | humanize }}{{ end }}x.
+            The error budget is being consumed faster than expected.
+          runbook_url: "https://runbooks.superai.internal/slo/burn-rate-high"

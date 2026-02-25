@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: seccompops-config
+  namespace: eco-seccompops
+  labels:
+    app.kubernetes.io/name: seccompops-platform
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/component: config
+    governance.io/managed: "true"
+data:
+  SECCOMPOPS_ENV: "production"
+  SECCOMPOPS_LOG_LEVEL: "INFO"
+  SECCOMPOPS_LOG_FORMAT: "json"
+  SECCOMPOPS_DB_HOST: "seccompops-postgres"
+  SECCOMPOPS_DB_PORT: "5432"
+  SECCOMPOPS_DB_NAME: "seccompops"
+  SECCOMPOPS_PLATFORM_SECCOMPOPS_REDIS_URL: "redis://seccompops-redis:6379/0"
+  SECCOMPOPS_ENFORCEMENT_MODE: "strict"
+  SECCOMPOPS_AUDIT_MODE: "continuous"

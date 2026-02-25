@@ -1,0 +1,173 @@
+# ============================================================================
+# Pod Security Standards — Restricted Profile
+# ============================================================================
+# Enforced via namespace labels (K8s 1.25+ Pod Security Admission)
+# ============================================================================
+
+# --- Namespace labels for Pod Security Admission ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: superai
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/audit-version: latest
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: latest
+---
+# --- Kyverno ClusterPolicy (if Kyverno is installed) ---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: superai-pod-security
+  labels:
+    app.kubernetes.io/name: superai-platform
+    app.kubernetes.io/component: security
+  annotations:
+    policies.kyverno.io/title: SuperAI Pod Security Policy
+    policies.kyverno.io/category: Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Enforces security best practices for all SuperAI platform pods.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    # Require non-root
+    - name: require-run-as-non-root
+      match:
+        any:
+          - resources:
+              kinds: ["Pod"]
+              namespaces: ["superai", "superai-staging", "superai-dev"]
+      validate:
+        message: "Pods must run as non-root"
+        pattern:
+          spec:
+            securityContext:
+              runAsNonRoot: true
+            containers:
+              - securityContext:
+                  allowPrivilegeEscalation: false
+
+    # Require read-only root filesystem
+    - name: require-readonly-rootfs
+      match:
+        any:
+          - resources:
+              kinds: ["Pod"]
+              namespaces: ["superai"]
+      validate:
+        message: "Production pods must use read-only root filesystem"
+        pattern:
+          spec:
+            containers:
+              - securityContext:
+                  readOnlyRootFilesystem: true
+
+    # Drop all capabilities
+    - name: drop-all-capabilities
+      match:
+        any:
+          - resources:
+              kinds: ["Pod"]
+              namespaces: ["superai", "superai-staging", "superai-dev"]
+      validate:
+        message: "Containers must drop ALL capabilities"
+        pattern:
+          spec:
+            containers:
+              - securityContext:
+                  capabilities:
+                    drop: ["ALL"]
+
+    # Require resource limits
+    - name: require-resource-limits
+      match:
+        any:
+          - resources:
+              kinds: ["Pod"]
+              namespaces: ["superai", "superai-staging"]
+      validate:
+        message: "Containers must specify resource limits"
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  limits:
+                    cpu: "?*"
+                    memory: "?*"
+                  requests:
+                    cpu: "?*"
+                    memory: "?*"
+
+    # Restrict image registries
+    - name: restrict-image-registries
+      match:
+        any:
+          - resources:
+              kinds: ["Pod"]
+              namespaces: ["superai"]
+      validate:
+        message: "Production images must come from ghcr.io/indestructibleautoops"
+        pattern:
+          spec:
+            containers:
+              - image: "ghcr.io/indestructibleautoops/*"
+
+    # Require liveness and readiness probes
+    - name: require-probes
+      match:
+        any:
+          - resources:
+              kinds: ["Deployment"]
+              namespaces: ["superai"]
+      validate:
+        message: "Production deployments must have liveness and readiness probes"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - livenessProbe:
+                      httpGet:
+                        path: "?*"
+                    readinessProbe:
+                      httpGet:
+                        path: "?*"
+
+    # Disallow privileged containers
+    - name: disallow-privileged
+      match:
+        any:
+          - resources:
+              kinds: ["Pod"]
+              namespaces: ["superai", "superai-staging", "superai-dev"]
+      validate:
+        message: "Privileged containers are not allowed"
+        pattern:
+          spec:
+            containers:
+              - =(securityContext):
+                  =(privileged): false
+            =(initContainers):
+              - =(securityContext):
+                  =(privileged): false
+
+    # Disallow hostPath volumes
+    - name: disallow-host-path
+      match:
+        any:
+          - resources:
+              kinds: ["Pod"]
+              namespaces: ["superai", "superai-staging", "superai-dev"]
+      validate:
+        message: "HostPath volumes are not allowed"
+        deny:
+          conditions:
+            any:
+              - key: "{{ request.object.spec.volumes[?hostPath] | length(@) }}"
+                operator: GreaterThan
+                value: 0

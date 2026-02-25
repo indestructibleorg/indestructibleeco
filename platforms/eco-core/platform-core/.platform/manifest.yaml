@@ -1,0 +1,70 @@
+# =============================================================================
+# Platform Core — Shared Kernel Identity Manifest
+# ECO Namespace Specification v1.0 Compliant
+# =============================================================================
+apiVersion: gl.platform.v1
+kind: PlatformManifest
+metadata:
+  name: platform-core
+  glName: "gl.core.shared-kernel"
+  version: "1.0.0"
+spec:
+  description: "Shared Kernel — Authentication, Event Bus, Memory Hub, Policy & Audit, Infra Manager"
+  tier: "core"
+  owner: "platform-engineering-team"
+
+  runtime:
+    language: python
+    framework: fastapi
+    ports:
+      api: 8080
+      metrics: 9080
+    health:
+      liveness: /healthz
+      readiness: /readyz
+
+  boundary:
+    api_boundary: strict
+
+  extraction:
+    target_repo: "https://github.com/indestructiblemachinen/ai-chatbot"
+    target_path: "platforms/platform-core"
+    standalone_ready: false
+
+  components:
+    services:
+      - name: auth-service
+        description: "OIDC federation, RBAC, token issuance (Keycloak/Supabase)"
+        port: 8081
+      - name: memory-hub
+        description: "Document chunking, vector retrieval, RAG context (pgvector)"
+        port: 8082
+      - name: event-bus
+        description: "Event routing, replay, deduplication (Kafka/Redis Streams)"
+        port: 8083
+      - name: policy-audit
+        description: "Policy decisions, immutable audit trail (OPA/Kyverno)"
+        port: 8084
+      - name: infra-manager
+        description: "Drift detection, sync, rollback hooks (ArgoCD/Helm)"
+        port: 8085
+
+  compliance:
+    frameworks:
+      - ISO_27001
+      - SOC2_Type_II
+      - GDPR
+
+  # ECO Namespace Specification v1.0 Alignment
+  eco_namespace:
+    k8s_namespace: eco-core
+    eco_uri: "eco-base://k8s/platform-core/namespace/eco-core"
+    eco_urn: "urn:eco-base:k8s:platform-core:namespace:eco-core:gl.core.shared-kernel"
+    eco_env_prefix: "PLATFORM_CORE_"
+    mandatory_labels:
+      eco-base/platform: platform-core
+      eco-base/environment: production
+      eco-base/owner: platform-engineering-team
+    mandatory_annotations:
+      eco-base/governance-policy: "eco-core-governance.rego"
+      eco-base/audit-log-level: "full"

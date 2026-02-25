@@ -1,0 +1,417 @@
+# AlertManager Configuration with PagerDuty Integration
+# P0 Critical: Alert routing and PagerDuty notifications
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alertmanager-pagerduty
+  namespace: default
+  labels:
+    app: superai-platform
+    component: monitoring
+type: Opaque
+stringData:
+  # PagerDuty Integration Key (replace with actual key)
+  PAGERDUTY_INTEGRATION_KEY: "YOUR_PAGERDUTY_INTEGRATION_KEY"
+  # PagerDuty API URL
+  PAGERDUTY_API_URL: "https://events.pagerduty.com/v2/enqueue"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: default
+  labels:
+    app: superai-platform
+    component: monitoring
+data:
+  alertmanager.yml: |
+    global:
+      resolve_timeout: 5m
+      smtp_smarthost: 'smtp.example.com:587'
+      smtp_from: 'alerts@superai.platform'
+      smtp_auth_username: 'alerts@superai.platform'
+      smtp_auth_password: '$SMTP_PASSWORD'
+
+    templates:
+      - '/etc/alertmanager/templates/*.tmpl'
+
+    route:
+      receiver: 'default-receiver'
+      group_by: ['alertname', 'cluster', 'service']
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 12h
+      routes:
+        # Critical alerts go to PagerDuty
+        - match:
+            severity: critical
+          receiver: 'pagerduty-critical'
+          continue: false
+        
+        # Warning alerts go to Slack
+        - match:
+            severity: warning
+          receiver: 'slack-warnings'
+          continue: false
+        
+        # Info alerts go to email
+        - match:
+            severity: info
+          receiver: 'email-info'
+          continue: false
+        
+        # Security alerts go to both PagerDuty and Slack
+        - match_re:
+            alertname: '(Security|Breach|Attack|Intrusion|Compromise)'
+          receiver: 'pagerduty-security'
+          continue: true
+        
+        - match_re:
+            alertname: '(Security|Breach|Attack|Intrusion|Compromise)'
+          receiver: 'slack-security'
+          continue: false
+
+    receivers:
+      - name: 'default-receiver'
+        email_configs:
+          - to: 'team@superai.platform'
+            headers:
+              Subject: '[{{ .Status | toUpper }}] {{ .GroupLabels.alertname }}'
+
+      - name: 'pagerduty-critical'
+        pagerduty_configs:
+          - service_key: '$PAGERDUTY_INTEGRATION_KEY'
+            severity: 'critical'
+            description: '{{ .CommonLabels.alertname }} - {{ .CommonAnnotations.summary }}'
+            details:
+              firing: '{{ template "pagerduty.default.instances" .Alerts.Firing }}'
+              resolved: '{{ template "pagerduty.default.instances" .Alerts.Resolved }}'
+              num_firing: '{{ .Alerts.Firing | len }}'
+              num_resolved: '{{ .Alerts.Resolved | len }}'
+
+      - name: 'pagerduty-security'
+        pagerduty_configs:
+          - service_key: '$PAGERDUTY_SECURITY_KEY'
+            severity: 'critical'
+            description: '[SECURITY] {{ .CommonLabels.alertname }} - {{ .CommonAnnotations.summary }}'
+            details:
+              firing: '{{ template "pagerduty.default.instances" .Alerts.Firing }}'
+              resolved: '{{ template "pagerduty.default.instances" .Alerts.Resolved }}'
+              num_firing: '{{ .Alerts.Firing | len }}'
+              num_resolved: '{{ .Alerts.Resolved | len }}'
+
+      - name: 'slack-warnings'
+        slack_configs:
+          - api_url: '$SLACK_WEBHOOK_URL'
+            channel: '#alerts-warnings'
+            title: '[{{ .Status | toUpper }}] {{ .GroupLabels.alertname }}'
+            text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+            send_resolved: true
+            color: '{{ if eq .Status "firing" }}danger{{ else }}good{{ end }}'
+
+      - name: 'slack-security'
+        slack_configs:
+          - api_url: '$SLACK_SECURITY_WEBHOOK_URL'
+            channel: '#security-alerts'
+            title: '[🚨 SECURITY] {{ .GroupLabels.alertname }}'
+            text: |
+              {{ range .Alerts }}
+              *Alert:* {{ .Labels.alertname }}
+              *Severity:* {{ .Labels.severity }}
+              *Description:* {{ .Annotations.description }}
+              *Summary:* {{ .Annotations.summary }}
+              {{ end }}
+            send_resolved: true
+            color: '{{ if eq .Status "firing" }}danger{{ else }}good{{ end }}'
+
+      - name: 'email-info'
+        email_configs:
+          - to: 'devops@superai.platform'
+            headers:
+              Subject: '[INFO] {{ .GroupLabels.alertname }}'
+
+    inhibit_rules:
+      # Inhibit info alerts if critical alert is firing for same instance
+      - source_match:
+          severity: 'critical'
+        target_match:
+          severity: 'info'
+        equal: ['alertname', 'instance']
+      
+      # Inhibit warning alerts if critical alert is firing for same instance
+      - source_match:
+          severity: 'critical'
+        target_match:
+          severity: 'warning'
+        equal: ['alertname', 'instance']
+
+---
+# AlertManager Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alertmanager
+  namespace: default
+  labels:
+    app: superai-platform
+    component: alertmanager
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: superai-platform
+      component: alertmanager
+  template:
+    metadata:
+      labels:
+        app: superai-platform
+        component: alertmanager
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9093"
+    spec:
+      serviceAccountName: superai-monitoring
+      containers:
+      - name: alertmanager
+        image: prom/alertmanager:v0.26.0
+        args:
+          - '--config.file=/etc/alertmanager/config/alertmanager.yml'
+          - '--storage.path=/alertmanager'
+          - '--web.external-url=http://alertmanager.default.svc.cluster.local:9093'
+          - '--cluster.listen-address=0.0.0.0:9094'
+          - '--web.route-prefix=/'
+        ports:
+        - name: web
+          containerPort: 9093
+        - name: cluster
+          containerPort: 9094
+        volumeMounts:
+        - name: config
+          mountPath: /etc/alertmanager/config
+        - name: storage
+          mountPath: /alertmanager
+        - name: templates
+          mountPath: /etc/alertmanager/templates
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 500m
+            memory: 500Mi
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: web
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: web
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+      - name: config
+        configMap:
+          name: alertmanager-config
+      - name: storage
+        emptyDir: {}
+      - name: templates
+        configMap:
+          name: alertmanager-templates
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alertmanager
+  namespace: default
+  labels:
+    app: superai-platform
+    component: alertmanager
+spec:
+  type: ClusterIP
+  ports:
+  - name: web
+    port: 9093
+    targetPort: web
+  - name: cluster
+    port: 9094
+    targetPort: cluster
+  selector:
+    app: superai-platform
+    component: alertmanager
+---
+# AlertManager ServiceMonitor for Prometheus Operator
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: alertmanager
+  namespace: default
+  labels:
+    app: superai-platform
+    component: alertmanager
+spec:
+  selector:
+    matchLabels:
+      app: superai-platform
+      component: alertmanager
+  endpoints:
+  - port: web
+    interval: 30s
+    path: /metrics
+---
+# Critical Alerts Definition
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-alerts
+  namespace: default
+  labels:
+    app: superai-platform
+    component: monitoring
+data:
+  alerts.yml: |
+    groups:
+      # Platform Health Alerts
+      - name: platform_health
+        interval: 30s
+        rules:
+          - alert: HighErrorRate
+            expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+            for: 5m
+            labels:
+              severity: critical
+              team: platform
+            annotations:
+              summary: High error rate detected
+              description: "Error rate is {{ $value }} errors/sec (threshold: 0.1)"
+              runbook: "https://docs.superai.platform/runbooks/high-error-rate"
+
+          - alert: HighLatency
+            expr: histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m])) > 1
+            for: 10m
+            labels:
+              severity: warning
+              team: platform
+            annotations:
+              summary: High latency detected
+              description: "99th percentile latency is {{ $value }}s (threshold: 1s)"
+
+          - alert: PodCrashLooping
+            expr: rate(kube_pod_container_status_restarts_total[15m]) > 0
+            for: 5m
+            labels:
+              severity: critical
+              team: platform
+            annotations:
+              summary: Pod is crash looping
+              description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is crash looping"
+
+      # Database Alerts
+      - name: database
+        interval: 30s
+        rules:
+          - alert: DatabaseConnectionFailure
+            expr: pg_stat_activity_count < 1
+            for: 1m
+            labels:
+              severity: critical
+              team: dba
+            annotations:
+              summary: Database connection failure
+              description: "Cannot connect to PostgreSQL database"
+
+          - alert: DatabaseSlowQueries
+            expr: rate(pg_stat_statements_calls_total{datname="superai"}[5m]) > 100
+            for: 10m
+            labels:
+              severity: warning
+              team: dba
+            annotations:
+              summary: High rate of slow database queries
+              description: "Database query rate is {{ $value }} queries/sec"
+
+      # Security Alerts
+      - name: security
+        interval: 30s
+        rules:
+          - alert: SecurityViolationDetected
+            expr: falco_events_total{priority="critical"} > 0
+            for: 1m
+            labels:
+              severity: critical
+              team: security
+            annotations:
+              summary: Critical security violation detected
+              description: "Falco detected {{ $value }} critical security events"
+              runbook: "https://docs.superai.platform/runbooks/security-incident"
+
+          - alert: UnauthorizedAccessAttempt
+            expr: rate(http_requests_total{status="401"}[5m]) > 10
+            for: 5m
+            labels:
+              severity: warning
+              team: security
+            annotations:
+              summary: High rate of unauthorized access attempts
+              description: "{{ $value }} unauthorized access attempts per second"
+
+          - alert: ContainerEscapeAttempt
+            expr: falco_events_total{rule="Container Escape Attempt"} > 0
+            for: 0s
+            labels:
+              severity: critical
+              team: security
+            annotations:
+              summary: Container escape attempt detected
+              description: "Possible container escape attempt in {{ $labels.container }}"
+
+      # Resource Alerts
+      - name: resources
+        interval: 30s
+        rules:
+          - alert: HighMemoryUsage
+            expr: container_memory_usage_bytes / container_spec_memory_limit_bytes > 0.9
+            for: 10m
+            labels:
+              severity: warning
+              team: ops
+            annotations:
+              summary: High memory usage
+              description: "Container {{ $labels.container }} is using {{ $value | humanizePercentage }} of memory limit"
+
+          - alert: DiskSpaceRunningLow
+            expr: kube_node_status_condition{condition="OutOfDisk", status="true"} == 1
+            for: 5m
+            labels:
+              severity: critical
+              team: ops
+            annotations:
+              summary: Node is running out of disk space
+              description: "Node {{ $labels.node }} is reporting OutOfDisk condition"
+
+      # Quantum/AI Alerts
+      - name: quantum_ai
+        interval: 30s
+        rules:
+          - alert: QuantumJobFailed
+            expr: quantum_job_status{status="failed"} > 0
+            for: 1m
+            labels:
+              severity: warning
+              team: quantum
+            annotations:
+              summary: Quantum job failed
+              description: "Quantum job {{ $labels.job_id }} failed"
+
+          - alert: AIModelInferenceFailure
+            expr: ai_inference_requests_total{status="error"} > 10
+            for: 5m
+            labels:
+              severity: warning
+              team: ai
+            annotations:
+              summary: High AI model inference failure rate
+              description: "{{ $value }} inference errors per second"

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eco-superai
+  labels:
+    app.kubernetes.io/name: superai-platform
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/managed-by: argocd
+    platform.gl/name: gl.ai.superai-platform
+    governance.io/managed: "true"
+    eco-base/platform: platform-superai
+    eco-base/environment: production
+    eco-base/owner: ai-quantum-team
+  annotations:
+    description: "SuperAI Platform — Quantum-AI Hybrid Cloud-Native Platform"
+    eco-base/uri: "eco-base://k8s/platform-superai/namespace/eco-superai"
+    eco-base/urn: "urn:eco-base:k8s:platform-superai:namespace:eco-superai:gl.ai.superai-platform"
+    eco-base/governance-policy: "eco-superai-governance.rego"
+    eco-base/audit-log-level: "full"

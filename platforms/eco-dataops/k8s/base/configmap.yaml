@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dataops-config
+  namespace: eco-dataops
+  labels:
+    app.kubernetes.io/name: dataops-platform
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/component: config
+    governance.io/managed: "true"
+data:
+  DATAOPS_ENV: "production"
+  DATAOPS_LOG_LEVEL: "INFO"
+  DATAOPS_LOG_FORMAT: "json"
+  DATAOPS_DB_HOST: "dataops-postgres"
+  DATAOPS_DB_PORT: "5432"
+  DATAOPS_DB_NAME: "dataops"
+  DATAOPS_PLATFORM_DATAOPS_REDIS_URL: "redis://dataops-redis:6379/0"
+  DATAOPS_EVIDENCE_MODE: "strict"
+  DATAOPS_REPLAY_MODE: "continuous"

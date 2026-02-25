@@ -1,0 +1,29 @@
+# =============================================================================
+# Platform Core — Dependency Declaration
+# ECO Namespace Specification v1.0 Compliant
+# =============================================================================
+apiVersion: gl.platform.v1
+kind: PlatformDependencies
+metadata:
+  name: platform-core-deps
+  platform: platform-core
+
+dependencies:
+  required: []
+  # platform-core is the root dependency — no upstream platform dependencies
+
+  external:
+    - name: postgresql
+      type: database
+      reason: "Persistent storage for auth, audit, memory hub"
+      provider: "supabase-cloud"
+
+    - name: redis
+      type: cache
+      reason: "Event bus backing store, session cache"
+      provider: "gke-internal"
+
+    - name: pgvector
+      type: extension
+      reason: "Vector embeddings for Memory Hub RAG"
+      provider: "supabase-cloud"

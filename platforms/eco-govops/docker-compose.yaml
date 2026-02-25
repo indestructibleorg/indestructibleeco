@@ -1,0 +1,256 @@
+# =============================================================================
+# GovOps Platform — Local Development Stack
+# Usage: docker compose up -d
+# =============================================================================
+
+x-common-env: &common-env
+  GOVOPS_ENV: "development"
+  GOVOPS_DB_HOST: "postgres"
+  GOVOPS_DB_PORT: "5432"
+  GOVOPS_DB_NAME: "govops"
+  GOVOPS_DB_USER: "govops"
+  GOVOPS_DB_PASSWORD: "govops-dev-password"
+  GOVOPS_REDIS_URL: "redis://redis:6379/0"
+  GOVOPS_LOG_LEVEL: "DEBUG"
+  GOVOPS_LOG_FORMAT: "json"
+  PYTHONPATH: "/app/src"
+
+x-common-healthcheck: &common-healthcheck
+  interval: 15s
+  timeout: 5s
+  retries: 5
+  start_period: 10s
+
+services:
+  # ---------------------------------------------------------------------------
+  # Core API — FastAPI governance engine
+  # ---------------------------------------------------------------------------
+  govops-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: govops-engine
+    ports:
+      - "8090:8090"
+    environment:
+      <<: *common-env
+      GOVOPS_COMPONENT: "engine"
+      GOVOPS_WORKERS: "2"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/healthz"]
+      <<: *common-healthcheck
+    volumes:
+      - ./src:/app/src:ro
+      - ./.config:/app/.config:ro
+      - engine-data:/app/data
+      - engine-logs:/app/logs
+    networks:
+      - govops-net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+
+  # ---------------------------------------------------------------------------
+  # Governance Scanner Worker
+  # ---------------------------------------------------------------------------
+  govops-scanner:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: govops-scanner
+    command: >
+      python -m engine.scanner.module_scanner
+    environment:
+      <<: *common-env
+      GOVOPS_COMPONENT: "scanner"
+      GOVOPS_SCAN_INTERVAL: "300"
+      GOVOPS_SCAN_TARGETS: "/app/src"
+    depends_on:
+      govops-engine:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      <<: *common-healthcheck
+    volumes:
+      - ./src:/app/src:ro
+      - ./.config:/app/.config:ro
+      - scanner-data:/app/data
+    networks:
+      - govops-net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+
+  # ---------------------------------------------------------------------------
+  # ETL Pipeline Worker
+  # ---------------------------------------------------------------------------
+  govops-etl:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: govops-etl
+    command: >
+      python -m etl.pipeline.etl_pipeline
+    environment:
+      <<: *common-env
+      GOVOPS_COMPONENT: "etl"
+      GOVOPS_ETL_BATCH_SIZE: "100"
+      GOVOPS_ETL_FLUSH_INTERVAL: "60"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      <<: *common-healthcheck
+    volumes:
+      - ./src:/app/src:ro
+      - ./.config:/app/.config:ro
+      - etl-data:/app/data
+    networks:
+      - govops-net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
+
+  # ---------------------------------------------------------------------------
+  # PostgreSQL — Governance metadata store
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: govops-postgres
+    environment:
+      POSTGRES_DB: "govops"
+      POSTGRES_USER: "govops"
+      POSTGRES_PASSWORD: "govops-dev-password"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U govops -d govops"]
+      <<: *common-healthcheck
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - govops-net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+  # ---------------------------------------------------------------------------
+  # Redis — Caching, task queue, pub/sub
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: govops-redis
+    command: >
+      redis-server
+        --maxmemory 128mb
+        --maxmemory-policy allkeys-lru
+        --appendonly yes
+        --appendfsync everysec
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      <<: *common-healthcheck
+    volumes:
+      - redis-data:/data
+    networks:
+      - govops-net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 192M
+
+  # ---------------------------------------------------------------------------
+  # Prometheus — Metrics collection and alerting
+  # ---------------------------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: govops-prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=7d"
+      - "--web.enable-lifecycle"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+    ports:
+      - "9090:9090"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      <<: *common-healthcheck
+    volumes:
+      - ./monitoring/prometheus:/etc/prometheus:ro
+      - prometheus-data:/prometheus
+    networks:
+      - govops-net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+# ---------------------------------------------------------------------------
+# Named volumes
+# ---------------------------------------------------------------------------
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  engine-data:
+    driver: local
+  engine-logs:
+    driver: local
+  scanner-data:
+    driver: local
+  etl-data:
+    driver: local
+
+# ---------------------------------------------------------------------------
+# Networks — isolate govops traffic
+# ---------------------------------------------------------------------------
+networks:
+  govops-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

@@ -1,0 +1,108 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: superai
+  namespace: argocd
+spec:
+  description: SuperAI Cloud-Native Platform
+  sourceRepos:
+    - "https://github.com/superai/platform.git"
+    - "https://charts.bitnami.com/bitnami"
+  destinations:
+    - namespace: eco-superai
+      server: https://kubernetes.default.svc
+    - namespace: eco-superai-staging
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+    - group: networking.k8s.io
+      kind: Ingress
+  namespaceResourceWhitelist:
+    - group: ""
+      kind: "*"
+    - group: apps
+      kind: "*"
+    - group: autoscaling
+      kind: "*"
+    - group: policy
+      kind: "*"
+    - group: batch
+      kind: "*"
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: superai-production
+  namespace: argocd
+  labels:
+    app: superai
+    env: production
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: superai
+  source:
+    repoURL: https://github.com/superai/platform.git
+    targetRevision: main
+    path: helm
+    helm:
+      valueFiles:
+        - values.yaml
+        - values-production.yaml
+      parameters:
+        - name: image.tag
+          value: "1.0.0"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: eco-superai
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+  revisionHistoryLimit: 10
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: superai-staging
+  namespace: argocd
+  labels:
+    app: superai
+    env: staging
+spec:
+  project: superai
+  source:
+    repoURL: https://github.com/superai/platform.git
+    targetRevision: develop
+    path: helm
+    helm:
+      valueFiles:
+        - values.yaml
+        - values-staging.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: eco-superai-staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

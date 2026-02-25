@@ -1,0 +1,49 @@
+replicaCount: 2
+
+image:
+  repository: seccompops-platform
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 8095
+  metricsPort: 9095
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+postgresql:
+  enabled: true
+  auth:
+    database: seccompops
+    username: seccompops
+
+redis:
+  enabled: true
+  architecture: standalone
+
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+enforcement:
+  mode: strict
+  zeroTolerance: true
+
+audit:
+  mode: continuous
+  retentionDays: 2555  # 7 years

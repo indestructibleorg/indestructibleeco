@@ -1,0 +1,62 @@
+groups:
+  - name: dataops-alerts
+    rules:
+      - alert: DataOpsHighAnomalyRate
+        expr: rate(dataops_anomalies_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: critical
+          platform: dataops
+        annotations:
+          summary: "High anomaly detection rate"
+          description: "DataOps is detecting more than 10 anomalies/sec for 5 minutes."
+
+      - alert: DataOpsEvidenceChainBroken
+        expr: dataops_evidence_chain_integrity == 0
+        for: 1m
+        labels:
+          severity: critical
+          platform: dataops
+        annotations:
+          summary: "Evidence chain integrity compromised"
+          description: "The cryptographic evidence chain has been broken. Immediate investigation required."
+
+      - alert: DataOpsEngineDown
+        expr: up{job="dataops-engine"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          platform: dataops
+        annotations:
+          summary: "DataOps engine is down"
+          description: "The DataOps API engine has been unreachable for 2 minutes."
+
+      - alert: DataOpsHighLatency
+        expr: histogram_quantile(0.95, rate(dataops_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          platform: dataops
+        annotations:
+          summary: "High API latency on DataOps"
+          description: "P95 latency exceeds 2 seconds."
+
+      - alert: DataOpsReplayDivergence
+        expr: dataops_replay_divergence_score > 0.05
+        for: 3m
+        labels:
+          severity: warning
+          platform: dataops
+        annotations:
+          summary: "Replay timeline divergence detected"
+          description: "Replay divergence score exceeds 5% threshold for 3 minutes."
+
+      - alert: DataOpsQualityGateFailed
+        expr: dataops_quality_gate_status == 0
+        for: 1m
+        labels:
+          severity: critical
+          platform: dataops
+        annotations:
+          summary: "Data quality gate failed"
+          description: "One or more data quality gates have failed. Pipeline integrity at risk."

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eco-observops
+  labels:
+    app.kubernetes.io/name: observops-platform
+    app.kubernetes.io/instance: observops-platform-prod
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: observability
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/managed-by: argocd
+    eco-base/platform: platform-observops
+    eco-base/environment: production
+    eco-base/owner: observability-operations-team
+    governance.io/managed: "true"
+  annotations:
+    eco-base/uri: "eco-base://k8s/platform-observops/namespace/eco-observops"
+    eco-base/urn: "urn:eco-base:k8s:platform-observops:namespace:eco-observops:gl.observ-ops.platform"
+    eco-base/governance-policy: "eco-observops-governance.rego"
+    eco-base/audit-log-level: "full"
+    description: "ObservOps Platform — Observability Operations"

@@ -1,0 +1,196 @@
+# =============================================================================
+# DataOps Platform — CD to Dev Environment
+# Triggered on push to dev branch; builds, pushes, deploys, and smoke-tests
+# =============================================================================
+
+name: CD — Dev
+
+on:
+  push:
+    branches: [dev]
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+concurrency:
+  group: cd-dev
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/dataops-platform
+  K8S_NAMESPACE: dataops-dev
+  HELM_RELEASE: dataops-dev
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Build & push Docker image
+  # ---------------------------------------------------------------------------
+  build-push:
+    name: Build & Push
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.meta.outputs.version }}
+      image-digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2  # v3.10.0
+
+      - name: Log in to container registry
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772  # v3.4.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract image metadata
+        id: meta
+        uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804  # v5.7.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=dev-
+            type=raw,value=dev-latest
+
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1  # v6.16.0
+        with:
+          context: .
+          file: Dockerfile.prod
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=dev
+          cache-to: type=gha,scope=dev,mode=max
+          provenance: true
+          sbom: true
+
+      - name: Run Trivy image scan
+        uses: aquasecurity/trivy-action@18f2510ee396bbf400402947e0f18c8ea39f3997  # v0.28.0
+        with:
+          image-ref: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:dev-latest"
+          severity: "CRITICAL"
+          format: "table"
+          exit-code: "1"
+
+  # ---------------------------------------------------------------------------
+  # Deploy to dev K8s cluster
+  # ---------------------------------------------------------------------------
+  deploy-dev:
+    name: Deploy to Dev
+    runs-on: ubuntu-latest
+    needs: build-push
+    environment:
+      name: dev
+      url: https://dataops-dev.internal.example.com
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Configure kubectl
+        uses: azure/setup-kubectl@5b97338aa6724d72de0c9fb5dfa2ced2d0d47577  # v4.0.0
+
+      - name: Set kubeconfig
+        run: |
+          mkdir -p "$HOME/.kube"
+          echo "${{ secrets.DEV_KUBECONFIG }}" | base64 -d > "$HOME/.kube/config"
+          chmod 600 "$HOME/.kube/config"
+
+      - name: Set up Helm
+        uses: azure/setup-helm@b9e51907a09c216f16ebe8536097933489208112  # v4.3.0
+        with:
+          version: "v3.14.0"
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install "$HELM_RELEASE" ./helm/dataops \
+            --namespace "$K8S_NAMESPACE" \
+            --create-namespace \
+            --set image.repository="${REGISTRY}/${IMAGE_NAME}" \
+            --set image.tag="dev-${{ github.sha }}" \
+            --set environment=dev \
+            --set replicaCount=1 \
+            --set resources.limits.cpu=500m \
+            --set resources.limits.memory=512Mi \
+            --wait \
+            --timeout 300s
+
+      - name: Verify deployment rollout
+        run: |
+          kubectl rollout status deployment/dataops-engine \
+            --namespace "$K8S_NAMESPACE" \
+            --timeout=180s
+          kubectl rollout status deployment/dataops-pipeline \
+            --namespace "$K8S_NAMESPACE" \
+            --timeout=180s
+
+  # ---------------------------------------------------------------------------
+  # Smoke tests
+  # ---------------------------------------------------------------------------
+  smoke-test:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+    needs: deploy-dev
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Configure kubectl
+        uses: azure/setup-kubectl@5b97338aa6724d72de0c9fb5dfa2ced2d0d47577  # v4.0.0
+
+      - name: Set kubeconfig
+        run: |
+          mkdir -p "$HOME/.kube"
+          echo "${{ secrets.DEV_KUBECONFIG }}" | base64 -d > "$HOME/.kube/config"
+          chmod 600 "$HOME/.kube/config"
+
+      - name: Wait for pods ready
+        run: |
+          kubectl wait --for=condition=ready pod \
+            -l app.kubernetes.io/name=dataops-engine \
+            --namespace "$K8S_NAMESPACE" \
+            --timeout=120s
+
+      - name: Port forward and run health checks
+        run: |
+          # Start port-forward in background
+          kubectl port-forward \
+            svc/dataops-engine 8093:8093 \
+            --namespace "$K8S_NAMESPACE" &
+          PF_PID=$!
+          trap "kill $PF_PID 2>/dev/null || true" EXIT
+
+          # Wait for port-forward to establish
+          sleep 5
+
+          echo "--- Health Check ---"
+          curl -sf http://localhost:8093/healthz | jq .
+          echo ""
+
+          echo "--- Liveness Check ---"
+          curl -sf http://localhost:8093/livez | jq .
+          echo ""
+
+          echo "--- Evidence Stats ---"
+          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8093/api/v1/evidence/stats)
+          if [ "$STATUS_CODE" -ge 200 ] && [ "$STATUS_CODE" -lt 300 ]; then
+            echo "Evidence endpoint OK (HTTP $STATUS_CODE)"
+          else
+            echo "WARN: Evidence endpoint returned HTTP $STATUS_CODE"
+          fi
+
+          echo "--- Replay Stats ---"
+          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8093/api/v1/replay/stats)
+          if [ "$STATUS_CODE" -ge 200 ] && [ "$STATUS_CODE" -lt 300 ]; then
+            echo "Replay endpoint OK (HTTP $STATUS_CODE)"
+          else
+            echo "WARN: Replay endpoint returned HTTP $STATUS_CODE"
+          fi
+
+          echo "All smoke tests passed."

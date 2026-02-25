@@ -1,0 +1,93 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dataops-platform"
+version = "1.0.0"
+description = "Data & Evidence Operations Platform — evidence pipeline lifecycle, replay engine, semantic processing, anomaly detection, and data quality governance."
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+authors = [{ name = "Data & Evidence Operations Team" }]
+
+dependencies = [
+    # === Core Web Framework ===
+    "fastapi>=0.115,<1",
+    "uvicorn[standard]>=0.32,<1",
+    "pydantic>=2.10,<3",
+    "pydantic-settings>=2.6,<3",
+    "httpx>=0.27,<1",
+
+    # === Database & ORM ===
+    "sqlalchemy[asyncio]>=2.0,<3",
+    "asyncpg>=0.30,<1",
+
+    # === Caching & Task Queue ===
+    "redis>=5.2,<6",
+    "celery[redis]>=5.4,<6",
+
+    # === Cryptography & Integrity ===
+    "cryptography>=44.0,<45",
+    "pyjwt>=2.9,<3",
+
+    # === Monitoring & Logging ===
+    "prometheus-client>=0.21,<1",
+    "structlog>=24.4,<25",
+    "opentelemetry-api>=1.22,<2",
+    "opentelemetry-sdk>=1.22,<2",
+
+    # === Data Processing ===
+    "numpy>=2.1,<3",
+    "pandas>=2.2,<3",
+    "scipy>=1.14,<2",
+
+    # === Configuration & Validation ===
+    "pyyaml>=6.0,<7",
+    "jsonschema>=4.23,<5",
+
+    # === Utilities ===
+    "typer>=0.14,<1",
+    "rich>=13.9,<14",
+    "tenacity>=9.0,<10",
+    "networkx>=3.4,<4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3,<9",
+    "pytest-asyncio>=0.24,<1",
+    "pytest-cov>=6.0,<7",
+    "ruff>=0.8,<1",
+    "mypy>=1.13,<2",
+    "pre-commit>=4.0,<5",
+]
+ml = [
+    "scikit-learn>=1.5,<2",
+]
+
+[project.scripts]
+dataops = "presentation.api.main:run"
+dataops-pipeline = "engines.evidence_pipeline.engine:main"
+dataops-replay = "engines.replay_engine.engine:main"
+dataops-semantic = "engines.semantic_processor.engine:main"
+dataops-anomaly = "engines.anomaly_detector.engine:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "SIM", "TCH"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true

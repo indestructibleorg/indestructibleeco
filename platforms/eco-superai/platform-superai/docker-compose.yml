@@ -1,0 +1,310 @@
+# ============================================================================
+# SuperAI Platform - Full Service Orchestration
+# ============================================================================
+version: "3.9"
+
+x-common-env: &common-env
+  APP_ENV: ${APP_ENV:-development}
+  DATABASE_URL: postgresql+asyncpg://superai:superai_secret@postgres:5432/superai_db
+  DATABASE_URL_SYNC: postgresql://superai:superai_secret@postgres:5432/superai_db
+  REDIS_URL: redis://redis:6379/0
+  CELERY_BROKER_URL: amqp://superai:superai_secret@rabbitmq:5672//
+  CELERY_RESULT_BACKEND: redis://redis:6379/1
+  ELASTICSEARCH_URL: http://elasticsearch:9200
+  SECRET_KEY: ${SECRET_KEY:-change-me-in-production-use-openssl-rand-hex-64}
+  JWT_ALGORITHM: HS256
+  JWT_EXPIRATION_MINUTES: 30
+  LOG_LEVEL: ${LOG_LEVEL:-info}
+  PROMETHEUS_ENABLED: "true"
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+
+services:
+  # ==========================================================================
+  # Application Services
+  # ==========================================================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: superai-app
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    environment:
+      <<: *common-env
+      APP_WORKERS: ${APP_WORKERS:-2}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - app-logs:/app/logs
+      - app-data:/app/data
+    networks:
+      - superai-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: superai-worker
+    command: >
+      celery -A src.infrastructure.tasks.worker:celery_app worker
+      --loglevel=info --concurrency=4 --pool=prefork
+      -Q default,quantum,ai,scientific
+    environment:
+      <<: *common-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - app-logs:/app/logs
+    networks:
+      - superai-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 4G
+
+  beat:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: superai-beat
+    command: >
+      celery -A src.infrastructure.tasks.worker:celery_app beat
+      --loglevel=info --schedule=/app/tmp/celerybeat-schedule
+    environment:
+      <<: *common-env
+    depends_on:
+      - worker
+    volumes:
+      - app-logs:/app/logs
+    networks:
+      - superai-network
+    restart: unless-stopped
+
+  # ==========================================================================
+  # Data Services
+  # ==========================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: superai-postgres
+    environment:
+      POSTGRES_DB: superai_db
+      POSTGRES_USER: superai
+      POSTGRES_PASSWORD: superai_secret
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./infrastructure/scripts/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql
+    networks:
+      - superai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U superai -d superai_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+
+  redis:
+    image: redis:7-alpine
+    container_name: superai-redis
+    command: >
+      redis-server
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --appendonly yes
+      --appendfsync everysec
+      --requirepass superai_redis_secret
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - superai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "superai_redis_secret", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: superai-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: superai
+      RABBITMQ_DEFAULT_PASS: superai_secret
+      RABBITMQ_DEFAULT_VHOST: /
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MGMT_PORT:-15672}:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - superai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+    container_name: superai-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - cluster.name=superai-cluster
+    ports:
+      - "${ES_PORT:-9200}:9200"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    networks:
+      - superai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+
+  # ==========================================================================
+  # Monitoring & Observability
+  # ==========================================================================
+  prometheus:
+    image: prom/prometheus:v2.49.1
+    container_name: superai-prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=30d"
+      - "--web.enable-lifecycle"
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - superai-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:10.3.1
+    container_name: superai-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-superai_grafana}
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    networks:
+      - superai-network
+    restart: unless-stopped
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.53
+    container_name: superai-jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "${JAEGER_UI_PORT:-16686}:16686"
+      - "4317:4317"
+      - "4318:4318"
+    networks:
+      - superai-network
+    restart: unless-stopped
+
+  # ==========================================================================
+  # Vector Database
+  # ==========================================================================
+  chromadb:
+    image: chromadb/chroma:0.4.22
+    container_name: superai-chromadb
+    ports:
+      - "${CHROMA_PORT:-8100}:8000"
+    volumes:
+      - chroma-data:/chroma/chroma
+    networks:
+      - superai-network
+    restart: unless-stopped
+    environment:
+      ANONYMIZED_TELEMETRY: "false"
+
+# ==========================================================================
+# Networks
+# ==========================================================================
+networks:
+  superai-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+# ==========================================================================
+# Volumes
+# ==========================================================================
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  rabbitmq-data:
+    driver: local
+  es-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+  chroma-data:
+    driver: local
+  app-logs:
+    driver: local
+  app-data:
+    driver: local

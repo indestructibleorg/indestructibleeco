@@ -1,0 +1,71 @@
+# =============================================================================
+# ObservOps Platform — External Dependencies Declaration
+# ECO Namespace Specification v1.0 Compliant
+# CRITICAL: This platform has ZERO cross-platform dependencies.
+# =============================================================================
+apiVersion: gl.platform.v1
+kind: DependencyManifest
+metadata:
+  name: observops-platform-dependencies
+  version: "1.0.0"
+
+spec:
+  cross_platform_dependencies: []  # NONE — fully decoupled
+
+  external_dependencies:
+    runtime:
+      - name: python
+        version: ">=3.11"
+        type: language_runtime
+
+      - name: postgresql
+        version: ">=16"
+        type: database
+        purpose: "Metrics metadata, alert history, SLO records"
+
+      - name: redis
+        version: ">=7"
+        type: cache
+        purpose: "Alert deduplication, metric cache, pub/sub"
+
+    python_packages:
+      core:
+        - fastapi
+        - uvicorn
+        - pydantic
+        - sqlalchemy
+        - asyncpg
+        - redis
+        - prometheus-client
+        - structlog
+        - opentelemetry-api
+        - opentelemetry-sdk
+        - numpy
+
+    infrastructure:
+      - name: docker
+        version: ">=24"
+        type: container_runtime
+
+      - name: kubernetes
+        version: ">=1.28"
+        type: orchestration
+        optional: true
+
+      - name: helm
+        version: ">=3.14"
+        type: package_manager
+        optional: true
+
+  eco_namespace:
+    k8s_namespace: eco-observops
+    eco_env_prefix: "PLATFORM_OBSERVOPS_"
+    env_vars:
+      - name: PLATFORM_OBSERVOPS_DB_URL
+        description: "PostgreSQL connection URL"
+      - name: PLATFORM_OBSERVOPS_REDIS_URL
+        description: "Redis connection URL"
+      - name: PLATFORM_OBSERVOPS_PROMETHEUS_URL
+        description: "Prometheus endpoint URL"
+      - name: ECO_AUTH_SERVICE_URL
+        description: "ECO Auth Service URL"

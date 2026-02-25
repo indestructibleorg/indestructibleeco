@@ -1,0 +1,112 @@
+# =============================================================================
+# SecCompOps Platform — Production Dockerfile
+# Multi-stage build for minimal, secure runtime image
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Stage 1: Builder — install dependencies and build the wheel
+# ---------------------------------------------------------------------------
+FROM python:3.11-slim AS builder
+
+LABEL stage="builder"
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+WORKDIR /build
+
+# Install build toolchain (needed for cryptography, asyncpg, etc.)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        libpq-dev \
+        libffi-dev \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv for fast dependency resolution
+RUN pip install --no-cache-dir uv>=0.4
+
+# Copy only dependency metadata first (maximises layer caching)
+COPY pyproject.toml ./
+
+# Install production dependencies into a virtual-env
+RUN uv venv /opt/venv && \
+    . /opt/venv/bin/activate && \
+    uv pip install --no-cache .
+
+# Copy source tree and build the wheel
+COPY src/ ./src/
+RUN . /opt/venv/bin/activate && \
+    uv pip install --no-cache .
+
+# ---------------------------------------------------------------------------
+# Stage 2: Runtime — minimal image with only what is needed to run
+# ---------------------------------------------------------------------------
+FROM python:3.11-slim AS runtime
+
+LABEL maintainer="IndestructibleAutoOps Security Team" \
+      org.opencontainers.image.title="seccompops-platform" \
+      org.opencontainers.image.description="Security & Compliance Operations Platform" \
+      org.opencontainers.image.version="1.0.0" \
+      org.opencontainers.image.vendor="IndestructibleAutoOps" \
+      org.opencontainers.image.source="https://github.com/indestructibleorg/indestructibleeco"
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH="/app/src" \
+    SECCOMPOPS_ENV="production" \
+    PATH="/opt/venv/bin:$PATH"
+
+# Runtime-only system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        libpq5 \
+        curl \
+        tini \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get purge -y --auto-remove
+
+# Create non-root user
+RUN groupadd --gid 1000 seccompops && \
+    useradd --uid 1000 --gid seccompops --shell /bin/false --create-home seccompops
+
+# Copy virtualenv from builder
+COPY --from=builder /opt/venv /opt/venv
+
+# Copy application source
+WORKDIR /app
+COPY --chown=seccompops:seccompops src/ ./src/
+COPY --chown=seccompops:seccompops pyproject.toml ./
+
+# Security hardening: drop all capabilities, read-only source
+RUN chmod -R a-w /app/src && \
+    mkdir -p /app/data /app/logs /app/tmp /app/evidence && \
+    chown -R seccompops:seccompops /app/data /app/logs /app/tmp /app/evidence
+
+# Health check — hits the FastAPI readiness probe
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+    CMD curl -f http://localhost:8095/healthz || exit 1
+
+# Switch to non-root user
+USER seccompops
+
+# Expose API port
+EXPOSE 8095
+
+# Use tini as PID 1 for proper signal handling
+ENTRYPOINT ["tini", "--"]
+
+# Run uvicorn with production settings
+CMD ["uvicorn", \
+     "presentation.api.main:app", \
+     "--host", "0.0.0.0", \
+     "--port", "8095", \
+     "--workers", "4", \
+     "--loop", "uvloop", \
+     "--http", "httptools", \
+     "--access-log", \
+     "--log-level", "info", \
+     "--timeout-keep-alive", "30"]

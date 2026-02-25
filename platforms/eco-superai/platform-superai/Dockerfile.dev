@@ -1,0 +1,65 @@
+# ============================================================================
+# SuperAI Platform — Development Dockerfile
+# ============================================================================
+# Hot-reload, debug tools, full dev dependencies
+# ============================================================================
+
+FROM python:3.11-slim
+
+LABEL maintainer="Enterprise Engineering Team" \
+      description="SuperAI Platform — Development Image"
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH="/app/src:${PYTHONPATH}" \
+    APP_ENV=development \
+    APP_PORT=8000 \
+    APP_DEBUG=true \
+    PIP_NO_CACHE_DIR=1
+
+# --- System dependencies ---
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    curl \
+    git \
+    vim \
+    jq \
+    postgresql-client \
+    redis-tools \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# --- Python dependencies (cached layer) ---
+COPY pyproject.toml ./
+RUN pip install --upgrade pip setuptools wheel \
+    && pip install -e ".[dev]" 2>/dev/null \
+    || pip install \
+        fastapi uvicorn[standard] sqlalchemy[asyncio] asyncpg \
+        alembic pydantic pydantic-settings python-jose[cryptography] \
+        passlib[bcrypt] redis celery structlog prometheus-client \
+        python-dotenv httpx orjson pyyaml tenacity aiofiles \
+        numpy pandas scipy scikit-learn \
+        pytest pytest-asyncio pytest-cov pytest-mock pytest-xdist \
+        httpx factory-boy faker black isort mypy ruff pre-commit \
+        bandit rich typer
+
+# --- Application source (mounted in dev, copied for CI) ---
+COPY . .
+
+# --- Create required directories ---
+RUN mkdir -p /app/logs /app/data /app/tmp
+
+EXPOSE ${APP_PORT}
+
+HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:${APP_PORT}/api/v1/health || exit 1
+
+# --- Default: uvicorn with hot-reload ---
+CMD ["uvicorn", "src.presentation.api.main:app", \
+     "--host", "0.0.0.0", \
+     "--port", "8000", \
+     "--reload", \
+     "--reload-dir", "src", \
+     "--log-level", "debug"]

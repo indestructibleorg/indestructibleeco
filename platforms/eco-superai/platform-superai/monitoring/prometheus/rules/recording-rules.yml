@@ -1,0 +1,293 @@
+# SuperAI Platform - Prometheus Recording Rules
+# Pre-computed metrics for dashboard performance and alerting efficiency.
+# Rule naming convention: superai:<metric_domain>:<aggregation>
+
+groups:
+  # ===========================================================================
+  # API Performance Recording Rules
+  # ===========================================================================
+  - name: superai_api_performance
+    interval: 30s
+    rules:
+      # -----------------------------------------------------------------------
+      # superai:http_request_duration:p95
+      # P95 request latency across all endpoints (global)
+      # -----------------------------------------------------------------------
+      - record: superai:http_request_duration:p95
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(superai_http_request_duration_seconds_bucket{job="superai-api"}[5m])) by (le)
+          )
+
+      # P95 latency broken down by endpoint
+      - record: superai:http_request_duration:p95:by_endpoint
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(superai_http_request_duration_seconds_bucket{job="superai-api"}[5m])) by (le, endpoint)
+          )
+
+      # P50 and P99 for dashboard percentile panels
+      - record: superai:http_request_duration:p50
+        expr: |
+          histogram_quantile(0.50,
+            sum(rate(superai_http_request_duration_seconds_bucket{job="superai-api"}[5m])) by (le)
+          )
+
+      - record: superai:http_request_duration:p99
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(superai_http_request_duration_seconds_bucket{job="superai-api"}[5m])) by (le)
+          )
+
+      # Average latency
+      - record: superai:http_request_duration:avg
+        expr: |
+          sum(rate(superai_http_request_duration_seconds_sum{job="superai-api"}[5m]))
+          /
+          sum(rate(superai_http_request_duration_seconds_count{job="superai-api"}[5m]))
+
+      # -----------------------------------------------------------------------
+      # superai:http_request_error_rate
+      # Ratio of 5xx responses to total responses
+      # -----------------------------------------------------------------------
+      - record: superai:http_request_error_rate
+        expr: |
+          sum(rate(superai_http_requests_total{job="superai-api", status=~"5.."}[5m]))
+          /
+          sum(rate(superai_http_requests_total{job="superai-api"}[5m]))
+
+      # Error rate by endpoint for per-endpoint dashboards
+      - record: superai:http_request_error_rate:by_endpoint
+        expr: |
+          sum(rate(superai_http_requests_total{job="superai-api", status=~"5.."}[5m])) by (endpoint)
+          /
+          sum(rate(superai_http_requests_total{job="superai-api"}[5m])) by (endpoint)
+
+      # Request rate by method and endpoint
+      - record: superai:http_requests:rate5m
+        expr: |
+          sum(rate(superai_http_requests_total{job="superai-api"}[5m])) by (method, endpoint, status)
+
+      # Total request rate (scalar)
+      - record: superai:http_requests_total:rate5m
+        expr: |
+          sum(rate(superai_http_requests_total{job="superai-api"}[5m]))
+
+  # ===========================================================================
+  # Naming Compliance Recording Rules (NCR / VFC / MFR / ARS)
+  # ===========================================================================
+  - name: superai_naming_compliance
+    interval: 1m
+    rules:
+      # -----------------------------------------------------------------------
+      # superai:naming_compliance_rate (NCR)
+      # Ratio of compliant resources to total evaluated resources.
+      # Target: >= 0.95 (95%)
+      # -----------------------------------------------------------------------
+      - record: superai:naming_compliance_rate
+        expr: |
+          superai_naming_compliant_resources_total
+          /
+          superai_naming_total_resources_evaluated
+
+      # NCR by namespace for granular compliance tracking
+      - record: superai:naming_compliance_rate:by_namespace
+        expr: |
+          sum(superai_naming_compliant_resources_total) by (namespace)
+          /
+          sum(superai_naming_total_resources_evaluated) by (namespace)
+
+      # NCR by resource type
+      - record: superai:naming_compliance_rate:by_resource_type
+        expr: |
+          sum(superai_naming_compliant_resources_total) by (resource_type)
+          /
+          sum(superai_naming_total_resources_evaluated) by (resource_type)
+
+      # -----------------------------------------------------------------------
+      # superai:violation_fix_count (VFC)
+      # Rolling count of violations that have been auto-fixed over the last hour.
+      # -----------------------------------------------------------------------
+      - record: superai:violation_fix_count
+        expr: |
+          sum(increase(superai_autofix_success_total[1h]))
+
+      # VFC by fix type for breakdown analysis
+      - record: superai:violation_fix_count:by_type
+        expr: |
+          sum(increase(superai_autofix_success_total[1h])) by (fix_type)
+
+      # VFC rate (fixes per minute) for real-time monitoring
+      - record: superai:violation_fix_rate:per_minute
+        expr: |
+          sum(rate(superai_autofix_success_total[5m])) * 60
+
+      # -----------------------------------------------------------------------
+      # superai:mean_fix_resolution (MFR)
+      # Average time to resolve a naming violation via auto-fix (seconds).
+      # -----------------------------------------------------------------------
+      - record: superai:mean_fix_resolution
+        expr: |
+          sum(rate(superai_autofix_duration_seconds_sum[15m]))
+          /
+          sum(rate(superai_autofix_duration_seconds_count[15m]))
+
+      # MFR p95 for SLA tracking
+      - record: superai:mean_fix_resolution:p95
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(superai_autofix_duration_seconds_bucket[15m])) by (le)
+          )
+
+      # MFR by fix type
+      - record: superai:mean_fix_resolution:by_type
+        expr: |
+          sum(rate(superai_autofix_duration_seconds_sum[15m])) by (fix_type)
+          /
+          sum(rate(superai_autofix_duration_seconds_count[15m])) by (fix_type)
+
+      # -----------------------------------------------------------------------
+      # superai:auto_remediation_success (ARS)
+      # Success rate of auto-remediation attempts.
+      # -----------------------------------------------------------------------
+      - record: superai:auto_remediation_success
+        expr: |
+          sum(rate(superai_autofix_success_total[15m]))
+          /
+          sum(rate(superai_autofix_attempts_total[15m]))
+
+      # ARS by fix type for identifying unreliable fix strategies
+      - record: superai:auto_remediation_success:by_type
+        expr: |
+          sum(rate(superai_autofix_success_total[15m])) by (fix_type)
+          /
+          sum(rate(superai_autofix_attempts_total[15m])) by (fix_type)
+
+      # ARS by namespace
+      - record: superai:auto_remediation_success:by_namespace
+        expr: |
+          sum(rate(superai_autofix_success_total[15m])) by (namespace)
+          /
+          sum(rate(superai_autofix_attempts_total[15m])) by (namespace)
+
+  # ===========================================================================
+  # SLI / SLO Recording Rules
+  # ===========================================================================
+  - name: superai_slo
+    interval: 1m
+    rules:
+      # Availability SLI: ratio of non-5xx responses
+      - record: superai:sli_availability:rate5m
+        expr: |
+          1 - (
+            sum(rate(superai_http_requests_total{job="superai-api", status=~"5.."}[5m]))
+            /
+            sum(rate(superai_http_requests_total{job="superai-api"}[5m]))
+          )
+
+      # Latency SLI: ratio of requests completed under 500ms
+      - record: superai:sli_latency:rate5m
+        expr: |
+          sum(rate(superai_http_request_duration_seconds_bucket{job="superai-api", le="0.5"}[5m]))
+          /
+          sum(rate(superai_http_request_duration_seconds_count{job="superai-api"}[5m]))
+
+      # Error budget burn rate (1h window, 99.9% SLO -> 0.001 error budget)
+      - record: superai:error_budget_burn_rate:1h
+        expr: |
+          sum(rate(superai_http_requests_total{job="superai-api", status=~"5.."}[1h]))
+          /
+          sum(rate(superai_http_requests_total{job="superai-api"}[1h]))
+          / 0.001
+
+      # Error budget burn rate (6h window)
+      - record: superai:error_budget_burn_rate:6h
+        expr: |
+          sum(rate(superai_http_requests_total{job="superai-api", status=~"5.."}[6h]))
+          /
+          sum(rate(superai_http_requests_total{job="superai-api"}[6h]))
+          / 0.001
+
+      # Error budget remaining (30-day window, 99.9% SLO)
+      - record: superai:error_budget_remaining:30d
+        expr: |
+          1 - (
+            sum(increase(superai_http_requests_total{job="superai-api", status=~"5.."}[30d]))
+            /
+            sum(increase(superai_http_requests_total{job="superai-api"}[30d]))
+          ) / 0.001
+
+  # ===========================================================================
+  # Infrastructure Recording Rules
+  # ===========================================================================
+  - name: superai_infrastructure
+    interval: 1m
+    rules:
+      # Pod CPU usage
+      - record: superai:pod_cpu_usage:rate5m
+        expr: |
+          sum(rate(container_cpu_usage_seconds_total{
+            pod=~"superai-.*", container!=""
+          }[5m])) by (pod, namespace)
+
+      # Pod memory working set
+      - record: superai:pod_memory_usage_bytes
+        expr: |
+          sum(container_memory_working_set_bytes{
+            pod=~"superai-.*", container!=""
+          }) by (pod, namespace)
+
+      # Pod restart count (rolling 15m)
+      - record: superai:pod_restarts:increase15m
+        expr: |
+          increase(kube_pod_container_status_restarts_total{
+            pod=~"superai-.*"
+          }[15m])
+
+      # Deployment replica availability ratio
+      - record: superai:deployment_available_ratio
+        expr: |
+          kube_deployment_status_replicas_available{deployment=~"superai-.*"}
+          /
+          kube_deployment_spec_replicas{deployment=~"superai-.*"}
+
+      # Database connection pool utilization
+      - record: superai:db_pool_utilization
+        expr: |
+          superai_db_pool_active_connections{job="superai-api"}
+          /
+          superai_db_pool_max_connections{job="superai-api"}
+
+      # Redis memory utilization
+      - record: superai:redis_memory_utilization
+        expr: |
+          redis_memory_used_bytes{job="redis"}
+          /
+          redis_memory_max_bytes{job="redis"}
+
+  # ===========================================================================
+  # Quantum Processing Recording Rules
+  # ===========================================================================
+  - name: superai_quantum
+    interval: 1m
+    rules:
+      # Quantum job success rate
+      - record: superai:quantum_job_success_rate
+        expr: |
+          1 - (
+            sum(rate(superai_quantum_jobs_failed_total[15m]))
+            /
+            sum(rate(superai_quantum_jobs_total[15m]))
+          )
+
+      # Quantum job duration p95
+      - record: superai:quantum_job_duration:p95
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(superai_quantum_job_duration_seconds_bucket[15m])) by (le, backend)
+          )
+
+      # Active quantum jobs
+      - record: superai:quantum_jobs_active
+        expr: |
+          sum(superai_quantum_jobs_active) by (backend)

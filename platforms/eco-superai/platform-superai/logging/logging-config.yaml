@@ -1,0 +1,127 @@
+# SuperAI Platform — Structured Logging Configuration
+# Compatible with Python structlog + stdlib logging
+---
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  json:
+    class: pythonjsonlogger.jsonlogger.JsonFormatter
+    format: "%(asctime)s %(name)s %(levelname)s %(message)s %(pathname)s %(lineno)d"
+    datefmt: "%Y-%m-%dT%H:%M:%S%z"
+  console:
+    format: "%(asctime)s [%(levelname)-8s] %(name)s: %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+
+filters:
+  sanitize:
+    class: src.shared.utils.log_filter.SanitizeFilter
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: console
+    stream: ext://sys.stdout
+    filters: [sanitize]
+
+  json_file:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: json
+    filename: /var/log/superai/app.log
+    maxBytes: 52428800  # 50MB
+    backupCount: 10
+    encoding: utf-8
+    filters: [sanitize]
+
+  error_file:
+    class: logging.handlers.RotatingFileHandler
+    level: ERROR
+    formatter: json
+    filename: /var/log/superai/error.log
+    maxBytes: 52428800
+    backupCount: 20
+    encoding: utf-8
+    filters: [sanitize]
+
+  audit_file:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: json
+    filename: /var/log/superai/audit.log
+    maxBytes: 104857600  # 100MB
+    backupCount: 30
+    encoding: utf-8
+
+loggers:
+  src:
+    level: DEBUG
+    handlers: [console, json_file, error_file]
+    propagate: false
+
+  src.presentation:
+    level: INFO
+    handlers: [console, json_file]
+    propagate: false
+
+  src.quantum:
+    level: INFO
+    handlers: [console, json_file]
+    propagate: false
+
+  src.ai:
+    level: INFO
+    handlers: [console, json_file]
+    propagate: false
+
+  src.scientific:
+    level: INFO
+    handlers: [console, json_file]
+    propagate: false
+
+  audit:
+    level: INFO
+    handlers: [audit_file]
+    propagate: false
+
+  uvicorn:
+    level: INFO
+    handlers: [console, json_file]
+    propagate: false
+
+  sqlalchemy.engine:
+    level: WARNING
+    handlers: [json_file]
+    propagate: false
+
+root:
+  level: WARNING
+  handlers: [console, json_file, error_file]
+
+# --- Structlog Configuration ---
+# Applied programmatically in src/infrastructure/config/settings.py
+structlog:
+  processors:
+    - structlog.contextvars.merge_contextvars
+    - structlog.processors.add_log_level
+    - structlog.processors.StackInfoRenderer
+    - structlog.dev.set_exc_info
+    - structlog.processors.TimeStamper(fmt="iso")
+    - structlog.processors.JSONRenderer
+  context_class: dict
+  logger_factory: structlog.stdlib.LoggerFactory
+  wrapper_class: structlog.stdlib.BoundLogger
+  cache_logger_on_first_use: true
+
+# --- Sanitization Rules ---
+# Fields that will be redacted in log output
+sanitize_fields:
+  - password
+  - token
+  - secret
+  - api_key
+  - authorization
+  - cookie
+  - credit_card
+  - ssn

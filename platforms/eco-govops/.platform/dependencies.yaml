@@ -1,0 +1,46 @@
+# =============================================================================
+# GovOps Platform — External Dependencies Declaration
+# =============================================================================
+# CRITICAL: This platform has ZERO cross-platform dependencies.
+apiVersion: gl.platform.v1
+kind: DependencyManifest
+metadata:
+  name: govops-platform-dependencies
+  version: "1.0.0"
+
+spec:
+  cross_platform_dependencies: []  # NONE — fully decoupled
+
+  external_dependencies:
+    runtime:
+      - name: python
+        version: ">=3.11"
+        type: language_runtime
+
+      - name: postgresql
+        version: ">=16"
+        type: database
+        purpose: "Governance metadata, scan results, ETL state"
+
+      - name: redis
+        version: ">=7"
+        type: cache
+        purpose: "Task queue, scan cache"
+
+    python_packages:
+      core:
+        - fastapi
+        - uvicorn
+        - pydantic
+        - pydantic-settings
+        - sqlalchemy
+        - asyncpg
+        - redis
+        - httpx
+        - celery
+        - prometheus-client
+        - structlog
+        - pyyaml
+        - jsonschema
+        - networkx
+        - cryptography

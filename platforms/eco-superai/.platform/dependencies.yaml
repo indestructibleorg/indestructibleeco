@@ -1,0 +1,37 @@
+# =============================================================================
+# SuperAI Platform — Dependency Declaration
+# ECO Namespace Specification v1.0 Compliant
+# =============================================================================
+apiVersion: gl.platform.v1
+kind: PlatformDependencies
+metadata:
+  name: superai-platform-deps
+  platform: superai-platform
+
+dependencies:
+  required:
+    - name: platform-core
+      type: shared-kernel
+      reason: "Shared authentication, event bus, audit trail"
+      interface: "gl.core.shared-kernel"
+
+    - name: seccompops-platform
+      type: platform
+      reason: "Security baseline, policy enforcement, compliance scanning"
+      interface: "gl.sec-ops.compliance-platform"
+
+    - name: observops-platform
+      type: platform
+      reason: "Metrics collection, distributed tracing, log aggregation"
+      interface: "gl.observ-ops.platform"
+
+  optional:
+    - name: dataops-platform
+      type: platform
+      reason: "Data pipeline for quantum simulation results"
+      interface: "gl.data-ops.evidence-platform"
+
+    - name: govops-platform
+      type: platform
+      reason: "Governance policy for quantum workload approval"
+      interface: "gl.gov.ops-platform"

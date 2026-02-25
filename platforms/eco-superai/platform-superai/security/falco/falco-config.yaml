@@ -1,0 +1,76 @@
+# ============================================================================
+# Falco Runtime Security — Configuration
+# ============================================================================
+# Deployed as DaemonSet in the cluster for real-time threat detection
+# ============================================================================
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: falco-config
+  namespace: eco-superai
+  labels:
+    app.kubernetes.io/name: falco
+    app.kubernetes.io/part-of: superai
+data:
+  falco.yaml: |
+    rules_file:
+      - /etc/falco/falco_rules.yaml
+      - /etc/falco/falco_rules.local.yaml
+      - /etc/falco/superai_rules.yaml
+
+    json_output: true
+    json_include_output_property: true
+    json_include_tags_property: true
+
+    log_stderr: true
+    log_syslog: false
+    log_level: info
+
+    priority: warning
+
+    buffered_outputs: false
+    syscall_event_drops:
+      threshold: 0.1
+      actions:
+        - log
+        - alert
+      rate: 0.03333
+      max_burst: 1
+
+    outputs:
+      rate: 1
+      max_burst: 1000
+
+    stdout_output:
+      enabled: true
+
+    syslog_output:
+      enabled: false
+
+    file_output:
+      enabled: true
+      keep_alive: false
+      filename: /var/log/falco/events.log
+
+    http_output:
+      enabled: true
+      url: "http://alertmanager.observability:9093/api/v1/alerts"
+
+    grpc:
+      enabled: true
+      bind_address: "unix:///var/run/falco/falco.sock"
+      threadiness: 8
+
+    grpc_output:
+      enabled: true
+
+    webserver:
+      enabled: true
+      listen_port: 8765
+      k8s_healthz_endpoint: /healthz
+
+    metadata_download:
+      max_mb: 100
+      chunk_wait_us: 1000
+      watch_freq_sec: 1

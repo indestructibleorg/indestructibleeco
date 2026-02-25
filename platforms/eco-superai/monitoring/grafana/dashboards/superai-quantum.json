@@ -1,0 +1,132 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "Quantum Jobs Submitted (rate)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(superai_http_requests_total{endpoint=~&quot;/api/v1/quantum.*&quot;, method=&quot;POST&quot;}[5m]))",
+          "legendFormat": "Jobs/s"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" } }
+    },
+    {
+      "title": "Quantum Job Status Distribution",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(superai_http_requests_total{endpoint=~&quot;/api/v1/quantum.*&quot;}[1h])) by (status)",
+          "legendFormat": "HTTP {{status}}"
+        }
+      ]
+    },
+    {
+      "title": "Quantum Execution Latency (p50 / p95 / p99)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(superai_http_request_duration_seconds_bucket{endpoint=~&quot;/api/v1/quantum.*&quot;}[5m])) by (le))",
+          "legendFormat": "p50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(superai_http_request_duration_seconds_bucket{endpoint=~&quot;/api/v1/quantum.*&quot;}[5m])) by (le))",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(superai_http_request_duration_seconds_bucket{endpoint=~&quot;/api/v1/quantum.*&quot;}[5m])) by (le))",
+          "legendFormat": "p99"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "title": "Quantum Requests by Algorithm",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum(rate(superai_http_requests_total{endpoint=&quot;/api/v1/quantum/circuit&quot;}[5m]))",
+          "legendFormat": "circuit"
+        },
+        {
+          "expr": "sum(rate(superai_http_requests_total{endpoint=&quot;/api/v1/quantum/vqe&quot;}[5m]))",
+          "legendFormat": "VQE"
+        },
+        {
+          "expr": "sum(rate(superai_http_requests_total{endpoint=&quot;/api/v1/quantum/qaoa&quot;}[5m]))",
+          "legendFormat": "QAOA"
+        },
+        {
+          "expr": "sum(rate(superai_http_requests_total{endpoint=&quot;/api/v1/quantum/qml&quot;}[5m]))",
+          "legendFormat": "QML"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" } }
+    },
+    {
+      "title": "Celery Quantum Queue Depth",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "expr": "celery_queue_length{queue=&quot;quantum&quot;}",
+          "legendFormat": "quantum queue"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": { "steps": [
+            { "color": "green", "value": null },
+            { "color": "yellow", "value": 10 },
+            { "color": "red", "value": 50 }
+          ]},
+          "max": 100
+        }
+      }
+    },
+    {
+      "title": "Worker CPU Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 16 },
+      "targets": [
+        {
+          "expr": "sum(rate(container_cpu_usage_seconds_total{pod=~&quot;superai-worker.*&quot;}[5m])) by (pod)",
+          "legendFormat": "{{pod}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit" } }
+    },
+    {
+      "title": "Worker Memory Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 16 },
+      "targets": [
+        {
+          "expr": "sum(container_memory_working_set_bytes{pod=~&quot;superai-worker.*&quot;}) by (pod)",
+          "legendFormat": "{{pod}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes" } }
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["superai", "quantum", "compute"],
+  "templating": { "list": [] },
+  "time": { "from": "now-3h", "to": "now" },
+  "timepicker": {},
+  "timezone": "utc",
+  "title": "SuperAI — Quantum Computing",
+  "uid": "superai-quantum",
+  "version": 1
+}

@@ -1,0 +1,483 @@
+# AutoEcoOps Kubernetes Manifests
+# 7-Layer Automation Architecture
+
+---
+# Namespace: infra (Infrastructure)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: infra
+  labels:
+    name: infra
+    tier: infrastructure
+
+---
+# Namespace: platform-01 (IndestructibleAutoOps)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: platform-01
+  labels:
+    name: platform-01
+    tier: platform
+    purpose: observability-healing
+
+---
+# Namespace: platform-02 (IAOps)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: platform-02
+  labels:
+    name: platform-02
+    tier: platform
+    purpose: infrastructure-automation
+
+---
+# Namespace: platform-03 (MachineNativeOps)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: platform-03
+  labels:
+    name: platform-03
+    tier: platform
+    purpose: machine-native-operations
+
+---
+# ServiceAccount for GitHub Actions
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: github-actions
+  namespace: platform-01
+
+---
+# ClusterRole for GitHub Actions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: github-actions-role
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments", "statefulsets", "daemonsets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch"]
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch"]
+- apiGroups: ["batch"]
+  resources: ["jobs", "cronjobs"]
+  verbs: ["get", "list", "watch", "create", "update", "patch"]
+
+---
+# ClusterRoleBinding for GitHub Actions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: github-actions-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: github-actions-role
+subjects:
+- kind: ServiceAccount
+  name: github-actions
+  namespace: platform-01
+
+---
+# ConfigMap for Argo Events Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argo-events-config
+  namespace: infra
+data:
+  github-webhook-port: "12000"
+  webhook-auth-enabled: "true"
+
+---
+# ConfigMap for Tekton Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tekton-config
+  namespace: infra
+data:
+  artifact-registry: "asia-east1-docker.pkg.dev/my-project-ops-1991/eco-base"
+  build-timeout: "3600"
+  max-concurrent-builds: "5"
+
+---
+# ConfigMap for Argo CD Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-config
+  namespace: infra
+data:
+  application.instanceLabelKey: "argocd.argoproj.io/instance"
+  server.insecure: "false"
+  server.disable.auth: "false"
+
+---
+# ConfigMap for Prometheus Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: infra
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+    scrape_configs:
+    - job_name: 'kubernetes-apiservers'
+      kubernetes_sd_configs:
+      - role: endpoints
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+    - job_name: 'kubernetes-nodes'
+      kubernetes_sd_configs:
+      - role: node
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+
+---
+# PersistentVolumeClaim for Prometheus
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prometheus-storage
+  namespace: infra
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+# PersistentVolumeClaim for Grafana
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: grafana-storage
+  namespace: infra
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+# PersistentVolumeClaim for Argo CD
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: argocd-storage
+  namespace: infra
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+# NetworkPolicy for infra namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: infra-network-policy
+  namespace: infra
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: infra
+    - namespaceSelector:
+        matchLabels:
+          name: platform-01
+    - namespaceSelector:
+        matchLabels:
+          name: platform-02
+    - namespaceSelector:
+        matchLabels:
+          name: platform-03
+  egress:
+  - to:
+    - namespaceSelector: {}
+  - to:
+    - podSelector: {}
+    ports:
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
+
+---
+# NetworkPolicy for platform-01 namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: platform-01-network-policy
+  namespace: platform-01
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: infra
+    - namespaceSelector:
+        matchLabels:
+          name: platform-01
+  egress:
+  - to:
+    - namespaceSelector: {}
+
+---
+# ResourceQuota for infra namespace
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: infra-quota
+  namespace: infra
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: "8Gi"
+    limits.cpu: "8"
+    limits.memory: "16Gi"
+    pods: "100"
+    services: "20"
+
+---
+# ResourceQuota for platform-01 namespace
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: platform-01-quota
+  namespace: platform-01
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: "8Gi"
+    limits.cpu: "8"
+    limits.memory: "16Gi"
+    pods: "50"
+    services: "10"
+
+---
+# HorizontalPodAutoscaler for example deployment
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: app-hpa
+  namespace: platform-01
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: app
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+# Example Deployment for platform-01
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+  namespace: platform-01
+  labels:
+    app: eco-base-app
+    tier: application
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: eco-base-app
+  template:
+    metadata:
+      labels:
+        app: eco-base-app
+    spec:
+      serviceAccountName: github-actions
+      containers:
+      - name: app
+        image: asia-east1-docker.pkg.dev/my-project-ops-1991/eco-base/app:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: ENVIRONMENT
+          value: "production"
+        - name: LOG_LEVEL
+          value: "info"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+# Service for example deployment
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+  namespace: platform-01
+  labels:
+    app: eco-base-app
+spec:
+  type: LoadBalancer
+  selector:
+    app: eco-base-app
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+
+---
+# Ingress for example deployment
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  namespace: platform-01
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  rules:
+  - host: "app.example.com"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: app
+            port:
+              number: 80
+
+---
+# ClusterRole for Prometheus
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: prometheus
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - nodes/proxy
+  - services
+  - endpoints
+  - pods
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["extensions"]
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+
+---
+# ClusterRoleBinding for Prometheus
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  namespace: infra
+
+---
+# ServiceAccount for Prometheus
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus
+  namespace: infra
+
+---
+# PodSecurityPolicy for infra namespace
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: infra-psp
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+  requiredDropCapabilities:
+  - ALL
+  volumes:
+  - 'configMap'
+  - 'emptyDir'
+  - 'projected'
+  - 'secret'
+  - 'downwardAPI'
+  - 'persistentVolumeClaim'
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    rule: 'MustRunAsNonRoot'
+  seLinux:
+    rule: 'MustRunAs'
+    seLinuxOptions:
+      level: "s0:c123,c456"
+  fsGroup:
+    rule: 'MustRunAs'
+    ranges:
+    - min: 1000
+      max: 65535
+  readOnlyRootFilesystem: false

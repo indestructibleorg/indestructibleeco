@@ -1,0 +1,105 @@
+# =============================================================================
+# DataOps Platform — Platform Identity Manifest
+# ECO Namespace Specification v1.0 Compliant
+# =============================================================================
+apiVersion: gl.platform.v1
+kind: PlatformManifest
+metadata:
+  name: dataops-platform
+  displayName: "Data & Evidence Operations Platform"
+  glName: "gl.data-ops.evidence-platform"
+  version: "1.0.0"
+  created: "2026-02-23T00:00:00Z"
+  owner: IndestructibleAutoOps
+  team: "Data & Evidence Operations Team"
+
+spec:
+  description: |
+    Evidence pipeline lifecycle management, replay engine for state reconstruction,
+    semantic processing and canonicalization, anomaly detection, and data quality governance.
+
+  type: microservice
+  status: active
+  language: python
+  runtime: python3.11
+
+  # Microservice identity (decoupled, no cross-platform deps)
+  isolation:
+    level: complete
+    cross_platform_dependencies: none
+    data_ownership: exclusive
+    api_boundary: strict
+
+  # Extraction target for standalone deployment
+  extraction:
+    target_repo: "https://github.com/indestructiblemachinen/ai-chatbot"
+    target_path: "platforms/dataops-platform"
+    standalone_ready: true
+
+  components:
+    engines:
+      - name: evidence_pipeline_engine
+        language: python
+        type: data_pipeline
+        description: "Evidence ingestion, validation, hash-chain binding, lifecycle state machine"
+      - name: replay_engine
+        language: python
+        type: state_reconstruction
+        description: "Full/partial replay, timeline verification, state snapshot and restoration"
+      - name: semantic_processor_engine
+        language: python
+        type: nlp_processing
+        description: "Canonicalization, narrative-free validation, semantic classification"
+      - name: anomaly_detector_engine
+        language: python
+        type: anomaly_detection
+        description: "Statistical anomaly detection, Z-score/IQR/isolation forest, drift monitoring"
+
+    registries:
+      - name: evidence_lifecycle_registry
+        format: yaml
+        description: "Evidence states, transitions, retention policies, chain-of-custody"
+      - name: replay_specification_registry
+        format: yaml
+        description: "Replay modes, timeline specs, snapshot intervals, verification"
+      - name: semantic_rules_registry
+        format: yaml
+        description: "Canonicalization rules, narrative patterns, classification taxonomy"
+      - name: data_quality_registry
+        format: yaml
+        description: "Quality gates, validation rules, integrity checks, SLOs"
+
+  ports:
+    api: 8093
+    metrics: 9093
+
+  infrastructure:
+    database: postgresql-16
+    cache: redis-7
+    monitoring: prometheus
+    container: docker
+    orchestration: kubernetes
+
+  domains_covered:
+    - "D2: Evidence Domain"
+    - "D3: Replay Domain"
+  tracks_covered:
+    - "TrackC: Evidence Management"
+    - "TrackD: Replay & Timeline"
+  layers_covered:
+    - "L2: Evidence Layer"
+    - "L4: Semantic Layer"
+
+  # ECO Namespace Specification v1.0 Alignment
+  eco_namespace:
+    k8s_namespace: eco-dataops
+    eco_uri: "eco-base://k8s/platform-dataops/namespace/eco-dataops"
+    eco_urn: "urn:eco-base:k8s:platform-dataops:namespace:eco-dataops:gl.data-ops.evidence-platform"
+    eco_env_prefix: "PLATFORM_DATAOPS_"
+    mandatory_labels:
+      eco-base/platform: platform-dataops
+      eco-base/environment: production
+      eco-base/owner: data-evidence-operations-team
+    mandatory_annotations:
+      eco-base/governance-policy: "eco-dataops-governance.rego"
+      eco-base/audit-log-level: "full"

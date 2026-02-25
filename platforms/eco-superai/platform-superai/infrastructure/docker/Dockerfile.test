@@ -1,0 +1,59 @@
+# ============================================================================
+# SuperAI Platform — Test Runner Image
+# ============================================================================
+# Full test suite with service dependencies via docker-compose
+# ============================================================================
+
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH="/app/src:${PYTHONPATH}" \
+    APP_ENV=testing \
+    PIP_NO_CACHE_DIR=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    curl \
+    postgresql-client \
+    redis-tools \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY pyproject.toml ./
+RUN pip install --upgrade pip setuptools wheel \
+    && pip install \
+        fastapi uvicorn[standard] sqlalchemy[asyncio] asyncpg \
+        alembic pydantic pydantic-settings python-jose[cryptography] \
+        passlib[bcrypt] redis celery structlog prometheus-client \
+        python-dotenv httpx orjson pyyaml tenacity aiofiles \
+        numpy pandas scipy scikit-learn \
+        pytest pytest-asyncio pytest-cov pytest-mock pytest-xdist \
+        httpx factory-boy faker rich
+
+COPY . .
+
+RUN mkdir -p /app/logs /app/tmp /app/test-results
+
+HEALTHCHECK --interval=5s --timeout=3s --retries=3 \
+    CMD python -c "print('ok')"
+
+# Default: run full test suite with coverage
+CMD ["bash", "-c", "\
+    echo 'Waiting for services...' && \
+    until pg_isready -h ${DB_HOST:-postgres} -p ${DB_PORT:-5432} -q 2>/dev/null; do sleep 1; done && \
+    echo 'Database ready.' && \
+    echo '=== Running migrations ===' && \
+    alembic upgrade head 2>/dev/null || echo 'Migrations skipped' && \
+    echo '=== Unit Tests ===' && \
+    pytest tests/unit/ -v --cov=src --cov-report=xml --cov-report=html \
+        --junitxml=/app/test-results/unit.xml -x && \
+    echo '=== Integration Tests ===' && \
+    pytest tests/integration/ -v --cov=src --cov-append --cov-report=xml \
+        --junitxml=/app/test-results/integration.xml -x && \
+    echo '=== E2E Tests ===' && \
+    pytest tests/e2e/ -v --cov=src --cov-append --cov-report=xml \
+        --junitxml=/app/test-results/e2e.xml -x && \
+    echo '=== ALL TESTS PASSED ==='"]

@@ -1,0 +1,53 @@
+# Replay Specification Registry — Modes, timeline specs, snapshot verification
+# DataOps Platform v1.0.0
+
+apiVersion: gl.registry.v1
+kind: ReplaySpecificationRegistry
+metadata:
+  name: DataOps-ReplaySpec-v1.0.0
+  version: "1.0.0"
+  created: "2026-02-23T00:00:00Z"
+  governance_stage: "S5-VERIFIED"
+  status: "ENFORCED"
+
+spec:
+  replay_modes:
+    - mode: FULL
+      description: "Complete state reconstruction from genesis"
+      use_case: "Audit, forensic investigation"
+      max_duration: "unlimited"
+
+    - mode: PARTIAL
+      description: "Replay between two sequence numbers"
+      use_case: "Incident analysis, debugging"
+      max_duration: "24_hours"
+
+    - mode: POINT_IN_TIME
+      description: "Reconstruct state at exact timestamp"
+      use_case: "Compliance snapshot, historical query"
+      max_duration: "1_hour"
+
+    - mode: DIFFERENTIAL
+      description: "Show changes between two snapshots"
+      use_case: "Change audit, drift detection"
+      max_duration: "1_hour"
+
+  timeline_specification:
+    event_ordering: "strict_sequential"
+    sequence_type: "monotonic_increasing"
+    timestamp_precision: "microsecond"
+    hash_algorithm: "sha3_512"
+    integrity_verification: "per_event"
+
+  snapshot_policy:
+    interval_seconds: 300
+    max_snapshots_retained: 1000
+    snapshot_hash_algorithm: "sha3_512"
+    compression: "zstd"
+    verification_on_restore: true
+
+  verification:
+    timeline_integrity: "continuous"
+    sequence_gap_detection: "real_time"
+    hash_chain_verification: "per_replay"
+    cross_reference_validation: true

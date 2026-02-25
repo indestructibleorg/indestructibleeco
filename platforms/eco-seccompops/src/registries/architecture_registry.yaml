@@ -1,0 +1,1177 @@
+# Architecture Registry v1.0
+# IndestructibleAutoOps Platform - Complete Architecture Classification
+# Generated: 2026-02-05
+
+apiVersion: gl.registry.v1
+kind: ArchitectureRegistry
+metadata:
+  name: IndestructibleAutoOps-Architecture-v1.0.0
+  version: "1.0.0"
+  created: "2026-02-05T00:00:00Z"
+  lastModified: "2026-02-05T12:00:00Z"
+  owner: IndestructibleAutoOps
+  governance_owner: IndestructibleAutoOps
+  description: "Complete architecture classification system for IndestructibleAutoOps platform, defining layers, domains, capabilities, and components"
+  documentation: "governance/docs/architecture_guide.md"
+
+spec:
+  # ============================================
+  # LAYER DEFINITIONS (L1-L5)
+  # ============================================
+  layers:
+    L1:
+      id: "L1"
+      name: "Governance Layer"
+      fullname: "Policy Definition and Governance Enforcement"
+      description: "Defines policies, establishes governance rules, makes decisions, and enforces compliance"
+      abbreviation: "L1"
+      level: 1
+      priority: 1
+      responsibilityType: "POLICY_DECISION"
+      keyResponsibilities:
+        - policy_definition
+        - rule_establishment
+        - governance_enforcement
+        - compliance_verification
+        - decision_generation
+      associatedDomains:
+        - D1  # Governance Domain (primary)
+        - D2  # Evidence Domain (uses evidence)
+        - D3  # Replay Domain (controls replay policies)
+        - D4  # Semantic Domain (enforces standards)
+      associatedCapabilities:
+        - C1   # Violation Detection
+        - C2   # Violation Classification
+        - C12  # GLCM-UNC Detection
+        - C13  # GLCM-EVC Enforcement
+      components:
+        backend:
+          - COMP-BE-1  # Semantic Scanner
+          - COMP-BE-2  # Severity Classifier
+          - COMP-BE-8  # Governance Control Plane
+        frontend:
+          - COMP-FE-1  # Dashboard
+          - COMP-FE-8  # Configuration Editor
+      ownerTeam: "Governance Team"
+      upstreamLayers: []
+      downstreamLayers: [L2, L3, L4, L5]
+      maturityLevel: 5  # 1-5 scale
+      criticality: "CRITICAL"
+      sla:
+        availability: "99.9%"
+        responsetime_ms: 100
+        detection_rate: "> 95%"
+      dependencies:
+        external:
+          - NIST_800_53
+          - ISO_27001
+          - SOC2_Type_II
+    
+    L2:
+      id: "L2"
+      name: "Evidence Layer"
+      fullname: "Evidence Collection, Storage, and Verification"
+      description: "Collects violations evidence, manages hash chain, performs canonicalization, and maintains immutable storage"
+      abbreviation: "L2"
+      level: 2
+      priority: 2
+      responsibilityType: "DATA_COLLECTION_STORAGE"
+      keyResponsibilities:
+        - evidence_collection
+        - hash_chain_management
+        - canonicalization
+        - immutable_storage
+        - audit_trail_generation
+      associatedDomains:
+        - D2  # Evidence Domain (primary)
+        - D1  # Governance Domain (supplies to)
+      associatedCapabilities:
+        - C5   # Hash Chain Verification
+        - C6   # Canonicalization
+        - C8   # Evidence Collection
+        - C9   # Audit Trail Generation
+      components:
+        backend:
+          - COMP-BE-4  # Evidence Collector
+          - COMP-BE-5  # Canonicalizer
+          - COMP-BE-6  # Hash Chain Verifier
+        frontend:
+          - COMP-FE-4  # Evidence Viewer
+          - COMP-FE-5  # Audit Trail Browser
+      ownerTeam: "Evidence & Audit Team"
+      upstreamLayers: [L1]
+      downstreamLayers: [L3, L4]
+      maturityLevel: 4
+      criticality: "CRITICAL"
+      sla:
+        availability: "99.95%"
+        responsetime_ms: 200
+        evidence_completeness: "100%"
+        hash_chain_integrity: "99.999%"
+      dependencies:
+        external:
+          - PostgreSQL_13+
+          - S3_or_GCS
+          - Blockchain_optional
+    
+    L3:
+      id: "L3"
+      name: "Decision Layer"
+      fullname: "Remediation Decision and Impact Analysis"
+      description: "Generates remediation decisions, ranks priorities, analyzes impact, and manages approval workflows"
+      abbreviation: "L3"
+      level: 3
+      priority: 3
+      responsibilityType: "DECISION_MAKING"
+      keyResponsibilities:
+        - fix_decision_generation
+        - priority_ranking
+        - impact_assessment
+        - approval_workflow
+        - validation_testing
+      associatedDomains:
+        - D1  # Governance Domain (primary)
+      associatedCapabilities:
+        - C3   # Auto-Fix Generation
+        - C4   # Fix Validation
+      components:
+        backend:
+          - COMP-BE-3  # Auto Fix Engine
+          - COMP-BE-7  # Impact Analyzer
+        frontend:
+          - COMP-FE-3  # Fix Suggestion Panel
+          - COMP-FE-6  # Approval Workflow UI
+      ownerTeam: "Decision Engine Team"
+      upstreamLayers: [L1, L2]
+      downstreamLayers: [L4, L5]
+      maturityLevel: 3
+      criticality: "HIGH"
+      sla:
+        availability: "99.5%"
+        responsetime_ms: 500
+        fix_success_rate: "> 90%"
+      dependencies:
+        external:
+          - AI_LLM_API
+          - Test_Framework
+    
+    L4:
+      id: "L4"
+      name: "Semantic Layer"
+      fullname: "Semantic Processing and Language Standardization"
+      description: "Enforces narrative-free language standards, performs semantic scanning, detects false timelines, and supports multi-language processing"
+      abbreviation: "L4"
+      level: 4
+      priority: 4
+      responsibilityType: "SEMANTIC_PROCESSING"
+      keyResponsibilities:
+        - semantic_scanning
+        - language_standardization
+        - glcm_enforcement
+        - multi_language_support
+        - false_timeline_detection
+      associatedDomains:
+        - D4  # Semantic Domain (primary)
+        - D3  # Replay Domain (verification)
+      associatedCapabilities:
+        - C7   # Replay Capability
+        - C10  # GLCM-NAR (Narrative-Free)
+        - C11  # GLCM-FCT (False Timeline Detection)
+      components:
+        backend:
+          - COMP-BE-1  # Semantic Scanner
+          - COMP-BE-10 # Replay Engine
+        frontend:
+          - COMP-FE-2  # Violation Viewer
+      ownerTeam: "Semantic Processing Team"
+      upstreamLayers: [L1, L2, L3]
+      downstreamLayers: [L5]
+      maturityLevel: 2
+      criticality: "HIGH"
+      sla:
+        availability: "99.0%"
+        responsetime_ms: 1000
+        semantic_accuracy: "> 95%"
+      dependencies:
+        external:
+          - AST_Parser
+          - Multi_Language_Compiler
+
+    L5:
+      id: "L5"
+      name: "Execution Layer"
+      fullname: "Fix Execution, Deployment, and Monitoring"
+      description: "Applies remediation fixes, performs validation testing, manages rollback, and monitors execution"
+      abbreviation: "L5"
+      level: 5
+      priority: 5
+      responsibilityType: "EXECUTION_MONITORING"
+      keyResponsibilities:
+        - fix_application
+        - validation_testing
+        - rollback_management
+        - execution_monitoring
+        - deployment_control
+      associatedDomains:
+        - D1  # Governance Domain (enforcement)
+        - D2  # Evidence Domain (audit trail)
+      associatedCapabilities:
+        - C1   # Violation Detection (runtime)
+      components:
+        backend:
+          - COMP-BE-9  # CI/CD Integrator
+        frontend:
+          - COMP-FE-7  # Deployment Monitor
+      ownerTeam: "Execution & DevOps Team"
+      upstreamLayers: [L1, L2, L3, L4]
+      downstreamLayers: []
+      maturityLevel: 3
+      criticality: "CRITICAL"
+      sla:
+        availability: "99.9%"
+        responsetime_ms: 5000
+        deployment_success_rate: "> 99%"
+      dependencies:
+        external:
+          - GitHub_Actions
+          - GitLab_CI
+          - Jenkins
+          - Kubernetes
+
+  # ============================================
+  # DOMAIN DEFINITIONS (D1-D4)
+  # ============================================
+  domains:
+    D1:
+      id: "D1"
+      name: "Governance Domain"
+      fullname: "Governance Rules, Policy Frameworks, and Decision Engines"
+      abbreviation: "Gov"
+      description: "Encompasses all governance-related functionality including policy definition, rule enforcement, compliance verification, and decision generation"
+      associatedLayers:
+        - L1  # Primary
+        - L3  # Primary
+        - L5  # Enforcement
+      associatedCapabilities:
+        - C1   # Violation Detection
+        - C2   # Violation Classification
+        - C3   # Auto-Fix Generation
+        - C4   # Fix Validation
+        - C12  # GLCM-UNC Detection
+        - C13  # GLCM-EVC Enforcement
+      components:
+        - COMP-BE-2  # Severity Classifier
+        - COMP-BE-3  # Auto Fix Engine
+        - COMP-BE-8  # Governance Control Plane
+      ownerTeam: "Governance Team"
+      dependencies:
+        depends_on:
+          - domain: D2
+            type: "EVIDENCE"
+            reason: "Evidence is required for governance decisions"
+            criticality: "CRITICAL"
+        enforces:
+          - domain: D4
+            type: "STANDARDS"
+            reason: "Enforces semantic language standards"
+            criticality: "CRITICAL"
+      compliance_frameworks:
+        - NIST_800_53
+        - ISO_27001
+        - SOC2_Type_II
+        - PCI_DSS
+        - GDPR
+        - HIPAA
+
+    D2:
+      id: "D2"
+      name: "Evidence Domain"
+      fullname: "Evidence Collection, Tracking, and Verification"
+      abbreviation: "Evi"
+      description: "Manages all aspects of evidence collection, storage, canonicalization, hash chain verification, and audit trail generation"
+      associatedLayers:
+        - L2  # Primary
+      associatedCapabilities:
+        - C5   # Hash Chain Verification
+        - C6   # Canonicalization
+        - C8   # Evidence Collection
+        - C9   # Audit Trail Generation
+      components:
+        - COMP-BE-4  # Evidence Collector
+        - COMP-BE-5  # Canonicalizer
+        - COMP-BE-6  # Hash Chain Verifier
+      ownerTeam: "Evidence & Audit Team"
+      dependencies:
+        supplies_to:
+          - domain: D1
+            type: "DATA"
+            reason: "Provides evidence for governance decisions"
+            criticality: "HIGH"
+        conforms_to:
+          - domain: D4
+            type: "STANDARDS"
+            reason: "Evidence must conform to semantic standards"
+            criticality: "CRITICAL"
+      storage_backends:
+        - PostgreSQL
+        - S3_compatible
+        - Blockchain_optional
+      immutability_requirement: "STRICT"
+      retention_years: 7
+
+    D3:
+      id: "D3"
+      name: "Replay Domain"
+      fullname: "Replay Mechanisms and Timeline Verification"
+      abbreviation: "Rep"
+      description: "Enables reproducible replay of violation detection and remediation sequences, with timeline verification"
+      associatedLayers:
+        - L4  # Primary
+      associatedCapabilities:
+        - C7   # Replay Capability
+        - C11  # GLCM-FCT Detection (False Timeline)
+      components:
+        - COMP-BE-10 # Replay Engine
+      ownerTeam: "Verification Team"
+      dependencies:
+        depends_on:
+          - domain: D2
+            type: "EVIDENCE"
+            reason: "Uses evidence data for replay"
+            criticality: "HIGH"
+        validates:
+          - domain: D4
+            type: "STANDARDS"
+            reason: "Validates semantic correctness during replay"
+            criticality: "CRITICAL"
+      replay_types:
+        - full_replay
+        - partial_replay
+        - timeline_verification
+
+    D4:
+      id: "D4"
+      name: "Semantic Domain"
+      fullname: "Language Standards, Multi-Language Support, and Semantic Standardization"
+      abbreviation: "Sem"
+      description: "Enforces narrative-free language standards, performs semantic scanning, and supports multi-language processing with canonical representation"
+      associatedLayers:
+        - L1  # Enforcement
+        - L4  # Primary
+      associatedCapabilities:
+        - C1   # Violation Detection (semantic)
+        - C10  # GLCM-NAR (Narrative-Free)
+        - C11  # GLCM-FCT (False Timeline Detection)
+      components:
+        - COMP-BE-1 # Semantic Scanner
+      ownerTeam: "Semantic Processing Team"
+      dependencies:
+        enforced_by:
+          - domain: D1
+            type: "POLICIES"
+            reason: "Governed by governance policies"
+            criticality: "CRITICAL"
+      supported_languages:
+        - Python
+        - Java
+        - JavaScript
+        - TypeScript
+        - Go
+        - Rust
+        - C++
+        - C#
+        - Ruby
+        - PHP
+
+  # ============================================
+  # CAPABILITY DEFINITIONS (C1-C13)
+  # ============================================
+  capabilities:
+    C1:
+      id: "C1"
+      name: "Violation Detection"
+      abbreviation: "VD"
+      type: "DETECTION"
+      version: "1.0.0"
+      description: "Multi-layer detection of code and architecture violations using static analysis, runtime monitoring, and semantic scanning"
+      associatedLayers:
+        - L1
+        - L4
+        - L5
+      associatedDomains:
+        - D1
+        - D4
+      components:
+        - COMP-BE-1  # Semantic Scanner
+      frontend_components:
+        - COMP-FE-2  # Violation Viewer
+      implementation_methods:
+        - static_analysis
+        - runtime_monitoring
+        - semantic_scanning
+      sla:
+        detection_rate: "> 95%"
+        false_positive_rate: "< 5%"
+        time_to_detect: "< 5 minutes"
+      dependencies:
+        requires:
+          - C10  # GLCM-NAR compliance
+          - C6   # Canonicalization
+
+    C2:
+      id: "C2"
+      name: "Violation Classification"
+      abbreviation: "VC"
+      type: "CLASSIFICATION"
+      version: "1.0.0"
+      description: "Classify violations by severity level (CRITICAL, HIGH, MEDIUM, LOW) with auto-fix policies"
+      associatedLayers:
+        - L1
+      associatedDomains:
+        - D1
+      components:
+        - COMP-BE-2  # Severity Classifier
+      frontend_components:
+        - COMP-FE-2  # Violation Viewer
+      severity_levels:
+        - CRITICAL
+        - HIGH
+        - MEDIUM
+        - LOW
+      auto_fix_policies:
+        CRITICAL: false
+        HIGH: true
+        MEDIUM: true
+        LOW: true
+      sla:
+        classification_accuracy: "> 99%"
+        time_to_classify: "< 1 minute"
+
+    C3:
+      id: "C3"
+      name: "Auto-Fix Generation"
+      abbreviation: "AFG"
+      type: "GENERATION"
+      version: "1.0.0"
+      description: "AI-powered generation of remediation fixes with validation and dry-run capabilities"
+      associatedLayers:
+        - L3
+      associatedDomains:
+        - D1
+      components:
+        - COMP-BE-3  # Auto Fix Engine
+      frontend_components:
+        - COMP-FE-3  # Fix Suggestion Panel
+      features:
+        - fix_generation
+        - dry_run
+        - rollback_support
+        - test_validation
+      sla:
+        fix_success_rate: "> 90%"
+        time_to_generate: "< 30 seconds"
+      dependencies:
+        requires:
+          - C4   # Fix Validation
+
+    C4:
+      id: "C4"
+      name: "Fix Validation"
+      abbreviation: "FV"
+      type: "VALIDATION"
+      version: "1.0.0"
+      description: "Comprehensive validation of generated fixes using static analysis, unit tests, and integration tests"
+      associatedLayers:
+        - L1
+        - L3
+      associatedDomains:
+        - D1
+      components:
+        - COMP-BE-3  # Auto Fix Engine (validation)
+      validation_types:
+        - static_analysis
+        - unit_tests
+        - integration_tests
+        - performance_benchmarks
+      sla:
+        validation_accuracy: "> 99%"
+        time_to_validate: "< 2 minutes"
+
+    C5:
+      id: "C5"
+      name: "Hash Chain Verification"
+      abbreviation: "HCV"
+      type: "VERIFICATION"
+      version: "1.0.0"
+      description: "Verify integrity of hash chain using cryptographic algorithms (SHA-256, SHA-512, BLAKE2b)"
+      associatedLayers:
+        - L2
+      associatedDomains:
+        - D2
+      components:
+        - COMP-BE-6  # Hash Chain Verifier
+      algorithms:
+        primary: "SHA-256"
+        secondary: "SHA-512"
+        fallback: "BLAKE2b"
+      sla:
+        chain_integrity: "99.999%"
+        verification_time_per_event_ms: "< 5"
+      dependencies:
+        requires:
+          - C6   # Canonicalization
+
+    C6:
+      id: "C6"
+      name: "Canonicalization"
+      abbreviation: "Can"
+      type: "PROCESSING"
+      version: "1.0.0"
+      description: "Normalize data representation for consistent governance enforcement across different input formats"
+      associatedLayers:
+        - L2
+      associatedDomains:
+        - D2
+      components:
+        - COMP-BE-5  # Canonicalizer
+      canonicalization_rules:
+        - remove_comments
+        - normalize_whitespace
+        - sort_imports
+        - normalize_naming_conventions
+        - remove_timestamps
+      output_format: "JSON"
+      sla:
+        consistency: "100%"
+        processing_time_ms: "< 100"
+
+    C7:
+      id: "C7"
+      name: "Replay Capability"
+      abbreviation: "Rep"
+      type: "VERIFICATION"
+      version: "1.0.0"
+      description: "Enable reproducible replay of violation detection and remediation sequences"
+      associatedLayers:
+        - L4
+      associatedDomains:
+        - D3
+      components:
+        - COMP-BE-10 # Replay Engine
+      replay_types:
+        - full_replay
+        - partial_replay
+        - timeline_verification
+      sla:
+        replay_accuracy: "> 99%"
+        time_to_replay: "< 5 minutes"
+      dependencies:
+        requires:
+          - C5   # Hash Chain Verification
+          - C11  # GLCM-FCT Detection
+
+    C8:
+      id: "C8"
+      name: "Evidence Collection"
+      abbreviation: "EC"
+      type: "COLLECTION"
+      version: "1.0.0"
+      description: "Collect comprehensive evidence of violation detection with immutable storage and tamper detection"
+      associatedLayers:
+        - L2
+      associatedDomains:
+        - D2
+      components:
+        - COMP-BE-4  # Evidence Collector
+      evidence_types:
+        - violation_detection
+        - analysis_results
+        - remediation_steps
+        - execution_logs
+      sla:
+        completeness: "100%"
+        collection_latency_ms: "< 500"
+      dependencies:
+        requires:
+          - C6   # Canonicalization
+
+    C9:
+      id: "C9"
+      name: "Audit Trail Generation"
+      abbreviation: "ATG"
+      type: "REPORTING"
+      version: "1.0.0"
+      description: "Generate complete audit trails of all governance activities with tamper-proof logging"
+      associatedLayers:
+        - L2
+      associatedDomains:
+        - D2
+      components:
+        - COMP-BE-4  # Evidence Collector (audit)
+      frontend_components:
+        - COMP-FE-5  # Audit Trail Browser
+      audit_scope:
+        - policy_changes
+        - violations_detected
+        - decisions_made
+        - fixes_applied
+        - approvals_granted
+        - access_logs
+      retention: ">= 7 years"
+      sla:
+        completeness: "100%"
+        query_latency_sec: "< 5"
+      compliance_frameworks:
+        - NIST_800_53
+        - ISO_27001
+        - SOC2_Type_II
+
+    C10:
+      id: "C10"
+      name: "GLCM-NAR (Narrative-Free Enforcement)"
+      abbreviation: "GLCM-NAR"
+      type: "ENFORCEMENT"
+      version: "1.0.0"
+      description: "Enforce narrative-free, canonical language representation in all governance and evidence records"
+      associatedLayers:
+        - L1
+        - L4
+      associatedDomains:
+        - D4
+      components:
+        - COMP-BE-1  # Semantic Scanner
+      enforcement_rules:
+        - no_subjective_descriptions
+        - no_timestamps_in_narrative
+        - canonical_data_representation
+        - language_neutrality
+      sla:
+        enforcement_accuracy: "> 99%"
+        detection_latency_ms: "< 50"
+
+    C11:
+      id: "C11"
+      name: "GLCM-FCT (False Timeline Detection)"
+      abbreviation: "GLCM-FCT"
+      type: "DETECTION"
+      version: "1.0.0"
+      description: "Detect and prevent false or manipulated timelines in violation detection and remediation records"
+      associatedLayers:
+        - L4
+      associatedDomains:
+        - D3
+        - D4
+      components:
+        - COMP-BE-10 # Replay Engine
+      detection_rules:
+        - monotonic_timestamp_verification
+        - cryptographic_hash_chain_validation
+        - sequence_integrity_check
+        - causality_validation
+      sla:
+        detection_rate: "> 99%"
+        false_positive_rate: "< 0.1%"
+        detection_latency_ms: "< 100"
+
+    C12:
+      id: "C12"
+      name: "GLCM-UNC (Unconc Concluded Evidence Detection)"
+      abbreviation: "GLCM-UNC"
+      type: "VALIDATION"
+      version: "1.0.0"
+      description: "Detect evidence lacking proper conclusion or disposition, requiring explicit closure"
+      associatedLayers:
+        - L1
+      associatedDomains:
+        - D1
+      components:
+        - COMP-BE-2  # Severity Classifier
+      validation_rules:
+        - mandatory_conclusion
+        - conclusion_authorization
+        - evidence_closure
+      sla:
+        detection_accuracy: "> 99.5%"
+        detection_latency_ms: "< 100"
+
+    C13:
+      id: "C13"
+      name: "GLCM-EVC (Evidence Chain Enforcement)"
+      abbreviation: "GLCM-EVC"
+      type: "ENFORCEMENT"
+      version: "1.0.0"
+      description: "Enforce continuous, unbreakable evidence chain with cryptographic binding between all events"
+      associatedLayers:
+        - L1
+      associatedDomains:
+        - D2
+      components:
+        - COMP-BE-6  # Hash Chain Verifier
+      enforcement_rules:
+        - continuous_chain_requirement
+        - no_missing_links
+        - cryptographic_binding
+        - immutability_requirement
+      sla:
+        chain_integrity: "99.999%"
+        verification_latency_ms: "< 50"
+
+  # ============================================
+  # COMPONENT DEFINITIONS
+  # ============================================
+  components:
+    backend:
+      COMP-BE-1:
+        id: "COMP-BE-1"
+        name: "Semantic Scanner"
+        filename: "enhanced_semantic_scanner.py"
+        type: "BACKEND_SERVICE"
+        language: "Python"
+        version: "1.0.0"
+        layer: [L1, L4]
+        domain: [D4]
+        capabilities: [C1, C10, C11]
+        api_endpoints:
+          - "POST /api/scan"
+          - "GET /api/scan/{id}"
+          - "POST /api/scan/batch"
+        responsibilities:
+          - AST_analysis
+          - Pattern_matching
+          - Multi_language_parsing
+          - Semantic_validation
+        documentation: "docs/semantic_scanner_guide.md"
+
+      COMP-BE-2:
+        id: "COMP-BE-2"
+        name: "Severity Classifier"
+        filename: "severity_classifier.py"
+        type: "BACKEND_SERVICE"
+        language: "Python"
+        version: "1.0.0"
+        layer: [L1]
+        domain: [D1]
+        capabilities: [C2, C12]
+        api_endpoints:
+          - "POST /api/classify"
+          - "GET /api/classify/{id}"
+        responsibilities:
+          - Violation_classification
+          - Severity_assignment
+          - Auto_fix_policy_application
+          - Unconc_concluded_detection
+
+      COMP-BE-3:
+        id: "COMP-BE-3"
+        name: "Auto Fix Engine"
+        filename: "auto_fix_engine.py"
+        type: "BACKEND_SERVICE"
+        language: "Python"
+        version: "1.0.0"
+        layer: [L3]
+        domain: [D1]
+        capabilities: [C3, C4]
+        api_endpoints:
+          - "POST /api/generate-fix"
+          - "POST /api/validate-fix"
+          - "POST /api/dry-run"
+        responsibilities:
+          - Fix_generation
+          - Fix_validation
+          - Dry_run_execution
+          - Rollback_script_generation
+
+      COMP-BE-4:
+        id: "COMP-BE-4"
+        name: "Evidence Collector"
+        filename: "evidence_collector.py"
+        type: "BACKEND_SERVICE"
+        language: "Python"
+        version: "1.0.0"
+        layer: [L2]
+        domain: [D2]
+        capabilities: [C8, C9]
+        api_endpoints:
+          - "POST /api/collect-evidence"
+          - "GET /api/evidence/{id}"
+          - "GET /api/audit-trail"
+        responsibilities:
+          - Evidence_collection
+          - Immutable_storage
+          - Audit_trail_generation
+          - Access_logging
+
+      COMP-BE-5:
+        id: "COMP-BE-5"
+        name: "Canonicalizer"
+        filename: "canonicalizer.py"
+        type: "BACKEND_SERVICE"
+        language: "Python"
+        version: "1.0.0"
+        layer: [L2]
+        domain: [D2]
+        capabilities: [C6]
+        api_endpoints:
+          - "POST /api/canonicalize"
+          - "POST /api/canonicalize/batch"
+        responsibilities:
+          - Data_normalization
+          - Canonical_representation
+          - Format_standardization
+          - Reproducibility_verification
+
+      COMP-BE-6:
+        id: "COMP-BE-6"
+        name: "Hash Chain Verifier"
+        filename: "hashchain_verifier.py"
+        type: "BACKEND_SERVICE"
+        language: "Python"
+        version: "1.0.0"
+        layer: [L2]
+        domain: [D2]
+        capabilities: [C5, C13]
+        api_endpoints:
+          - "POST /api/verify-chain"
+          - "GET /api/chain/{id}"
+          - "POST /api/detect-tampering"
+        responsibilities:
+          - Hash_chain_verification
+          - Tamper_detection
+          - Cryptographic_validation
+          - Chain_integrity_assurance
+
+      COMP-BE-7:
+        id: "COMP-BE-7"
+        name: "Impact Analyzer"
+        filename: "impact_analyzer.py"
+        type: "BACKEND_SERVICE"
+        language: "Python"
+        version: "1.0.0"
+        layer: [L3]
+        domain: [D1]
+        capabilities: []
+        api_endpoints:
+          - "POST /api/analyze-impact"
+          - "GET /api/impact/{id}"
+        responsibilities:
+          - Impact_assessment
+          - Dependency_analysis
+          - Risk_scoring
+          - Priority_ranking
+
+      COMP-BE-8:
+        id: "COMP-BE-8"
+        name: "Governance Control Plane"
+        filename: "governance_control_plane"
+        type: "BACKEND_SERVICE"
+        language: "Multi (Lua, YAML)"
+        version: "1.0.0"
+        layer: [L1]
+        domain: [D1]
+        capabilities: [C2, C13]
+        technologies:
+          - Istio (Service Mesh)
+          - Kong (API Gateway)
+        api_endpoints:
+          - "GET /api/policies"
+          - "POST /api/policies"
+          - "PUT /api/policies/{id}"
+        responsibilities:
+          - Policy_enforcement
+          - Authorization_decisions
+          - Cross_platform_governance
+          - Evidence_chain_enforcement
+
+      COMP-BE-9:
+        id: "COMP-BE-9"
+        name: "CI/CD Integrator"
+        filename: "github_actions_workflow"
+        type: "BACKEND_SERVICE"
+        language: "YAML"
+        version: "1.0.0"
+        layer: [L5]
+        domain: [D1]
+        capabilities: []
+        technologies:
+          - GitHub_Actions
+          - GitLab_CI
+          - Jenkins
+          - CircleCI
+        responsibilities:
+          - Violation_detection
+          - Fix_application
+          - Deployment_control
+          - Monitoring_integration
+
+      COMP-BE-10:
+        id: "COMP-BE-10"
+        name: "Replay Engine"
+        filename: "replay_engine.py"
+        type: "BACKEND_SERVICE"
+        language: "Python"
+        version: "1.0.0"
+        layer: [L4]
+        domain: [D3]
+        capabilities: [C7, C11]
+        api_endpoints:
+          - "POST /api/replay"
+          - "GET /api/replay/{id}"
+          - "POST /api/verify-timeline"
+        responsibilities:
+          - Replay_execution
+          - Timeline_verification
+          - False_timeline_detection
+          - Reproducibility_validation
+
+    frontend:
+      COMP-FE-1:
+        id: "COMP-FE-1"
+        name: "Dashboard"
+        type: "FRONTEND_COMPONENT"
+        framework: "React"
+        language: "TypeScript"
+        version: "1.0.0"
+        layer: [L1]
+        domain: [D1]
+        features:
+          - violation_overview
+          - statistics_display
+          - trend_analysis
+          - real_time_updates
+        api_dependencies:
+          - COMP-BE-1
+          - COMP-BE-2
+          - COMP-BE-4
+
+      COMP-FE-2:
+        id: "COMP-FE-2"
+        name: "Violation Viewer"
+        type: "FRONTEND_COMPONENT"
+        framework: "React"
+        language: "TypeScript"
+        version: "1.0.0"
+        layer: [L1, L4]
+        domain: [D1, D4]
+        features:
+          - violation_details
+          - classification_display
+          - code_highlighting
+          - language_tags
+        api_dependencies:
+          - COMP-BE-1
+          - COMP-BE-2
+
+      COMP-FE-3:
+        id: "COMP-FE-3"
+        name: "Fix Suggestion Panel"
+        type: "FRONTEND_COMPONENT"
+        framework: "React"
+        language: "TypeScript"
+        version: "1.0.0"
+        layer: [L3]
+        domain: [D1]
+        features:
+          - fix_suggestions
+          - preview
+          - dry_run_results
+          - approval_interface
+        api_dependencies:
+          - COMP-BE-3
+          - COMP-BE-4
+
+      COMP-FE-4:
+        id: "COMP-FE-4"
+        name: "Evidence Viewer"
+        type: "FRONTEND_COMPONENT"
+        framework: "React"
+        language: "TypeScript"
+        version: "1.0.0"
+        layer: [L2]
+        domain: [D2]
+        features:
+          - evidence_chain_display
+          - hash_verification_ui
+          - tamper_detection_alerts
+          - canonicalization_view
+        api_dependencies:
+          - COMP-BE-4
+          - COMP-BE-5
+          - COMP-BE-6
+
+      COMP-FE-5:
+        id: "COMP-FE-5"
+        name: "Audit Trail Browser"
+        type: "FRONTEND_COMPONENT"
+        framework: "React"
+        language: "TypeScript"
+        version: "1.0.0"
+        layer: [L2]
+        domain: [D2]
+        features:
+          - audit_log_display
+          - timeline_visualization
+          - filtering_and_search
+          - export_functionality
+        api_dependencies:
+          - COMP-BE-4
+
+      COMP-FE-6:
+        id: "COMP-FE-6"
+        name: "Approval Workflow UI"
+        type: "FRONTEND_COMPONENT"
+        framework: "React"
+        language: "TypeScript"
+        version: "1.0.0"
+        layer: [L3]
+        domain: [D1]
+        features:
+          - approval_queue
+          - decision_interface
+          - notification_display
+          - history_tracking
+        api_dependencies:
+          - COMP-BE-3
+          - COMP-BE-8
+
+      COMP-FE-7:
+        id: "COMP-FE-7"
+        name: "Deployment Monitor"
+        type: "FRONTEND_COMPONENT"
+        framework: "React"
+        language: "TypeScript"
+        version: "1.0.0"
+        layer: [L5]
+        domain: [D1]
+        features:
+          - deployment_progress
+          - log_viewer
+          - status_indicators
+          - rollback_controls
+        api_dependencies:
+          - COMP-BE-9
+
+      COMP-FE-8:
+        id: "COMP-FE-8"
+        name: "Configuration Editor"
+        type: "FRONTEND_COMPONENT"
+        framework: "React"
+        language: "TypeScript"
+        version: "1.0.0"
+        layer: [L1]
+        domain: [D1]
+        features:
+          - registry_editor
+          - policy_editor
+          - rule_manager
+          - validation_display
+        api_dependencies:
+          - COMP-BE-2
+          - COMP-BE-8
+
+  # ============================================
+  # DEPENDENCIES
+  # ============================================
+  dependencies:
+    vertical_layer_dependencies:
+      L5_to_L4:
+        type: "DEPENDS_ON"
+        reason: "Execution layer requires semantic validation before applying fixes"
+        criticality: "CRITICAL"
+        
+      L4_to_L3:
+        type: "DEPENDS_ON"
+        reason: "Semantic layer requires decision layer output"
+        criticality: "CRITICAL"
+        
+      L3_to_L2:
+        type: "DEPENDS_ON"
+        reason: "Decision layer requires evidence for impact analysis"
+        criticality: "HIGH"
+        
+      L2_to_L1:
+        type: "DEPENDS_ON"
+        reason: "Evidence layer follows governance rules"
+        criticality: "CRITICAL"
+    
+    cross_domain_dependencies:
+      D1_to_D2:
+        type: "USES"
+        reason: "Governance uses evidence for decisions"
+        criticality: "HIGH"
+        
+      D2_to_D4:
+        type: "MUST_CONFORM_TO"
+        reason: "Evidence must conform to semantic standards"
+        criticality: "CRITICAL"
+        
+      D3_to_D2:
+        type: "USES"
+        reason: "Replay uses evidence data"
+        criticality: "HIGH"
+        
+      D3_to_D4:
+        type: "VALIDATES"
+        reason: "Replay validates semantic correctness"
+        criticality: "CRITICAL"
+
+  # ============================================
+  # RESPONSIBILITY BOUNDARIES
+  # ============================================
+  responsibilities:
+    frontend:
+      scope: "User Interface & Interaction"
+      components:
+        - COMP-FE-1 to COMP-FE-8
+      included:
+        - dashboard_display
+        - form_handling
+        - data_presentation
+        - user_navigation
+        - real_time_updates
+      excluded:
+        - violation_detection
+        - governance_rule_execution
+        - hash_chain_verification
+        - cryptographic_operations
+        - fix_application
+      teams:
+        - Frontend Team
+        - UX/Design Team
+    
+    backend:
+      scope: "Core Logic & Data Processing"
+      components:
+        - COMP-BE-1 to COMP-BE-10
+      included:
+        - violation_detection
+        - governance_enforcement
+        - evidence_management
+        - decision_generation
+        - fix_execution
+        - hash_chain_management
+        - authentication
+        - authorization
+      excluded:
+        - ui_rendering
+        - user_interaction_handling
+      teams:
+        - Backend Team
+        - Security Team
+        - DevOps Team
+    
+    shared:
+      scope: "Coordination & Integration"
+      included:
+        - api_contracts
+        - data_flow
+        - status_updates
+        - error_handling
+      teams:
+        - All Teams
+
+status:
+  validationStatus: "PASSED"
+  lastValidated: "2026-02-05T12:00:00Z"
+  applicableVersion: "1.0.0"
+  completeness: "100%"
+  qualityScore: 95

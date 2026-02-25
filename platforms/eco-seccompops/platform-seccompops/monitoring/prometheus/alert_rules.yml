@@ -1,0 +1,42 @@
+groups:
+  - name: seccompops-alerts
+    rules:
+      - alert: SecCompOpsHighViolationRate
+        expr: rate(seccompops_violations_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: critical
+          platform: seccompops
+        annotations:
+          summary: "High governance violation rate detected"
+          description: "SecCompOps is detecting more than 10 violations/sec for 5 minutes."
+
+      - alert: SecCompOpsEvidenceChainBroken
+        expr: seccompops_evidence_chain_integrity == 0
+        for: 1m
+        labels:
+          severity: critical
+          platform: seccompops
+        annotations:
+          summary: "Evidence chain integrity compromised"
+          description: "The cryptographic evidence chain has been broken. Immediate investigation required."
+
+      - alert: SecCompOpsEngineDown
+        expr: up{job="seccompops-engine"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          platform: seccompops
+        annotations:
+          summary: "SecCompOps engine is down"
+          description: "The SecCompOps API engine has been unreachable for 2 minutes."
+
+      - alert: SecCompOpsHighLatency
+        expr: histogram_quantile(0.95, rate(seccompops_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          platform: seccompops
+        annotations:
+          summary: "High API latency on SecCompOps"
+          description: "P95 latency exceeds 2 seconds."

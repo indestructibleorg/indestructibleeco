@@ -1,0 +1,312 @@
+# AI Anomaly Detection Configuration
+# P0 Critical: Machine learning-based anomaly detection for metrics, logs, and network traffic
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: anomaly-detection-config
+  namespace: default
+  labels:
+    app: superai-platform
+    component: ai-anomaly-detection
+data:
+  config.yaml: |
+    # Anomaly Detection Configuration
+    
+    models:
+      # Metrics Anomaly Detection
+      metrics:
+        enabled: true
+        algorithm: isolation_forest
+        threshold: 0.95
+        sliding_window: 3600  # 1 hour
+        features:
+          - cpu_usage
+          - memory_usage
+          - request_rate
+          - error_rate
+          - latency_p95
+          - latency_p99
+        ensemble:
+          enabled: true
+          models:
+            - isolation_forest
+            - one_class_svm
+            - local_outlier_factor
+          voting: hard
+      
+      # Log Anomaly Detection
+      logs:
+        enabled: true
+        algorithm: autoencoder
+        threshold: 0.92
+        features:
+          - log_frequency
+          - error_patterns
+          - timestamp_anomalies
+          - user_agent_anomalies
+          - path_anomalies
+        preprocessing:
+          - tokenization
+          - embedding
+          - normalization
+        model:
+          type: lstm_autoencoder
+          hidden_layers: [128, 64, 128]
+          dropout: 0.2
+      
+      # Network Traffic Anomaly Detection
+      network:
+        enabled: true
+        algorithm: spectral_anomaly
+        threshold: 0.90
+        features:
+          - packet_rate
+          - byte_rate
+          - connection_count
+          - port_distribution
+          - protocol_distribution
+          - geo_location_anomalies
+        sliding_window: 300  # 5 minutes
+      
+      # User Behavior Analytics
+      user_behavior:
+        enabled: true
+        algorithm: markov_chain
+        threshold: 0.88
+        features:
+          - login_patterns
+          - access_patterns
+          - time_patterns
+          - location_patterns
+          - resource_access
+        behavioral_profiles:
+          enabled: true
+          update_interval: 86400  # 24 hours
+    
+    alerting:
+      enabled: true
+      severity_levels:
+        critical:
+          threshold: 0.98
+          min_duration: 60  # seconds
+          channels: [pagerduty, slack, email]
+        warning:
+          threshold: 0.95
+          min_duration: 300  # seconds
+          channels: [slack, email]
+        info:
+          threshold: 0.90
+          min_duration: 600  # seconds
+          channels: [email]
+      correlation:
+        enabled: true
+        time_window: 900  # 15 minutes
+        min_anomalies: 3
+      suppression:
+        enabled: true
+        suppression_period: 1800  # 30 minutes
+    
+    training:
+      enabled: true
+      schedule: "0 2 * * *"  # Daily at 2 AM
+      training_data_retention: 90  # days
+      model_retention: 30  # days
+      retrain_threshold: 0.85  # Retrain if accuracy drops below this
+      validation:
+        enabled: true
+        split_ratio: 0.2  # 20% for validation
+        cross_validation_folds: 5
+    
+    storage:
+      features_backend: "redis"
+      models_backend: "s3://superai-ml-models"
+      metrics_backend: "prometheus"
+      logs_backend: "loki"
+      
+    performance:
+      batch_size: 1000
+      max_concurrent_predictions: 10
+      prediction_timeout: 5  # seconds
+      model_loading_timeout: 30  # seconds
+    
+    security:
+      encryption:
+        enabled: true
+        algorithm: AES-256-GCM
+        key_rotation: 2592000  # 30 days
+      access_control:
+        enabled: true
+        role_based: true
+        audit_logging: true
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: anomaly-model-training
+  namespace: default
+  labels:
+    app: superai-platform
+    component: ai-anomaly-detection
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 3
+      activeDeadlineSeconds: 3600
+      template:
+        spec:
+          serviceAccountName: superai-monitoring
+          restartPolicy: OnFailure
+          containers:
+          - name: trainer
+            image: ghcr.io/superai-platform/anomaly-detection-trainer:latest
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                python train_models.py \
+                  --config /etc/config/config.yaml \
+                  --metrics-backend http://prometheus.monitoring.svc.cluster.local:9090 \
+                  --logs-backend http://loki.monitoring.svc.cluster.local:3100 \
+                  --output s3://superai-ml-models/anomaly-detection
+            volumeMounts:
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
+            - name: models
+              mountPath: /models
+            env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: anomaly-detection-secrets
+                  key: aws_access_key_id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: anomaly-detection-secrets
+                  key: aws_secret_access_key
+            resources:
+              requests:
+                cpu: 2000m
+                memory: 8Gi
+              limits:
+                cpu: 8000m
+                memory: 32Gi
+            envFrom:
+            - secretRef:
+                name: anomaly-detection-secrets
+          volumes:
+          - name: config
+            configMap:
+              name: anomaly-detection-config
+          - name: models
+            emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anomaly-detection-service
+  namespace: default
+  labels:
+    app: superai-platform
+    component: ai-anomaly-detection
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: anomaly-detection-service
+  template:
+    metadata:
+      labels:
+        app: anomaly-detection-service
+        app: superai-platform
+        component: ai-anomaly-detection
+    spec:
+      serviceAccountName: superai-monitoring
+      containers:
+      - name: detector
+        image: ghcr.io/superai-platform/anomaly-detection-service:latest
+        args:
+          - --config=/etc/config/config.yaml
+          - --metrics-address=:8080
+          - --api-address=:8443
+        ports:
+        - name: metrics
+          containerPort: 8080
+        - name: api
+          containerPort: 8443
+        volumeMounts:
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        resources:
+          requests:
+            cpu: 500m
+            memory: 2Gi
+          limits:
+            cpu: 2000m
+            memory: 8Gi
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: metrics
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: metrics
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+      - name: config
+        configMap:
+          name: anomaly-detection-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: anomaly-detection-service
+  namespace: default
+  labels:
+    app: superai-platform
+    component: ai-anomaly-detection
+spec:
+  type: ClusterIP
+  ports:
+  - name: metrics
+    port: 8080
+    targetPort: metrics
+  - name: api
+    port: 8443
+    targetPort: api
+  selector:
+    app: anomaly-detection-service
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: anomaly-detection-secrets
+  namespace: default
+  labels:
+    app: superai-platform
+    component: ai-anomaly-detection
+type: Opaque
+stringData:
+  aws_access_key_id: "YOUR_AWS_ACCESS_KEY_ID"
+  aws_secret_access_key: "YOUR_AWS_SECRET_ACCESS_KEY"
+  encryption_key: "YOUR_AES_256_GCM_KEY"

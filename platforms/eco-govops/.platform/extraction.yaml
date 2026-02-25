@@ -1,0 +1,45 @@
+# =============================================================================
+# GovOps Platform — Standalone Extraction Manifest
+# =============================================================================
+apiVersion: gl.platform.v1
+kind: ExtractionManifest
+metadata:
+  name: govops-platform-extraction
+  version: "1.0.0"
+
+spec:
+  source:
+    monorepo: "indestructibleautoops"
+    path: "govops-platform/"
+
+  target:
+    repository: "https://github.com/indestructibleorg/indestructibleeco"
+    path: "platforms/govops-platform"
+    branch: "main"
+
+  extraction_steps:
+    - step: 1
+      action: "Copy platform directory"
+      command: "cp -r govops-platform/ <target>/platforms/govops-platform/"
+
+    - step: 2
+      action: "Verify no cross-platform imports"
+      command: "grep -r 'from superai' src/ || grep -r 'from seccompops' src/ || echo 'CLEAN'"
+
+    - step: 3
+      action: "Install dependencies"
+      command: "pip install -e '.[dev]'"
+
+    - step: 4
+      action: "Run tests"
+      command: "pytest tests/"
+
+    - step: 5
+      action: "Build container"
+      command: "docker build -f Dockerfile.prod -t govops-platform:latest ."
+
+  verification:
+    - "All tests pass independently"
+    - "Docker image builds successfully"
+    - "No references to sibling platforms"
+    - "API endpoints respond correctly"

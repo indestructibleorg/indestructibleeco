@@ -1,0 +1,29 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: superai-app-pdb
+  namespace: eco-superai
+  labels:
+    app.kubernetes.io/name: superai-platform
+    app.kubernetes.io/component: app
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: superai-platform
+      app.kubernetes.io/component: app
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: superai-worker-pdb
+  namespace: eco-superai
+  labels:
+    app.kubernetes.io/name: superai-platform
+    app.kubernetes.io/component: worker
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: superai-platform
+      app.kubernetes.io/component: worker

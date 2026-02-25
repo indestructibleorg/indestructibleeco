@@ -1,0 +1,45 @@
+# ============================================================================
+# SuperAI Platform — Development Dockerfile
+# ============================================================================
+# Optimized for fast rebuilds and hot-reload during development
+FROM python:3.11-slim AS base
+
+# System dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd -r superai && useradd -r -g superai -d /app -s /bin/bash superai
+
+WORKDIR /app
+
+# Install Python dependencies (cached layer)
+COPY pyproject.toml ./
+RUN pip install --no-cache-dir -e ".[dev]" 2>/dev/null || \
+    pip install --no-cache-dir \
+    fastapi[all] uvicorn[standard] pydantic-settings \
+    sqlalchemy asyncpg alembic redis \
+    pytest pytest-cov pytest-asyncio httpx \
+    ruff mypy bandit \
+    numpy scipy scikit-learn \
+    qiskit qiskit-aer \
+    openai chromadb
+
+# Copy source code
+COPY . .
+
+# Set ownership
+RUN chown -R superai:superai /app
+
+USER superai
+
+# Expose port
+EXPOSE 8000
+
+# Development server with hot-reload
+CMD ["uvicorn", "src.presentation.api.main:app", \
+     "--reload", "--host", "0.0.0.0", "--port", "8000", \
+     "--log-level", "debug"]

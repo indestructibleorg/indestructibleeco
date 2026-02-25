@@ -1,0 +1,79 @@
+# Data Quality Registry — Quality gates, validation rules, integrity SLOs
+# DataOps Platform v1.0.0
+
+apiVersion: gl.registry.v1
+kind: DataQualityRegistry
+metadata:
+  name: DataOps-DataQuality-v1.0.0
+  version: "1.0.0"
+  created: "2026-02-23T00:00:00Z"
+  governance_stage: "S5-VERIFIED"
+  status: "ENFORCED"
+
+spec:
+  quality_dimensions:
+    - dimension: COMPLETENESS
+      description: "All required fields present and non-null"
+      slo_target: "99.9%"
+      measurement: "missing_field_ratio"
+
+    - dimension: ACCURACY
+      description: "Values match expected formats and ranges"
+      slo_target: "99.5%"
+      measurement: "validation_pass_ratio"
+
+    - dimension: CONSISTENCY
+      description: "No contradictions across related records"
+      slo_target: "99.0%"
+      measurement: "cross_reference_match_ratio"
+
+    - dimension: TIMELINESS
+      description: "Data arrives within expected latency"
+      slo_target: "95.0%"
+      measurement: "p95_ingestion_latency_seconds"
+      threshold: 5.0
+
+    - dimension: INTEGRITY
+      description: "Hash chain unbroken, no tampering detected"
+      slo_target: "100.0%"
+      measurement: "chain_integrity_ratio"
+
+  quality_gates:
+    - gate_id: "QG-INGEST"
+      stage: "INGEST"
+      checks:
+        - schema_valid: true
+        - required_fields_present: true
+        - payload_size_under_limit: true
+      blocking: true
+
+    - gate_id: "QG-VALIDATE"
+      stage: "VALIDATE"
+      checks:
+        - hash_computable: true
+        - format_correct: true
+        - no_duplicate: true
+      blocking: true
+
+    - gate_id: "QG-SEAL"
+      stage: "SEAL"
+      checks:
+        - chain_parent_valid: true
+        - hash_matches: true
+        - state_transition_valid: true
+      blocking: true
+
+  anomaly_thresholds:
+    z_score_threshold: 3.0
+    iqr_multiplier: 1.5
+    moving_average_window: 100
+    drift_detection_sensitivity: 0.05
+
+  slo_reporting:
+    frequency: "hourly"
+    retention: "90_days"
+    alert_on_breach: true
+    escalation:
+      minor_breach: "team_lead"
+      major_breach: "governance_officer"
+      critical_breach: "cto"

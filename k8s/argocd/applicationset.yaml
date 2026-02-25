@@ -38,35 +38,35 @@ spec:
     spec:
       project: default
       source:
-          repoURL: https://github.com/indestructibleorg/eco-base.git
-          targetRevision: "{{revision}}"
-          path: helm
-          helm:
-            releaseName: "eco-{{env}}"
-            valueFiles:
-        - "{{values_file}}"
-            parameters:
+        repoURL: https://github.com/indestructibleorg/eco-base.git
+        targetRevision: "{{revision}}"
+        path: helm
+        helm:
+          releaseName: "eco-{{env}}"
+          valueFiles:
+      - "{{values_file}}"
+          parameters:
         - name: global.namespace
-                value: "{{namespace}}"
+            value: "{{namespace}}"
         - name: global.environment
-                value: "{{env}}"
+            value: "{{env}}"
       destination:
-          server: "{{cluster}}"
-          namespace: "{{namespace}}"
+        server: "{{cluster}}"
+        namespace: "{{namespace}}"
       syncPolicy:
-          automated:
-            selfHeal: true
-            prune: true
-          syncOptions:
-        - CreateNamespace=true
-        - PrunePropagationPolicy=foreground
-        - PruneLast=true
-          retry:
-            limit: 3
-            backoff:
-              duration: 5s
-              factor: 2
-              maxDuration: 3m
+        automated:
+          selfHeal: true
+          prune: true
+        syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+        retry:
+          limit: 3
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
       ignoreDifferences:
         - group: apps
             kind: Deployment

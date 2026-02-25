@@ -1,0 +1,644 @@
+[ECO-SPEC-FAIL] k8s/argocd/applicationset.yaml: yaml parse error: while parsing a block mapping
+  in "k8s/argocd/applicationset.yaml", line 39, column 7
+expected <block end>, but found '<block sequence start>'
+  in "k8s/argocd/applicationset.yaml", line 47, column 9
+[ECO-SPEC-FAIL] platforms/quantum/computing/infrastructure/enforcers/policy-enforcer.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/quantum/computing/infrastructure/enforcers/policy-enforcer.yaml", line 93, column 5
+expected <block end>, but found '<block sequence start>'
+  in "platforms/quantum/computing/infrastructure/enforcers/policy-enforcer.yaml", line 96, column 7
+[ECO-SPEC-FAIL] platforms/quantum/computing/infrastructure/policies/security-policies.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/quantum/computing/infrastructure/policies/security-policies.yaml", line 23, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/quantum/computing/infrastructure/policies/security-policies.yaml", line 153, column 5
+[ECO-SPEC-FAIL] platforms/quantum/infrastructure/enforcers/policy-enforcer.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/quantum/infrastructure/enforcers/policy-enforcer.yaml", line 93, column 5
+expected <block end>, but found '<block sequence start>'
+  in "platforms/quantum/infrastructure/enforcers/policy-enforcer.yaml", line 96, column 7
+[ECO-SPEC-FAIL] platforms/quantum/infrastructure/policies/security-policies.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/quantum/infrastructure/policies/security-policies.yaml", line 23, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/quantum/infrastructure/policies/security-policies.yaml", line 153, column 5
+[ECO-SPEC-FAIL] platforms/automation/instant/docs/INSTANT-EXECUTION-MANIFEST.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/automation/instant/docs/INSTANT-EXECUTION-MANIFEST.yaml", line 35, column 1
+[ECO-SPEC-FAIL] platforms/automation/instant/legacy/.instant-manifest.yaml: yaml parse error: while parsing a block collection
+  in "platforms/automation/instant/legacy/.instant-manifest.yaml", line 13, column 3
+expected <block end>, but found '?'
+  in "platforms/automation/instant/legacy/.instant-manifest.yaml", line 34, column 3
+[ECO-SPEC-FAIL] platforms/automation/instant/legacy/instant-grail.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/automation/instant/legacy/instant-grail.yaml", line 10, column 9
+[ECO-SPEC-FAIL] platforms/automation/instant/workflows/instant-validation.yml: yaml parse error: while scanning a simple key
+  in "platforms/automation/instant/workflows/instant-validation.yml", line 37, column 3
+could not find expected ':'
+  in "platforms/automation/instant/workflows/instant-validation.yml", line 38, column 11
+[ECO-SPEC-FAIL] platforms/automation/organizer/.github/workflows/gov-validation.yml: yaml parse error: while scanning a simple key
+  in "platforms/automation/organizer/.github/workflows/gov-validation.yml", line 40, column 3
+could not find expected ':'
+  in "platforms/automation/organizer/.github/workflows/gov-validation.yml", line 41, column 3
+[ECO-SPEC-FAIL] platforms/infrastructure/deployment/helm/machine-native-ops/Chart.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/infrastructure/deployment/helm/machine-native-ops/Chart.yaml", line 34, column 14
+[ECO-SPEC-FAIL] platforms/infrastructure/deployment/helm/machine-native-ops/values.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/deployment/helm/machine-native-ops/values.yaml", line 76, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/infrastructure/deployment/helm/machine-native-ops/values.yaml", line 80, column 5
+[ECO-SPEC-FAIL] platforms/infrastructure/deployment/kubernetes/base/monitoring-deployment.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/deployment/kubernetes/base/monitoring-deployment.yaml", line 19, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/infrastructure/deployment/kubernetes/base/monitoring-deployment.yaml", line 30, column 5
+[ECO-SPEC-FAIL] platforms/infrastructure/deployment/kubernetes/base/namespace.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/infrastructure/deployment/kubernetes/base/namespace.yaml", line 16, column 16
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/deployment/helm/machine-native-ops/Chart.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/infrastructure/foundation/deployment/helm/machine-native-ops/Chart.yaml", line 34, column 14
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/deployment/helm/machine-native-ops/values.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/foundation/deployment/helm/machine-native-ops/values.yaml", line 76, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/infrastructure/foundation/deployment/helm/machine-native-ops/values.yaml", line 80, column 5
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/deployment/kubernetes/base/monitoring-deployment.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/foundation/deployment/kubernetes/base/monitoring-deployment.yaml", line 19, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/infrastructure/foundation/deployment/kubernetes/base/monitoring-deployment.yaml", line 30, column 5
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/deployment/kubernetes/base/namespace.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/infrastructure/foundation/deployment/kubernetes/base/namespace.yaml", line 16, column 16
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/k8s-legacy/high-availability/failover/failover-policies.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/foundation/k8s-legacy/high-availability/failover/failover-policies.yaml", line 92, column 3
+expected <block end>, but found '-'
+  in "platforms/infrastructure/foundation/k8s-legacy/high-availability/failover/failover-policies.yaml", line 102, column 3
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/k8s-legacy/istio/namespace.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/infrastructure/foundation/k8s-legacy/istio/namespace.yaml", line 19, column 39
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/k8s-legacy/jaeger/values.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/foundation/k8s-legacy/jaeger/values.yaml", line 112, column 5
+expected <block end>, but found '<block mapping start>'
+  in "platforms/infrastructure/foundation/k8s-legacy/jaeger/values.yaml", line 113, column 7
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/k8s-legacy/production/cross-platform-monitoring.yaml: yaml parse error: while scanning a simple key
+  in "platforms/infrastructure/foundation/k8s-legacy/production/cross-platform-monitoring.yaml", line 383, column 3
+could not find expected ':'
+  in "platforms/infrastructure/foundation/k8s-legacy/production/cross-platform-monitoring.yaml", line 384, column 3
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/k8s-legacy/production/deployment-istio.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/foundation/k8s-legacy/production/deployment-istio.yaml", line 55, column 7
+expected <block end>, but found '-'
+  in "platforms/infrastructure/foundation/k8s-legacy/production/deployment-istio.yaml", line 58, column 7
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/k8s-legacy/production/deployment.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/foundation/k8s-legacy/production/deployment.yaml", line 49, column 7
+expected <block end>, but found '-'
+  in "platforms/infrastructure/foundation/k8s-legacy/production/deployment.yaml", line 52, column 7
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/k8s-legacy/production/namespace.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/infrastructure/foundation/k8s-legacy/production/namespace.yaml", line 16, column 16
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/k8s-legacy/production/resilience-middleware.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/infrastructure/foundation/k8s-legacy/production/resilience-middleware.yaml", line 45, column 16
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/k8s-legacy/production/universal-deployment.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/infrastructure/foundation/k8s-legacy/production/universal-deployment.yaml", line 24, column 9
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/kubernetes/manifests/base/hpa.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/foundation/kubernetes/manifests/base/hpa.yaml", line 25, column 3
+expected <block end>, but found '-'
+  in "platforms/infrastructure/foundation/kubernetes/manifests/base/hpa.yaml", line 35, column 3
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/kubernetes/manifests/base/namespace.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/infrastructure/foundation/kubernetes/manifests/base/namespace.yaml", line 17, column 27
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/kubernetes/manifests/systems/elasticsearch-search-system/deployment.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/foundation/kubernetes/manifests/systems/elasticsearch-search-system/deployment.yaml", line 23, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/infrastructure/foundation/kubernetes/manifests/systems/elasticsearch-search-system/deployment.yaml", line 35, column 5
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/kubernetes/manifests/systems/elasticsearch-search-system/service.yaml: Service/elasticsearch-search-service: app.kubernetes.io/part-of must be 'eco-base'
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/kubernetes/manifests/systems/engine/deployment.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/foundation/kubernetes/manifests/systems/engine/deployment.yaml", line 23, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/infrastructure/foundation/kubernetes/manifests/systems/engine/deployment.yaml", line 35, column 5
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/kubernetes/manifests/systems/engine/service.yaml: Service/aep-engine-service: app.kubernetes.io/part-of must be 'eco-base'
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/kubernetes/manifests/systems/esync-platform/deployment.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/foundation/kubernetes/manifests/systems/esync-platform/deployment.yaml", line 23, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/infrastructure/foundation/kubernetes/manifests/systems/esync-platform/deployment.yaml", line 35, column 5
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/kubernetes/manifests/systems/esync-platform/service.yaml: Service/esync-platform-service: app.kubernetes.io/part-of must be 'eco-base'
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/kubernetes/manifests/systems/file-organizer-system/deployment.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/foundation/kubernetes/manifests/systems/file-organizer-system/deployment.yaml", line 23, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/infrastructure/foundation/kubernetes/manifests/systems/file-organizer-system/deployment.yaml", line 35, column 5
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/kubernetes/manifests/systems/file-organizer-system/service.yaml: Service/file-organizer-service: app.kubernetes.io/part-of must be 'eco-base'
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/kubernetes/manifests/systems/instant/deployment.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/foundation/kubernetes/manifests/systems/instant/deployment.yaml", line 23, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/infrastructure/foundation/kubernetes/manifests/systems/instant/deployment.yaml", line 35, column 5
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/kubernetes/manifests/systems/instant/service.yaml: Service/instant-service: app.kubernetes.io/part-of must be 'eco-base'
+[ECO-SPEC-FAIL] platforms/infrastructure/foundation/redis-stack/docker-compose.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/foundation/redis-stack/docker-compose.yaml", line 8, column 1
+expected <block end>, but found '<block mapping start>'
+  in "platforms/infrastructure/foundation/redis-stack/docker-compose.yaml", line 10, column 3
+[ECO-SPEC-FAIL] platforms/infrastructure/k8s-legacy/high-availability/failover/failover-policies.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/k8s-legacy/high-availability/failover/failover-policies.yaml", line 92, column 3
+expected <block end>, but found '-'
+  in "platforms/infrastructure/k8s-legacy/high-availability/failover/failover-policies.yaml", line 102, column 3
+[ECO-SPEC-FAIL] platforms/infrastructure/k8s-legacy/istio/namespace.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/infrastructure/k8s-legacy/istio/namespace.yaml", line 19, column 39
+[ECO-SPEC-FAIL] platforms/infrastructure/k8s-legacy/jaeger/values.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/k8s-legacy/jaeger/values.yaml", line 112, column 5
+expected <block end>, but found '<block mapping start>'
+  in "platforms/infrastructure/k8s-legacy/jaeger/values.yaml", line 113, column 7
+[ECO-SPEC-FAIL] platforms/infrastructure/k8s-legacy/production/cross-platform-monitoring.yaml: yaml parse error: while scanning a simple key
+  in "platforms/infrastructure/k8s-legacy/production/cross-platform-monitoring.yaml", line 383, column 3
+could not find expected ':'
+  in "platforms/infrastructure/k8s-legacy/production/cross-platform-monitoring.yaml", line 384, column 3
+[ECO-SPEC-FAIL] platforms/infrastructure/k8s-legacy/production/deployment-istio.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/k8s-legacy/production/deployment-istio.yaml", line 55, column 7
+expected <block end>, but found '-'
+  in "platforms/infrastructure/k8s-legacy/production/deployment-istio.yaml", line 58, column 7
+[ECO-SPEC-FAIL] platforms/infrastructure/k8s-legacy/production/deployment.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/k8s-legacy/production/deployment.yaml", line 49, column 7
+expected <block end>, but found '-'
+  in "platforms/infrastructure/k8s-legacy/production/deployment.yaml", line 52, column 7
+[ECO-SPEC-FAIL] platforms/infrastructure/k8s-legacy/production/namespace.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/infrastructure/k8s-legacy/production/namespace.yaml", line 16, column 16
+[ECO-SPEC-FAIL] platforms/infrastructure/k8s-legacy/production/resilience-middleware.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/infrastructure/k8s-legacy/production/resilience-middleware.yaml", line 45, column 16
+[ECO-SPEC-FAIL] platforms/infrastructure/k8s-legacy/production/universal-deployment.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/infrastructure/k8s-legacy/production/universal-deployment.yaml", line 24, column 9
+[ECO-SPEC-FAIL] platforms/infrastructure/kubernetes/manifests/base/hpa.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/kubernetes/manifests/base/hpa.yaml", line 25, column 3
+expected <block end>, but found '-'
+  in "platforms/infrastructure/kubernetes/manifests/base/hpa.yaml", line 35, column 3
+[ECO-SPEC-FAIL] platforms/infrastructure/kubernetes/manifests/base/namespace.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/infrastructure/kubernetes/manifests/base/namespace.yaml", line 17, column 27
+[ECO-SPEC-FAIL] platforms/infrastructure/kubernetes/manifests/systems/elasticsearch-search-system/deployment.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/kubernetes/manifests/systems/elasticsearch-search-system/deployment.yaml", line 23, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/infrastructure/kubernetes/manifests/systems/elasticsearch-search-system/deployment.yaml", line 35, column 5
+[ECO-SPEC-FAIL] platforms/infrastructure/kubernetes/manifests/systems/elasticsearch-search-system/service.yaml: Service/elasticsearch-search-service: app.kubernetes.io/part-of must be 'eco-base'
+[ECO-SPEC-FAIL] platforms/infrastructure/kubernetes/manifests/systems/engine/deployment.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/kubernetes/manifests/systems/engine/deployment.yaml", line 23, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/infrastructure/kubernetes/manifests/systems/engine/deployment.yaml", line 35, column 5
+[ECO-SPEC-FAIL] platforms/infrastructure/kubernetes/manifests/systems/engine/service.yaml: Service/aep-engine-service: app.kubernetes.io/part-of must be 'eco-base'
+[ECO-SPEC-FAIL] platforms/infrastructure/kubernetes/manifests/systems/esync-platform/deployment.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/kubernetes/manifests/systems/esync-platform/deployment.yaml", line 23, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/infrastructure/kubernetes/manifests/systems/esync-platform/deployment.yaml", line 35, column 5
+[ECO-SPEC-FAIL] platforms/infrastructure/kubernetes/manifests/systems/esync-platform/service.yaml: Service/esync-platform-service: app.kubernetes.io/part-of must be 'eco-base'
+[ECO-SPEC-FAIL] platforms/infrastructure/kubernetes/manifests/systems/file-organizer-system/deployment.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/kubernetes/manifests/systems/file-organizer-system/deployment.yaml", line 23, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/infrastructure/kubernetes/manifests/systems/file-organizer-system/deployment.yaml", line 35, column 5
+[ECO-SPEC-FAIL] platforms/infrastructure/kubernetes/manifests/systems/file-organizer-system/service.yaml: Service/file-organizer-service: app.kubernetes.io/part-of must be 'eco-base'
+[ECO-SPEC-FAIL] platforms/infrastructure/kubernetes/manifests/systems/instant/deployment.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/kubernetes/manifests/systems/instant/deployment.yaml", line 23, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/infrastructure/kubernetes/manifests/systems/instant/deployment.yaml", line 35, column 5
+[ECO-SPEC-FAIL] platforms/infrastructure/kubernetes/manifests/systems/instant/service.yaml: Service/instant-service: app.kubernetes.io/part-of must be 'eco-base'
+[ECO-SPEC-FAIL] platforms/infrastructure/redis-stack/docker-compose.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/infrastructure/redis-stack/docker-compose.yaml", line 8, column 1
+expected <block end>, but found '<block mapping start>'
+  in "platforms/infrastructure/redis-stack/docker-compose.yaml", line 10, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era3-platforms/extensions/integration-hub/pagerduty/config.example.yaml: yaml parse error: while scanning a simple key
+  in "platforms/ng-era-platforms/ng-era3-platforms/extensions/integration-hub/pagerduty/config.example.yaml", line 166, column 11
+could not find expected ':'
+  in "platforms/ng-era-platforms/ng-era3-platforms/extensions/integration-hub/pagerduty/config.example.yaml", line 170, column 12
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/GL-ROOT-SEMANTIC-ANCHOR.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/GL-ROOT-SEMANTIC-ANCHOR.yaml", line 9, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/gl-unified-naming-charter.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/gl-unified-naming-charter.yaml", line 16, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/.governance/audit/audit-schema.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/.governance/audit/audit-schema.yaml", line 16, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/.governance/playbooks/naming-migration.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/.governance/playbooks/naming-migration.yaml", line 17, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/api/openapi.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/api/openapi.yaml", line 22, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/naming-governance-v1.0.0/monitoring/prometheus/naming-governance-rules.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/naming-governance-v1.0.0/monitoring/prometheus/naming-governance-rules.yaml", line 230, column 36
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/naming-governance-v1.0.0/config/machine-spec.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/naming-governance-v1.0.0/config/machine-spec.yaml", line 8, column 15
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/naming-governance-v1.0.0/training/modules/roles-curriculum.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/naming-governance-v1.0.0/training/modules/roles-curriculum.yaml", line 8, column 15
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/quantum-naming-v4.0.0/monitoring/prometheus-quantum-rules.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/quantum-naming-v4.0.0/monitoring/prometheus-quantum-rules.yaml", line 30, column 9
+expected <block end>, but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/quantum-naming-v4.0.0/monitoring/prometheus-quantum-rules.yaml", line 41, column 11
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/quantum-naming-v4.0.0/config/naming-governance-v2.0.0.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/quantum-naming-v4.0.0/config/naming-governance-v2.0.0.yaml", line 147, column 7
+expected <block end>, but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/quantum-naming-v4.0.0/config/naming-governance-v2.0.0.yaml", line 152, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/quantum-naming-v4.0.0/deployment/quantum-deployment-manifest.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/quantum-naming-v4.0.0/deployment/quantum-deployment-manifest.yaml", line 240, column 16
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/quantum-naming-v4.0.0/workflows/quantum-naming-governance.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/quantum-naming-v4.0.0/workflows/quantum-naming-governance.yaml", line 7, column 1
+expected <block end>, but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/quantum-naming-v4.0.0/workflows/quantum-naming-governance.yaml", line 11, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-core/gl-constitution.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-core/gl-constitution.yaml", line 9, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-core/gl-index.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-core/gl-index.yaml", line 9, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-core/gl-layers.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-core/gl-layers.yaml", line 9, column 16
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/DEFINITION.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/DEFINITION.yaml", line 9, column 11
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ARCHITECTURE-SPEC.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ARCHITECTURE-SPEC.yaml", line 14, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ARTIFACT-COLLECTION.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ARTIFACT-COLLECTION.yaml", line 9, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ARTIFACTS-TEMPLATES.yaml: yaml parse error: while scanning a simple key
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ARTIFACTS-TEMPLATES.yaml", line 19, column 3
+could not find expected ':'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ARTIFACTS-TEMPLATES.yaml", line 20, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-DEPENDENCY-GRAPH.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-DEPENDENCY-GRAPH.yaml", line 14, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-GOVERNANCE-EVENT-FLOW.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-GOVERNANCE-EVENT-FLOW.yaml", line 9, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-HIGH-WEIGHT-PROMPTS.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-HIGH-WEIGHT-PROMPTS.yaml", line 13, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-LAYER-DEFINITIONS.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-LAYER-DEFINITIONS.yaml", line 9, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-QUANTUM-VALIDATION.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-QUANTUM-VALIDATION.yaml", line 10, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ROOT-SEMANTIC-ANCHOR.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-ROOT-SEMANTIC-ANCHOR.yaml", line 9, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-SEAL-MANIFEST.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-SEAL-MANIFEST.yaml", line 9, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-SEMANTIC-SEAL.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/GL-SEMANTIC-SEAL.yaml", line 9, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/api-design-specification.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/api-design-specification.yaml", line 10, column 1
+expected <block end>, but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/api-design-specification.yaml", line 753, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/backward-reconciliation-mechanism.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/backward-reconciliation-mechanism.yaml", line 9, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/bi-direction-governance-loop-vision.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/bi-direction-governance-loop-vision.yaml", line 9, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/compliance-standards-reference.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/compliance-standards-reference.yaml", line 9, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/cross-domain-integration.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/cross-domain-integration.yaml", line 11, column 1
+expected <block end>, but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/cross-domain-integration.yaml", line 19, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/ethical-guidelines.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/ethical-guidelines.yaml", line 9, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/forward-expansion-implementation.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/forward-expansion-implementation.yaml", line 9, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-artifact-dsl.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-artifact-dsl.yaml", line 24, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-artifact-engine.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-artifact-engine.yaml", line 9, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-artifacts-matrix.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-artifacts-matrix.yaml", line 9, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-automation-engine.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-automation-engine.yaml", line 9, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-chain-registry.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-chain-registry.yaml", line 9, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-constitution.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-constitution.yaml", line 9, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-dag.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-dag.yaml", line 9, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-directory-naming-spec.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-directory-naming-spec.yaml", line 9, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-execution-mode.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-execution-mode.yaml", line 9, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-filesystem-mapping.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-filesystem-mapping.yaml", line 9, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-final-seal.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-final-seal.yaml", line 24, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-global-governance-audit-report.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-global-governance-audit-report.yaml", line 9, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-global-parallelism-engine.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-global-parallelism-engine.yaml", line 24, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-global-semantic-index.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-global-semantic-index.yaml", line 9, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-governance-loop.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-governance-loop.yaml", line 9, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-index.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-index.yaml", line 9, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-integrated-seal.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-integrated-seal.yaml", line 9, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-layers.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-layers.yaml", line 9, column 16
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-semantic-boundaries.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-semantic-boundaries.yaml", line 9, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-semantic-stabilization.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-semantic-stabilization.yaml", line 9, column 21
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-skills-matrix.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-skills-matrix.yaml", line 9, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-task-lifecycle.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-task-lifecycle.yaml", line 9, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-unified-naming-charter.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/gl-unified-naming-charter.yaml", line 16, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/governance-loop-process-policy.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/governance-loop-process-policy.yaml", line 9, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/metrics-definition.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/metrics-definition.yaml", line 55, column 11
+expected <block end>, but found '-'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/metrics-definition.yaml", line 57, column 11
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/org-structure.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/org-structure.yaml", line 9, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/quantum-enhanced-validation-implementation.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/quantum-enhanced-validation-implementation.yaml", line 10, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/quantum-validation-metrics.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/quantum-validation-metrics.yaml", line 10, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/validation-rules-definition.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/gl-artifacts/validation-rules-definition.yaml", line 9, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/change-management/change-policy.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/change-management/change-policy.yaml", line 22, column 3
+expected <block end>, but found '<block sequence start>'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/change-management/change-policy.yaml", line 287, column 7
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/exception/exception-policy.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/exception/exception-policy.yaml", line 22, column 3
+expected <block end>, but found '<block sequence start>'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/exception/exception-policy.yaml", line 292, column 7
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/naming/api-naming.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/naming/api-naming.yaml", line 22, column 3
+expected <block end>, but found '<block sequence start>'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/naming/api-naming.yaml", line 162, column 7
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/naming/canonical-regex.policy.yaml: yaml parse error: while parsing a block collection
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/naming/canonical-regex.policy.yaml", line 271, column 3
+expected <block end>, but found '?'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/naming/canonical-regex.policy.yaml", line 276, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/naming/k8s-deployment-naming.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/naming/k8s-deployment-naming.yaml", line 24, column 3
+expected <block end>, but found '<block sequence start>'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/naming/k8s-deployment-naming.yaml", line 135, column 7
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/naming/pipeline-naming.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/naming/pipeline-naming.yaml", line 22, column 3
+expected <block end>, but found '<block sequence start>'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/naming/pipeline-naming.yaml", line 195, column 7
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/naming/required-labels.policy.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/naming/required-labels.policy.yaml", line 42, column 5
+expected <block end>, but found '-'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/naming/required-labels.policy.yaml", line 45, column 5
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/security/info-security-policy-reference.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/security/info-security-policy-reference.yaml", line 21, column 3
+expected <block end>, but found '<block sequence start>'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/GL90-99-Meta-Specification-Layer/governance/archived/legacy/governance-legacy/policies/security/info-security-policy-reference.yaml", line 292, column 7
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/contracts/semantic-unification-spec.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/contracts/semantic-unification-spec.yaml", line 244, column 7
+expected <block end>, but found '-'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/contracts/semantic-unification-spec.yaml", line 246, column 7
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/contracts/unified-naming-governance-contract.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/contracts/unified-naming-governance-contract.yaml", line 520, column 5
+expected <block end>, but found '-'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/contracts/unified-naming-governance-contract.yaml", line 522, column 5
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/governance/naming-governance/contracts/directory-standards.yaml: yaml parse error: while parsing a block collection
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/governance/naming-governance/contracts/directory-standards.yaml", line 104, column 7
+expected <block end>, but found '?'
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/governance/naming-governance/contracts/directory-standards.yaml", line 105, column 7
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/governance/naming-governance/contracts/naming-conventions.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/governance-architecture/governance/naming-governance/contracts/naming-conventions.yaml", line 4, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/runtime-services/esync-platform/.github/workflows/auto-fix-bot.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/runtime-services/esync-platform/.github/workflows/auto-fix-bot.yaml", line 52, column 16
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/runtime-services/esync-platform/.github/workflows/ci.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/runtime-services/esync-platform/.github/workflows/ci.yaml", line 49, column 16
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/runtime-services/esync-platform/.github/workflows/naming-governance.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era1-platforms/runtime-services/esync-platform/.github/workflows/naming-governance.yaml", line 49, column 16
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/runtime-services/esync-platform/pipelines/example-pipeline.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era1-platforms/runtime-services/esync-platform/pipelines/example-pipeline.yaml", line 7, column 1
+expected <block end>, but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era1-platforms/runtime-services/esync-platform/pipelines/example-pipeline.yaml", line 14, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/infrastructure/enforcers/policy-enforcer.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/infrastructure/enforcers/policy-enforcer.yaml", line 93, column 5
+expected <block end>, but found '<block sequence start>'
+  in "platforms/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/infrastructure/enforcers/policy-enforcer.yaml", line 96, column 7
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/infrastructure/policies/security-policies.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/infrastructure/policies/security-policies.yaml", line 23, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era1-platforms/runtime-services/quantum-platform/infrastructure/policies/security-policies.yaml", line 153, column 5
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era1-platforms/runtime-services/integrations/pagerduty/config.example.yaml: yaml parse error: while scanning a simple key
+  in "platforms/ng-era-platforms/ng-era1-platforms/runtime-services/integrations/pagerduty/config.example.yaml", line 166, column 11
+could not find expected ':'
+  in "platforms/ng-era-platforms/ng-era1-platforms/runtime-services/integrations/pagerduty/config.example.yaml", line 170, column 12
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/data-processing/processing-platform/elasticsearch-search-system/manifest.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/data-processing/processing-platform/elasticsearch-search-system/manifest.yaml", line 18, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/data-processing/processing-platform/elasticsearch-search-system/controlplane/manifest.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/data-processing/processing-platform/elasticsearch-search-system/controlplane/manifest.yaml", line 16, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/data-processing/processing-platform/elasticsearch-search-system/controlplane/policy.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/data-processing/processing-platform/elasticsearch-search-system/controlplane/policy.yaml", line 15, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/data-processing/processing-platform/elasticsearch-search-system/root-policy/manifest.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/data-processing/processing-platform/elasticsearch-search-system/root-policy/manifest.yaml", line 16, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/data-processing/processing-platform/elasticsearch-search-system/root-policy/policy.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/data-processing/processing-platform/elasticsearch-search-system/root-policy/policy.yaml", line 15, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/data-processing/processing-platform/elasticsearch-search-system/root-policy/naming-convention/naming-registry.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/data-processing/processing-platform/elasticsearch-search-system/root-policy/naming-convention/naming-registry.yaml", line 15, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/data-processing/processing-platform/elasticsearch-search-system/workspace/projects/search-system/config/index-mapping.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era2-platforms/data-processing/processing-platform/elasticsearch-search-system/workspace/projects/search-system/config/index-mapping.yaml", line 12, column 1
+expected <block end>, but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/data-processing/processing-platform/elasticsearch-search-system/workspace/projects/search-system/config/index-mapping.yaml", line 73, column 7
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/data-processing/search/manifest.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/data-processing/search/manifest.yaml", line 18, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/data-processing/search/controlplane/manifest.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/data-processing/search/controlplane/manifest.yaml", line 16, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/data-processing/search/controlplane/policy.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/data-processing/search/controlplane/policy.yaml", line 15, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/data-processing/search/root-policy/manifest.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/data-processing/search/root-policy/manifest.yaml", line 16, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/data-processing/search/root-policy/policy.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/data-processing/search/root-policy/policy.yaml", line 15, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/data-processing/search/root-policy/naming-convention/naming-registry.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/data-processing/search/root-policy/naming-convention/naming-registry.yaml", line 15, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/data-processing/search/workspace/projects/search-system/config/index-mapping.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era2-platforms/data-processing/search/workspace/projects/search-system/config/index-mapping.yaml", line 12, column 1
+expected <block end>, but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/data-processing/search/workspace/projects/search-system/config/index-mapping.yaml", line 73, column 7
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/governance/compliance-platform/scripts/naming/auto-label.k8s.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era2-platforms/governance/compliance-platform/scripts/naming/auto-label.k8s.yaml", line 20, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/governance/compliance-platform/scripts/naming/auto-label.k8s.yaml", line 35, column 5
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/governance/compliance/data/evolution/gl-evolution-data/executions/raw/05a65738-f8e8-4e40-88a9-484e81458e0d.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/governance/compliance/data/evolution/gl-evolution-data/executions/raw/05a65738-f8e8-4e40-88a9-484e81458e0d.yaml", line 6, column 12
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/governance/compliance/data/evolution/gl-evolution-data/executions/raw/1d86e97a-96c1-4d5d-bede-0fd283643b01.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/governance/compliance/data/evolution/gl-evolution-data/executions/raw/1d86e97a-96c1-4d5d-bede-0fd283643b01.yaml", line 6, column 12
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/governance/compliance/data/evolution/gl-evolution-data/executions/raw/ce140863-b63f-4094-a82c-ebc7ab1274b6.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/governance/compliance/data/evolution/gl-evolution-data/executions/raw/ce140863-b63f-4094-a82c-ebc7ab1274b6.yaml", line 6, column 12
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/governance/compliance/data/evolution/gl-evolution-data/upgrades/planned/29c4438b-1b2e-4cf0-b38b-f42dbacd480e.yaml: yaml parse error: could not determine a constructor for the tag 'tag:yaml.org,2002:python/object/apply:__main__.Priority'
+  in "platforms/ng-era-platforms/ng-era2-platforms/governance/compliance/data/evolution/gl-evolution-data/upgrades/planned/29c4438b-1b2e-4cf0-b38b-f42dbacd480e.yaml", line 20, column 11
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.config.yaml: yaml parse error: while scanning a simple key
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.config.yaml", line 7, column 3
+could not find expected ':'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.config.yaml", line 8, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.governance.yaml: yaml parse error: while scanning a simple key
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.governance.yaml", line 7, column 3
+could not find expected ':'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.governance.yaml", line 8, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.integrity.yaml: yaml parse error: while scanning a simple key
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.integrity.yaml", line 7, column 3
+could not find expected ':'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.integrity.yaml", line 8, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.modules.yaml: yaml parse error: while scanning a simple key
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.modules.yaml", line 7, column 3
+could not find expected ':'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.modules.yaml", line 8, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.naming-policy.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.naming-policy.yaml", line 14, column 9
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.provenance.yaml: yaml parse error: while scanning a simple key
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.provenance.yaml", line 7, column 3
+could not find expected ':'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.provenance.yaml", line 8, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.super-execution.yaml: yaml parse error: while scanning a simple key
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.super-execution.yaml", line 7, column 3
+could not find expected ':'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/config/root.super-execution.yaml", line 8, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/registries/GL-AI-NATIVE-MODULES.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/registries/GL-AI-NATIVE-MODULES.yaml", line 11, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/registries/root.registry.modules.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/registries/root.registry.modules.yaml", line 31, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/registries/root.registry.modules.yaml", line 59, column 5
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/01-core/module-manifest.yaml: yaml parse error: while parsing a block collection
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/01-core/module-manifest.yaml", line 61, column 3
+expected <block end>, but found '?'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/01-core/module-manifest.yaml", line 74, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/02-intelligence/module-manifest.yaml: yaml parse error: while parsing a block collection
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/02-intelligence/module-manifest.yaml", line 74, column 3
+expected <block end>, but found '?'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/02-intelligence/module-manifest.yaml", line 90, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/03-governance/module-manifest.yaml: yaml parse error: while parsing a block collection
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/03-governance/module-manifest.yaml", line 86, column 3
+expected <block end>, but found '?'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/03-governance/module-manifest.yaml", line 102, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/04-autonomous/module-manifest.yaml: yaml parse error: while parsing a block collection
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/04-autonomous/module-manifest.yaml", line 87, column 3
+expected <block end>, but found '?'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/04-autonomous/module-manifest.yaml", line 103, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/05-observability/module-manifest.yaml: yaml parse error: while parsing a block collection
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/05-observability/module-manifest.yaml", line 97, column 3
+expected <block end>, but found '?'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/05-observability/module-manifest.yaml", line 119, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/06-security/module-manifest.yaml: yaml parse error: while parsing a block collection
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/06-security/module-manifest.yaml", line 108, column 3
+expected <block end>, but found '?'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/baseline/modules/06-security/module-manifest.yaml", line 130, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/validation/root.validator.schema.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/controlplane/validation/root.validator.schema.yaml", line 55, column 66
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/design/FileX-standard-template-v1.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/design/FileX-standard-template-v1.yaml", line 20, column 12
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/manifest.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/manifest.yaml", line 18, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/controlplane/manifest.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/controlplane/manifest.yaml", line 15, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/controlplane/policy.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/controlplane/policy.yaml", line 15, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/controlplane/baseline/pipeline-baseline.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/controlplane/baseline/pipeline-baseline.yaml", line 17, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/controlplane/governance/policies/pipeline-governance.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/controlplane/governance/policies/pipeline-governance.yaml", line 18, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/root-policy/manifest.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/root-policy/manifest.yaml", line 15, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/root-policy/policy.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/root-policy/policy.yaml", line 15, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/root-policy/naming-convention/naming-registry.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/root-policy/naming-convention/naming-registry.yaml", line 17, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/workspace/manifest.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/workspace/manifest.yaml", line 15, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/workspace/policy.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/workspace/policy.yaml", line 15, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/workspace/projects/etl-pipeline/config/pipeline.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/etl-pipeline/workspace/projects/etl-pipeline/config/pipeline.yaml", line 17, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/gl-gate/gates/gates-01-99.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/gl-gate/gates/gates-01-99.yaml", line 23, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/execution/DEFINITION.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/execution/DEFINITION.yaml", line 11, column 11
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/execution/artifacts/api-design-specification.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/execution/artifacts/api-design-specification.yaml", line 12, column 1
+expected <block end>, but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/execution/artifacts/api-design-specification.yaml", line 755, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/execution/artifacts/forward-expansion-implementation.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/execution/artifacts/forward-expansion-implementation.yaml", line 11, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/extended/DEFINITION.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/extended/DEFINITION.yaml", line 11, column 11
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/feedback/DEFINITION.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/feedback/DEFINITION.yaml", line 11, column 11
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/feedback/artifacts/backward-reconciliation-mechanism.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/feedback/artifacts/backward-reconciliation-mechanism.yaml", line 11, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/DEFINITION.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/DEFINITION.yaml", line 11, column 11
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/artifacts/GL-ARTIFACT-COLLECTION.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/artifacts/GL-ARTIFACT-COLLECTION.yaml", line 11, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/artifacts/GL-GOVERNANCE-EVENT-FLOW.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/artifacts/GL-GOVERNANCE-EVENT-FLOW.yaml", line 11, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/artifacts/GL-QUANTUM-VALIDATION.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/artifacts/GL-QUANTUM-VALIDATION.yaml", line 12, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/naming-charter/gl-unified-naming-charter.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/naming-charter/gl-unified-naming-charter.yaml", line 18, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/semantic/GL-ROOT-SEMANTIC-ANCHOR.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/semantic/GL-ROOT-SEMANTIC-ANCHOR.yaml", line 11, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/spec/GL-ARCHITECTURE-SPEC.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/spec/GL-ARCHITECTURE-SPEC.yaml", line 16, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/spec/GL-ARTIFACTS-TEMPLATES.yaml: yaml parse error: while scanning a simple key
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/spec/GL-ARTIFACTS-TEMPLATES.yaml", line 21, column 3
+could not find expected ':'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/spec/GL-ARTIFACTS-TEMPLATES.yaml", line 22, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/spec/GL-DEPENDENCY-GRAPH.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/spec/GL-DEPENDENCY-GRAPH.yaml", line 16, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/spec/GL-HIGH-WEIGHT-PROMPTS.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/spec/GL-HIGH-WEIGHT-PROMPTS.yaml", line 15, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/spec/GL-LAYER-DEFINITIONS.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/meta/spec/GL-LAYER-DEFINITIONS.yaml", line 11, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/observability/DEFINITION.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/observability/DEFINITION.yaml", line 11, column 11
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/observability/artifacts/metrics-definition.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/observability/artifacts/metrics-definition.yaml", line 57, column 11
+expected <block end>, but found '-'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/observability/artifacts/metrics-definition.yaml", line 59, column 11
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/observability/artifacts/quantum-enhanced-validation-implementation.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/observability/artifacts/quantum-enhanced-validation-implementation.yaml", line 12, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/observability/artifacts/quantum-validation-metrics.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/observability/artifacts/quantum-validation-metrics.yaml", line 12, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/observability/artifacts/validation-rules-definition.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/observability/artifacts/validation-rules-definition.yaml", line 11, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/operational/DEFINITION.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/operational/DEFINITION.yaml", line 11, column 11
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/operational/artifacts/governance-loop-process-policy.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/operational/artifacts/governance-loop-process-policy.yaml", line 11, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/strategic/DEFINITION.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/strategic/DEFINITION.yaml", line 11, column 11
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/strategic/artifacts/bi-direction-governance-loop-vision.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/strategic/artifacts/bi-direction-governance-loop-vision.yaml", line 11, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/strategic/artifacts/compliance-standards-reference.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/strategic/artifacts/compliance-standards-reference.yaml", line 11, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/strategic/artifacts/cross-domain-integration.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/strategic/artifacts/cross-domain-integration.yaml", line 13, column 1
+expected <block end>, but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/strategic/artifacts/cross-domain-integration.yaml", line 21, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/strategic/artifacts/ethical-guidelines.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/strategic/artifacts/ethical-guidelines.yaml", line 11, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/strategic/artifacts/org-structure.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/engine/governance/gl-artifacts/strategic/artifacts/org-structure.yaml", line 11, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/governance/gl-artifacts/strategic/DEFINITION.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/governance/gl-artifacts/strategic/DEFINITION.yaml", line 11, column 11
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/governance/gl-artifacts/strategic/artifacts/bi-direction-governance-loop-vision.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/governance/gl-artifacts/strategic/artifacts/bi-direction-governance-loop-vision.yaml", line 11, column 10
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/governance/gl-artifacts/strategic/artifacts/compliance-standards-reference.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/governance/gl-artifacts/strategic/artifacts/compliance-standards-reference.yaml", line 11, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/governance/gl-artifacts/strategic/artifacts/cross-domain-integration.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/governance/gl-artifacts/strategic/artifacts/cross-domain-integration.yaml", line 13, column 1
+expected <block end>, but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/governance/gl-artifacts/strategic/artifacts/cross-domain-integration.yaml", line 21, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/governance/gl-artifacts/strategic/artifacts/ethical-guidelines.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/governance/gl-artifacts/strategic/artifacts/ethical-guidelines.yaml", line 11, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/governance/gl-artifacts/strategic/artifacts/org-structure.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/governance/gl-artifacts/strategic/artifacts/org-structure.yaml", line 11, column 13
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/templates/ci/github-actions-naming-check.yml: yaml parse error: while scanning a simple key
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/templates/ci/github-actions-naming-check.yml", line 37, column 3
+could not find expected ':'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/templates/ci/github-actions-naming-check.yml", line 38, column 11
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tests-legacy/fixtures/sample-config.yaml: yaml parse error: while scanning a simple key
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tests-legacy/fixtures/sample-config.yaml", line 58, column 3
+could not find expected ':'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tests-legacy/fixtures/sample-config.yaml", line 58, column 16
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tools-legacy/language-dashboard-data.yaml: yaml parse error: expected '<document start>', but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tools-legacy/language-dashboard-data.yaml", line 15, column 1
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tools-legacy/infrastructure/kubernetes/quantum/backend-deployment.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tools-legacy/infrastructure/kubernetes/quantum/backend-deployment.yaml", line 20, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tools-legacy/infrastructure/kubernetes/quantum/backend-deployment.yaml", line 37, column 5
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tools-legacy/infrastructure/kubernetes/quantum/frontend-deployment.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tools-legacy/infrastructure/kubernetes/quantum/frontend-deployment.yaml", line 20, column 3
+expected <block end>, but found '<block mapping start>'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tools-legacy/infrastructure/kubernetes/quantum/frontend-deployment.yaml", line 37, column 5
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tools-legacy/infrastructure/kubernetes/quantum/hpa.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tools-legacy/infrastructure/kubernetes/quantum/hpa.yaml", line 19, column 3
+expected <block end>, but found '-'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tools-legacy/infrastructure/kubernetes/quantum/hpa.yaml", line 29, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tools-legacy/infrastructure/kubernetes/quantum/namespace.yaml: yaml parse error: mapping values are not allowed here
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tools-legacy/infrastructure/kubernetes/quantum/namespace.yaml", line 17, column 27
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tools-legacy/infrastructure/kubernetes/validation/hybrid-decider-service.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tools-legacy/infrastructure/kubernetes/validation/hybrid-decider-service.yaml", line 85, column 7
+expected <block end>, but found '-'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/engine/tools-legacy/infrastructure/kubernetes/validation/hybrid-decider-service.yaml", line 88, column 7
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/file-organizer-system/.github/workflows/gl-validation.yml: yaml parse error: while scanning a simple key
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/file-organizer-system/.github/workflows/gl-validation.yml", line 40, column 3
+could not find expected ':'
+  in "platforms/ng-era-platforms/ng-era2-platforms/runtime/execution-platform/file-organizer-system/.github/workflows/gl-validation.yml", line 41, column 3
+[ECO-SPEC-FAIL] platforms/ng-era-platforms/ng-cross-era-platforms/meta/semantic-core/configs/folding-config.yaml: yaml parse error: while parsing a block mapping
+  in "platforms/ng-era-platforms/ng-cross-era-platforms/meta/semantic-core/configs/folding-config.yaml", line 91, column 11
+expected <block end>, but found '-'
+  in "platforms/ng-era-platforms/ng-cross-era-platforms/meta/semantic-core/configs/folding-config.yaml", line 93, column 11

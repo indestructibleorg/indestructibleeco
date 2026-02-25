@@ -7,7 +7,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/ingress/quantumflow-ingress
-    eco-base/urn: urn:eco-base:k8s:core:ingress:quantumflow-ingress:sha256-3630325c6d3d241016f6dad7e7e1b9d150edfa490a0fadee70d62135de9a307f
+    eco-base/urn: urn:eco-base:k8s:core:ingress:quantumflow-ingress:sha256-92f90bf318f86bcd2d10088a2c7f60f1bf0a4024a87776163ba2182f73c5d1cc
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
     nginx.ingress.kubernetes.io/rate-limit: '100'

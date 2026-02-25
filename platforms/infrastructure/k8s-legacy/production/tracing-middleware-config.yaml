@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/machine-native-ops
-    eco-base/urn: urn:eco-base:k8s:core:deployment:machine-native-ops:sha256-8956dba80a07ae4baeb0d22a131675a810ce9a0977235643496c8e7648057a63
+    eco-base/urn: urn:eco-base:k8s:core:deployment:machine-native-ops:sha256-c0e7c1bb1425e370e8601d4e0789b2b3754beb4b6c746ed2e32216f8a0d261cd
     sidecar.istio.io/interceptionMode: TPROXY
     sidecar.istio.io/proxyConfig: "proxyStatsMatcher:\n  inclusionRegexps:\n  - \"\
       .*_outbound.*\"\n  - \".*_inbound.*\"\n"

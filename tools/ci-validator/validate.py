@@ -522,9 +522,18 @@ def validate_cross_references(repo: Path) -> list[dict]:
         rel = kust.relative_to(repo)
         kust_dir = kust.parent
 
+        # Track if we are inside a 'resources' block
+        in_resources = False
         for i, line in enumerate(content.splitlines(), 1):
             stripped = line.strip()
-            if stripped.startswith("- ") and not stripped.startswith("- apiVersion"):
+            if stripped == "resources:":
+                in_resources = True
+                continue
+            elif stripped and not stripped.startswith("-") and not stripped.startswith("#") and ":" in stripped:
+                in_resources = False
+                continue
+
+            if in_resources and stripped.startswith("- "):
                 ref = stripped[2:].strip()
                 if ref and not ref.startswith("#") and not ref.startswith("{"):
                     ref_path = kust_dir / ref
@@ -691,7 +700,7 @@ def main():
     print(f"eco-base CI Validator — {repo}")
     print(f"{'='*60}")
 
-    run_all(repo, args.report); exit_code = 0
+    exit_code = run_all(repo, args.report)
 
     if exit_code == 0:
         print("\n  ✓ ALL VALIDATORS PASSED")

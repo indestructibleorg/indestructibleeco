@@ -3,14 +3,22 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/elasticsearch-search-service
-    eco-base/urn: urn:eco-base:k8s:core:service:elasticsearch-search-service:sha256-8e5d31fb6581545d0d6eb02db6395e37042e35a953d997d95d2081e5fd4300b1
+    eco-base/urn: urn:eco-base:k8s:core:service:elasticsearch-search-service:sha256-1ab2a7fe0deb28f882513d200fc722d2233a8130e2f333feeb85fff475cbe9aa
   labels:
     app.kubernetes.io/app.kubernetes.io/component: search
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: elasticsearch-search-system
     app.kubernetes.io/part-of: machine-native-ops
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
     governance.machinenativeops.io/charter-version: 2.0.0
   name: elasticsearch-search-service
   namespace: platform-03

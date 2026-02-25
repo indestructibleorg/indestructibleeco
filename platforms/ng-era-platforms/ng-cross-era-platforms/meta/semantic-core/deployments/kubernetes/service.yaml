@@ -3,14 +3,23 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/gl-spec-core-service
-    eco-base/urn: urn:eco-base:k8s:core:service:gl-spec-core-service:sha256-b26808b355e5ac83d9ca734075ab33cacf506b91802d65c5fc91a5d63183b74e
+    eco-base/urn: urn:eco-base:k8s:core:service:gl-spec-core-service:sha256-6dd79e0959c6e09e6c702ee4becdbbe8166979a30261a3a3be7adc11b15f5bd2
     prometheus.io/port: '9091'
     prometheus.io/scrape: 'true'
   labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: spec-core
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
     gl.service/semantic.core: 'true'
     platform: gl-platform-services
   name: gl-spec-core-service
@@ -38,14 +47,23 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/gl-spec-core-external
-    eco-base/urn: urn:eco-base:k8s:core:service:gl-spec-core-external:sha256-83e4f762fbc667d19433e75bba5561348d2a4fff4bf7560b4b12032fde3c8842
+    eco-base/urn: urn:eco-base:k8s:core:service:gl-spec-core-external:sha256-3a567563c0f7ec10ddf7911a99e351a936ecac3a0e3fb4afc11601eaa8730fea
     service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
     service.beta.kubernetes.io/aws-load-balancer-type: alb
   labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: spec-core-external
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
     platform: gl-platform-services
   name: gl-spec-core-external
   namespace: gl-platform-spec-core

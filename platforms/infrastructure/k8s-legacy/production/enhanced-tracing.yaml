@@ -18,9 +18,19 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/jaeger-enhanced-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:jaeger-enhanced-config:sha256-27edf913f91518cea723ba6ddeaffb14d34df14958f4584f31577c5c895d0db8
-  labels: {}
+    eco-base/urn: urn:eco-base:k8s:core:configmap:jaeger-enhanced-config:sha256-5a6a864a7cf526ac7e199c3cdd228b63e43e2bd7ddea71d54f59dbed18a4f203
+  labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/name: jaeger-enhanced-config
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
+    eco-base/owner: eco-system
+    eco-base/platform: core
   name: jaeger-enhanced-config
   namespace: istio-system
 ---
@@ -33,9 +43,19 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/tracing-context-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:tracing-context-config:sha256-1c30670549e846d75fbd47bd15afe0f589bd55b56ae5bac49c7d9dfb32dcd5aa
-  labels: {}
+    eco-base/urn: urn:eco-base:k8s:core:configmap:tracing-context-config:sha256-e4c89a0cbd65456b1ce77697b78f57ab58bd76495f8038d489c363a37fe43ff6
+  labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/name: tracing-context-config
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
+    eco-base/owner: eco-system
+    eco-base/platform: core
   name: tracing-context-config
   namespace: istio-system
 ---
@@ -54,9 +74,19 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/trace-retention-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:trace-retention-config:sha256-16a90b108d735cbb8ff5408145aaf9e35d09d42d442ef8942e708fa87e1d1b42
-  labels: {}
+    eco-base/urn: urn:eco-base:k8s:core:configmap:trace-retention-config:sha256-dd384d81fd6f6c4b5d1cfe768de2da58ed165adfa1a4e826a7dd2790d998cd23
+  labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/name: trace-retention-config
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
+    eco-base/owner: eco-system
+    eco-base/platform: core
   name: trace-retention-config
   namespace: istio-system
 ---

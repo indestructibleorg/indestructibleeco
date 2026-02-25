@@ -3,12 +3,21 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-smoke
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-smoke:sha256-4bbddda6b02ea8132279a84896188fbcb9d8932c849e888b9ac5f153b9660bd2
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-smoke:sha256-02f3e549b3e33160e326edcd09a1f0ab85274008051b94f7b84203ec5f2ce628
   labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: performance-benchmark
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
     environment: production
     test-type: smoke
   name: performance-benchmark-smoke
@@ -63,12 +72,21 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-load
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-load:sha256-7e589d8e76534dfd87895b3dd1d0069a31e18822647f6f933b1483f6e753a4e0
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-load:sha256-61c70137404b5c8140e7a8aecabc9fc43019d6a2c0142e8bcd627be186c017d7
   labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: performance-benchmark
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
     environment: production
     test-type: load
   name: performance-benchmark-load
@@ -123,12 +141,21 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-stress
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-stress:sha256-6ba2496626141c20cc52f1bbfe48e124de4700ff3df1c449ad867b6ff2088e9a
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-stress:sha256-fa220e8eb364cb52e1ab6201f968a7139863e68b405d24212c859a3c0c4361ce
   labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: performance-benchmark
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
     environment: production
     test-type: stress
   name: performance-benchmark-stress
@@ -183,12 +210,21 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-endurance
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-endurance:sha256-d85c1edde1aa89306b3f51fc5a07a85f6e49a832f542226e2a48b426c71c65ef
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-endurance:sha256-f748879aef8762728e8de58ba08edf82074c4f38c4a6a8c2cc0444d913c4025f
   labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: performance-benchmark
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
     environment: production
     test-type: endurance
   name: performance-benchmark-endurance

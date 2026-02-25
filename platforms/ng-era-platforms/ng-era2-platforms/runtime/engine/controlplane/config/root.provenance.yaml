@@ -537,8 +537,18 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/provenance-schema
-    eco-base/urn: urn:eco-base:k8s:core:configmap:provenance-schema:sha256-ca1974bddacfb4d2c9c092e62fe012ba08a23964bf4d3deeab1fb36fbfb6b994
-  labels: {}
+    eco-base/urn: urn:eco-base:k8s:core:configmap:provenance-schema:sha256-82f9d8f6d094cf1aa896542b904174c13def9c511922018acad5c32ceae99eb3
+  labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/name: provenance-schema
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
+    eco-base/owner: eco-system
+    eco-base/platform: core
   name: provenance-schema
   namespace: machinenativenops-provenance

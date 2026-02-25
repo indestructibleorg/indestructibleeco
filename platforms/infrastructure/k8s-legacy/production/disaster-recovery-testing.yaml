@@ -125,12 +125,21 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/disaster-recovery-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:disaster-recovery-config:sha256-4e49c744eef6e191f26597042c4f438592acdbc5f49cbf36e23cafdb812809b3
+    eco-base/urn: urn:eco-base:k8s:core:configmap:disaster-recovery-config:sha256-b1ac84c1d0573f84a913666c920022639995e398739e62846b06ba370b9c37b4
   labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: disaster-recovery
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
     environment: production
   name: disaster-recovery-config
   namespace: production

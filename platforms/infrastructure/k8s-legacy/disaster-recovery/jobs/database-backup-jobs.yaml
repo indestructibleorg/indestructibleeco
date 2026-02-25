@@ -4,13 +4,21 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/postgres-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:postgres-backup:sha256-1c0bd21122bfe978af34c10478c2c0856abb4a566dfc936de33e1eadbabd4444
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:postgres-backup:sha256-cfa59da6abcfa7463ca0dde5695d53b7ab2d24d8401516bfad7d7994a9710556
   labels:
     app.kubernetes.io/component: backup
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: postgres-backup
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
   name: postgres-backup
   namespace: platform-03
 spec:
@@ -91,13 +99,21 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/redis-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:redis-backup:sha256-63664324514d678f897ce46e17a90272ce1e31fb6f29f3beb23f6a17f1c88a5a
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:redis-backup:sha256-f6387034cbcd31d9e40971d710a7cf15f66fd402e58244820d9a93ac01f397a8
   labels:
     app.kubernetes.io/component: backup
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: redis-backup
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
   name: redis-backup
   namespace: platform-03
 spec:
@@ -176,13 +192,21 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/config-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:config-backup:sha256-68c3f6d9df5812a5e95961ace883a51db863bb9d4118bd1dc092f451b3bb75eb
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:config-backup:sha256-b59eaf017a68407320c54e95a8fa5e595726f52303d6f32ec7684e3bc1ec8956
   labels:
     app.kubernetes.io/component: backup
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: config-backup
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
   name: config-backup
   namespace: platform-03
 spec:
@@ -269,13 +293,21 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/backup-validation
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:backup-validation:sha256-d24c47933f76922a39b8f28b20136366a33d22aa0e64eb335969e894568e30e0
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:backup-validation:sha256-effcc32e62820dc12021d1c7980032476141a19c7fc046ce4559bfee7c84aa78
   labels:
     app.kubernetes.io/component: backup
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: backup-validation
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
   name: backup-validation
   namespace: platform-03
 spec:

@@ -199,8 +199,18 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/root-config-schema
-    eco-base/urn: urn:eco-base:k8s:core:configmap:root-config-schema:sha256-d4bacaacd219598ec71c35288494472273cf382b7711803ab9392d49bc570773
-  labels: {}
+    eco-base/urn: urn:eco-base:k8s:core:configmap:root-config-schema:sha256-604cd65a63f441bba348e70c9971451668b23a422e0b6f39a90df536a228b694
+  labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/name: root-config-schema
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
+    eco-base/owner: eco-system
+    eco-base/platform: core
   name: root-config-schema
   namespace: machinenativenops-root

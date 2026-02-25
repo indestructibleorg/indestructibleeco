@@ -474,8 +474,18 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/integrity-schema
-    eco-base/urn: urn:eco-base:k8s:core:configmap:integrity-schema:sha256-b09d907cb65fe3044816fc450b79ab9d027c0c34f0861210f349f9abb957110d
-  labels: {}
+    eco-base/urn: urn:eco-base:k8s:core:configmap:integrity-schema:sha256-d8cacfc36f44075cafe7cd6712b0b14ed2c33e3bd5ba22a144e3e385b54ad980
+  labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/name: integrity-schema
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
+    eco-base/owner: eco-system
+    eco-base/platform: core
   name: integrity-schema
   namespace: machinenativenops-integrity

@@ -3,14 +3,22 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/instant-service
-    eco-base/urn: urn:eco-base:k8s:core:service:instant-service:sha256-ac787e5282f22cb746180519b87552fd5e95069adf1c507e813037f99a50d0f3
+    eco-base/urn: urn:eco-base:k8s:core:service:instant-service:sha256-99e46ecd4df70892050154f054c863878906bebe476e96fe5a61c24a18a72576
   labels:
     app.kubernetes.io/app.kubernetes.io/component: data
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: instant-system
     app.kubernetes.io/part-of: machine-native-ops
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
     governance.machinenativeops.io/charter-version: 2.0.0
   name: instant-service
   namespace: platform-03

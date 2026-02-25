@@ -190,8 +190,18 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/extended-platforms-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:extended-platforms-config:sha256-dd5c4ba08789fae59ccd955c2c2885cc8d7628ce38b381e5b4a80f5b7517f9b4
-  labels: {}
+    eco-base/urn: urn:eco-base:k8s:core:configmap:extended-platforms-config:sha256-bc095ce6e32366ecec6628c4825139a7202c4a8db36c3537b5d96ac3799ec94e
+  labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/name: extended-platforms-config
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
+    eco-base/owner: eco-system
+    eco-base/platform: core
   name: extended-platforms-config
   namespace: production

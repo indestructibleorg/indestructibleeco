@@ -3,14 +3,22 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/esync-platform-service
-    eco-base/urn: urn:eco-base:k8s:core:service:esync-platform-service:sha256-2cd280a237bfcd23cb222d7e151edb53cd6f2f5df1aa89f58d44d466dbc321cd
+    eco-base/urn: urn:eco-base:k8s:core:service:esync-platform-service:sha256-64fa48598b43613323328efaed9539df10c3954a45978337228703ce13672974
   labels:
     app.kubernetes.io/app.kubernetes.io/component: platform
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: esync-platform
     app.kubernetes.io/part-of: machine-native-ops
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
     governance.machinenativeops.io/charter-version: 2.0.0
   name: esync-platform-service
   namespace: platform-03

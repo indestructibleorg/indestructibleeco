@@ -81,8 +81,18 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/predictive-scaling-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:predictive-scaling-config:sha256-0e3c2fa0972446d92fc1eeece3e0dba908894b7d4d4133eb800ca5e661b0637b
-  labels: {}
+    eco-base/urn: urn:eco-base:k8s:core:configmap:predictive-scaling-config:sha256-66fcfd9b6d577c040f0fd5fe344e8eed0bbd30b3443ea268d5c2c36a83be2ac0
+  labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/name: predictive-scaling-config
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
+    eco-base/owner: eco-system
+    eco-base/platform: core
   name: predictive-scaling-config
   namespace: production

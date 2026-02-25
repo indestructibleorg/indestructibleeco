@@ -49,11 +49,21 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/trace-analysis-dashboard
-    eco-base/urn: urn:eco-base:k8s:core:configmap:trace-analysis-dashboard:sha256-2dbd72e7afe4c7d765881b82f7dcb21554736768a00fdbc50df0a3d5bb3645ab
+    eco-base/urn: urn:eco-base:k8s:core:configmap:trace-analysis-dashboard:sha256-d19716665c8dbf3696c9dde55351be1d64cf957a13fd037f47de1f953cfd97b1
   labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/name: trace-analysis-dashboard
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
     grafana_dashboard: '1'
   name: trace-analysis-dashboard
   namespace: istio-system
@@ -87,9 +97,19 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/trace-analysis-alerts
-    eco-base/urn: urn:eco-base:k8s:core:configmap:trace-analysis-alerts:sha256-67f307399563b2534202eb4a79c40a85dbe7aa9012906705f30f2c6b83015624
-  labels: {}
+    eco-base/urn: urn:eco-base:k8s:core:configmap:trace-analysis-alerts:sha256-ace516466c8b323377b0f9682a3c2e7adcada6ead988ed8065fbaaa953c0c14e
+  labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/name: trace-analysis-alerts
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
+    eco-base/owner: eco-system
+    eco-base/platform: core
   name: trace-analysis-alerts
   namespace: istio-system
 ---
@@ -97,9 +117,19 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/trace-analysis-report
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:trace-analysis-report:sha256-2aaec663b159df90b524200835e570b197d842bf75618a22f2f48ed1d6df86da
-  labels: {}
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:trace-analysis-report:sha256-54fe047218fadf7920111d26d3002e1704dac09e400d932a374ab9ff1e8eea4d
+  labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/name: trace-analysis-report
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
+    eco-base/owner: eco-system
+    eco-base/platform: core
   name: trace-analysis-report
   namespace: istio-system
 spec:

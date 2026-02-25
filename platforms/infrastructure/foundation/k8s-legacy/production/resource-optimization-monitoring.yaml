@@ -115,8 +115,18 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/resource-optimization-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:resource-optimization-config:sha256-33919bd4703384ecf6fb0d3532617a751db537f50ac22ad8e5450c2b688b986a
-  labels: {}
+    eco-base/urn: urn:eco-base:k8s:core:configmap:resource-optimization-config:sha256-2f56b269713117648bd433eb18da87aeaca6958c5258866b9549fb5f804a4f4c
+  labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/name: resource-optimization-config
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
+    eco-base/owner: eco-system
+    eco-base/platform: core
   name: resource-optimization-config
   namespace: production

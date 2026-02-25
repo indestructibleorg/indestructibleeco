@@ -81,12 +81,21 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/grafana-dashboards
-    eco-base/urn: urn:eco-base:k8s:core:configmap:grafana-dashboards:sha256-79285b8bd75295d601c6b86efa7db1414ddf91efbcb3a9e0f09510d298be9ad5
+    eco-base/urn: urn:eco-base:k8s:core:configmap:grafana-dashboards:sha256-5ccf91a3207085301bb29b24cd1d4b34844749218a4fd7977d9d7e738cb189a4
   labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: grafana
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
     environment: production
   name: grafana-dashboards
   namespace: monitoring

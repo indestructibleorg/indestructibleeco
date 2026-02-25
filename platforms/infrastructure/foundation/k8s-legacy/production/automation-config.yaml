@@ -165,12 +165,21 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/automation-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:automation-config:sha256-94f157a7c2ded1e905069c47265356e7b1078f99f335221b23b96f5fed99d21a
+    eco-base/urn: urn:eco-base:k8s:core:configmap:automation-config:sha256-34ff467a494069388255904db3e039783ab628b04e9fc1e5f7c472ed46020da9
   labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: automation
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
     environment: production
   name: automation-config
   namespace: production

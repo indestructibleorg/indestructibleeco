@@ -21,11 +21,20 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/quantumflow-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:quantumflow-config:sha256-80647c5ea3b671d3dc8e1797fef6e23a5bf4b818b6a910fabd8d6613aa536c91
+    eco-base/urn: urn:eco-base:k8s:core:configmap:quantumflow-config:sha256-1aadaff03271d5926025caf8d60c4170c9694807aef8abea99aa00abe9f37146
   labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: quantumflow
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
   name: quantumflow-config
   namespace: quantumflow

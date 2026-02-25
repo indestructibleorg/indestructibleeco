@@ -3,13 +3,21 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/quantumflow-frontend
-    eco-base/urn: urn:eco-base:k8s:core:service:quantumflow-frontend:sha256-6f7e2703d0e41e2b34f2e1835662276d662ade3b6529a5f31db2e8fa21555202
+    eco-base/urn: urn:eco-base:k8s:core:service:quantumflow-frontend:sha256-b151172bc6b23eb56aa10f225806eb5b8cf6d8a4598c08eec764990429dd1b7b
   labels:
     app.kubernetes.io/component: frontend
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: quantumflow
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
   name: quantumflow-frontend
   namespace: quantumflow
 spec:

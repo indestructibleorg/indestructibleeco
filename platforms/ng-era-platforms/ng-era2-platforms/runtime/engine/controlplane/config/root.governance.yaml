@@ -418,8 +418,18 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/governance-schema
-    eco-base/urn: urn:eco-base:k8s:core:configmap:governance-schema:sha256-4bf583feecb98986128a52f4c8515ae6b90de1dd6b5f87d394019a6ba7e18d11
-  labels: {}
+    eco-base/urn: urn:eco-base:k8s:core:configmap:governance-schema:sha256-e3a430f96cfa1f1fa5cf31247fec3a8818b835df39afc42556726d68f678b1cf
+  labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/name: governance-schema
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
+    eco-base/owner: eco-system
+    eco-base/platform: core
   name: governance-schema
   namespace: machinenativenops-governance

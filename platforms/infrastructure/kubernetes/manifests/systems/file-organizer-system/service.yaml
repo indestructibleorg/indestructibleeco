@@ -3,14 +3,22 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/file-organizer-service
-    eco-base/urn: urn:eco-base:k8s:core:service:file-organizer-service:sha256-b9fb5a3bb95c203674be41e4dcae7844a071ebcedd397348e68db4d52b8fdced
+    eco-base/urn: urn:eco-base:k8s:core:service:file-organizer-service:sha256-3d83eae2af9160824170449a84eac82d15ed40ab093d55ee47f5683bcf641a14
   labels:
     app.kubernetes.io/app.kubernetes.io/component: application
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: file-organizer-system
     app.kubernetes.io/part-of: machine-native-ops
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
     governance.machinenativeops.io/charter-version: 2.0.0
   name: file-organizer-service
   namespace: platform-03

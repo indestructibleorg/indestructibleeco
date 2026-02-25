@@ -3,14 +3,22 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/aep-engine-service
-    eco-base/urn: urn:eco-base:k8s:core:service:aep-engine-service:sha256-8d13ed6a7fdf97999fda4737160d59f8d3f22ab79be3c0a7ab54f9c9871f9df7
+    eco-base/urn: urn:eco-base:k8s:core:service:aep-engine-service:sha256-54fd301c05b60157d1b215bd0c00108f95d15684032716cbb69e099a7c11d83b
   labels:
     app.kubernetes.io/app.kubernetes.io/component: engine
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: aep-engine
     app.kubernetes.io/part-of: machine-native-ops
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
     governance.machinenativeops.io/charter-version: 2.0.0
   name: aep-engine-service
   namespace: platform-03

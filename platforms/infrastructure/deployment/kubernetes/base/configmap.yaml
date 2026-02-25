@@ -12,9 +12,19 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/machine-native-ops-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:machine-native-ops-config:sha256-4d576f8c42fed11427c990174a47c17e1f0a63fe0dd2b08e4db6ff317b5f2e8f
-  labels: {}
+    eco-base/urn: urn:eco-base:k8s:core:configmap:machine-native-ops-config:sha256-425edb2ab3c7c81055fae8d5564f65b1c22516537a428af5a00f3268cba3ca85
+  labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/name: machine-native-ops-config
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
+    eco-base/owner: eco-system
+    eco-base/platform: core
   name: machine-native-ops-config
   namespace: platform-03
 ---
@@ -28,9 +38,19 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/monitoring-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:monitoring-config:sha256-b5a1bf63a271f460ef7747fb81424f8a31266a501cdabbe828d55c6a0497fc04
-  labels: {}
+    eco-base/urn: urn:eco-base:k8s:core:configmap:monitoring-config:sha256-52f2dbbef13cffa775a27ee5d43be4d7255661145ca8a783976e8908b5835cb9
+  labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/name: monitoring-config
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
+    eco-base/owner: eco-system
+    eco-base/platform: core
   name: monitoring-config
   namespace: platform-03
 ---
@@ -43,8 +63,18 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/secrets-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:secrets-config:sha256-67902ed6783f757885be9ea638c6c30e72621ac40d70744aff02a6aef3aee6b9
-  labels: {}
+    eco-base/urn: urn:eco-base:k8s:core:configmap:secrets-config:sha256-ab0f66ae560855a2855ce98263c07b6480aa7f375637af17e555f9f05e3a878a
+  labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/name: secrets-config
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
+    eco-base/owner: eco-system
+    eco-base/platform: core
   name: secrets-config
   namespace: platform-03

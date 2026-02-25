@@ -51,12 +51,21 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/k6-tests
-    eco-base/urn: urn:eco-base:k8s:core:configmap:k6-tests:sha256-1a4530d8b6c3a4c70828bdc596135368a8f092c0a7079ab8319e632d876478b4
+    eco-base/urn: urn:eco-base:k8s:core:configmap:k6-tests:sha256-05db17827b66f608f68aca87e6afaa9cf313e7822498e28a3ef33820c9ec7ff3
   labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: performance-benchmark
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
     environment: production
   name: k6-tests
   namespace: production

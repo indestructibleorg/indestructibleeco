@@ -10,13 +10,22 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/machine-native-ops-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:machine-native-ops-config:sha256-0e8f5b5b66a98dbcc5633df2f3ba9616c6d3ca772e5a3d777d84c1244a140005
+    eco-base/urn: urn:eco-base:k8s:core:configmap:machine-native-ops-config:sha256-28ad76d76458c0efcfbaf41ff6ee0e7568710e38867bc1f6938445d6b1655788
   labels:
     app.kubernetes.io/app.kubernetes.io/component: config
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: machine-native-ops
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
     governance.machinenativeops.io/charter-version: 2.0.0
   name: machine-native-ops-config
   namespace: platform-03

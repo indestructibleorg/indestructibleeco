@@ -3,8 +3,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/ingress/gl-spec-core-ingress
-    eco-base/urn: urn:eco-base:k8s:core:ingress:gl-spec-core-ingress:sha256-5dd3d097e10787d8a0dbb1d90becea6739dea53f5e5d11bf738b24a20e3e3079
+    eco-base/urn: urn:eco-base:k8s:core:ingress:gl-spec-core-ingress:sha256-6669bed588957cafed5b43b39bd8c13c0fccadea4a976070df0c196c93d4fc3f
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/configuration-snippet: 'more_set_headers "ECO-Platform:
       spec-core";
@@ -21,9 +23,16 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
     nginx.ingress.kubernetes.io/use-regex: 'true'
   labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: spec-core
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
     eco-base/governance: aligned
+    eco-base/owner: eco-system
     eco-base/part-of: eco-base
+    eco-base/platform: core
     platform: gl-platform-services
   name: gl-spec-core-ingress
   namespace: gl-platform-spec-core

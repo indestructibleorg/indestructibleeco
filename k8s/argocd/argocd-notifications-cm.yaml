@@ -70,10 +70,18 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/argocd-notifications-cm
-    eco-base/urn: urn:eco-base:k8s:core:configmap:argocd-notifications-cm:sha256-657dd82f2d928df7f0e0eaede9b1898ff31200cc29d9af4b72c056a1007781de
+    eco-base/urn: urn:eco-base:k8s:core:configmap:argocd-notifications-cm:sha256-c29789663167c6ab84d731cb5beba7560bde117f40cb6f32d75811c57d002485
   labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: argocd-notifications
     app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
+    eco-base/owner: eco-system
+    eco-base/platform: core
   name: argocd-notifications-cm
   namespace: argocd

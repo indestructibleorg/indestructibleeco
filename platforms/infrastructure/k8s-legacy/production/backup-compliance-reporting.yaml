@@ -50,9 +50,19 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/backup-compliance-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:backup-compliance-config:sha256-a4fd179fa536f1b35997803e1709f193aa00af3189b7502586abd22cbaa8a826
-  labels: {}
+    eco-base/urn: urn:eco-base:k8s:core:configmap:backup-compliance-config:sha256-76140b9a46c0df1c29b17daf5d70239eaf74a64478e1060a9c76f394945b8aee
+  labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/name: backup-compliance-config
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
+    eco-base/owner: eco-system
+    eco-base/platform: core
   name: backup-compliance-config
   namespace: velero
 ---
@@ -60,9 +70,19 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
+    eco-base/audit-log-level: minimal
+    eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/backup-compliance-report
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:backup-compliance-report:sha256-fc48965bc6365fba590f9afc626b423d2b7a2ecd6ada2ea870c45c2691d283fa
-  labels: {}
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:backup-compliance-report:sha256-8c845e05a403b021d79b4e751d324ffbc96ddc12b58f79ecba5577da56e67910
+  labels:
+    app.kubernetes.io/component: eco-component
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/name: backup-compliance-report
+    app.kubernetes.io/part-of: eco-base
+    app.kubernetes.io/version: 1.0.0
+    eco-base/environment: development
+    eco-base/owner: eco-system
+    eco-base/platform: core
   name: backup-compliance-report
   namespace: velero
 spec:

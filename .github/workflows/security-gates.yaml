@@ -3,9 +3,10 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  security-events: write
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      - run: echo "Security Gates test"
+      - run: echo "Security Gates test with security-events write"

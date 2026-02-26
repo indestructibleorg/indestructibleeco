@@ -49,7 +49,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/machine-native-ops-lb
-    eco-base/urn: urn:eco-base:k8s:core:service:machine-native-ops-lb:sha256-5428a004bd20297d2617b3b79e3bfbada3072bd2566e08848e4cf2b314f7e53c
+    eco-base/urn: urn:eco-base:k8s:core:service:machine-native-ops-lb:sha256-0383d4f3aa69429ce59041b748c0aed970864851d6e120874decfc23e3d6addf
     service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
     service.beta.kubernetes.io/aws-load-balancer-type: nlb
   labels:

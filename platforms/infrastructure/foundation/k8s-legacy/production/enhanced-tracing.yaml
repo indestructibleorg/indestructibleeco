@@ -20,8 +20,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/configmap/jaeger-enhanced-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:jaeger-enhanced-config:sha256-63a6d474335a41c377bde0636d57772f65456a6e5957975608d30ab365088261
+    eco-base/uri: eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/enhanced-tracing.yaml
+    eco-base/urn: urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:enhanced-tracing.yaml
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -45,8 +45,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/configmap/tracing-context-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:tracing-context-config:sha256-72a9a1e87e073623f8a4116faeb9854682c834463b5c050c7ec72c787aa36ed0
+    eco-base/uri: eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/enhanced-tracing.yaml
+    eco-base/urn: urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:enhanced-tracing.yaml
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -76,8 +76,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/configmap/trace-retention-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:trace-retention-config:sha256-c6ff9832fea1877e956e8f897a1a4cc34ea84a9e7117d412966a313911f699d5
+    eco-base/uri: eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/enhanced-tracing.yaml
+    eco-base/urn: urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:enhanced-tracing.yaml
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance

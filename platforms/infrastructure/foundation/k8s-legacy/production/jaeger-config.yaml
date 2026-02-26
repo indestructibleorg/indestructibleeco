@@ -18,8 +18,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/configmap/jaeger-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:jaeger-config:sha256-cf8b4b10ff7bb769cdbb2c315ba0e1a638e33ae1215f103126ea73b8f3e080fe
+    eco-base/uri: eco-base://k8s/core/configmap/tracing-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:tracing-config:sha256-e6ca917fb036b3fbe853f189c3d2242622457266b76587e3b4fbbb410db3cd4b
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -51,7 +51,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/tracing-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:tracing-config:sha256-aa7f59dd64d7fcc3968e1343cbd16e3d5133fb258aa34b2dfc5283ff38cb8fbf
+    eco-base/urn: urn:eco-base:k8s:core:configmap:tracing-config:sha256-e6ca917fb036b3fbe853f189c3d2242622457266b76587e3b4fbbb410db3cd4b
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance

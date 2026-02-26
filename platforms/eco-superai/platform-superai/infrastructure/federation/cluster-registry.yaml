@@ -34,8 +34,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/configmap/cluster-registry
-    eco-base/urn: urn:eco-base:k8s:core:configmap:cluster-registry:sha256-4ce6072590997b4c120a474d2932800391b4303d8029f29302701ecad56dd9ab
+    eco-base/uri: eco-base://k8s/core/service/cluster-registry-service
+    eco-base/urn: urn:eco-base:k8s:core:service:cluster-registry-service:sha256-667bba520f5e2d6518796041fc341f22dcbc7945101bf8b155b4f27067715a3f
   labels:
     app: superai-platform
     app.kubernetes.io/component: eco-component
@@ -56,8 +56,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/secret/cluster-secrets
-    eco-base/urn: urn:eco-base:k8s:core:secret:cluster-secrets:sha256-887be3399e7bce42852c03414241838cf781f85aed4be648a5167a42b99496dd
+    eco-base/uri: eco-base://k8s/core/service/cluster-registry-service
+    eco-base/urn: urn:eco-base:k8s:core:service:cluster-registry-service:sha256-667bba520f5e2d6518796041fc341f22dcbc7945101bf8b155b4f27067715a3f
   labels:
     app: superai-platform
     app.kubernetes.io/component: eco-component
@@ -91,8 +91,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/deployment/cluster-registry-operator
-    eco-base/urn: urn:eco-base:k8s:core:deployment:cluster-registry-operator:sha256-d431a5c12fce679ad6e6031d281d05408d0f48245ecbf01c8e85d149af4bc32f
+    eco-base/uri: eco-base://k8s/core/service/cluster-registry-service
+    eco-base/urn: urn:eco-base:k8s:core:service:cluster-registry-service:sha256-667bba520f5e2d6518796041fc341f22dcbc7945101bf8b155b4f27067715a3f
   labels:
     app: superai-platform
     app.kubernetes.io/component: eco-component
@@ -176,7 +176,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/cluster-registry-service
-    eco-base/urn: urn:eco-base:k8s:core:service:cluster-registry-service:sha256-92400b43c0a7be8be21796c669398d69fe80f17271b798ccea51acfc450fb1e6
+    eco-base/urn: urn:eco-base:k8s:core:service:cluster-registry-service:sha256-667bba520f5e2d6518796041fc341f22dcbc7945101bf8b155b4f27067715a3f
   labels:
     app: superai-platform
     app.kubernetes.io/component: eco-component

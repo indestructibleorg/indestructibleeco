@@ -5,8 +5,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/cronjob/trivy-image-scanner
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:trivy-image-scanner:sha256-e05b60582bba71d7f259d5c59c8b5e1e1d02aecd497937b1fffd8a932dfe94b8
+    eco-base/uri: eco-base://k8s/core/configmap/grafana-dashboard-security-scan
+    eco-base/urn: urn:eco-base:k8s:core:configmap:grafana-dashboard-security-scan:sha256-d3f4b5c95bee6ebbc012e17695eb4e7cdf44f457d525c03c1e6ca5d41344a279
   labels:
     app: superai-platform
     app.kubernetes.io/component: eco-component
@@ -90,8 +90,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/cronjob/kube-bench-scanner
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:kube-bench-scanner:sha256-3c799a67e8941e3e7f474e3a211a0fb784fc5a6d50a59ef95e6b556eb2754233
+    eco-base/uri: eco-base://k8s/core/configmap/grafana-dashboard-security-scan
+    eco-base/urn: urn:eco-base:k8s:core:configmap:grafana-dashboard-security-scan:sha256-d3f4b5c95bee6ebbc012e17695eb4e7cdf44f457d525c03c1e6ca5d41344a279
   labels:
     app: superai-platform
     app.kubernetes.io/component: eco-component
@@ -204,8 +204,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/cronjob/kube-hunter-scanner
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:kube-hunter-scanner:sha256-2a03439be0379614ffa5173e46bc5336e5e6e84aee48f0a56cacc6415b7d7d22
+    eco-base/uri: eco-base://k8s/core/configmap/grafana-dashboard-security-scan
+    eco-base/urn: urn:eco-base:k8s:core:configmap:grafana-dashboard-security-scan:sha256-d3f4b5c95bee6ebbc012e17695eb4e7cdf44f457d525c03c1e6ca5d41344a279
   labels:
     app: superai-platform
     app.kubernetes.io/component: eco-component
@@ -289,8 +289,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/cronjob/code-scanner
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:code-scanner:sha256-5314c6870dc3d7dcc6a0ded5db563bf1d540e81a4f715cefd573027f66ea47f6
+    eco-base/uri: eco-base://k8s/core/configmap/grafana-dashboard-security-scan
+    eco-base/urn: urn:eco-base:k8s:core:configmap:grafana-dashboard-security-scan:sha256-d3f4b5c95bee6ebbc012e17695eb4e7cdf44f457d525c03c1e6ca5d41344a279
   labels:
     app: superai-platform
     app.kubernetes.io/component: eco-component
@@ -410,7 +410,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/grafana-dashboard-security-scan
-    eco-base/urn: urn:eco-base:k8s:core:configmap:grafana-dashboard-security-scan:sha256-487fa3ea19a0317162f31dc4406f67684f0d624506774e197a6c0cb0015704f7
+    eco-base/urn: urn:eco-base:k8s:core:configmap:grafana-dashboard-security-scan:sha256-d3f4b5c95bee6ebbc012e17695eb4e7cdf44f457d525c03c1e6ca5d41344a279
   labels:
     app: superai-platform
     app.kubernetes.io/component: eco-component

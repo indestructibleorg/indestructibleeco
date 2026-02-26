@@ -5,8 +5,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/deployment/dataops-engine
-    eco-base/urn: urn:eco-base:k8s:core:deployment:dataops-engine:sha256-7158523c8b525ee7af78738cdd5eb2d1258b3a5a01822f409fcf38f90e741db2
+    eco-base/uri: eco-base://k8s/core/deployment/dataops-anomaly
+    eco-base/urn: urn:eco-base:k8s:core:deployment:dataops-anomaly:sha256-16b6b10d906d263c206a7eceab4e89673237f840136860a3f76ecc7e3c7bac6e
   labels:
     app.kubernetes.io/component: api
     app.kubernetes.io/instance: eco-instance
@@ -97,8 +97,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/deployment/dataops-pipeline
-    eco-base/urn: urn:eco-base:k8s:core:deployment:dataops-pipeline:sha256-d5cb584864006415be9834e9dd0d571695e3bd44d9aed7cd82383919755ac994
+    eco-base/uri: eco-base://k8s/core/deployment/dataops-anomaly
+    eco-base/urn: urn:eco-base:k8s:core:deployment:dataops-anomaly:sha256-16b6b10d906d263c206a7eceab4e89673237f840136860a3f76ecc7e3c7bac6e
   labels:
     app.kubernetes.io/component: worker
     app.kubernetes.io/instance: eco-instance
@@ -154,7 +154,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/dataops-anomaly
-    eco-base/urn: urn:eco-base:k8s:core:deployment:dataops-anomaly:sha256-fac1bcb5b5a605153945bb30157cfebdcd850a1d3717950fe06b7a4c5020744e
+    eco-base/urn: urn:eco-base:k8s:core:deployment:dataops-anomaly:sha256-16b6b10d906d263c206a7eceab4e89673237f840136860a3f76ecc7e3c7bac6e
   labels:
     app.kubernetes.io/component: worker
     app.kubernetes.io/instance: eco-instance

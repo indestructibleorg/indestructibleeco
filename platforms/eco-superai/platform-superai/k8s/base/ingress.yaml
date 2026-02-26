@@ -7,7 +7,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/ingress/superai-ingress
-    eco-base/urn: urn:eco-base:k8s:core:ingress:superai-ingress:sha256-3fec7e5fc90212515f05f03b03b08ecebb58482dbb204248a93b855fced13575
+    eco-base/urn: urn:eco-base:k8s:core:ingress:superai-ingress:sha256-7a9350cbff556cc31520dcfb4b372a7d989eb17b52aa9232bf428ab6900075a5
     nginx.ingress.kubernetes.io/configuration-snippet: 'more_set_headers "X-Frame-Options:
       DENY";
 

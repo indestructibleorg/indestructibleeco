@@ -5,8 +5,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/service/superai-app
-    eco-base/urn: urn:eco-base:k8s:core:service:superai-app:sha256-23217dadd70dcd0f80f01bc2a5e541d01f9009c71aa5543d7fd1d13d2a18a212
+    eco-base/uri: eco-base://k8s/core/service/superai-app-headless
+    eco-base/urn: urn:eco-base:k8s:core:service:superai-app-headless:sha256-699298fab87ee797c4a30d0ccc48f6612f24f99f0387315cb07bd7f9f520c4e1
     prometheus.io/path: /metrics
     prometheus.io/port: '8000'
     prometheus.io/scrape: 'true'
@@ -44,7 +44,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/service/superai-app-headless
-    eco-base/urn: urn:eco-base:k8s:core:service:superai-app-headless:sha256-b6b04bd30d146c3905dc1039f43be1014545c6cd15d68c4fd8538525ab59a0e7
+    eco-base/urn: urn:eco-base:k8s:core:service:superai-app-headless:sha256-699298fab87ee797c4a30d0ccc48f6612f24f99f0387315cb07bd7f9f520c4e1
   labels:
     app.kubernetes.io/component: app
     app.kubernetes.io/instance: eco-instance

@@ -28,7 +28,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/superai-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:superai-config:sha256-489dd712ab3109e4074de707f195f4a8d9979a5c3b32e60ca237cdf069270a33
+    eco-base/urn: urn:eco-base:k8s:core:configmap:superai-config:sha256-bc0fc2c6caaec62f7b2431cd884bd623d1213bdf669a7b079cb28bfdef7239f5
   labels:
     app.kubernetes.io/component: config
     app.kubernetes.io/instance: eco-instance

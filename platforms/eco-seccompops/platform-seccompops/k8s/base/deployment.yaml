@@ -5,8 +5,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/deployment/seccompops-engine
-    eco-base/urn: urn:eco-base:k8s:core:deployment:seccompops-engine:sha256-f961d32d4347dd828bd85580c2163c414ff9e827ecd9126407bc371ec7cfeae8
+    eco-base/uri: eco-base://k8s/core/deployment/seccompops-auditor
+    eco-base/urn: urn:eco-base:k8s:core:deployment:seccompops-auditor:sha256-db94412589d94c0c0a98e36b333d96e9c289ac80d2a40bd2954612bcbbe53ba1
   labels:
     app.kubernetes.io/component: api
     app.kubernetes.io/instance: eco-instance
@@ -96,8 +96,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/deployment/seccompops-enforcer
-    eco-base/urn: urn:eco-base:k8s:core:deployment:seccompops-enforcer:sha256-6971a4ea26cb3f0623fefc56d67d139c822763ed41b0bef3fd7fbbb943c62b3f
+    eco-base/uri: eco-base://k8s/core/deployment/seccompops-auditor
+    eco-base/urn: urn:eco-base:k8s:core:deployment:seccompops-auditor:sha256-db94412589d94c0c0a98e36b333d96e9c289ac80d2a40bd2954612bcbbe53ba1
   labels:
     app.kubernetes.io/component: worker
     app.kubernetes.io/instance: eco-instance
@@ -151,7 +151,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/seccompops-auditor
-    eco-base/urn: urn:eco-base:k8s:core:deployment:seccompops-auditor:sha256-c576f22c3d5feaff8d45c51e8241703ab5a4a729f887898e2502bef73b02bff2
+    eco-base/urn: urn:eco-base:k8s:core:deployment:seccompops-auditor:sha256-db94412589d94c0c0a98e36b333d96e9c289ac80d2a40bd2954612bcbbe53ba1
   labels:
     app.kubernetes.io/component: worker
     app.kubernetes.io/instance: eco-instance

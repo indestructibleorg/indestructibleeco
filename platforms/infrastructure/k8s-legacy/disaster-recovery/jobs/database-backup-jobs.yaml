@@ -6,8 +6,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/cronjob/postgres-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:postgres-backup:sha256-de363248d3ef1c1772f4cfc8393b703662a91807d77cb08d75d1ffcaadbf3257
+    eco-base/uri: eco-base://platform/resource/infrastructure/k8s-legacy/disaster-recovery/jobs/database-backup-jobs.yaml
+    eco-base/urn: urn:eco-base:platform:resource:infrastructure:k8s-legacy:disaster-recovery:jobs:database-backup-jobs.yaml
   labels:
     app.kubernetes.io/component: backup
     app.kubernetes.io/instance: eco-instance
@@ -101,8 +101,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/cronjob/redis-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:redis-backup:sha256-f95c1bfab10e2b7bb48d8308e898c7919b3ebcc7dfdb25f186508d0446e192ea
+    eco-base/uri: eco-base://platform/resource/infrastructure/k8s-legacy/disaster-recovery/jobs/database-backup-jobs.yaml
+    eco-base/urn: urn:eco-base:platform:resource:infrastructure:k8s-legacy:disaster-recovery:jobs:database-backup-jobs.yaml
   labels:
     app.kubernetes.io/component: backup
     app.kubernetes.io/instance: eco-instance
@@ -194,8 +194,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/cronjob/config-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:config-backup:sha256-2e5333e4e757680b662c8d343c63a84345b6908fd3d44e30b5773b2482949e1f
+    eco-base/uri: eco-base://platform/resource/infrastructure/k8s-legacy/disaster-recovery/jobs/database-backup-jobs.yaml
+    eco-base/urn: urn:eco-base:platform:resource:infrastructure:k8s-legacy:disaster-recovery:jobs:database-backup-jobs.yaml
   labels:
     app.kubernetes.io/component: backup
     app.kubernetes.io/instance: eco-instance
@@ -295,8 +295,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/cronjob/backup-validation
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:backup-validation:sha256-32ea911d69580605b7799e3456b16a27dac68ad1de00f3117344ac9b15553183
+    eco-base/uri: eco-base://platform/resource/infrastructure/k8s-legacy/disaster-recovery/jobs/database-backup-jobs.yaml
+    eco-base/urn: urn:eco-base:platform:resource:infrastructure:k8s-legacy:disaster-recovery:jobs:database-backup-jobs.yaml
   labels:
     app.kubernetes.io/component: backup
     app.kubernetes.io/instance: eco-instance

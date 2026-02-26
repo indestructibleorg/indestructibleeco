@@ -5,8 +5,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/deployment/superai-app
-    eco-base/urn: urn:eco-base:k8s:core:deployment:superai-app:sha256-786b0a2ef25e0aec8f5bd4b12b3bb873ae03840b8a153377b318f44c1b162262
+    eco-base/uri: eco-base://k8s/core/deployment/superai-beat
+    eco-base/urn: urn:eco-base:k8s:core:deployment:superai-beat:sha256-5548c8b244b80bf1ebb8b796983b852a7df28874660551d21d9e3037a07a2ee5
   labels:
     app.kubernetes.io/component: app
     app.kubernetes.io/instance: eco-instance
@@ -136,8 +136,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/deployment/superai-worker
-    eco-base/urn: urn:eco-base:k8s:core:deployment:superai-worker:sha256-4f8d2d8a3e2b5623068eb1678114b73ffec5cba881beb1e203bbb7ed69649d4f
+    eco-base/uri: eco-base://k8s/core/deployment/superai-beat
+    eco-base/urn: urn:eco-base:k8s:core:deployment:superai-beat:sha256-5548c8b244b80bf1ebb8b796983b852a7df28874660551d21d9e3037a07a2ee5
   labels:
     app.kubernetes.io/component: worker
     app.kubernetes.io/instance: eco-instance
@@ -243,7 +243,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/superai-beat
-    eco-base/urn: urn:eco-base:k8s:core:deployment:superai-beat:sha256-b6aa648ea2407778e1b91584e9d57a31a03c9b7b83ebeff2823136437635136d
+    eco-base/urn: urn:eco-base:k8s:core:deployment:superai-beat:sha256-5548c8b244b80bf1ebb8b796983b852a7df28874660551d21d9e3037a07a2ee5
   labels:
     app.kubernetes.io/component: beat
     app.kubernetes.io/instance: eco-instance

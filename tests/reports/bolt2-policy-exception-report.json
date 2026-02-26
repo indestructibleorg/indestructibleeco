@@ -1,0 +1,83 @@
+{
+  "bolt": "Bolt-2",
+  "test": "Kyverno PolicyException Migration",
+  "timestamp": "2026-02-26T01:44:50Z",
+  "gate_result": "PASS",
+  "gate_message": "All 9 PolicyExceptions deployed with expiry dates, owners, and issue links. Webhook excludes only kyverno namespace.",
+  "webhook": {
+    "excluded_namespaces": [
+      "kyverno"
+    ],
+    "note": "Only self-protection exclusion; all other namespaces covered by PolicyExceptions"
+  },
+  "policy_exceptions": [
+    {
+      "name": "argo-events-root-exception",
+      "namespace": "argo-events",
+      "expires": "2026-04-01",
+      "owner": "platform-team",
+      "issue": "https://github.com/indestructibleorg/eco-base/issues/3"
+    },
+    {
+      "name": "tekton-pipelines-exception",
+      "namespace": "tekton-pipelines",
+      "expires": "2026-04-15",
+      "owner": "platform-team",
+      "issue": "https://github.com/indestructibleorg/eco-base/issues/4"
+    },
+    {
+      "name": "harbor-exception",
+      "namespace": "harbor",
+      "expires": "2026-04-15",
+      "owner": "platform-team",
+      "issue": "https://github.com/indestructibleorg/eco-base/issues/5"
+    },
+    {
+      "name": "argocd-exception",
+      "namespace": "argocd",
+      "expires": "2026-04-15",
+      "owner": "platform-team",
+      "issue": "https://github.com/indestructibleorg/eco-base/issues/6"
+    },
+    {
+      "name": "gatekeeper-exception",
+      "namespace": "gatekeeper-system",
+      "expires": "2026-04-15",
+      "owner": "platform-team",
+      "issue": "https://github.com/indestructibleorg/eco-base/issues/7"
+    },
+    {
+      "name": "keda-exception",
+      "namespace": "keda",
+      "expires": "2026-04-15",
+      "owner": "platform-team",
+      "issue": "https://github.com/indestructibleorg/eco-base/issues/8"
+    },
+    {
+      "name": "flagger-exception",
+      "namespace": "flagger-system",
+      "expires": "2026-04-15",
+      "owner": "platform-team",
+      "issue": "https://github.com/indestructibleorg/eco-base/issues/9"
+    },
+    {
+      "name": "monitoring-stack-exception",
+      "namespace": "monitoring",
+      "expires": "2026-05-01",
+      "owner": "platform-team",
+      "issue": "https://github.com/indestructibleorg/eco-base/issues/10"
+    },
+    {
+      "name": "kube-system-resource-limits-exception",
+      "namespace": "kube-system",
+      "expires": "2026-06-01",
+      "owner": "platform-team",
+      "issue": "https://github.com/indestructibleorg/eco-base/issues/11"
+    }
+  ],
+  "ci_gate": {
+    "file": ".github/workflows/policy-gate.yml",
+    "job": "exception-expiry-check",
+    "check": "eco.policy/expires < today \u2192 fail merge"
+  }
+}

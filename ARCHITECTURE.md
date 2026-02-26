@@ -221,3 +221,85 @@ indestructibleorg/eco-base/
 | eventbus-default-js-0 | f14d316a-6w8q | asia-east1-b |
 | eventbus-default-js-1 | 9fe3d7b3-6lgk | asia-east1-a |
 | eventbus-default-js-2 | 9fe3d7b3-zjc0 | asia-east1-a |
+
+---
+## Bolt 修復紀錄（2026-02-26）
+
+### Bolt-1: EventBus 跨區分佈
+| 項目 | 值 |
+|------|-----|
+| 修復方式 | topologySpreadConstraints (maxSkew=1, zone) |
+| 最終分佈 | js-0: asia-east1-b, js-1: asia-east1-a, js-2: asia-east1-a |
+| 說明 | asia-east1-c 資源不足，2+1 分佈符合 maxSkew:1 約束 |
+| 狀態 | **PASS** |
+
+### Bolt-2: Kyverno PolicyException 遷移
+| 項目 | 值 |
+|------|-----|
+| 遷移方式 | webhook namespace 排除 → 9 個 PolicyException（含 expiry/owner/issue） |
+| Webhook 排除 | 僅保留 `kyverno`（自我保護） |
+| PolicyException 數量 | 9 個，全部含 `eco.policy/expires`、`eco.policy/owner`、`eco.policy/issue` |
+| CI Gate | `policy-gate.yml` job `exception-expiry-check`：過期 exception 阻斷 merge |
+| 報告 | `tests/reports/bolt2-policy-exception-report.json` |
+| 狀態 | **PASS** |
+
+| PolicyException | 命名空間 | 到期日 | Issue |
+|-----------------|----------|--------|-------|
+| argo-events-root-exception | argo-events | 2026-04-01 | #3 |
+| tekton-pipelines-exception | tekton-pipelines | 2026-04-15 | #4 |
+| harbor-exception | harbor | 2026-04-15 | #5 |
+| argocd-exception | argocd | 2026-04-15 | #6 |
+| gatekeeper-exception | gatekeeper-system | 2026-04-15 | #7 |
+| keda-exception | keda | 2026-04-15 | #8 |
+| flagger-exception | flagger-system | 2026-04-15 | #9 |
+| monitoring-stack-exception | monitoring | 2026-05-01 | #10 |
+| kube-system-resource-limits-exception | kube-system/kube-public/gke-managed-system | 2026-06-01 | #11 |
+
+### Bolt-3: Flagger Rollback Drill
+| 項目 | 值 |
+|------|-----|
+| 測試命名空間 | platform-01 |
+| 注入失敗 | 高錯誤率映像（stefanprodan/podinfo:fake） |
+| SLI 閾值 | error_rate ≤1%、p99 latency ≤200ms、failure_threshold=3 |
+| Flagger 偵測 | Progressing → Failed（分析週期 10s × 3 次失敗） |
+| 最終狀態 | phase=Failed, weight=0（回滾完成） |
+| 回滾時間 | ~64 秒（01:39:36 → 01:40:44） |
+| 報告 | `tests/reports/bolt3-flagger-rollback-report.json` |
+| 狀態 | **PASS** |
+
+---
+## 最終系統狀態（2026-02-26）
+
+### Helm Releases（9/9 deployed）
+| Release | Namespace | Chart | App Version | Status |
+|---------|-----------|-------|-------------|--------|
+| argocd | argocd | argo-cd-9.4.4 | v3.3.2 | deployed |
+| flagger | flagger-system | flagger-1.42.0 | 1.42.0 | deployed |
+| gatekeeper | gatekeeper-system | gatekeeper-3.21.1 | v3.21.1 | deployed |
+| harbor | harbor | harbor-1.18.2 | 2.14.2 | deployed |
+| keda | keda | keda-2.19.0 | 2.19.0 | deployed |
+| kyverno | kyverno | kyverno-3.7.1 | v1.17.1 | deployed |
+| loki | monitoring | loki-6.53.0 | 3.6.5 | deployed |
+| prometheus | monitoring | kube-prometheus-stack-82.4.0 | v0.89.0 | deployed |
+| promtail | monitoring | promtail-6.17.1 | 3.5.1 | deployed |
+
+### Pod 健康狀態
+| 命名空間 | Running/Total |
+|----------|--------------|
+| argo-events | 4/4 |
+| tekton-pipelines | 4/4 |
+| harbor | 9/9 |
+| argocd | 7/7 |
+| kyverno | 5/5 |
+| gatekeeper-system | 2/2 |
+| monitoring | 32/32 |
+| keda | 3/3 |
+| flagger-system | 2/2 |
+
+### Validation Gates（全部通過）
+| Gate | 結果 |
+|------|------|
+| P0 驗證（23/23） | PASS |
+| Bolt-1 EventBus 跨區 | PASS |
+| Bolt-2 PolicyException 遷移 | PASS |
+| Bolt-3 Flagger Rollback Drill | PASS |

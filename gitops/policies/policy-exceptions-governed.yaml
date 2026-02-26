@@ -1,0 +1,269 @@
+---
+# Bolt-2: Governed PolicyExceptions replacing broad webhook namespace exclusion
+# All exceptions MUST have: eco.policy/expires, eco.policy/owner, eco.policy/issue
+# CI will fail if any exception is past its expiry date
+# Renewal requires PR review + updated expiry annotation
+
+# Exception: kube-system GKE-managed components
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: kube-system-resource-limits-exception
+  namespace: kyverno
+  annotations:
+    eco.policy/expires: "2026-06-01"
+    eco.policy/owner: "platform-team"
+    eco.policy/issue: "https://github.com/indestructibleorg/eco-base/issues/1"
+    eco.policy/reason: "kube-system components managed by GKE, not subject to ECO resource limits"
+    eco.policy/review-date: "2026-05-01"
+spec:
+  exceptions:
+    - policyName: require-resource-limits
+      ruleNames:
+        - require-resource-limits
+    - policyName: require-non-root-user
+      ruleNames:
+        - require-non-root-user
+    - policyName: require-eco-labels
+      ruleNames:
+        - require-eco-labels
+  match:
+    any:
+      - resources:
+          kinds:
+            - Pod
+          namespaces:
+            - kube-system
+            - kube-public
+            - gke-managed-system
+---
+# Exception: monitoring stack (Prometheus/Grafana/Loki) - GKE-deployed, non-ECO workloads
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: monitoring-stack-exception
+  namespace: kyverno
+  annotations:
+    eco.policy/expires: "2026-05-01"
+    eco.policy/owner: "platform-team"
+    eco.policy/issue: "https://github.com/indestructibleorg/eco-base/issues/2"
+    eco.policy/reason: "Prometheus/Grafana/Loki use upstream Helm charts; resource limits defined in Helm values, not pod spec annotations"
+    eco.policy/review-date: "2026-04-01"
+spec:
+  exceptions:
+    - policyName: require-resource-limits
+      ruleNames:
+        - require-resource-limits
+    - policyName: require-eco-labels
+      ruleNames:
+        - require-eco-labels
+    - policyName: require-non-root-user
+      ruleNames:
+        - require-non-root-user
+  match:
+    any:
+      - resources:
+          kinds:
+            - Pod
+          namespaces:
+            - monitoring
+---
+# Exception: argo-events - JetStream pods run as root for NATS internal requirements
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: argo-events-root-exception
+  namespace: kyverno
+  annotations:
+    eco.policy/expires: "2026-04-01"
+    eco.policy/owner: "platform-team"
+    eco.policy/issue: "https://github.com/indestructibleorg/eco-base/issues/3"
+    eco.policy/reason: "JetStream StatefulSet requires root for volume mount; track upstream fix"
+    eco.policy/review-date: "2026-03-15"
+spec:
+  exceptions:
+    - policyName: require-non-root-user
+      ruleNames:
+        - require-non-root-user
+    - policyName: require-eco-labels
+      ruleNames:
+        - require-eco-labels
+  match:
+    any:
+      - resources:
+          kinds:
+            - Pod
+          namespaces:
+            - argo-events
+---
+# Exception: tekton-pipelines - upstream Helm chart, non-ECO labels
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: tekton-pipelines-exception
+  namespace: kyverno
+  annotations:
+    eco.policy/expires: "2026-04-15"
+    eco.policy/owner: "platform-team"
+    eco.policy/issue: "https://github.com/indestructibleorg/eco-base/issues/4"
+    eco.policy/reason: "Tekton upstream Helm chart; labels and resource limits managed by chart maintainer"
+    eco.policy/review-date: "2026-04-01"
+spec:
+  exceptions:
+    - policyName: require-eco-labels
+      ruleNames:
+        - require-eco-labels
+    - policyName: require-resource-limits
+      ruleNames:
+        - require-resource-limits
+  match:
+    any:
+      - resources:
+          kinds:
+            - Pod
+          namespaces:
+            - tekton-pipelines
+            - tekton-pipelines-resolvers
+---
+# Exception: harbor - upstream Helm chart
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: harbor-exception
+  namespace: kyverno
+  annotations:
+    eco.policy/expires: "2026-04-15"
+    eco.policy/owner: "platform-team"
+    eco.policy/issue: "https://github.com/indestructibleorg/eco-base/issues/5"
+    eco.policy/reason: "Harbor upstream Helm chart; resource limits and labels managed by chart"
+    eco.policy/review-date: "2026-04-01"
+spec:
+  exceptions:
+    - policyName: require-eco-labels
+      ruleNames:
+        - require-eco-labels
+    - policyName: require-resource-limits
+      ruleNames:
+        - require-resource-limits
+    - policyName: require-non-root-user
+      ruleNames:
+        - require-non-root-user
+  match:
+    any:
+      - resources:
+          kinds:
+            - Pod
+          namespaces:
+            - harbor
+---
+# Exception: argocd - upstream Helm chart
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: argocd-exception
+  namespace: kyverno
+  annotations:
+    eco.policy/expires: "2026-04-15"
+    eco.policy/owner: "platform-team"
+    eco.policy/issue: "https://github.com/indestructibleorg/eco-base/issues/6"
+    eco.policy/reason: "Argo CD upstream Helm chart; resource limits and labels managed by chart"
+    eco.policy/review-date: "2026-04-01"
+spec:
+  exceptions:
+    - policyName: require-eco-labels
+      ruleNames:
+        - require-eco-labels
+    - policyName: require-resource-limits
+      ruleNames:
+        - require-resource-limits
+  match:
+    any:
+      - resources:
+          kinds:
+            - Pod
+          namespaces:
+            - argocd
+---
+# Exception: gatekeeper-system - OPA Gatekeeper controller
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: gatekeeper-exception
+  namespace: kyverno
+  annotations:
+    eco.policy/expires: "2026-04-15"
+    eco.policy/owner: "platform-team"
+    eco.policy/issue: "https://github.com/indestructibleorg/eco-base/issues/7"
+    eco.policy/reason: "Gatekeeper system namespace; managed by OPA team, not ECO policies"
+    eco.policy/review-date: "2026-04-01"
+spec:
+  exceptions:
+    - policyName: require-eco-labels
+      ruleNames:
+        - require-eco-labels
+    - policyName: require-resource-limits
+      ruleNames:
+        - require-resource-limits
+  match:
+    any:
+      - resources:
+          kinds:
+            - Pod
+          namespaces:
+            - gatekeeper-system
+---
+# Exception: keda - upstream Helm chart
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: keda-exception
+  namespace: kyverno
+  annotations:
+    eco.policy/expires: "2026-04-15"
+    eco.policy/owner: "platform-team"
+    eco.policy/issue: "https://github.com/indestructibleorg/eco-base/issues/8"
+    eco.policy/reason: "KEDA upstream Helm chart; resource limits managed by chart"
+    eco.policy/review-date: "2026-04-01"
+spec:
+  exceptions:
+    - policyName: require-eco-labels
+      ruleNames:
+        - require-eco-labels
+    - policyName: require-resource-limits
+      ruleNames:
+        - require-resource-limits
+  match:
+    any:
+      - resources:
+          kinds:
+            - Pod
+          namespaces:
+            - keda
+---
+# Exception: flagger-system - upstream Helm chart
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: flagger-exception
+  namespace: kyverno
+  annotations:
+    eco.policy/expires: "2026-04-15"
+    eco.policy/owner: "platform-team"
+    eco.policy/issue: "https://github.com/indestructibleorg/eco-base/issues/9"
+    eco.policy/reason: "Flagger upstream Helm chart; resource limits managed by chart"
+    eco.policy/review-date: "2026-04-01"
+spec:
+  exceptions:
+    - policyName: require-eco-labels
+      ruleNames:
+        - require-eco-labels
+    - policyName: require-resource-limits
+      ruleNames:
+        - require-resource-limits
+  match:
+    any:
+      - resources:
+          kinds:
+            - Pod
+          namespaces:
+            - flagger-system

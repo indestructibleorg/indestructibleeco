@@ -4,8 +4,9 @@ metadata:
   name: default
   namespace: argo-events
   annotations:
-    eco.platform/p1-fix: "required-anti-affinity-v2"
+    eco.platform/bolt1-fix: "zone-spread-topologySpreadConstraints"
     eco.platform/owner: "platform-ops"
+    eco.platform/last-updated: "2026-02-26"
 spec:
   jetstream:
     version: "latest"
@@ -24,8 +25,26 @@ spec:
           memory: 512Mi
     affinity:
       podAntiAffinity:
+        # Bolt-1: hostname-level hard anti-affinity (no two pods on same node)
         requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchLabels:
                 eventbus-name: default
             topologyKey: kubernetes.io/hostname
+        # Zone-level soft anti-affinity (prefer different zones)
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  eventbus-name: default
+              topologyKey: topology.kubernetes.io/zone
+    # Bolt-1: topologySpreadConstraints for zone-level distribution
+    # maxSkew:1 ensures at most 1 zone imbalance (e.g., 2+1 is allowed, 3+0 is not)
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            eventbus-name: default

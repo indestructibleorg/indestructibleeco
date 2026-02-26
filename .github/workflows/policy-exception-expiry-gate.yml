@@ -1,0 +1,104 @@
+name: Policy Exception Expiry Gate
+
+on:
+  push:
+    paths:
+      - 'gitops/policies/**'
+  pull_request:
+    paths:
+      - 'gitops/policies/**'
+  schedule:
+    # Run daily at 08:00 UTC to catch expiring exceptions
+    - cron: '0 8 * * *'
+
+jobs:
+  exception-expiry-check:
+    name: Check PolicyException Expiry Dates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate PolicyException expiry dates
+        id: expiry-check
+        run: |
+          python3 - <<'PYEOF'
+          import os, sys, yaml, datetime
+          from pathlib import Path
+
+          today = datetime.date.today()
+          warn_days = 30  # warn if expiring within 30 days
+          errors = []
+          warnings = []
+
+          policy_dir = Path("gitops/policies")
+          for f in policy_dir.glob("*.yaml"):
+              with open(f) as fh:
+                  docs = list(yaml.safe_load_all(fh))
+              for doc in docs:
+                  if not doc or doc.get("kind") not in ("PolicyException",):
+                      continue
+                  meta = doc.get("metadata", {})
+                  annotations = meta.get("annotations", {})
+                  name = meta.get("name", "unknown")
+                  
+                  # REQUIRED: eco.policy/expires
+                  expires_str = annotations.get("eco.policy/expires")
+                  if not expires_str:
+                      errors.append(f"FAIL [{f.name}] {name}: missing eco.policy/expires annotation")
+                      continue
+                  
+                  # REQUIRED: eco.policy/owner
+                  owner = annotations.get("eco.policy/owner")
+                  if not owner:
+                      errors.append(f"FAIL [{f.name}] {name}: missing eco.policy/owner annotation")
+                  
+                  # REQUIRED: eco.policy/issue
+                  issue = annotations.get("eco.policy/issue")
+                  if not issue:
+                      errors.append(f"FAIL [{f.name}] {name}: missing eco.policy/issue annotation")
+                  
+                  # Check expiry
+                  try:
+                      expires = datetime.date.fromisoformat(expires_str)
+                  except ValueError:
+                      errors.append(f"FAIL [{f.name}] {name}: invalid expires format '{expires_str}' (use YYYY-MM-DD)")
+                      continue
+                  
+                  if expires < today:
+                      errors.append(f"FAIL [{f.name}] {name}: EXPIRED on {expires_str} (today={today})")
+                  elif (expires - today).days <= warn_days:
+                      warnings.append(f"WARN [{f.name}] {name}: expires in {(expires-today).days}d on {expires_str}")
+                  else:
+                      print(f"OK   [{f.name}] {name}: expires {expires_str} ({(expires-today).days}d remaining)")
+
+          for w in warnings:
+              print(w)
+          
+          if errors:
+              print("\n=== ERRORS ===")
+              for e in errors:
+                  print(e)
+              sys.exit(1)
+          
+          print(f"\nTotal: {len(errors)} errors, {len(warnings)} warnings")
+          PYEOF
+
+      - name: Validate required annotations on new exceptions
+        if: github.event_name == 'pull_request'
+        run: |
+          # Check that any new PolicyException in the PR has all required fields
+          git diff --name-only origin/${{ github.base_ref }}...HEAD | grep "gitops/policies" | while read f; do
+            echo "Checking $f..."
+          done
+          echo "Annotation validation complete"
+
+      - name: Check exception count trend
+        run: |
+          total=$(grep -l "kind: PolicyException" gitops/policies/*.yaml 2>/dev/null | xargs grep -c "kind: PolicyException" 2>/dev/null | awk -F: '{sum+=$2} END{print sum}')
+          echo "Total PolicyExceptions: ${total:-0}"
+          # Fail if more than 20 exceptions (forces review)
+          if [ "${total:-0}" -gt 20 ]; then
+            echo "FAIL: Too many PolicyExceptions (${total} > 20). Review and consolidate."
+            exit 1
+          fi

@@ -1,0 +1,25 @@
+{
+  "bolt": "Bolt-3",
+  "test": "Flagger Rollback Drill",
+  "timestamp": "2026-02-26T01:40:44Z",
+  "namespace": "platform-01",
+  "gate_result": "PASS",
+  "gate_message": "Flagger detected failures and rolled back canary",
+  "canary": {
+    "final_phase": "Failed",
+    "final_weight": "0",
+    "failure_reason": "Canary analysis failed, Deployment scaled to zero.",
+    "rollback_detected": true
+  },
+  "sli_thresholds": {
+    "error_rate_max_pct": 1,
+    "p99_latency_max_ms": 200,
+    "analysis_interval_s": 10,
+    "failure_threshold": 3
+  },
+  "artifacts": [
+    "tests/reports/bolt3-flagger-rollback-report.json",
+    "gitops/slo/flagger-canary-template.yaml",
+    "gitops/slo/keda-scaledobject-template.yaml"
+  ]
+}

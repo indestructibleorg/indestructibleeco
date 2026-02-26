@@ -1,0 +1,23 @@
+# Bolt-2: Minimal webhook namespace exclusion
+# Only exclude kyverno namespace itself (required for controller to function)
+# All other namespaces use PolicyException with expiry/owner/issue
+admissionController:
+  replicas: 1
+backgroundController:
+  enabled: true
+cleanupController:
+  enabled: true
+reportsController:
+  enabled: true
+features:
+  policyExceptions:
+    enabled: true
+    namespace: kyverno
+config:
+  webhooks:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
+            - kyverno

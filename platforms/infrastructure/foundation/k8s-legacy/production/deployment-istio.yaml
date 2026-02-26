@@ -106,7 +106,7 @@ spec:
             secretKeyRef:
               key: secret-key
               name: machine-native-ops-secrets
-        image: ghcr.io/machinenativeops/machine-native-ops:latest
+        image: ghcr.io/machinenativeops/machine-native-ops:v0.1.0
         imagePullPolicy: Always
         livenessProbe:
           failureThreshold: 3

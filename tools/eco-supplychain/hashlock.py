@@ -111,7 +111,7 @@ _SKIP_PATH_PATTERNS = [
 def _is_helm_template_file(path: str) -> bool:
     """Check if a YAML file is a Helm template (contains {{ }})."""
     try:
-        with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+        with open(path, encoding='utf-8', errors='ignore') as f:
             chunk = f.read(8192)
             return '{{' in chunk and '}}' in chunk
     except Exception:
@@ -120,7 +120,7 @@ def _is_helm_template_file(path: str) -> bool:
 def _is_k8s_manifest_file(path: str) -> bool:
     """Quick check if a YAML file looks like a k8s manifest."""
     try:
-        with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+        with open(path, encoding='utf-8', errors='ignore') as f:
             chunk = f.read(2048)
             return ('apiVersion:' in chunk or 'kind:' in chunk) and 'metadata:' in chunk
     except Exception:

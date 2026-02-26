@@ -19,7 +19,8 @@ import sys
 import os
 # Read index
 try:
-    index=json.load(open(".gl-index.json", encoding='utf-8'))
+    with open(".gl-index.json", encoding='utf-8') as _f:
+        index=json.load(_f)
 except Exception as e:
     print("Missing .gl-index.json",e); sys.exit(2)
 required_sem=index.get("semanticterms_required",[])
@@ -39,7 +40,8 @@ artifact_semantic={}
 artifact_func={}
 for f in files:
     try:
-        data=json.load(open(f, encoding='utf-8'))
+        with open(f, encoding='utf-8') as _f:
+            data=json.load(_f)
     except Exception:
         format_discrepancy.append(f); continue
     # Check id prefix

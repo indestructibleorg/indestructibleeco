@@ -67,7 +67,7 @@ spec:
                 secretKeyRef:
                   key: postgres-db
                   name: machine-native-ops-secrets
-            image: ghcr.io/machinenativeops/dr-testing:latest
+            image: ghcr.io/machinenativeops/dr-testing:v0.1.0
             name: dr-health-check
             resources:
               limits:
@@ -133,7 +133,7 @@ spec:
               \ $BACKUP_NAME \\\n  --dry-run \\\n  --wait\n\necho \"DR backup verification\
               \ completed successfully at $(date)\"\n\n# Clean up\nvelero backup delete\
               \ $BACKUP_NAME --confirm\n"
-            image: ghcr.io/machinenativeops/dr-testing:latest
+            image: ghcr.io/machinenativeops/dr-testing:v0.1.0
             name: dr-backup-verification
             resources:
               limits:

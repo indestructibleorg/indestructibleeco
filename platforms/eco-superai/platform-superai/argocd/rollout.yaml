@@ -81,7 +81,7 @@ spec:
             name: superai-config
         - secretRef:
             name: superai-secrets
-        image: ghcr.io/indestructibleautoops/superai-platform:latest
+        image: ghcr.io/indestructibleautoops/superai-platform:v0.1.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3

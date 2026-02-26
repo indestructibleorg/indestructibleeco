@@ -47,7 +47,7 @@ spec:
           value: INFO
       - name: RESILIENCE_CONFIG_PATH
           value: /config/resilience-policies.yaml
-        image: ghcr.io/machinenativeops/resilience-middleware:latest
+        image: ghcr.io/machinenativeops/resilience-middleware:v0.1.0
         imagePullPolicy: Always
         livenessProbe:
           failureThreshold: 3

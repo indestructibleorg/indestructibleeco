@@ -112,7 +112,7 @@ spec:
             envFrom:
             - secretRef:
                 name: anomaly-detection-secrets
-            image: ghcr.io/superai-platform/anomaly-detection-trainer:latest
+            image: ghcr.io/superai-platform/anomaly-detection-trainer:v0.1.0
             name: trainer
             resources:
               limits:
@@ -184,7 +184,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: ghcr.io/superai-platform/anomaly-detection-service:latest
+        image: ghcr.io/superai-platform/anomaly-detection-service:v0.1.0
         livenessProbe:
           httpGet:
             path: /healthz

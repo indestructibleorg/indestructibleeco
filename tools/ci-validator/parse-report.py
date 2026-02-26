@@ -3,14 +3,16 @@
 import json, os, re, sys
 
 try:
-    report = json.load(open('/tmp/validation-report.json', encoding='utf-8'))
+    with open('/tmp/validation-report.json', encoding='utf-8') as _f:
+        report = json.load(_f)
     error_count = report.get('error_count', 0)
     warning_count = report.get('warning_count', 0)
     total = error_count + warning_count
 except Exception as e:
     print(f'Could not parse report: {e}', file=sys.stderr)
     try:
-        output = open('/tmp/validator-output.txt', encoding='utf-8').read()
+        with open('/tmp/validator-output.txt', encoding='utf-8') as _f:
+            output = _f.read()
         m = re.search(r'Total:\s*(\d+)\s*errors?,\s*(\d+)\s*warnings?', output)
         if m:
             error_count = int(m.group(1))

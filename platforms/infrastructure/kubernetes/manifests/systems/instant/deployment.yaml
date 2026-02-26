@@ -36,7 +36,7 @@ spec:
       serviceAccountName: machine-native-ops-sa
       containers:
         - name: instant
-          image: machinenativeops/instant-system:latest
+          image: machinenativeops/instant-system:v0.1.0
           imagePullPolicy: Always
           ports:
             - name: http

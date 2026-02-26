@@ -495,7 +495,7 @@ def test_sample_input_validates_against_schema(input_schema):
     sample = {
         "repository": "indestructibleorg/eco-base",
         "run_id": "22159820085",
-        "github_token": "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "github_token": "ghp_XXXX_EXAMPLE_TOKEN_FOR_TESTING_ONLY",
         "branch": "main",
         "workflow_file": "ci.yaml",
         "commit_message": "fix: automated CI/CD repair"

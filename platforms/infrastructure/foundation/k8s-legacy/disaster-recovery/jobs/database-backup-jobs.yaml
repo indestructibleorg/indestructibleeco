@@ -263,7 +263,7 @@ spec:
                   name: aws-credentials
             - name: AWS_DEFAULT_REGION
               value: us-east-1
-            image: bitnami/kubectl:latest
+            image: bitnami/kubectl:1.32.2
             name: config-backup
             resources:
               limits:
@@ -361,7 +361,7 @@ spec:
                   name: aws-credentials
             - name: AWS_DEFAULT_REGION
               value: us-east-1
-            image: bitnami/kubectl:latest
+            image: bitnami/kubectl:1.32.2
             name: backup-validator
             resources:
               limits:

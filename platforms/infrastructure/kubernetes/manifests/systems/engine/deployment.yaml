@@ -36,7 +36,7 @@ spec:
       serviceAccountName: machine-native-ops-sa
       containers:
         - name: aep-engine
-          image: machinenativeops/aep-engine:latest
+          image: machinenativeops/aep-engine:v0.1.0
           imagePullPolicy: Always
           ports:
             - name: http

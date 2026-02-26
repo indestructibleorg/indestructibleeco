@@ -40,7 +40,7 @@ spec:
             name: dataops-config
         - secretRef:
             name: dataops-secrets
-        image: dataops-platform:latest
+        image: dataops-platform:v0.1.0
         livenessProbe:
           httpGet:
             path: /livez
@@ -129,7 +129,7 @@ spec:
             name: dataops-config
         - secretRef:
             name: dataops-secrets
-        image: dataops-platform:latest
+        image: dataops-platform:v0.1.0
         name: dataops-pipeline
         resources:
           limits:
@@ -183,7 +183,7 @@ spec:
             name: dataops-config
         - secretRef:
             name: dataops-secrets
-        image: dataops-platform:latest
+        image: dataops-platform:v0.1.0
         name: dataops-anomaly
         resources:
           limits:

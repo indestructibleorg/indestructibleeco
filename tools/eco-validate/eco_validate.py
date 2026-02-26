@@ -81,7 +81,7 @@ def should_skip_file(path):
 def is_helm_template(path):
     """Check if a YAML file is a Helm template (contains {{ }})."""
     try:
-        with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+        with open(path, encoding='utf-8', errors='ignore') as f:
             # Read first 8KB to check for Helm template syntax
             chunk = f.read(8192)
             return '{{' in chunk and '}}' in chunk
@@ -91,7 +91,7 @@ def is_helm_template(path):
 def is_k8s_manifest(path):
     """Quick check if a YAML file looks like a k8s manifest."""
     try:
-        with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+        with open(path, encoding='utf-8', errors='ignore') as f:
             chunk = f.read(2048)
             # k8s manifests typically have apiVersion and kind at the top
             return ('apiVersion:' in chunk or 'kind:' in chunk) and 'metadata:' in chunk

@@ -38,7 +38,7 @@ spec:
       
       containers:
       - name: auto-labeler
-        image: ghcr.io/machinenativeops/auto-labeler:latest
+        image: ghcr.io/machinenativeops/auto-labeler:v0.1.0
         imagePullPolicy: Always
         
         env:

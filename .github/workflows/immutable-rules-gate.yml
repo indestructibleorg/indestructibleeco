@@ -287,8 +287,6 @@ jobs:
           NEW_SUCCESS=$(echo "$DIFF" | grep '^\+.*request-success-rate' -A5 | grep 'threshold' | grep -oP '\d+\.?\d*' | head -1)
           if [ -n "$OLD_SUCCESS" ] && [ -n "$NEW_SUCCESS" ]; then
             if python3 -c "exit(0 if float('$NEW_SUCCESS') < float('$OLD_SUCCESS') else 1)" 2>/dev/null; then
-          import sys
-          print("Fixing YAML parse error")
               VIOLATIONS+=("RULE-04-A: request-success-rate threshold reduced: $OLD_SUCCESS → $NEW_SUCCESS (minimum: 99)")
             fi
           fi

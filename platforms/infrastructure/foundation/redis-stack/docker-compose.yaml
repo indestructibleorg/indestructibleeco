@@ -7,11 +7,6 @@
 
 version: '3.8'
 
-  labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-
-
 services:
   redis-stack:
     image: redis/redis-stack:latest

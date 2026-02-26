@@ -15,26 +15,25 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/governance: aligned
     app.kubernetes.io/name: aep-engine
-    app.kubernetes.io/app.kubernetes.io/component: autoscaling
+    app.kubernetes.io/component: autoscaling
     governance.machinenativeops.io/charter-version: "2.0.0"
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-metadata:
-  name: aep-engine
+    name: aep-engine
   minReplicas: 3
   maxReplicas: 10
   metrics:
-  - type: Resource
-  resource:
-  name: cpu
-  target:
-  type: Utilization
-  averageUtilization: 70
-  - type: Resource
-  resource:
-  name: memory
-  target:
-  type: Utilization
-  averageUtilization: 80
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80

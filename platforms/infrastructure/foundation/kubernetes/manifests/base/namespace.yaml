@@ -13,7 +13,6 @@ metadata:
   labels:
     eco-base/part-of: eco-base
     eco-base/governance: aligned
-  name: machine-native-ops
     app.kubernetes.io/name: machine-native-ops
     app.kubernetes.io/part-of: infrastructure
     app.kubernetes.io/managed-by: kubectl

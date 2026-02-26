@@ -1,11 +1,3 @@
-# @ECO-governed
-# @ECO-layer: infrastructure
-# @ECO-semantic: kubernetes-deployment-elasticsearch
-# @ECO-audit-trail: ../../../engine/governance/GL_SEMANTIC_ANCHOR.json
-#
-# GL Unified Architecture Governance Framework Activated
-# Elasticsearch Search System Deployment Manifest
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,58 +7,68 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/governance: aligned
     app.kubernetes.io/name: elasticsearch-search-system
-    app.kubernetes.io/app.kubernetes.io/component: search
-    app.kubernetes.io/part-of: machine-native-ops
-    governance.machinenativeops.io/charter-version: "2.0.0"
-    governance.machinenativeops.io/layer: "search"
+    app.kubernetes.io/component: search
+    app.kubernetes.io/part-of: eco-base
+    governance.machinenativeops.io/charter-version: 2.0.0
+    governance.machinenativeops.io/layer: search
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/version: 1.0.0
+    eco-base/platform: infrastructure
+    eco-base/environment: production
+    eco-base/owner: eco-team
+  annotations:
+    eco-base/uri: eco-base://k8s/infrastructure/deployment/elasticsearch-search-system
+    eco-base/urn: urn:eco-base:deployment:infrastructure:server:elasticsearch-search-system:sha256-f2f222c111176950
+    eco-base/governance-policy: standard-v1
+    eco-base/audit-log-level: full
 spec:
   replicas: 2
   selector:
     matchLabels:
       app.kubernetes.io/name: elasticsearch-search-system
   template:
-    
+    metadata:
       labels:
         eco-base/part-of: eco-base
         eco-base/governance: aligned
         app.kubernetes.io/name: elasticsearch-search-system
-        app.kubernetes.io/app.kubernetes.io/component: search
-        governance.machinenativeops.io/layer: "search"
+        app.kubernetes.io/component: search
+        governance.machinenativeops.io/layer: search
     spec:
       serviceAccountName: machine-native-ops-sa
       containers:
-        - name: elasticsearch-search
-          image: machinenativeops/elasticsearch-search-system:latest
-          imagePullPolicy: Always
-          ports:
-            - name: http
-              containerPort: 3003
-              protocol: TCP
-          env:
-            - name: NODE_ENV
-              value: "production"
-            - name: GOVERNANCE_MODE
-              value: "strict"
-            - name: CONTINUE_ON_ERROR
-              value: "false"
-            - name: VALIDATION_REQUIRED
-              value: "true"
-          resources:
-            requests:
-              cpu: "200m"
-              memory: "256Mi"
-            limits:
-              cpu: "1000m"
-              memory: "1Gi"
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: http
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: http
-            initialDelaySeconds: 10
-            periodSeconds: 5
+      - name: elasticsearch-search
+        image: machinenativeops/elasticsearch-search-system:latest
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 3003
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          value: production
+        - name: GOVERNANCE_MODE
+          value: strict
+        - name: CONTINUE_ON_ERROR
+          value: 'false'
+        - name: VALIDATION_REQUIRED
+          value: 'true'
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5

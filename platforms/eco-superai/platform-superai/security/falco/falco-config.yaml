@@ -1,4 +1,3 @@
----
 apiVersion: v1
 data:
   falco.yaml: "rules_file:\n  - /etc/falco/falco_rules.yaml\n  - /etc/falco/falco_rules.local.yaml\n\
@@ -9,11 +8,11 @@ data:
     \ 1\n\noutputs:\n  rate: 1\n  max_burst: 1000\n\nstdout_output:\n  enabled: true\n\
     \nsyslog_output:\n  enabled: false\n\nfile_output:\n  enabled: true\n  keep_alive:\
     \ false\n  filename: /var/log/falco/events.log\n\nhttp_output:\n  enabled: true\n\
-    \  url: http://$(ALERTMANAGER_SERVICE_HOST):$(ALERTMANAGER_SERVICE_PORT)/api/v1/alerts\n\ngrpc:\n  enabled:\
-    \ true\n  bind_address: \"unix:///var/run/falco/falco.sock\"\n  threadiness: 8\n\
-    \ngrpc_output:\n  enabled: true\n\nwebserver:\n  enabled: true\n  listen_port:\
-    \ 8765\n  k8s_healthz_endpoint: /healthz\n\nmetadata_download:\n  max_mb: 100\n\
-    \  chunk_wait_us: 1000\n  watch_freq_sec: 1"
+    \  url: http://$(ALERTMANAGER_SERVICE_HOST):$(ALERTMANAGER_SERVICE_PORT)/api/v1/alerts\n\
+    \ngrpc:\n  enabled: true\n  bind_address: \"unix:///var/run/falco/falco.sock\"\
+    \n  threadiness: 8\n\ngrpc_output:\n  enabled: true\n\nwebserver:\n  enabled:\
+    \ true\n  listen_port: 8765\n  k8s_healthz_endpoint: /healthz\n\nmetadata_download:\n\
+    \  max_mb: 100\n  chunk_wait_us: 1000\n  watch_freq_sec: 1"
 kind: ConfigMap
 metadata:
   annotations:
@@ -25,7 +24,7 @@ metadata:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: falco
-    app.kubernetes.io/part-of: superai
+    app.kubernetes.io/part-of: eco-base
     app.kubernetes.io/version: 1.0.0
     eco-base/environment: development
     eco-base/owner: eco-system

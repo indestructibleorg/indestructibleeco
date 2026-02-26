@@ -1,11 +1,3 @@
-# @ECO-governed
-# @ECO-layer: infrastructure
-# @ECO-semantic: kubernetes-deployment-instant
-# @ECO-audit-trail: ../../../engine/governance/GL_SEMANTIC_ANCHOR.json
-#
-# GL Unified Architecture Governance Framework Activated
-# Instant System Deployment Manifest
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,58 +7,68 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/governance: aligned
     app.kubernetes.io/name: instant-system
-    app.kubernetes.io/app.kubernetes.io/component: data
-    app.kubernetes.io/part-of: machine-native-ops
-    governance.machinenativeops.io/charter-version: "2.0.0"
-    governance.machinenativeops.io/layer: "data"
+    app.kubernetes.io/component: data
+    app.kubernetes.io/part-of: eco-base
+    governance.machinenativeops.io/charter-version: 2.0.0
+    governance.machinenativeops.io/layer: data
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/version: 1.0.0
+    eco-base/platform: infrastructure
+    eco-base/environment: production
+    eco-base/owner: eco-team
+  annotations:
+    eco-base/uri: eco-base://k8s/infrastructure/deployment/instant-system
+    eco-base/urn: urn:eco-base:deployment:infrastructure:server:instant-system:sha256-575b336d732ed7b3
+    eco-base/governance-policy: standard-v1
+    eco-base/audit-log-level: full
 spec:
   replicas: 3
   selector:
     matchLabels:
       app.kubernetes.io/name: instant-system
   template:
-    
+    metadata:
       labels:
         eco-base/part-of: eco-base
         eco-base/governance: aligned
         app.kubernetes.io/name: instant-system
-        app.kubernetes.io/app.kubernetes.io/component: data
-        governance.machinenativeops.io/layer: "data"
+        app.kubernetes.io/component: data
+        governance.machinenativeops.io/layer: data
     spec:
       serviceAccountName: machine-native-ops-sa
       containers:
-        - name: instant
-          image: machinenativeops/instant-system:latest
-          imagePullPolicy: Always
-          ports:
-            - name: http
-              containerPort: 3002
-              protocol: TCP
-          env:
-            - name: NODE_ENV
-              value: "production"
-            - name: GOVERNANCE_MODE
-              value: "strict"
-            - name: CONTINUE_ON_ERROR
-              value: "false"
-            - name: VALIDATION_REQUIRED
-              value: "true"
-          resources:
-            requests:
-              cpu: "150m"
-              memory: "192Mi"
-            limits:
-              cpu: "750m"
-              memory: "768Mi"
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: http
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: http
-            initialDelaySeconds: 10
-            periodSeconds: 5
+      - name: instant
+        image: machinenativeops/instant-system:latest
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 3002
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          value: production
+        - name: GOVERNANCE_MODE
+          value: strict
+        - name: CONTINUE_ON_ERROR
+          value: 'false'
+        - name: VALIDATION_REQUIRED
+          value: 'true'
+        resources:
+          requests:
+            cpu: 150m
+            memory: 192Mi
+          limits:
+            cpu: 750m
+            memory: 768Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5

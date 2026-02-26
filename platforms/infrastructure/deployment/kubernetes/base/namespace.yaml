@@ -12,6 +12,5 @@ metadata:
   labels:
     eco-base/part-of: eco-base
     eco-base/governance: aligned
-  name: machine-native-ops
     environment: production
     tier: infrastructure

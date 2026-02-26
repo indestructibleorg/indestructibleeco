@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -11,7 +10,7 @@ metadata:
     app.kubernetes.io/component: api
     app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: seccompops-engine
-    app.kubernetes.io/part-of: seccompops-platform
+    app.kubernetes.io/part-of: eco-base
     app.kubernetes.io/version: 1.0.0
     eco-base/environment: development
     eco-base/owner: eco-system
@@ -33,6 +32,7 @@ spec:
       labels:
         app.kubernetes.io/component: api
         app.kubernetes.io/name: seccompops-engine
+        app.kubernetes.io/part-of: eco-base
     spec:
       containers:
       - envFrom:
@@ -67,11 +67,11 @@ spec:
           limits:
             cpu: '1'
             memory: 512Mi
-            ephemeral-storage: "1Gi"
+            ephemeral-storage: 1Gi
           requests:
             cpu: 250m
             memory: 256Mi
-            ephemeral-storage: "1Gi"
+            ephemeral-storage: 1Gi
         volumeMounts:
         - mountPath: /app/evidence
           name: evidence-store
@@ -104,7 +104,7 @@ metadata:
     app.kubernetes.io/component: worker
     app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: seccompops-enforcer
-    app.kubernetes.io/part-of: seccompops-platform
+    app.kubernetes.io/part-of: eco-base
     app.kubernetes.io/version: 1.0.0
     eco-base/environment: development
     eco-base/owner: eco-system
@@ -121,6 +121,7 @@ spec:
       labels:
         app.kubernetes.io/component: worker
         app.kubernetes.io/name: seccompops-enforcer
+        app.kubernetes.io/part-of: eco-base
     spec:
       containers:
       - command:
@@ -138,11 +139,11 @@ spec:
           limits:
             cpu: 500m
             memory: 256Mi
-            ephemeral-storage: "1Gi"
+            ephemeral-storage: 1Gi
           requests:
             cpu: 100m
             memory: 128Mi
-            ephemeral-storage: "1Gi"
+            ephemeral-storage: 1Gi
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -160,7 +161,7 @@ metadata:
     app.kubernetes.io/component: worker
     app.kubernetes.io/instance: eco-instance
     app.kubernetes.io/name: seccompops-auditor
-    app.kubernetes.io/part-of: seccompops-platform
+    app.kubernetes.io/part-of: eco-base
     app.kubernetes.io/version: 1.0.0
     eco-base/environment: development
     eco-base/owner: eco-system
@@ -177,6 +178,7 @@ spec:
       labels:
         app.kubernetes.io/component: worker
         app.kubernetes.io/name: seccompops-auditor
+        app.kubernetes.io/part-of: eco-base
     spec:
       containers:
       - command:
@@ -194,11 +196,11 @@ spec:
           limits:
             cpu: 500m
             memory: 512Mi
-            ephemeral-storage: "1Gi"
+            ephemeral-storage: 1Gi
           requests:
             cpu: 100m
             memory: 256Mi
-            ephemeral-storage: "1Gi"
+            ephemeral-storage: 1Gi
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000

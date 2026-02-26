@@ -1,11 +1,3 @@
-# @ECO-governed
-# @ECO-layer: infrastructure
-# @ECO-semantic: kubernetes-deployment-esync
-# @ECO-audit-trail: ../../../engine/governance/GL_SEMANTIC_ANCHOR.json
-#
-# GL Unified Architecture Governance Framework Activated
-# ESync Platform Deployment Manifest
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,61 +7,71 @@ metadata:
     eco-base/part-of: eco-base
     eco-base/governance: aligned
     app.kubernetes.io/name: esync-platform
-    app.kubernetes.io/app.kubernetes.io/component: platform
-    app.kubernetes.io/part-of: machine-native-ops
-    governance.machinenativeops.io/charter-version: "2.0.0"
-    governance.machinenativeops.io/layer: "platform"
+    app.kubernetes.io/component: platform
+    app.kubernetes.io/part-of: eco-base
+    governance.machinenativeops.io/charter-version: 2.0.0
+    governance.machinenativeops.io/layer: platform
+    app.kubernetes.io/instance: eco-instance
+    app.kubernetes.io/version: 1.0.0
+    eco-base/platform: infrastructure
+    eco-base/environment: production
+    eco-base/owner: eco-team
+  annotations:
+    eco-base/uri: eco-base://k8s/infrastructure/deployment/esync-platform
+    eco-base/urn: urn:eco-base:deployment:infrastructure:server:esync-platform:sha256-d84a39313f1bbe27
+    eco-base/governance-policy: standard-v1
+    eco-base/audit-log-level: full
 spec:
   replicas: 2
   selector:
     matchLabels:
       app.kubernetes.io/name: esync-platform
   template:
-    
+    metadata:
       labels:
         eco-base/part-of: eco-base
         eco-base/governance: aligned
         app.kubernetes.io/name: esync-platform
-        app.kubernetes.io/app.kubernetes.io/component: platform
-        governance.machinenativeops.io/layer: "platform"
+        app.kubernetes.io/component: platform
+        governance.machinenativeops.io/layer: platform
     spec:
       serviceAccountName: machine-native-ops-sa
       containers:
-        - name: esync
-          image: machinenativeops/esync-platform:latest
-          imagePullPolicy: Always
-          ports:
-            - name: http
-              containerPort: 8080
-              protocol: TCP
-            - name: metrics
-              containerPort: 9090
-              protocol: TCP
-          env:
-            - name: GO_ENV
-              value: "production"
-            - name: GOVERNANCE_MODE
-              value: "strict"
-            - name: CONTINUE_ON_ERROR
-              value: "false"
-            - name: VALIDATION_REQUIRED
-              value: "true"
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "128Mi"
-            limits:
-              cpu: "500m"
-              memory: "512Mi"
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: http
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: http
-            initialDelaySeconds: 10
-            periodSeconds: 5
+      - name: esync
+        image: machinenativeops/esync-platform:latest
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        env:
+        - name: GO_ENV
+          value: production
+        - name: GOVERNANCE_MODE
+          value: strict
+        - name: CONTINUE_ON_ERROR
+          value: 'false'
+        - name: VALIDATION_REQUIRED
+          value: 'true'
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5

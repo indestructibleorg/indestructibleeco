@@ -6,13 +6,6 @@
 # GL Unified Architecture Governance Framework Activated
 
 apiVersion: v2
-metadata:
-  name: ""
-  description: ""
-  labels:
-    eco-base/part-of: eco-base
-    eco-base/governance: aligned
-
 name: machine-native-ops
 description: Enterprise-grade MachineNativeOps platform for infrastructure automation
 type: application
@@ -31,6 +24,6 @@ maintainers:
   - name: MachineNativeOps Team
     email: team@machinenativeops.com
 icon: https://raw.githubusercontent.com/MachineNativeOps/machine-native-ops/main/docs/logo.png
-  annotations:
+annotations:
   category: Infrastructure
   licenses: Apache-2.0

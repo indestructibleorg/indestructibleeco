@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { api } from "../lib/api";
 
 interface HealthData {
@@ -22,7 +22,7 @@ interface ModelInfo {
 export default function Dashboard() {
   const [health, setHealth] = useState<HealthData | null>(null);
   const [models, setModels] = useState<ModelInfo[]>([]);
-  const [recentJobs, setRecentJobs] = useState<any[]>([]);
+  const [_recentJobs, _setRecentJobs] = useState<any[]>([]);
 
   useEffect(() => {
     api.health()

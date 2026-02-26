@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/dataops-engine
-    eco-base/urn: urn:eco-base:k8s:core:deployment:dataops-engine:sha256-1f59089117899004399521f2056d9876c335dcc24f807f5428d3f71027553afb
+    eco-base/urn: urn:eco-base:k8s:core:deployment:dataops-engine:sha256-aa9fca4a306d42be054596c7bdf3be9fedff3275b4363c52081b0572cf47725e
   labels:
     app.kubernetes.io/component: api
     app.kubernetes.io/instance: eco-instance
@@ -67,11 +67,9 @@ spec:
           limits:
             cpu: '1'
             memory: 512Mi
-
           requests:
             cpu: 250m
             memory: 256Mi
-
         volumeMounts:
         - mountPath: /app/evidence
           name: evidence-store
@@ -98,7 +96,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/dataops-pipeline
-    eco-base/urn: urn:eco-base:k8s:core:deployment:dataops-pipeline:sha256-7b3d0de74276a6dc00f53d8a8b7834df2174a954588f22cd3bd6b632c19cd1ea
+    eco-base/urn: urn:eco-base:k8s:core:deployment:dataops-pipeline:sha256-8094d5b696f9d7c65ac29730f2a954eef3005f4ebcaec2f40e38b638dc02e524
   labels:
     app.kubernetes.io/component: worker
     app.kubernetes.io/instance: eco-instance
@@ -137,11 +135,9 @@ spec:
           limits:
             cpu: 500m
             memory: 256Mi
-
           requests:
             cpu: 100m
             memory: 128Mi
-
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -154,7 +150,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/dataops-anomaly
-    eco-base/urn: urn:eco-base:k8s:core:deployment:dataops-anomaly:sha256-16b6b10d906d263c206a7eceab4e89673237f840136860a3f76ecc7e3c7bac6e
+    eco-base/urn: urn:eco-base:k8s:core:deployment:dataops-anomaly:sha256-66249e1f1011d2e51de9e16b8bdff99912e9c2565f78a74e79cff9c06cbbb9b5
   labels:
     app.kubernetes.io/component: worker
     app.kubernetes.io/instance: eco-instance
@@ -193,11 +189,9 @@ spec:
           limits:
             cpu: '1'
             memory: 1Gi
-
           requests:
             cpu: 250m
             memory: 256Mi
-
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000

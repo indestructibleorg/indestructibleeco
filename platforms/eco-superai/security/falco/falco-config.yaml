@@ -20,7 +20,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/falco-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:falco-config:sha256-b4fc94b222e3e6e210f392c85ff16051d9d2f984223f7cc8d940bf6f0661b1c6
+    eco-base/urn: urn:eco-base:k8s:core:configmap:falco-config:sha256-8ef6d94cc0d7bb2a05342cbe132af3acd8c48ac267aacc9ceb803eb077df64b1
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance

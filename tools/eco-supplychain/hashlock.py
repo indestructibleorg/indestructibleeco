@@ -77,18 +77,72 @@ def dump_yaml_docs(path: str, docs):
             allow_unicode=True
         )
 
+# Directories to skip (non-k8s manifest directories)
+_SKIP_DIRS = {
+    '.git', 'charts', 'node_modules', '__pycache__',
+    'governance', 'gl-artifacts', 'artifacts', 'scripts-legacy',
+    'tools-legacy', 'tests-legacy', 'archived', 'legacy',
+    'templates',
+}
+
+# Path pattern fragments to skip
+_SKIP_PATH_PATTERNS = [
+    re.compile(r'\.github/'),
+    re.compile(r'/gl-artifacts/'),
+    re.compile(r'/governance/'),
+    re.compile(r'/artifacts/'),
+    re.compile(r'/scripts-legacy/'),
+    re.compile(r'/tools-legacy/'),
+    re.compile(r'/tests-legacy/'),
+    re.compile(r'/archived/'),
+    re.compile(r'/legacy/'),
+    re.compile(r'/Chart\.ya?ml$'),
+    re.compile(r'/values\.ya?ml$'),
+    re.compile(r'/values-.*\.ya?ml$'),
+]
+
+def _is_helm_template_file(path: str) -> bool:
+    """Check if a YAML file is a Helm template (contains {{ }})."""
+    try:
+        with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+            chunk = f.read(8192)
+            return '{{' in chunk and '}}' in chunk
+    except Exception:
+        return False
+
+def _is_k8s_manifest_file(path: str) -> bool:
+    """Quick check if a YAML file looks like a k8s manifest."""
+    try:
+        with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+            chunk = f.read(2048)
+            return ('apiVersion:' in chunk or 'kind:' in chunk) and 'metadata:' in chunk
+    except Exception:
+        return False
+
+def _should_skip_path(path: str) -> bool:
+    """Check if a file should be skipped based on path patterns."""
+    norm = path.replace('\\', '/')
+    for pattern in _SKIP_PATH_PATTERNS:
+        if pattern.search(norm):
+            return True
+    return False
+
 def find_yaml_files(paths):
     out = []
     for p in paths:
         if not os.path.exists(p):
             continue
         if os.path.isfile(p) and p.endswith((".yml", ".yaml")):
-            out.append(p)
+            if not _should_skip_path(p) and not _is_helm_template_file(p) and _is_k8s_manifest_file(p):
+                out.append(p)
             continue
-        for root, _, files in os.walk(p):
+        for root, dirs, files in os.walk(p):
+            dirs[:] = [d for d in dirs if d not in _SKIP_DIRS]
             for fn in files:
                 if fn.endswith((".yml", ".yaml")):
-                    out.append(os.path.join(root, fn))
+                    fp = os.path.join(root, fn)
+                    if not _should_skip_path(fp) and not _is_helm_template_file(fp) and _is_k8s_manifest_file(fp):
+                        out.append(fp)
     return sorted(set(out))
 
 def compute_identity(obj: dict):

@@ -8,7 +8,6 @@
 # Jaeger Production Configuration Values
 # Enterprise-grade configuration for production deployment
 
-# Global configuration
 global:
   imageRegistry: ""
   imagePullSecrets: []
@@ -39,31 +38,30 @@ global:
       healthCheck: true
       waitForDataReady: 30s
       version: 7
+      tls:
+        enabled: false
+      sniffer:
+        enabled: false
+        sniffOnStart: true
+      storageType: filesystem
+      maxDocCount: 100000
+      maxSpanAge: 72h
+      timeout: 60s
+      username: ""
+      password: ""
+      tlsSkipVerify: true
+      pluginStorage:
+        enabled: false
+        type: ""
+        host: ""
+        port: ""
+        path: ""
 metadata:
   name: ""
   description: ""
   labels:
     eco-base/part-of: eco-base
     eco-base/governance: aligned
-
-  tls:
-  enabled: false
-  sniffer:
-  enabled: false
-  sniffOnStart: true
-  storageType: filesystem
-  maxDocCount: 100000
-  maxSpanAge: 72h
-  timeout: 60s
-  username: ""
-  password: ""
-  tlsSkipVerify: true
-  pluginStorage:
-  enabled: false
-  type: ""
-  host: ""
-  port: ""
-  path: ""
 
 # Provision data store
 provisionDataStore:
@@ -110,7 +108,7 @@ agent:
   annotations: {}
   service:
     annotations: {}
-      type: ClusterIP
+    type: ClusterIP
     # Service headless is required for agent
     headless: true
     ports:
@@ -120,9 +118,9 @@ agent:
         # Port for Zipkin compact Thrift
         compactThrift:
           port: 6831
-          # Port for Zipkin compact Thrift over HTTP
-          httpCompactThrift:
-            port: 5775
+        # Port for Zipkin compact Thrift over HTTP
+        httpCompactThrift:
+          port: 5775
       jaeger-thrift:
         enabled: true
         # Port for Jaeger compact Thrift
@@ -190,7 +188,7 @@ collector:
   annotations: {}
   service:
     annotations: {}
-      type: ClusterIP
+    type: ClusterIP
     ports:
       grpc:
         enabled: true
@@ -279,7 +277,7 @@ query:
   annotations: {}
   service:
     annotations: {}
-      type: ClusterIP
+    type: ClusterIP
     ports:
       http-query:
         enabled: true
@@ -403,7 +401,7 @@ esRollover:
   schedule: "0 0 * * *"
   image: jaegertracing/jaeger-es-rollover
   tag: 1.52.0
-  conditions: "{&quot;max_age&quot;: &quot;24h&quot;, &quot;max_size&quot;: &quot;50gb&quot;}"
+  conditions: '{"max_age": "24h", "max_size": "50gb"}'
   resources:
     limits:
       cpu: 100m

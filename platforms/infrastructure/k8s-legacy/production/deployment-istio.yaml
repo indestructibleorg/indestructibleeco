@@ -36,36 +36,36 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-  annotations:
-    prometheus.io/path: /metrics
-    prometheus.io/port: '8000'
-    prometheus.io/scrape: 'true'
-    sidecar.istio.io/inject: 'true'
-    sidecar.istio.io/proxyCPU: 200m
-    sidecar.istio.io/proxyMemory: 256Mi
-    traffic.sidecar.istio.io/includeInboundIPRanges: '*'
-    traffic.sidecar.istio.io/includeOutboundIPRanges: '*'
-  labels:
-    app.kubernetes.io/name: machine-native-ops
-    eco-base/governance: aligned
-    eco-base/part-of: eco-base
-    environment: production
-    version: v1
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: '8000'
+        prometheus.io/scrape: 'true'
+        sidecar.istio.io/inject: 'true'
+        sidecar.istio.io/proxyCPU: 200m
+        sidecar.istio.io/proxyMemory: 256Mi
+        traffic.sidecar.istio.io/includeInboundIPRanges: '*'
+        traffic.sidecar.istio.io/includeOutboundIPRanges: '*'
+      labels:
+        app.kubernetes.io/name: machine-native-ops
+        eco-base/governance: aligned
+        eco-base/part-of: eco-base
+        environment: production
+        version: v1
     spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-      - podAffinityTerm:
+          - podAffinityTerm:
               labelSelector:
                 matchExpressions:
-      - key: app
+                - key: app
                   operator: In
                   values:
-      - machine-native-ops
+                  - machine-native-ops
               topologyKey: kubernetes.io/hostname
             weight: 100
         topologySpreadConstraints:
-      - labelSelector:
+        - labelSelector:
             matchLabels:
               app.kubernetes.io/name: machine-native-ops
               environment: production
@@ -73,107 +73,107 @@ spec:
           topologyKey: topology.kubernetes.io/zone
           whenUnsatisfiable: DoNotSchedule
       containers:
-      - env:
-      - name: ENVIRONMENT
-          value: production
-      - name: LOG_LEVEL
-          value: INFO
-      - name: REDIS_HOST
-          value: redis-master.production.svc.cluster.local
-      - name: REDIS_PORT
-          value: '6379'
-      - name: POSTGRES_HOST
-          value: postgresql.production.svc.cluster.local
-      - name: POSTGRES_PORT
-          value: '5432'
-      - name: POSTGRES_DB
-          valueFrom:
-            secretKeyRef:
-              key: postgres-db
-              name: machine-native-ops-secrets
-      - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              key: postgres-user
-              name: machine-native-ops-secrets
-      - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: postgres-password
-              name: machine-native-ops-secrets
-      - name: SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              key: secret-key
-              name: machine-native-ops-secrets
+      - name: app
         image: ghcr.io/machinenativeops/machine-native-ops:latest
         imagePullPolicy: Always
+        env:
+        - name: ENVIRONMENT
+          value: production
+        - name: LOG_LEVEL
+          value: INFO
+        - name: REDIS_HOST
+          value: redis-master.production.svc.cluster.local
+        - name: REDIS_PORT
+          value: '6379'
+        - name: POSTGRES_HOST
+          value: postgresql.production.svc.cluster.local
+        - name: POSTGRES_PORT
+          value: '5432'
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: machine-native-ops-secrets
+              key: postgres-db
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: machine-native-ops-secrets
+              key: postgres-user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: machine-native-ops-secrets
+              key: postgres-password
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: machine-native-ops-secrets
+              key: secret-key
+        ports:
+        - name: http
+          containerPort: 8000
+          protocol: TCP
         livenessProbe:
-          failureThreshold: 3
           httpGet:
             path: /health
             port: http
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
-        name: app
-        ports:
-      - containerPort: 8000
-          name: http
-          protocol: TCP
-        readinessProbe:
           failureThreshold: 3
+        readinessProbe:
           httpGet:
             path: /ready
             port: http
           initialDelaySeconds: 10
           periodSeconds: 5
           timeoutSeconds: 3
-        resources:
-          limits:
-            cpu: 1000m
-            memory: 1Gi
-          requests:
-            cpu: 500m
-            memory: 512Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-      - ALL
-          readOnlyRootFilesystem: true
-          runAsGroup: 1000
-          runAsUser: 1000
+          failureThreshold: 3
         startupProbe:
-          failureThreshold: 30
           httpGet:
             path: /health
             port: http
           initialDelaySeconds: 0
           periodSeconds: 10
           timeoutSeconds: 3
+          failureThreshold: 30
+        resources:
+          requests:
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 1000
+          runAsGroup: 1000
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
         volumeMounts:
-      - mountPath: /app/logs
-          name: logs
-      - mountPath: /app/data
-          name: data
-      - mountPath: /app/cache
-          name: cache
+        - name: logs
+          mountPath: /app/logs
+        - name: data
+          mountPath: /app/data
+        - name: cache
+          mountPath: /app/cache
       nodeSelector:
         node-role.kubernetes.io/worker: 'true'
       securityContext:
-        fsGroup: 1000
         runAsNonRoot: true
         runAsUser: 1000
+        fsGroup: 1000
       serviceAccountName: machine-native-ops
       tolerations:
-      - effect: NoSchedule
-        key: dedicated
+      - key: dedicated
         operator: Equal
         value: machine-native-ops
+        effect: NoSchedule
       volumes:
-      - emptyDir: {}
-        name: logs
+      - name: logs
+        emptyDir: {}
       - name: data
         persistentVolumeClaim:
           claimName: machine-native-ops-data
@@ -210,12 +210,12 @@ spec:
   ports:
   - name: http
     port: 8000
-    protocol: TCP
     targetPort: 8000
+    protocol: TCP
   - name: http-web
     port: 80
-    protocol: TCP
     targetPort: 8000
+    protocol: TCP
   selector:
     app.kubernetes.io/name: machine-native-ops
     environment: production
@@ -227,40 +227,42 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  behavior:
-  scaleDown:
-  policies:
-  - periodSeconds: 60
-  type: Percent
-  value: 10
-  stabilizationWindowSeconds: 300
-  scaleUp:
-  policies:
-  - periodSeconds: 60
-  type: Percent
-  value: 50
-  - periodSeconds: 60
-  type: Pods
-  value: 2
-  selectPolicy: Max
-  stabilizationWindowSeconds: 0
-  maxReplicas: 10
-  metrics:
-  - resource:
-  name: cpu
-  target:
-  averageUtilization: 70
-  type: Utilization
-  type: Resource
-  - resource:
-  name: memory
-  target:
-  averageUtilization: 80
-  type: Utilization
-  type: Resource
-  minReplicas: 3
   name: machine-native-ops
+  namespace: production
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
+    name: machine-native-ops
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+      - type: Pods
+        value: 2
+        periodSeconds: 60
+      selectPolicy: Max

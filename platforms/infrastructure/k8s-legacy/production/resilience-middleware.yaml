@@ -29,63 +29,64 @@ spec:
       environment: production
   template:
     metadata:
-  annotations:
-    prometheus.io/path: /metrics
-    prometheus.io/port: '8001'
-    prometheus.io/scrape: 'true'
-  labels:
-    app.kubernetes.io/name: resilience-middleware
-    eco-base/governance: aligned
-    eco-base/part-of: eco-base
-    environment: production
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: '8001'
+        prometheus.io/scrape: 'true'
+      labels:
+        app.kubernetes.io/name: resilience-middleware
+        eco-base/governance: aligned
+        eco-base/part-of: eco-base
+        environment: production
     spec:
       containers:
-      - env:
-      - name: ENVIRONMENT
-          value: production
-      - name: LOG_LEVEL
-          value: INFO
-      - name: RESILIENCE_CONFIG_PATH
-          value: /config/resilience-policies.yaml
+      - name: middleware
         image: ghcr.io/machinenativeops/resilience-middleware:latest
         imagePullPolicy: Always
+        env:
+        - name: ENVIRONMENT
+          value: production
+        - name: LOG_LEVEL
+          value: INFO
+        - name: RESILIENCE_CONFIG_PATH
+          value: /config/resilience-policies.yaml
+        ports:
+        - containerPort: 8001
+          name: http
+          protocol: TCP
         livenessProbe:
-          failureThreshold: 3
           httpGet:
             path: /health
             port: http
           initialDelaySeconds: 10
           periodSeconds: 10
           timeoutSeconds: 5
-        name: middleware
-        ports:
-      - containerPort: 8001
-          name: http
-          protocol: TCP
-        readinessProbe:
           failureThreshold: 3
+        readinessProbe:
           httpGet:
             path: /ready
             port: http
           initialDelaySeconds: 5
           periodSeconds: 5
           timeoutSeconds: 3
+          failureThreshold: 3
         resources:
-          limits:
-            cpu: 500m
-            memory: 512Mi
           requests:
             cpu: 200m
             memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
         volumeMounts:
-      - mountPath: /config
-          name: config
+        - name: config
+          mountPath: /config
           readOnly: true
       serviceAccountName: resilience-middleware
       volumes:
-      - configMap:
+      - name: config
+        configMap:
           name: resilience-policies
-        name: config
+
 ---
 apiVersion: v1
 kind: Service
@@ -122,47 +123,51 @@ spec:
     app.kubernetes.io/name: resilience-middleware
     environment: production
   sessionAffinity: ClientIP
+
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  behavior:
-  scaleDown:
-  policies:
-  - periodSeconds: 60
-  type: Percent
-  value: 10
-  stabilizationWindowSeconds: 300
-  scaleUp:
-  policies:
-  - periodSeconds: 60
-  type: Percent
-  value: 50
-  stabilizationWindowSeconds: 0
-  maxReplicas: 5
-  metrics:
-  - resource:
-  name: cpu
-  target:
-  averageUtilization: 70
-  type: Utilization
-  type: Resource
-  - resource:
-  name: memory
-  target:
-  averageUtilization: 80
-  type: Utilization
-  type: Resource
-  minReplicas: 2
   name: resilience-middleware
+  namespace: production
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
+    name: resilience-middleware
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+
 ---
 apiVersion: v1
-automountServiceAccountToken: false
 kind: ServiceAccount
 metadata:
   name: resilience-middleware
   namespace: production
+automountServiceAccountToken: false

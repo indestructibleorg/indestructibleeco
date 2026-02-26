@@ -12,7 +12,6 @@ metadata:
   labels:
     eco-base/part-of: eco-base
     eco-base/governance: aligned
-  name: production
     environment: production
     pod-security.kubernetes.io/enforce: restricted
     pod-security.kubernetes.io/enforce-version: latest
@@ -24,7 +23,6 @@ metadata:
 apiVersion: v1
 kind: ResourceQuota
 metadata:
-  name: compute-resources
   namespace: production
 spec:
   hard:
@@ -41,7 +39,6 @@ spec:
 apiVersion: v1
 kind: LimitRange
 metadata:
-  name: default-limits
   namespace: production
 spec:
   limits:
@@ -56,7 +53,6 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: deny-all
   namespace: production
 spec:
   podSelector: {}
@@ -67,7 +63,6 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-app-egress
   namespace: production
 spec:
   podSelector:

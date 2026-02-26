@@ -1,3 +1,4 @@
+---
 # @ECO-governed
 # @ECO-layer: infrastructure
 # @ECO-semantic: cross-platform-monitoring
@@ -152,56 +153,38 @@ data:
               names:
                 - production
         relabel_configs:
-          - source_labels:
-            eco-base/part-of: eco-base
-            eco-base/governance: aligned
+          - source_labels: [__meta_kubernetes_pod_label_eco_base_part_of, __meta_kubernetes_pod_label_eco_base_governance]
             action: keep
-            regex: machine-native-ops
-          - source_labels:
-            eco-base/part-of: eco-base
-            eco-base/governance: aligned
+            regex: eco-base;aligned
+          - source_labels: [__meta_kubernetes_pod_name]
             target_label: pod
-          - source_labels:
-            eco-base/part-of: eco-base
-            eco-base/governance: aligned
+          - source_labels: [__meta_kubernetes_namespace]
             target_label: namespace
-          - source_labels:
-            eco-base/part-of: eco-base
-            eco-base/governance: aligned
+          - source_labels: [__meta_kubernetes_pod_node_name]
             target_label: node
       
       - job_name: 'kubernetes-pods'
         kubernetes_sd_configs:
           - role: pod
         relabel_configs:
-          - source_labels:
-            eco-base/part-of: eco-base
-            eco-base/governance: aligned
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
             action: keep
             regex: true
-          - source_labels:
-            eco-base/part-of: eco-base
-            eco-base/governance: aligned
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
             action: replace
             target_label: __metrics_path__
             regex: (.+)
-          - source_labels:
-            eco-base/part-of: eco-base
-            eco-base/governance: aligned
+          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
             action: replace
             regex: ([^:]+)(?::\d+)?;(\d+)
             replacement: $1:$2
             target_label: __address__
           - action: labelmap
             regex: __meta_kubernetes_pod_label_(.+)
-          - source_labels:
-            eco-base/part-of: eco-base
-            eco-base/governance: aligned
+          - source_labels: [__meta_kubernetes_namespace]
             action: replace
             target_label: namespace
-          - source_labels:
-            eco-base/part-of: eco-base
-            eco-base/governance: aligned
+          - source_labels: [__meta_kubernetes_pod_name]
             action: replace
             target_label: pod
     
@@ -296,14 +279,12 @@ data:
           type: GAUGE
           metricKind: CUMULATIVE
           valueType: INT64
-          unit: 1
+          unit: "1"
           labels:
-            eco-base/part-of: eco-base
-            eco-base/governance: aligned
-            - name: operation
-              type: STRING
-            - name: status
-              type: STRING
+            - key: operation
+              valueType: STRING
+            - key: status
+              valueType: STRING
         
         - name: custom.googleapis.com/machine-native-ops/request_latency
           type: GAUGE
@@ -311,37 +292,31 @@ data:
           valueType: DOUBLE
           unit: ms
           labels:
-            eco-base/part-of: eco-base
-            eco-base/governance: aligned
-            - name: operation
-              type: STRING
-            - name: percentile
-              type: STRING
+            - key: operation
+              valueType: STRING
+            - key: percentile
+              valueType: STRING
         
         - name: custom.googleapis.com/machine-native-ops/error_rate
           type: GAUGE
           metricKind: GAUGE
           valueType: DOUBLE
-          unit: 1
+          unit: "1"
           labels:
-            eco-base/part-of: eco-base
-            eco-base/governance: aligned
-            - name: error_type
-              type: STRING
+            - key: error_type
+              valueType: STRING
       
       logs:
         logId: machine-native-ops-production
         resource:
           type: k8s_container
           labels:
-            eco-base/part-of: eco-base
-            eco-base/governance: aligned
             cluster_name: ${CLUSTER_NAME}
             location: ${GCP_ZONE}
             namespace_name: production
             pod_name: ${POD_NAME}
             container_name: machine-native-ops
-  
+
   # Azure Monitor Configuration
   azure-monitor.yaml: |
     azure-monitor:
@@ -370,84 +345,84 @@ data:
       logs:
         logType: ApplicationInsights
         samplingPercentage: 100
-  
-  # Grafana Dashboards (Universal)
-  grafana-dashboards.yaml: |
-    apiVersion: v1
-    kind: ConfigMap
+
+---
+
+apiVersion: v1
+kind: ConfigMap
 metadata:
   name: grafana-dashboards
   namespace: monitoring
-  data:
+data:
   machine-native-ops-dashboard.json: |
-  {
-  "dashboard": {
-  "title": "MachineNativeOps - Cross-Platform Monitoring",
-  "panels": [
-  {
-  "title": "Request Rate",
-  "targets": [
-  {
-  "expr": "sum(rate(http_requests_total{service=&quot;machine-native-ops&quot;}[5m]))",
-  "legendFormat": "{{method}} {{path}}"
-  }
-  ],
-  "type": "graph"
-  },
-  {
-  "title": "Request Latency",
-  "targets": [
-  {
-  "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service=&quot;machine-native-ops&quot;}[5m])) by (le))",
-  "legendFormat": "P95"
-  },
-  {
-  "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{service=&quot;machine-native-ops&quot;}[5m])) by (le))",
-  "legendFormat": "P99"
-  }
-  ],
-  "type": "graph"
-  },
-  {
-  "title": "Error Rate",
-  "targets": [
-  {
-  "expr": "sum(rate(http_requests_total{service=&quot;machine-native-ops&quot;,status=~&quot;5..&quot;}[5m])) / sum(rate(http_requests_total{service=&quot;machine-native-ops&quot;}[5m])) * 100",
-  "legendFormat": "Error Rate %"
-  }
-  ],
-  "type": "gauge"
-  },
-  {
-  "title": "Active Connections",
-  "targets": [
-  {
-  "expr": "active_connections{service=&quot;machine-native-ops&quot;}",
-  "legendFormat": "{{type}}"
-  }
-  ],
-  "type": "graph"
-  },
-  {
-  "title": "CPU Utilization",
-  "targets": [
-  {
-  "expr": "rate(process_cpu_seconds_total{service=&quot;machine-native-ops&quot;}[5m]) * 100",
-  "legendFormat": "CPU %"
-  }
-  ],
-  "type": "graph"
-  },
-  {
-  "title": "Memory Utilization",
-  "targets": [
-  {
-  "expr": "process_resident_memory_bytes{service=&quot;machine-native-ops&quot;} / 1024 / 1024",
-  "legendFormat": "Memory MB"
-  }
-  ],
-  "type": "graph"
-  }
-  ]
-  }
-  }
+    {
+      "dashboard": {
+        "title": "MachineNativeOps - Cross-Platform Monitoring",
+        "panels": [
+          {
+            "title": "Request Rate",
+            "targets": [
+              {
+                "expr": "sum(rate(http_requests_total{service=\"machine-native-ops\"}[5m]))",
+                "legendFormat": "{{method}} {{path}}"
+              }
+            ],
+            "type": "graph"
+          },
+          {
+            "title": "Request Latency",
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service=\"machine-native-ops\"}[5m])) by (le))",
+                "legendFormat": "P95"
+              },
+              {
+                "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{service=\"machine-native-ops\"}[5m])) by (le))",
+                "legendFormat": "P99"
+              }
+            ],
+            "type": "graph"
+          },
+          {
+            "title": "Error Rate",
+            "targets": [
+              {
+                "expr": "sum(rate(http_requests_total{service=\"machine-native-ops\",status=~\"5..\"}[5m])) / sum(rate(http_requests_total{service=\"machine-native-ops\"}[5m])) * 100",
+                "legendFormat": "Error Rate %"
+              }
+            ],
+            "type": "gauge"
+          },
+          {
+            "title": "Active Connections",
+            "targets": [
+              {
+                "expr": "active_connections{service=\"machine-native-ops\"}",
+                "legendFormat": "{{type}}"
+              }
+            ],
+            "type": "graph"
+          },
+          {
+            "title": "CPU Utilization",
+            "targets": [
+              {
+                "expr": "rate(process_cpu_seconds_total{service=\"machine-native-ops\"}[5m]) * 100",
+                "legendFormat": "CPU %"
+              }
+            ],
+            "type": "graph"
+          },
+          {
+            "title": "Memory Utilization",
+            "targets": [
+              {
+                "expr": "process_resident_memory_bytes{service=\"machine-native-ops\"} / 1024 / 1024",
+                "legendFormat": "Memory MB"
+              }
+            ],
+            "type": "graph"
+          }
+        ]
+      }
+    }

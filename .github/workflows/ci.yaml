@@ -3,6 +3,9 @@ name: eco-base CI/CD
 # URI: eco-base://github/workflows/ci
 # Last updated: 2026-02-26 - Codacy coverage integration
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [main]

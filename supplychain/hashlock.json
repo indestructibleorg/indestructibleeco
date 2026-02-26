@@ -2209,7 +2209,7 @@
       "urn": "urn:eco-base:k8s:core:configmap:trust-schema:sha256-45ac21df88c9d95de544798e4242e06209d29b9e198aede863b1c834088d8790"
     }
   ],
-  "generatedAt": "2026-02-26T14:37:45.864972+00:00",
+  "generatedAt": "2026-02-26T14:45:56.538336+00:00",
   "hashAlgorithm": "sha256",
   "specVersion": "eco-hashlock/v1"
 }

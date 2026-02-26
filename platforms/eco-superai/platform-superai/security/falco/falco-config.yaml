@@ -9,7 +9,7 @@ data:
     \ 1\n\noutputs:\n  rate: 1\n  max_burst: 1000\n\nstdout_output:\n  enabled: true\n\
     \nsyslog_output:\n  enabled: false\n\nfile_output:\n  enabled: true\n  keep_alive:\
     \ false\n  filename: /var/log/falco/events.log\n\nhttp_output:\n  enabled: true\n\
-    \  url: \"http://alertmanager.observability:9093/api/v1/alerts\"\n\ngrpc:\n  enabled:\
+    \  url: http://$(ALERTMANAGER_SERVICE_HOST):$(ALERTMANAGER_SERVICE_PORT)/api/v1/alerts\n\ngrpc:\n  enabled:\
     \ true\n  bind_address: \"unix:///var/run/falco/falco.sock\"\n  threadiness: 8\n\
     \ngrpc_output:\n  enabled: true\n\nwebserver:\n  enabled: true\n  listen_port:\
     \ 8765\n  k8s_healthz_endpoint: /healthz\n\nmetadata_download:\n  max_mb: 100\n\

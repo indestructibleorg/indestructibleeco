@@ -10,8 +10,9 @@ export function ModelSelector() {
 
   return (
     <div className="flex items-center gap-2">
-      <label className="text-xs text-muted">Model:</label>
+      <label htmlFor="model-selector" className="text-xs text-muted">Model:</label>
       <select
+        id="model-selector"
         className="select"
         value={selectedModel}
         onChange={(e) => setSelectedModel(e.target.value)}

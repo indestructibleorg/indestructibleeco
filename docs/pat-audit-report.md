@@ -92,3 +92,18 @@ The `pat-expiry-check.yml` workflow alerts 14 days before expiry using the `PAT_
 ---
 
 *This report is generated automatically. Full token values are never stored in this document.*
+
+## §7 GitHub OAuth App 設定記錄
+
+| 欄位 | 值 |
+|------|-----|
+| Application Name | eco-base-ci |
+| App ID | 3420770 |
+| Client ID | Ov23liQEBw4D3jc0466G |
+| Client Secret | [已加密儲存於 ECO_OAUTH_CLIENT_SECRET] |
+| Homepage URL | https://app.autoecoops.io |
+| Callback URL | https://api.autoecoops.io/api/oauth/callback |
+| Owner | indestructibleorg |
+| Created | 2026-02-26 |
+| Secret Created By | indestructiblemachinen |
+| Secrets Updated | ECO_OAUTH_CLIENT_ID, ECO_OAUTH_CLIENT_SECRET (2026-02-26T09:40:30Z) |

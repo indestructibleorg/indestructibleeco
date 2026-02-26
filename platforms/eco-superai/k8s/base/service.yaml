@@ -5,8 +5,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/service/superai-app-headless
-    eco-base/urn: urn:eco-base:k8s:core:service:superai-app-headless:sha256-699298fab87ee797c4a30d0ccc48f6612f24f99f0387315cb07bd7f9f520c4e1
+    eco-base/uri: eco-base://k8s/core/service/superai-app
+    eco-base/urn: urn:eco-base:k8s:core:service:superai-app:sha256-ac71ff0686de6bbd8d89b01837f9c93743afb513670ee7ba04f05fa777d643e9
     prometheus.io/path: /metrics
     prometheus.io/port: '8000'
     prometheus.io/scrape: 'true'

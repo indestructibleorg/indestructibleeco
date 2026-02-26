@@ -184,8 +184,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/configmap/multi-cluster-health-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:multi-cluster-health-config:sha256-517debacdf226dce5fb13afa2d7128e8581360e99d71697529061de25b316aea
+    eco-base/uri: eco-base://k8s/core/configmap/istio
+    eco-base/urn: urn:eco-base:k8s:core:configmap:istio:sha256-bf14d7b052d9ebf44d091385cfa8aef2a6b12b80b5f6d817babcfeeb92cbace1
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance

@@ -6,8 +6,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/service/monitoring
-    eco-base/urn: urn:eco-base:k8s:core:service:monitoring:sha256-5bea2043ad7d6f08925cd67847a0250cc88ce573db12ca67d42b0d8e31f5a6db
+    eco-base/uri: eco-base://k8s/core/service/machine-native-ops
+    eco-base/urn: urn:eco-base:k8s:core:service:machine-native-ops:sha256-fb3aa8fe6961cb5b2fe60e49ef3b7b3766527e6b4c0a518048a74646ec22f42b
     prometheus.io/port: '9090'
     prometheus.io/scrape: 'true'
     service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
@@ -61,8 +61,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/service/monitoring
-    eco-base/urn: urn:eco-base:k8s:core:service:monitoring:sha256-5bea2043ad7d6f08925cd67847a0250cc88ce573db12ca67d42b0d8e31f5a6db
+    eco-base/uri: eco-base://k8s/core/service/machine-native-ops-api
+    eco-base/urn: urn:eco-base:k8s:core:service:machine-native-ops-api:sha256-36b104a45a114ae5cf88ee36a6657049802b39ac1f1fa8fac5fa26da461e5282
     prometheus.io/port: '9090'
     prometheus.io/scrape: 'true'
   labels:
@@ -98,8 +98,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/service/monitoring
-    eco-base/urn: urn:eco-base:k8s:core:service:monitoring:sha256-5bea2043ad7d6f08925cd67847a0250cc88ce573db12ca67d42b0d8e31f5a6db
+    eco-base/uri: eco-base://k8s/core/service/machine-native-ops-worker
+    eco-base/urn: urn:eco-base:k8s:core:service:machine-native-ops-worker:sha256-a9cbe937261751d38c535179f25202f256fbfb012fd35d1ab6337dc2e2c59471
   labels:
     app.kubernetes.io/component: worker
     app.kubernetes.io/instance: eco-instance
@@ -130,8 +130,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/service/monitoring
-    eco-base/urn: urn:eco-base:k8s:core:service:monitoring:sha256-5bea2043ad7d6f08925cd67847a0250cc88ce573db12ca67d42b0d8e31f5a6db
+    eco-base/uri: eco-base://k8s/core/service/redis-cluster
+    eco-base/urn: urn:eco-base:k8s:core:service:redis-cluster:sha256-ac234e20210022d75313a5a83b764b95d3b87add24b631137e8afb52fec0b219
   labels:
     app.kubernetes.io/component: cache
     app.kubernetes.io/instance: eco-instance
@@ -165,8 +165,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/service/monitoring
-    eco-base/urn: urn:eco-base:k8s:core:service:monitoring:sha256-5bea2043ad7d6f08925cd67847a0250cc88ce573db12ca67d42b0d8e31f5a6db
+    eco-base/uri: eco-base://k8s/core/service/postgres
+    eco-base/urn: urn:eco-base:k8s:core:service:postgres:sha256-37398c6942ac18897533148d8c63c539efee76871798b0dde85d9040165a68e8
     prometheus.io/port: '9187'
     prometheus.io/scrape: 'true'
   labels:

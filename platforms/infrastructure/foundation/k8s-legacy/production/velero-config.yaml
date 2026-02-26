@@ -3,8 +3,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/core/cronjob/redis-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:redis-backup:sha256-c5e16758270f86753e2d44192c796b059ceccf5cf122bcae9449f857f47c60b3
+    eco-base/uri: eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/velero-config.yaml
+    eco-base/urn: urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:velero-config.yaml
   labels:
     app.kubernetes.io/name: velero
     eco-base/governance: aligned
@@ -18,8 +18,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/cronjob/redis-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:redis-backup:sha256-c5e16758270f86753e2d44192c796b059ceccf5cf122bcae9449f857f47c60b3
+    eco-base/uri: eco-base://k8s/core/secret/velero-s3-credentials
+    eco-base/urn: urn:eco-base:k8s:core:secret:velero-s3-credentials:sha256-42967d904bd01bf9b46a0b8a52a4a59784acc9f70ddfd3ef1f586588fc399881
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -48,8 +48,8 @@ apiVersion: velero.io/v1
 kind: BackupStorageLocation
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/core/cronjob/redis-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:redis-backup:sha256-c5e16758270f86753e2d44192c796b059ceccf5cf122bcae9449f857f47c60b3
+    eco-base/uri: eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/velero-config.yaml
+    eco-base/urn: urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:velero-config.yaml
   labels:
     app.kubernetes.io/name: velero
     eco-base/governance: aligned
@@ -72,8 +72,8 @@ apiVersion: velero.io/v1
 kind: VolumeSnapshotLocation
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/core/cronjob/redis-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:redis-backup:sha256-c5e16758270f86753e2d44192c796b059ceccf5cf122bcae9449f857f47c60b3
+    eco-base/uri: eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/velero-config.yaml
+    eco-base/urn: urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:velero-config.yaml
   labels:
     app.kubernetes.io/name: velero
     eco-base/governance: aligned
@@ -90,8 +90,8 @@ apiVersion: velero.io/v1
 kind: Schedule
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/core/cronjob/redis-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:redis-backup:sha256-c5e16758270f86753e2d44192c796b059ceccf5cf122bcae9449f857f47c60b3
+    eco-base/uri: eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/velero-config.yaml
+    eco-base/urn: urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:velero-config.yaml
   labels:
     app.kubernetes.io/name: velero
     eco-base/governance: aligned
@@ -137,8 +137,8 @@ apiVersion: velero.io/v1
 kind: Schedule
 metadata:
   annotations:
-    eco-base/uri: eco-base://k8s/core/cronjob/redis-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:redis-backup:sha256-c5e16758270f86753e2d44192c796b059ceccf5cf122bcae9449f857f47c60b3
+    eco-base/uri: eco-base://platform/resource/infrastructure/foundation/k8s-legacy/production/velero-config.yaml
+    eco-base/urn: urn:eco-base:platform:resource:infrastructure:foundation:k8s-legacy:production:velero-config.yaml
   labels:
     app.kubernetes.io/name: velero
     eco-base/governance: aligned
@@ -166,8 +166,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/cronjob/redis-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:redis-backup:sha256-c5e16758270f86753e2d44192c796b059ceccf5cf122bcae9449f857f47c60b3
+    eco-base/uri: eco-base://k8s/core/cronjob/postgres-backup
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:postgres-backup:sha256-62acd2a54b9bf968385f16b97ad3acfa5afa6a66f4a72d04586aa4cb7ff9ff37
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance

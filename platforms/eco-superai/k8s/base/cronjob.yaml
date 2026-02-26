@@ -5,8 +5,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/cronjob/superai-cleanup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:superai-cleanup:sha256-6faaad32eaeb50fdbeb01e20f039d3dbe401fd5238bfcc9c4dbbcd9629d57f1f
+    eco-base/uri: eco-base://k8s/core/cronjob/superai-db-backup
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:superai-db-backup:sha256-eb1272e4e5e8ad09fb5d6c7d6e27d50ccc9fb63a5b35482038e664d8fe603e75
   labels:
     app.kubernetes.io/component: backup
     app.kubernetes.io/instance: eco-instance

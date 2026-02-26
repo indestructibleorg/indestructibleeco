@@ -62,8 +62,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://platform/resource/infrastructure/k8s-legacy/jaeger/istio-config.yaml
-    eco-base/urn: urn:eco-base:platform:resource:infrastructure:k8s-legacy:jaeger:istio-config.yaml
+    eco-base/uri: eco-base://k8s/core/configmap/jaeger-tracing-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:jaeger-tracing-config:sha256-fd4e2c8a25ae9d337f32d0db4097cb5444a61c0d212aa3ea4e300014afa2066f
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance

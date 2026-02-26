@@ -107,8 +107,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/ingress/app-ingress
-    eco-base/urn: urn:eco-base:k8s:core:ingress:app-ingress:sha256-c409b9fef2a0ab0828c73d3689026fb55ae7f50c9eb939b507b1c8622c1210e7
+    eco-base/uri: eco-base://k8s/core/configmap/argo-events-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:argo-events-config:sha256-f8a48c072fde98bc956ab72a01007ce2ac33068cd6f8c142eb1603becfd69894
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -131,8 +131,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/ingress/app-ingress
-    eco-base/urn: urn:eco-base:k8s:core:ingress:app-ingress:sha256-c409b9fef2a0ab0828c73d3689026fb55ae7f50c9eb939b507b1c8622c1210e7
+    eco-base/uri: eco-base://k8s/core/configmap/tekton-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:tekton-config:sha256-28b62190e97105d654088701a45f7a24dea51f570fd22327b67cfbaae5b8e1ba
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -155,8 +155,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/ingress/app-ingress
-    eco-base/urn: urn:eco-base:k8s:core:ingress:app-ingress:sha256-c409b9fef2a0ab0828c73d3689026fb55ae7f50c9eb939b507b1c8622c1210e7
+    eco-base/uri: eco-base://k8s/core/configmap/argocd-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:argocd-config:sha256-f5cc2f5429b7b1baa4b97f645aab7156adbbe301cd8971da91599942b848d662
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -183,8 +183,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/ingress/app-ingress
-    eco-base/urn: urn:eco-base:k8s:core:ingress:app-ingress:sha256-c409b9fef2a0ab0828c73d3689026fb55ae7f50c9eb939b507b1c8622c1210e7
+    eco-base/uri: eco-base://k8s/core/configmap/prometheus-config
+    eco-base/urn: urn:eco-base:k8s:core:configmap:prometheus-config:sha256-2b8e9a4d49443a37e571bdb5b45fb5337a9f385a67dbcc1b554378264083b32d
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -350,8 +350,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/ingress/app-ingress
-    eco-base/urn: urn:eco-base:k8s:core:ingress:app-ingress:sha256-c409b9fef2a0ab0828c73d3689026fb55ae7f50c9eb939b507b1c8622c1210e7
+    eco-base/uri: eco-base://k8s/core/deployment/app
+    eco-base/urn: urn:eco-base:k8s:core:deployment:app:sha256-65cd420861c9063e1363abae5bdd080a7ee02f08b1b2dc138f2ebe8e7bdc317d
   labels:
     app: eco-base-app
     app.kubernetes.io/component: eco-component
@@ -402,12 +402,12 @@ spec:
         resources:
           limits:
             cpu: 500m
-            ephemeral-storage: 1Gi
             memory: 512Mi
+
           requests:
             cpu: 100m
-            ephemeral-storage: 1Gi
             memory: 128Mi
+
       serviceAccountName: github-actions
 ---
 apiVersion: v1
@@ -416,8 +416,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/ingress/app-ingress
-    eco-base/urn: urn:eco-base:k8s:core:ingress:app-ingress:sha256-c409b9fef2a0ab0828c73d3689026fb55ae7f50c9eb939b507b1c8622c1210e7
+    eco-base/uri: eco-base://k8s/core/service/app
+    eco-base/urn: urn:eco-base:k8s:core:service:app:sha256-6607ea75053886e94a98946d786ddc4e2eb7afc8fd2ff3879066c1d5662ec1f7
   labels:
     app: eco-base-app
     app.kubernetes.io/component: eco-component

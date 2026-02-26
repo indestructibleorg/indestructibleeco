@@ -5,8 +5,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-endurance
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-endurance:sha256-4de25dd25eaeba82b0d70e1acb632cca2107c51afa64906adf4e0cf051f38848
+    eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-smoke
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-smoke:sha256-52d90e849f6b933970b76550dfce1d6ad55547f0f09eea7811cab67e351669f5
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -74,8 +74,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-endurance
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-endurance:sha256-4de25dd25eaeba82b0d70e1acb632cca2107c51afa64906adf4e0cf051f38848
+    eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-load
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-load:sha256-dca826eef3ed528fb906118d3fd68c1804b886194aecd0c1d920aab7c3b40da2
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -143,8 +143,8 @@ metadata:
   annotations:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
-    eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-endurance
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-endurance:sha256-4de25dd25eaeba82b0d70e1acb632cca2107c51afa64906adf4e0cf051f38848
+    eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-stress
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-stress:sha256-c3ee7567cda0c410a1101dcc9e4a477b49f6ea6d3e720157da965995623526a3
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance

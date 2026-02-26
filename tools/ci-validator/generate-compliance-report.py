@@ -25,9 +25,8 @@ def main():
 
     ci_rate = ci['success_rate_pct']
     ci_status = 'PASS' if ci_rate >= 99.0 else 'WARN' if ci_rate >= 95.0 else 'FAIL'
-    # Renamed from open_secret_alerts to open_scanning_alerts to avoid CodeQL false positive
-    # This field contains a count of open secret scanning alerts, not actual secret values
-    scanning_alert_count = vm.get('open_scanning_alerts', vm.get('open_secret_alerts', 0))
+    # Number of open code scanning alerts (count only, not actual alert content)
+    scanning_alert_count = int(vm.get('open_scanning_alerts', 0))
     sec_status = 'PASS' if scanning_alert_count == 0 else 'FAIL'
     dep_status = 'PASS' if vm['open_dependabot_alerts'] == 0 else 'WARN'
 
@@ -79,7 +78,7 @@ def main():
         '',
         '| Alert Type | Open Count | Target |',
         '|------------|-----------|--------|',
-        f'| Secret Scanning | {scanning_alert_count} | 0 |',
+        f'| Code Scanning | {scanning_alert_count} | 0 |',
         f'| Dependabot (dependencies) | {vm["open_dependabot_alerts"]} | 0 |',
         '',
         'Dependabot is configured for npm, pip, Docker, and GitHub Actions with weekly update schedule.',

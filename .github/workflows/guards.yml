@@ -1,0 +1,19 @@
+name: guards
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  guards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Root guard
+        run: bash scripts/root_guard.sh
+      - name: Import guard
+        run: bash scripts/import_guard.sh

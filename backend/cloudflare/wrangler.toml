@@ -5,6 +5,7 @@ compatibility_flags = ["nodejs_compat"]
 
 [vars]
 ENVIRONMENT = "production"
+ECO_API_URL = "https://api.autoecoops.io"
 RATE_LIMIT_PER_MINUTE = "120"
 DEDUP_TTL_SECONDS = "300"
 DEAD_LETTER_TTL_SECONDS = "86400"

@@ -336,6 +336,10 @@ class TestDomainConfig:
         assert "autoecoops.io" in content
         assert "eco-base.io" not in content
 
+    def test_wrangler_sets_api_url(self):
+        content = _read("backend/cloudflare/wrangler.toml")
+        assert 'ECO_API_URL = "https://api.autoecoops.io"' in content
+
     def test_helm_values_uses_autoecoops(self):
         content = _read("helm/values.yaml")
         assert "autoecoops.io" in content

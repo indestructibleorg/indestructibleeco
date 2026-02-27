@@ -2,7 +2,10 @@
 set -euo pipefail
 
 allow="infra/root-guard/allowed-roots.txt"
-test -f "$allow"
+if [[ ! -f "$allow" ]]; then
+  echo "ROOT-GUARD: allow-list file not found: $allow" >&2
+  exit 1
+fi
 
 mapfile -t allowed < <(sed '/^[[:space:]]*$/d' "$allow")
 

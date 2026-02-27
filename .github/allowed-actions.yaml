@@ -14,7 +14,11 @@ policy:
     - azure
     - docker
     - github
-  
+    - codacy
+    - aquasecurity
+    - trufflesecurity
+    - sigstore
+
   # Require all actions to be pinned to full-length commit SHAs
   require_sha_pinning: false
   
@@ -32,6 +36,7 @@ blocked_actions: []
 
 # Approved GitHub-owned actions (exempt from org ownership check)
 approved_actions:
+  # Core GitHub Actions
   - actions/checkout
   - actions/upload-artifact
   - actions/download-artifact
@@ -47,3 +52,23 @@ approved_actions:
   - actions/attest-build-provenance
   - actions/upload-pages-artifact
   - actions/deploy-pages
+
+  # GitHub CodeQL Actions
+  - github/codeql-action/init
+  - github/codeql-action/analyze
+  - github/codeql-action/upload-sarif
+  - github/codeql-action/autobuild
+
+  # Google GitHub Actions (explicitly approved)
+  - google-github-actions/auth
+  - google-github-actions/get-gke-credentials
+  - google-github-actions/setup-gcloud
+
+  # Security Scanning Actions
+  - codacy/codacy-analysis-cli-action
+  - codacy/codacy-coverage-reporter-action
+  - aquasecurity/trivy-action
+  - trufflesecurity/trufflehog
+
+  # Supply Chain Security
+  - sigstore/cosign-installer

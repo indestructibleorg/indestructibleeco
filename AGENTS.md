@@ -10,7 +10,7 @@ eco-base is an enterprise cloud-native AI inference platform monorepo with Pytho
 
 - **Root FastAPI gateway** (port 8000): `PYTHONPATH=. python3 -m uvicorn src.app:app --host 0.0.0.0 --port 8000 --reload`
   - Provides `/health`, `/metrics`, `/v1/models`, `/v1/chat/completions` endpoints
-  - Falls back to simulated inference when no GPU engines are connected
+  - Falls back to simulated inference when the upstream AI proxy/service is unreachable or returns an error
 - Authenticate via JWT: generate a token with `python3 -c "import sys; sys.path.insert(0,'.'); from src.middleware.auth import AuthMiddleware; print(AuthMiddleware().create_jwt_token('dev-user','admin'))"`
 
 ### Testing

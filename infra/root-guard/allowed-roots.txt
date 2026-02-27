@@ -25,6 +25,7 @@ gitops
 monitoring
 mobile
 infrastructure
+inputs
 policy
 policies
 supplychain
@@ -47,6 +48,8 @@ supplychain
 artifacts
 inputs
 node_modules
+node_modules
+pnpm-lock.json
 pnpm-lock.yaml
 package-lock.json
 pyproject.toml

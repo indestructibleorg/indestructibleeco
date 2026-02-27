@@ -8,9 +8,6 @@ on:
       - 'mobile/**'
   pull_request:
     branches: [main]
-    paths:
-      - 'platforms/**'
-      - 'mobile/**'
 
 permissions:
   contents: read
@@ -184,3 +181,20 @@ jobs:
           done
 
           echo "Registry compliance check complete"
+
+  # ── Required status check gate ───────────────────────────────────────────
+  supply-chain:
+    runs-on: ubuntu-latest
+    needs: [sbom-generate, admission-policy-check]
+    if: always()
+    steps:
+      - name: Supply chain gate
+        run: |
+          if [[ "${{ needs.sbom-generate.result }}" == "failure" || \
+                "${{ needs.sbom-generate.result }}" == "cancelled" || \
+                "${{ needs.admission-policy-check.result }}" == "failure" || \
+                "${{ needs.admission-policy-check.result }}" == "cancelled" ]]; then
+            echo "Supply chain gate FAILED"
+            exit 1
+          fi
+          echo "Supply chain gate PASSED"

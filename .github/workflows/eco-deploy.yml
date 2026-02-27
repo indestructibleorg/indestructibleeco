@@ -15,8 +15,7 @@ env:
 
 jobs:
   # Stage 1: Code Quality & Security Scanning
-  code-quality:
-    name: Code Quality & Security
+  lint:
     runs-on: ubuntu-latest
 
     permissions:
@@ -77,9 +76,8 @@ jobs:
 
   # Stage 2: Build & Push Docker Image
   build:
-    name: Build & Push Docker Image
     runs-on: ubuntu-latest
-    needs: code-quality
+    needs: lint
 
     permissions:
       contents: read
@@ -401,7 +399,7 @@ jobs:
   notify:
     name: Send Notifications
     runs-on: ubuntu-latest
-    needs: [code-quality, build, immutable-rules-proxy, deploy-production, integration-tests]
+    needs: [lint, build, immutable-rules-proxy, deploy-production, integration-tests]
     if: always()
 
     permissions:
@@ -412,7 +410,7 @@ jobs:
       - name: Determine status
         id: status
         run: |
-          if [[ "${{ needs.code-quality.result }}" == "failure" || \
+          if [[ "${{ needs.lint.result }}" == "failure" || \
                 "${{ needs.build.result }}" == "failure" || \
                 "${{ needs.deploy-production.result }}" == "failure" || \
                 "${{ needs.integration-tests.result }}" == "failure" ]]; then

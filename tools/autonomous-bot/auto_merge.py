@@ -31,7 +31,7 @@ def gh_api(path, method="GET", data=None):
         data=json.dumps(data).encode() if data else None,
     )
     try:
-        with urllib.request.urlopen(req) as r:
+        with urllib.request.urlopen(req, encoding='utf-8') as r:
             return json.loads(r.read())
     except urllib.error.HTTPError as e:
         return {"error": str(e.code), "body": e.read().decode()}

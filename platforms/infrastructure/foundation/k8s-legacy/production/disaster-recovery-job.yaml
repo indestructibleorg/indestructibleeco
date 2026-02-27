@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/dr-health-check
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:dr-health-check:sha256-0ac7817a99f9887cca62c3dd9c0a86853654b53611974251700dbdeaab230518
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:dr-health-check:sha256-aa9aac2987abb810a881e41cea4095a424c712970a69d9dc3fa38775ab762637
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -67,7 +67,7 @@ spec:
                 secretKeyRef:
                   key: postgres-db
                   name: machine-native-ops-secrets
-            image: ghcr.io/machinenativeops/dr-testing:latest
+            image: ghcr.io/machinenativeops/dr-testing:v0.1.0
             name: dr-health-check
             resources:
               limits:
@@ -93,7 +93,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/dr-backup-verification
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:dr-backup-verification:sha256-ab12622356f41812c60c21c9639e7b3c92af6d72e41d738bad693b6a2a320cdd
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:dr-backup-verification:sha256-0c2a776e6129cecfe9327dbfb2d470afa5094f855eb613bc14f13156db26d147
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -133,7 +133,7 @@ spec:
               \ $BACKUP_NAME \\\n  --dry-run \\\n  --wait\n\necho \"DR backup verification\
               \ completed successfully at $(date)\"\n\n# Clean up\nvelero backup delete\
               \ $BACKUP_NAME --confirm\n"
-            image: ghcr.io/machinenativeops/dr-testing:latest
+            image: ghcr.io/machinenativeops/dr-testing:v0.1.0
             name: dr-backup-verification
             resources:
               limits:

@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/superai-app
-    eco-base/urn: urn:eco-base:k8s:core:deployment:superai-app:sha256-8fdfb805e77482b8e92fac866df58229f4f55db037988af3878a607cc3f60465
+    eco-base/urn: urn:eco-base:k8s:core:deployment:superai-app:sha256-82853160c98f4dd4d138f51543692154681b8f7261a433f733f8840f6756bba4
   labels:
     app.kubernetes.io/component: app
     app.kubernetes.io/instance: eco-instance
@@ -62,7 +62,7 @@ spec:
             name: superai-config
         - secretRef:
             name: superai-secrets
-        image: ghcr.io/indestructibleautoops/superai-platform:latest
+        image: ghcr.io/indestructibleautoops/superai-platform:v0.1.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
@@ -137,7 +137,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/superai-worker
-    eco-base/urn: urn:eco-base:k8s:core:deployment:superai-worker:sha256-9995b183eb58a63aad3d79069732ca341c0f560e976aec47f76cd402f63ba6b7
+    eco-base/urn: urn:eco-base:k8s:core:deployment:superai-worker:sha256-7ab7484d28106886a8e8684848f4ea0b4a7fbb32489d43f48ac589ab825a3316
   labels:
     app.kubernetes.io/component: worker
     app.kubernetes.io/instance: eco-instance
@@ -187,7 +187,7 @@ spec:
             name: superai-config
         - secretRef:
             name: superai-secrets
-        image: ghcr.io/indestructibleautoops/superai-platform:latest
+        image: ghcr.io/indestructibleautoops/superai-platform:v0.1.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:
@@ -243,7 +243,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/superai-beat
-    eco-base/urn: urn:eco-base:k8s:core:deployment:superai-beat:sha256-5548c8b244b80bf1ebb8b796983b852a7df28874660551d21d9e3037a07a2ee5
+    eco-base/urn: urn:eco-base:k8s:core:deployment:superai-beat:sha256-202548d66d448e25515410054b619f8b85106cb71235ddc4505fee0894e20907
   labels:
     app.kubernetes.io/component: beat
     app.kubernetes.io/instance: eco-instance
@@ -283,7 +283,7 @@ spec:
             name: superai-config
         - secretRef:
             name: superai-secrets
-        image: ghcr.io/indestructibleautoops/superai-platform:latest
+        image: ghcr.io/indestructibleautoops/superai-platform:v0.1.0
         imagePullPolicy: IfNotPresent
         name: beat
         resources:

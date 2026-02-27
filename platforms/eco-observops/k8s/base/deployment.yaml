@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: full
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/platform-observops/deployment/observops-engine
-    eco-base/urn: urn:eco-base:k8s:platform-observops:deployment:observops-engine:sha256-422cd19cce178d1c3bc9b4bec6ff6ceccd91ac61ced01f078976c516cae72244
+    eco-base/urn: urn:eco-base:k8s:platform-observops:deployment:observops-engine:sha256-8842c6b6faf097d90a99cb44598b3af0ea0d45be62f22c9c97aa3fac8c0dfef5
   labels:
     app.kubernetes.io/component: engine
     app.kubernetes.io/instance: observops-engine-prod
@@ -97,12 +97,12 @@ spec:
         resources:
           limits:
             cpu: 500m
+            ephemeral-storage: 1Gi
             memory: 512Mi
-            ephemeral-storage: "1Gi"
           requests:
             cpu: 250m
+            ephemeral-storage: 1Gi
             memory: 256Mi
-            ephemeral-storage: "1Gi"
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:

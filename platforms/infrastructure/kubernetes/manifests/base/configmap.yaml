@@ -13,7 +13,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/configmap/machine-native-ops-config
-    eco-base/urn: urn:eco-base:k8s:core:configmap:machine-native-ops-config:sha256-5bc59e335d045f20b28f8ca882374f9e4285bcd1000eaf4a94a9ac346caf8a70
+    eco-base/urn: urn:eco-base:k8s:core:configmap:machine-native-ops-config:sha256-4101f767bb0d5bbc7b5eee121d6ec11b1b13b99590400a47447093ed1aa2f981
   labels:
     app.kubernetes.io/app.kubernetes.io/component: config
     app.kubernetes.io/component: eco-component

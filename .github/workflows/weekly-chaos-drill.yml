@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.drill == 'all' || github.event.inputs.drill == 'eventbus' || github.event_name == 'schedule' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
 
       - name: Record scheduled vs actual time
         id: timing
@@ -51,12 +51,12 @@ jobs:
           fi
 
       - name: Authenticate to GCP
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed  # v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Get GKE credentials
-        uses: google-github-actions/get-gke-credentials@v2
+        uses: google-github-actions/get-gke-credentials@64bc7249bbcf78056bb92f14d3cedc2da193946c  # v2
         with:
           cluster_name: ${{ env.GKE_CLUSTER_NAME }}
           location: ${{ env.GKE_REGION }}
@@ -70,7 +70,7 @@ jobs:
           bash tests/drill-eventbus-zone.sh
 
       - name: Upload full drill report (90d retention)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         if: always()
         with:
           name: drill-eventbus-zone-${{ github.run_number }}
@@ -107,7 +107,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.drill == 'all' || github.event.inputs.drill == 'flagger' || github.event_name == 'schedule' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
 
       - name: Record scheduled vs actual time
         id: timing
@@ -128,12 +128,12 @@ jobs:
           fi
 
       - name: Authenticate to GCP
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed  # v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Get GKE credentials
-        uses: google-github-actions/get-gke-credentials@v2
+        uses: google-github-actions/get-gke-credentials@64bc7249bbcf78056bb92f14d3cedc2da193946c  # v2
         with:
           cluster_name: ${{ env.GKE_CLUSTER_NAME }}
           location: ${{ env.GKE_REGION }}
@@ -147,7 +147,7 @@ jobs:
           bash tests/drill-flagger-rollback.sh
 
       - name: Upload full drill report (90d retention)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         if: always()
         with:
           name: drill-flagger-rollback-${{ github.run_number }}
@@ -187,7 +187,7 @@ jobs:
     permissions:
       issues: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
 
       - name: Summarize results
         id: summary
@@ -212,7 +212,7 @@ jobs:
       # Issue deduplication: search for open issue with same drill+label within 7 days
       - name: Create or update GitHub issue on failure (deduplicated)
         if: steps.summary.outputs.degraded == 'true'
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7
         with:
           script: |
             const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();

@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/ingress/gl-spec-core-ingress
-    eco-base/urn: urn:eco-base:k8s:core:ingress:gl-spec-core-ingress:sha256-89fec526fba898a9067d240e0a02ad37d8b85f118811ccb5be5c7672b458f81b
+    eco-base/urn: urn:eco-base:k8s:core:ingress:gl-spec-core-ingress:sha256-981efda0b2490167f83345981d16939d948606894d2d522d736875cd3c684c70
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/configuration-snippet: 'more_set_headers "ECO-Platform:
       spec-core";

@@ -36,7 +36,7 @@ spec:
       serviceAccountName: machine-native-ops-sa
       containers:
         - name: elasticsearch-search
-          image: machinenativeops/elasticsearch-search-system:latest
+          image: machinenativeops/elasticsearch-search-system:v0.1.0
           imagePullPolicy: Always
           ports:
             - name: http

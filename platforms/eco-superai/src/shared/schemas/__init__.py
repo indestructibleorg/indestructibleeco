@@ -204,7 +204,7 @@ class DateRangeFilter(BaseModel):
         return self.start is not None and self.end is not None
 
     @property
-    def is_open(self) -> bool:
+    def is_open(self, encoding='utf-8') -> bool:
         """True when neither bound is specified."""
         return self.start is None and self.end is None
 

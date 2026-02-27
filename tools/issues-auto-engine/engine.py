@@ -137,7 +137,7 @@ def gh_api(
             req.add_header("Authorization", f"Bearer {TOKEN}")
             req.add_header("Accept", "application/vnd.github.v3+json")
             req.add_header("Content-Type", "application/json")
-            with urllib.request.urlopen(req, timeout=30) as r:
+            with urllib.request.urlopen(req, timeout=30, encoding='utf-8') as r:
                 _circuit_failures[path] = 0  # Reset on success
                 return json.loads(r.read())
         except urllib.error.HTTPError as e:

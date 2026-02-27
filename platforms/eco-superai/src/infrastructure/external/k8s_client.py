@@ -33,7 +33,7 @@ try:
     from kubernetes.client.rest import ApiException  # type: ignore[import-untyped]
 
     _K8S_AVAILABLE = True
-except ImportError:
+except ImportError:  # pragma: no cover
     # Create a stand-in so type-checkers and runtime both work.
 
     class ApiException(Exception):  # type: ignore[no-redef]
@@ -330,7 +330,7 @@ class K8sClient:
         except ApiException as exc:
             logger.error(
                 "k8s_get_deployment_status_failed",
-                extra={"name": name, "namespace": namespace, "status": exc.status},
+                extra={"resource_name": name, "namespace": namespace, "status": exc.status},
             )
             return {"error": f"API error {exc.status}: {exc.reason}"}
         except Exception as exc:
@@ -364,13 +364,13 @@ class K8sClient:
             resp = await asyncio.to_thread(_call)
             logger.info(
                 "deployment_scaled",
-                extra={"name": name, "namespace": namespace, "replicas": replicas},
+                extra={"resource_name": name, "namespace": namespace, "replicas": replicas},
             )
             return resp
         except ApiException as exc:
             logger.error(
                 "k8s_scale_deployment_failed",
-                extra={"name": name, "namespace": namespace, "status": exc.status},
+                extra={"resource_name": name, "namespace": namespace, "status": exc.status},
             )
             return {"error": f"API error {exc.status}: {exc.reason}"}
         except Exception as exc:
@@ -555,7 +555,7 @@ class K8sClient:
         except ApiException as exc:
             logger.error(
                 "k8s_apply_manifest_failed",
-                extra={"kind": kind, "name": resource_name, "status": exc.status},
+                extra={"kind": kind, "resource_name": resource_name, "status": exc.status},
             )
             return {"error": f"API error {exc.status}: {exc.reason}"}
         except Exception as exc:

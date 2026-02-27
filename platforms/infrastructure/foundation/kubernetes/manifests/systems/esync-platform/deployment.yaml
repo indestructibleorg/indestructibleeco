@@ -36,7 +36,7 @@ spec:
       serviceAccountName: machine-native-ops-sa
       containers:
         - name: esync
-          image: machinenativeops/esync-platform:latest
+          image: machinenativeops/esync-platform:v0.1.0
           imagePullPolicy: Always
           ports:
             - name: http

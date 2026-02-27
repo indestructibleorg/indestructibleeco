@@ -27,12 +27,25 @@ jobs:
           set -euo pipefail
           git fetch origin ${{ github.base_ref }} --depth=1
           if git diff origin/${{ github.base_ref }}...HEAD -U0 | grep -E '^\+.*eco-base/(urn|uri):|^-.*eco-base/(urn|uri):' >/dev/null; then
-            AUTHOR="$(git log -1 --pretty=format:'%an <%ae>')"
-            if echo "$AUTHOR" | grep -qi 'eco-supplychain-bot'; then
-              echo "OK: urn/uri change authored by supplychain bot."
-            else
-              echo "ERROR: manual edits to eco-base/urn or eco-base/uri are forbidden. Run supplychain regeneration (CI/bot) instead."
+            # Check ALL commits that individually modified urn/uri annotations
+            # (not just the last commit) to support the pattern where bot commits
+            # urn/uri updates followed by subsequent non-bot commits (e.g., security fixes)
+            FAILED_COMMITS=""
+            for COMMIT in $(git log origin/${{ github.base_ref }}..HEAD --pretty=format:'%H'); do
+              if git diff "${COMMIT}^" "$COMMIT" -U0 2>/dev/null | grep -qE '^\+.*eco-base/(urn|uri):|^-.*eco-base/(urn|uri):'; then
+                COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an <%ae>' "$COMMIT")
+                if ! echo "$COMMIT_AUTHOR" | grep -qi 'eco-supplychain-bot'; then
+                  FAILED_COMMITS="$FAILED_COMMITS\n  $COMMIT by $COMMIT_AUTHOR"
+                fi
+              fi
+            done
+            if [ -n "$FAILED_COMMITS" ]; then
+              echo "ERROR: manual edits to eco-base/urn or eco-base/uri are forbidden."
+              printf "Non-bot commits with urn/uri changes:%b\n" "$FAILED_COMMITS"
+              echo "Run supplychain regeneration (CI/bot) instead."
               exit 1
+            else
+              echo "OK: all urn/uri changes are authored by eco-supplychain-bot."
             fi
           fi
 

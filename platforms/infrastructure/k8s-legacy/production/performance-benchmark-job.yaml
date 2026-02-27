@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-smoke
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-smoke:sha256-a2758c7e069bfb2d9b332bb1cd8629156c6a239ec8995f26a6a5988655f5c18c
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-smoke:sha256-15e7a473e1bfe270bc07648350dbb5ca013ca393137bfd4e05f672c70aed2795
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -41,7 +41,7 @@ spec:
               echo "Smoke test completed at $(date)"
 
               '
-            image: grafana/k6:latest
+            image: grafana/k6:0.56.0
             name: k6
             resources:
               limits:
@@ -75,7 +75,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-load
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-load:sha256-194c7f247f6f97452836bea9f8fac0f776a1bf3b055ec09c572b13f7e515de14
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-load:sha256-621d8db4a681c5af199849fbde671d502452fa5ebf0265a727b92a329be996b5
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -110,7 +110,7 @@ spec:
               echo "Load test completed at $(date)"
 
               '
-            image: grafana/k6:latest
+            image: grafana/k6:0.56.0
             name: k6
             resources:
               limits:
@@ -144,7 +144,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-stress
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-stress:sha256-f0ae2c016df857c77fc8c885fdb858acf547e375d2785d5d7d567d8b1dcfed7c
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-stress:sha256-d013ae7efd38d8fc0fea299c4f709242800203689e0f6e6259a2da8d17841514
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -179,7 +179,7 @@ spec:
               echo "Stress test completed at $(date)"
 
               '
-            image: grafana/k6:latest
+            image: grafana/k6:0.56.0
             name: k6
             resources:
               limits:
@@ -213,7 +213,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/performance-benchmark-endurance
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-endurance:sha256-02b778e821dcbe3b399381fc592ff7d6cd8a0d239c52cc5b2a90571e3c15d139
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:performance-benchmark-endurance:sha256-b28e84b7204683ecca2de69b6cbfa26ef03ca9e4b600521435202544aaaca0e4
   labels:
     app.kubernetes.io/component: eco-component
     app.kubernetes.io/instance: eco-instance
@@ -242,7 +242,7 @@ spec:
             - /bin/sh
             - -c - | echo "Starting endurance test at $(date)" k6 run --out json=/results/endurance-test.json
               /tests/memory-leak-test.js echo "Endurance test completed at $(date)"
-            image: grafana/k6:latest
+            image: grafana/k6:0.56.0
             name: k6
             resources:
               limits:

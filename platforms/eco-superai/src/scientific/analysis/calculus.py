@@ -24,7 +24,7 @@ class NumericalCalculus:
             elif method == "trapezoid":
                 x = np.linspace(lower_bound, upper_bound, 1000)
                 y = np.array([f(xi) for xi in x])
-                result = float(np.trapz(y, x))
+                result = float(np.trapezoid(y, x) if hasattr(np, 'trapezoid') else np.trapz(y, x))
                 error = abs(result - sci_integrate.quad(f, lower_bound, upper_bound)[0])
             elif method == "simpson":
                 from scipy.integrate import simpson
@@ -33,7 +33,11 @@ class NumericalCalculus:
                 result = float(simpson(y, x=x))
                 error = abs(result - sci_integrate.quad(f, lower_bound, upper_bound)[0])
             elif method == "romberg":
-                result = float(sci_integrate.romberg(f, lower_bound, upper_bound))
+                if hasattr(sci_integrate, 'romberg'):
+                    result = float(sci_integrate.romberg(f, lower_bound, upper_bound))
+                else:
+                    # scipy >= 1.14 removed romberg; fall back to quad
+                    result = float(sci_integrate.quad(f, lower_bound, upper_bound)[0])
                 error = abs(result - sci_integrate.quad(f, lower_bound, upper_bound)[0])
             else:
                 return {"error": f"Unknown method: {method}"}

@@ -103,7 +103,7 @@ spec:
               ) | .metadata.name' | \\\n  while read backup_name; do\n    echo \"\
               Verifying backup: $backup_name\"\n    velero backup describe $backup_name\
               \ --namespace velero --details\n  done\n"
-            image: velero/velero:latest
+            image: velero/velero:v1.15.2
             name: lifecycle-manager
             volumeMounts:
             - mountPath: /etc/velero

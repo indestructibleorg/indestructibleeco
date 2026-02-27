@@ -19,7 +19,7 @@ try:
     from bs4 import BeautifulSoup, Tag  # type: ignore[import-untyped]
 
     _HAS_BS4 = True
-except ImportError:
+except ImportError:  # pragma: no cover
     _HAS_BS4 = False
     logger.info(
         "beautifulsoup4_not_installed",

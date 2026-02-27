@@ -33,7 +33,7 @@ def gh_api(path: str, token: str, repo: str) -> list | dict:
     }
     req = urllib.request.Request(url, headers=headers)
     try:
-        with urllib.request.urlopen(req) as r:
+        with urllib.request.urlopen(req, encoding='utf-8') as r:
             return json.loads(r.read())
     except Exception as e:
         print(f"API error {path}: {e}")

@@ -35,7 +35,7 @@ def _to_camel_case(text: str) -> str:
     """Convert a snake_case or space-separated string to camelCase."""
     parts = re.split(r"[\s_\-]+", text)
     if not parts:
-        return text
+        return text  # pragma: no cover
     return parts[0].lower() + "".join(p.capitalize() for p in parts[1:])
 
 

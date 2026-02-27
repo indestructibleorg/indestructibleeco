@@ -142,7 +142,7 @@ spec:
               \n# curl -X POST -H 'Content-type: application/json' \\\n#   --data\
               \ \"{&quot;text&quot;:&quot;Backup Compliance Report Generated&quot;}\"\
               \ \\\n#   https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK\n"
-            image: velero/velero:latest
+            image: velero/velero:v1.15.2
             name: compliance-reporter
             volumeMounts:
             - mountPath: /etc/velero

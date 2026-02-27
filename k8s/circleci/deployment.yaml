@@ -6,7 +6,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/circleci-agent
-    eco-base/urn: urn:eco-base:k8s:core:deployment:circleci-agent:sha256-bfc568aea0c365cec11255e166eca4f144ad0d2057c505c1c93ab39bcb9a8b5a
+    eco-base/urn: urn:eco-base:k8s:core:deployment:circleci-agent:sha256-24065a84b17e8cb2b1640fbabb73f90d28007fe228b8c5767a31172c3d42ca39
   labels:
     app: circleci-runner
     app.kubernetes.io/component: eco-component
@@ -32,78 +32,78 @@ spec:
         app: circleci-runner
         component: agent
     spec:
-      serviceAccountName: circleci-runner
-      restartPolicy: Always
       containers:
-      - name: runner-agent
-        image: circleci/runner:launch-agent
-        imagePullPolicy: Always
-        env:
+      - env:
         - name: CIRCLECI_RESOURCE_CLASS
           valueFrom:
             configMapKeyRef:
-              name: circleci-agent-config
               key: CIRCLECI_RUNNER_RESOURCE_CLASS
+              name: circleci-agent-config
         - name: CIRCLECI_RUNNER_TOKEN
           valueFrom:
             secretKeyRef:
-              name: circleci-runner-secrets
               key: CIRCLECI_RUNNER_TOKEN
+              name: circleci-runner-secrets
         - name: CIRCLECI_API_TOKEN
           valueFrom:
             secretKeyRef:
-              name: circleci-runner-secrets
               key: CIRCLECI_API_TOKEN
+              name: circleci-runner-secrets
               optional: true
         - name: LOG_LEVEL
           valueFrom:
             configMapKeyRef:
-              name: circleci-agent-config
               key: LOG_LEVEL
+              name: circleci-agent-config
         - name: AGENT_NAME
           valueFrom:
             configMapKeyRef:
-              name: circleci-agent-config
               key: CIRCLECI_RUNNER_NAME
+              name: circleci-agent-config
         - name: LAUNCH_AGENT_MODE
           valueFrom:
             configMapKeyRef:
-              name: circleci-agent-config
               key: CIRCLECI_RUNNER_MODE
+              name: circleci-agent-config
         - name: WORKING_DIRECTORY
           valueFrom:
             configMapKeyRef:
-              name: circleci-agent-config
               key: WORKING_DIRECTORY
+              name: circleci-agent-config
         - name: CLEANUP_WORKSPACE
           valueFrom:
             configMapKeyRef:
-              name: circleci-agent-config
               key: CLEANUP_WORKSPACE
+              name: circleci-agent-config
+        image: circleci/runner:launch-agent
+        imagePullPolicy: Always
         livenessProbe:
           exec:
             command:
             - /bin/sh
             - -c
             - pgrep -f launch-agent || exit 1
+          failureThreshold: 3
           initialDelaySeconds: 30
           periodSeconds: 30
           timeoutSeconds: 10
-          failureThreshold: 3
+        name: runner-agent
         readinessProbe:
           exec:
             command:
             - /bin/sh
             - -c
             - pgrep -f launch-agent || exit 1
+          failureThreshold: 3
           initialDelaySeconds: 10
           periodSeconds: 10
           timeoutSeconds: 5
-          failureThreshold: 3
         resources:
-          requests:
-            cpu: 250m
-            memory: 512Mi
           limits:
             cpu: 2000m
             memory: 4Gi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+      restartPolicy: Always
+      serviceAccountName: circleci-runner

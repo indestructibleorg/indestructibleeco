@@ -27,7 +27,7 @@ def gh_get(path: str):
     url = f"https://api.github.com/repos/{repo}{path}"
     req = urllib.request.Request(url, headers=headers)
     try:
-        with urllib.request.urlopen(req) as r:
+        with urllib.request.urlopen(req, encoding='utf-8') as r:
             return json.loads(r.read())
     except urllib.error.HTTPError as e:
         # Explicitly log HTTP status for GET failures to distinguish auth, rate limits, etc.
@@ -108,7 +108,7 @@ req = urllib.request.Request(
     headers={**headers, "Content-Type": "application/json"},
 )
 try:
-    with urllib.request.urlopen(req) as r:
+    with urllib.request.urlopen(req, encoding='utf-8') as r:
         issue = json.loads(r.read())
     print(f"Created SLO breach issue: #{issue['number']}")
 except urllib.error.HTTPError as e:

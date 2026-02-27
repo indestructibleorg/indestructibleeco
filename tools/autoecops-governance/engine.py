@@ -198,7 +198,7 @@ def gh_api(path: str, method: str = "GET", body: dict = None) -> Any:
     req.add_header("X-GitHub-Api-Version", "2022-11-28")
 
     def _call():
-        with urllib.request.urlopen(req, timeout=20) as resp:
+        with urllib.request.urlopen(req, timeout=20, encoding='utf-8') as resp:
             raw = resp.read()
             if not raw:
                 return {}
@@ -231,7 +231,7 @@ def verify_docker_tag(image: str, tag: str) -> dict:
         url = f"https://hub.docker.com/v2/repositories/{namespace}/{name}/tags/{tag}"
         req = urllib.request.Request(url)
         req.add_header("Accept", "application/json")
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=10, encoding='utf-8') as resp:
             data = json.loads(resp.read())
             if data.get("name"):
                 evidence["exists"] = True
@@ -253,7 +253,7 @@ def verify_docker_tag(image: str, tag: str) -> dict:
             url = f"https://hub.docker.com/v2/repositories/{namespace}/{name}/tags?name={tag}&page_size=5"
             req = urllib.request.Request(url)
             req.add_header("Accept", "application/json")
-            with urllib.request.urlopen(req, timeout=10) as resp:
+            with urllib.request.urlopen(req, timeout=10, encoding='utf-8') as resp:
                 data = json.loads(resp.read())
                 results = data.get("results", [])
                 if any(r.get("name") == tag for r in results):
@@ -368,7 +368,7 @@ def capture_pr_snapshot(pr_number: int) -> dict:
 
     # Create tarball for full replay capability
     tarball_path = REPLAY_DIR / f"replay-pr{pr_number}.tar.gz"
-    with tarfile.open(tarball_path, "w:gz") as tar:
+    with tarfile.open(tarball_path, "w:gz", encoding='utf-8') as tar:
         tar.add(snapshot_path, arcname=f"pr-{pr_number}-snapshot.json")
         # Include current policy files for reproducibility
         for policy_file in Path("policy").glob("*.rego"):
@@ -1159,7 +1159,7 @@ def main():
 
     if args.replay:
         print(f"REPLAY MODE: {args.replay}")
-        with tarfile.open(args.replay, "r:gz") as tar:
+        with tarfile.open(args.replay, "r:gz", encoding='utf-8') as tar:
             tar.extractall(path=str(ARTIFACTS_DIR / "replay-extracted"))
         print(f"Snapshot extracted to {ARTIFACTS_DIR}/replay-extracted/")
         return 0
@@ -1200,7 +1200,7 @@ def main():
     # Write output for GitHub Actions
     output_file = os.environ.get("GITHUB_OUTPUT", "")
     if output_file:
-        with open(output_file, "a") as f:
+        with open(output_file, "a", encoding='utf-8') as f:
             f.write(f"prs_processed={len(results)}\n")
             f.write(f"results_json={json.dumps(results)}\n")
 

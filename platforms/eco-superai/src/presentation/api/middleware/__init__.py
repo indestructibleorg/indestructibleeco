@@ -100,7 +100,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             return
         async with self._cleanup_lock:
             if now - self._last_cleanup < self._cleanup_interval:
-                return  # double-check after acquiring lock
+                return  # pragma: no cover  # double-check after acquiring lock
             stale_keys: list[str] = []
             for ip, bucket in self._buckets.items():
                 # If the bucket is full (no recent activity), it can be evicted

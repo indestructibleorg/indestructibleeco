@@ -37,7 +37,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: quantumflow/backend:latest
+        image: quantumflow/backend:v0.1.0
         imagePullPolicy: Always
         ports:
         - containerPort: 8000

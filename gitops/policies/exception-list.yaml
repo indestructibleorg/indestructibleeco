@@ -11,6 +11,7 @@ metadata:
     eco.policy/expires: "2026-06-01"
     eco.policy/reason: "kube-system components managed by GKE, not subject to ECO resource limits"
     eco.policy/owner: "platform-team"
+    eco.policy/issue: "https://github.com/indestructibleorg/eco-base/issues/100"
 spec:
   exceptions:
   - policyName: require-resource-limits
@@ -35,6 +36,7 @@ metadata:
     eco.policy/expires: "2026-05-01"
     eco.policy/reason: "Prometheus/Grafana/Loki deployed via Helm with upstream defaults, migration to ECO labels in progress"
     eco.policy/owner: "platform-team"
+    eco.policy/issue: "https://github.com/indestructibleorg/eco-base/issues/101"
 spec:
   exceptions:
   - policyName: require-eco-labels

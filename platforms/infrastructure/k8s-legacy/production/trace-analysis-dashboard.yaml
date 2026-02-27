@@ -151,7 +151,7 @@ spec:
               curl -s \"http://jaeger-query:16686/api/traces?service=machine-native-ops-production&limit=100\"\
               \ \\\n  | jq -r '.data[] | select(.duration > 5000000) | .traceID' >>\
               \ /tmp/trace-report.txt\n\ncat /tmp/trace-report.txt\n"
-            image: jaegertracing/jaeger-query:latest
+            image: jaegertracing/jaeger-query:1.65.0
             name: trace-analyzer
             volumeMounts:
             - mountPath: /tmp

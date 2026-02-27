@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import structlog
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -203,7 +203,7 @@ class ConverterConfig(BaseModel):
     # Persistence helpers
     # ------------------------------------------------------------------
 
-    CONFIG_FILENAME: str = ".artifact_converter.json"
+    CONFIG_FILENAME: ClassVar[str] = ".artifact_converter.json"
 
     def save(self, directory: Path | None = None) -> Path:
         """Persist configuration to *directory* / ``.artifact_converter.json``."""

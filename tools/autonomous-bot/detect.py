@@ -33,7 +33,7 @@ def gh_api(path, method="GET", data=None):
         data=json.dumps(data).encode() if data else None,
     )
     try:
-        with urllib.request.urlopen(req) as r:
+        with urllib.request.urlopen(req, encoding='utf-8') as r:
             return json.loads(r.read())
     except Exception as e:
         print(f"API error {path}: {e}")
@@ -98,7 +98,7 @@ if ci_conclusion == "failure":
 try:
     url = f"https://api.github.com/repos/{repo}/dependabot/alerts?state=open&per_page=30"
     req = urllib.request.Request(url, headers={"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json"})
-    with urllib.request.urlopen(req) as r:
+    with urllib.request.urlopen(req, encoding='utf-8') as r:
         alerts = json.loads(r.read())
     for alert in alerts:
         sev = alert.get("security_advisory", {}).get("severity", "unknown")
@@ -130,7 +130,7 @@ try:
         capture_output=True, text=True, timeout=60,
     )
     if os.path.exists("/tmp/validate-report.json"):
-        with open("/tmp/validate-report.json") as f:
+        with open("/tmp/validate-report.json", encoding='utf-8') as f:
             report = json.load(f)
         errors = report.get("errors", [])
         if errors:
@@ -153,7 +153,7 @@ except Exception as e:
 # ── 4. Unpinned GitHub Actions ───────────────────────────────────────────────
 unpinned = []
 for wf_file in glob.glob(".github/workflows/*.yaml") + glob.glob(".github/workflows/*.yml"):
-    with open(wf_file) as f:
+    with open(wf_file, encoding='utf-8') as f:
         content = f.read()
     for use in re.findall(r"uses:\s+(\S+)", content):
         if "@" in use:

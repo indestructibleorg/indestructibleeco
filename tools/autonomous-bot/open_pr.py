@@ -23,7 +23,7 @@ def gh_api(path, method="GET", data=None):
     headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json"}
     req = urllib.request.Request(url, headers=headers, method=method, data=json.dumps(data).encode() if data else None)
     try:
-        with urllib.request.urlopen(req) as r:
+        with urllib.request.urlopen(req, encoding='utf-8') as r:
             return json.loads(r.read())
     except urllib.error.HTTPError as e:
         print(f"HTTP {e.code}: {e.read().decode()[:200]}")
@@ -81,7 +81,7 @@ if pr.get("number"):
         gql_req = urllib.request.Request("https://api.github.com/graphql", data=json.dumps(mutation).encode(), method="POST",
             headers={"Authorization": f"token {token}", "Content-Type": "application/json"})
         try:
-            with urllib.request.urlopen(gql_req) as r:
+            with urllib.request.urlopen(gql_req, encoding='utf-8') as r:
                 result = json.loads(r.read())
                 if result.get("data"):
                     print(f"Auto-merge enabled for PR #{pr_number}")

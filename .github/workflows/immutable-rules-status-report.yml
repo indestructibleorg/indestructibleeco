@@ -40,12 +40,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
         with:
           python-version: '3.11'
 
@@ -98,7 +98,7 @@ jobs:
           echo "total_runs=$TOTAL_RUNS" >> $GITHUB_OUTPUT
 
       - name: Upload report as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
           name: immutable-rules-report-${{ steps.timing.outputs.actual_time }}
           path: tests/reports/immutable-rules-report-latest.json
@@ -115,7 +115,7 @@ jobs:
 
       - name: Create or update tracking issue on failure
         if: steps.report.outputs.overall == 'FAIL'
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7
         env:
           FAIL_COUNT: ${{ steps.report.outputs.fail_count }}
           PASS_RATE: ${{ steps.report.outputs.pass_rate }}

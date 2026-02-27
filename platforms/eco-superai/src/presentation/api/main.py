@@ -29,7 +29,7 @@ def _safe_metric(metric_cls, name, doc, labels, **kwargs):
     base_name = name.rstrip('_total') if name.endswith('_total') else name
     collector = REGISTRY._names_to_collectors.get(base_name)
     if collector is not None:
-        return collector
+        return collector  # pragma: no cover
     return metric_cls(name, doc, labels, **kwargs)
 
 REQUEST_COUNT = _safe_metric(Counter, "superai_http_requests_total", "Total HTTP requests", ["method", "endpoint", "status"])

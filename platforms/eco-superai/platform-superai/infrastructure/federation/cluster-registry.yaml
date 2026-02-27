@@ -92,7 +92,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/deployment/cluster-registry-operator
-    eco-base/urn: urn:eco-base:k8s:core:deployment:cluster-registry-operator:sha256-382a10aff3308a032167433f0da2a6ab4149593595d22a5105b61513fd3a9002
+    eco-base/urn: urn:eco-base:k8s:core:deployment:cluster-registry-operator:sha256-d73075ea8db7e87dcf63ccfabca71b16aabe6bf21652e96871e9299c72b2d19f
   labels:
     app: superai-platform
     app.kubernetes.io/component: eco-component
@@ -127,7 +127,7 @@ spec:
           value: fleet-management
         - name: LOG_LEVEL
           value: info
-        image: ghcr.io/superai-platform/cluster-registry-operator:latest
+        image: ghcr.io/superai-platform/cluster-registry-operator:v0.1.0
         livenessProbe:
           httpGet:
             path: /healthz

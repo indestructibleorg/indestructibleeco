@@ -152,7 +152,7 @@ def gh_api(path, method="GET", data=None):
     if data is not None:
         req.data = json.dumps(data).encode()
     try:
-        with urllib.request.urlopen(req, timeout=20) as resp:
+        with urllib.request.urlopen(req, timeout=20, encoding='utf-8') as resp:
             body = resp.read()
             return json.loads(body) if body else {}
     except urllib.error.HTTPError as e:

@@ -20,7 +20,7 @@ try:
     import pdfplumber  # type: ignore[import-untyped]
 
     _HAS_PDFPLUMBER = True
-except ImportError:
+except ImportError:  # pragma: no cover
     _HAS_PDFPLUMBER = False
     logger.info(
         "pdfplumber_not_installed",

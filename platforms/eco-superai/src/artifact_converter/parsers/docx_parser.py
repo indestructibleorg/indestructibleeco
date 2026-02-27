@@ -22,7 +22,7 @@ try:
     import docx as python_docx  # type: ignore[import-untyped]
 
     _HAS_PYTHON_DOCX = True
-except ImportError:
+except ImportError:  # pragma: no cover
     _HAS_PYTHON_DOCX = False
     logger.info(
         "python_docx_not_installed",

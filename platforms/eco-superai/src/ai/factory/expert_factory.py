@@ -1,3 +1,4 @@
+
 """AI Expert Factory - Create and manage domain-specific AI experts."""
 from __future__ import annotations
 
@@ -122,3 +123,9 @@ class ExpertFactory:
             return {"status": "not_found", "expert_id": expert_id}
         logger.info("expert_deleted", expert_id=expert_id)
         return {"status": "deleted", "expert_id": expert_id, "name": removed.get("name", "")}
+
+    def clear_experts(self) -> None:
+        _EXPERT_STORE.clear()
+def clear_experts() -> None:
+    """Clear all experts from the store. For testing purposes."""
+    _EXPERT_STORE.clear()

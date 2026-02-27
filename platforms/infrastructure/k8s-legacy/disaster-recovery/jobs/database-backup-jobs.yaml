@@ -7,7 +7,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/postgres-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:postgres-backup:sha256-877d848fbd735718ab2981c63818651db5965952b5663bee2045f8f03eb6e55f
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:postgres-backup:sha256-ed3e39ac20a1c1881b5028f5c2bb009d6d5e56024f7425fecf97e0ec5da37b29
   labels:
     app.kubernetes.io/component: backup
     app.kubernetes.io/instance: eco-instance
@@ -102,7 +102,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/redis-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:redis-backup:sha256-a6d0393a4f83924bda0568592d571220d0dd06cd76c01b0a725e89714a9c821c
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:redis-backup:sha256-9e01c3b25fe54647e2146a0e72280fc154a252493af5b930b1375cb4d1893c23
   labels:
     app.kubernetes.io/component: backup
     app.kubernetes.io/instance: eco-instance
@@ -195,7 +195,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/config-backup
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:config-backup:sha256-e0954cb5d0f3aada5be390ba57d7a9e1e718463ce62947ba754b4b9d6638c224
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:config-backup:sha256-bd92beb2ddbc92612e106721a8a3e1dc3e121794fd5a435cf6ba166dd5635ae1
   labels:
     app.kubernetes.io/component: backup
     app.kubernetes.io/instance: eco-instance
@@ -263,7 +263,7 @@ spec:
                   name: aws-credentials
             - name: AWS_DEFAULT_REGION
               value: us-east-1
-            image: bitnami/kubectl:latest
+            image: bitnami/kubectl:1.32.2
             name: config-backup
             resources:
               limits:
@@ -296,7 +296,7 @@ metadata:
     eco-base/audit-log-level: minimal
     eco-base/governance-policy: standard-v1
     eco-base/uri: eco-base://k8s/core/cronjob/backup-validation
-    eco-base/urn: urn:eco-base:k8s:core:cronjob:backup-validation:sha256-57b3e9c51b5e8b349ba97b84838bb045a3f57ae9bd9b086e7c2fc86c06373578
+    eco-base/urn: urn:eco-base:k8s:core:cronjob:backup-validation:sha256-676403f5f6964e58d8671252063ef613e021f9255e5935c7ddd7f8adccaa4ae9
   labels:
     app.kubernetes.io/component: backup
     app.kubernetes.io/instance: eco-instance
@@ -361,7 +361,7 @@ spec:
                   name: aws-credentials
             - name: AWS_DEFAULT_REGION
               value: us-east-1
-            image: bitnami/kubectl:latest
+            image: bitnami/kubectl:1.32.2
             name: backup-validator
             resources:
               limits:

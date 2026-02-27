@@ -50,7 +50,7 @@ class ArtifactMetadata(BaseModel):
     def merge(self, other: "ArtifactMetadata") -> "ArtifactMetadata":
         """Return a new ``ArtifactMetadata`` with *other*'s non-empty fields overlaid."""
         merged = self.model_copy()
-        for field_name in self.model_fields:
+        for field_name in ArtifactMetadata.model_fields:
             other_val = getattr(other, field_name)
             if field_name == "extra":
                 merged.extra = {**self.extra, **other.extra}

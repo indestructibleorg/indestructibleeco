@@ -20,7 +20,7 @@ packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "~0.131.0"
+fastapi = "~0.133.1"
 uvicorn = { extras = ["standard"], version = "~0.41.0" }
 pydantic = "~2.12.5"
 prometheus-client = "~0.24.1"

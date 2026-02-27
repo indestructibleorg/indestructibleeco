@@ -438,14 +438,12 @@ jobs:
         continue-on-error: true
 
   # ================================================================
-  # Summary: All tests passed
+  # Gate: test — required status check (all test jobs must pass)
   # ================================================================
-  ci-summary:
-    name: "CI Summary"
+  test:
     needs:
-      - validate
-      - security
       - test-eco-superai
+      - test-eco-superai-integration
       - test-eco-govops
       - test-eco-core
       - test-eco-observops
@@ -456,14 +454,42 @@ jobs:
       contents: read
     if: always()
     steps:
+      - name: Check all test jobs
+        run: |
+          results=(
+            "${{ needs.test-eco-superai.result }}"
+            "${{ needs.test-eco-superai-integration.result }}"
+            "${{ needs.test-eco-govops.result }}"
+            "${{ needs.test-eco-core.result }}"
+            "${{ needs.test-eco-observops.result }}"
+            "${{ needs.test-eco-seccompops.result }}"
+            "${{ needs.test-eco-dataops.result }}"
+          )
+          for r in "${results[@]}"; do
+            if [[ "$r" == "failure" || "$r" == "cancelled" ]]; then
+              echo "One or more test jobs failed or were cancelled"
+              exit 1
+            fi
+          done
+          echo "All test jobs completed successfully or were skipped"
+
+  # ================================================================
+  # Summary: All CI jobs completed
+  # ================================================================
+  ci-summary:
+    name: "CI Summary"
+    needs:
+      - validate
+      - security
+      - test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    if: always()
+    steps:
       - name: Check all jobs
         run: |
           echo "All CI jobs completed."
           echo "Validate: ${{ needs.validate.result }}"
           echo "Security: ${{ needs.security.result }}"
-          echo "eco-superai: ${{ needs.test-eco-superai.result }}"
-          echo "eco-govops: ${{ needs.test-eco-govops.result }}"
-          echo "eco-core: ${{ needs.test-eco-core.result }}"
-          echo "eco-observops: ${{ needs.test-eco-observops.result }}"
-          echo "eco-seccompops: ${{ needs.test-eco-seccompops.result }}"
-          echo "eco-dataops: ${{ needs.test-eco-dataops.result }}"
+          echo "Test: ${{ needs.test.result }}"

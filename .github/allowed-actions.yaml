@@ -5,7 +5,7 @@
 policy:
   # Require all actions to be from approved organizations
   require_org_ownership: false
-  
+
   # List of allowed organizations
   allowed_organizations:
     - indestructibleorg
@@ -21,13 +21,13 @@ policy:
 
   # Require all actions to be pinned to full-length commit SHAs
   require_sha_pinning: false
-  
+
   # Block tag references (e.g., @v1, @v2, @main)
   block_tag_references: false
-  
+
   # Require Docker actions to be pinned to SHA256 digests
   require_docker_digest_pinning: false
-  
+
   # Enforcement level: error | warning
   enforcement_level: warning
 

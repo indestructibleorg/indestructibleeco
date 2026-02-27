@@ -28,7 +28,7 @@ scan "apps" "ops" "infra"
 
 if [[ -d "ops" ]]; then
   while IFS= read -r f; do
-    if grep -nE "(from\s+['\"](\.\./)+apps/|require\(['\"](\.\./)+apps/)" "$f" >/dev/null; then
+    if grep -nE "(from\s+['\"](\.\./)+apps(['\"/])|require\(['\"](\.\./)+apps(['\"/]))" "$f" >/dev/null; then
       echo "IMPORT-GUARD: $f imports forbidden path (apps/)" >&2
       fail=1
     fi

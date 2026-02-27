@@ -1,0 +1,12 @@
+artifact:
+  version: '1.0'
+  metadata:
+    title: Hello
+    date: '2026-02-27T07:06:31.929910+00:00'
+    source: /tmp/pytest-of-ubuntu/pytest-76/test_handler_converts_supporte0/watch/test.md
+    format: markdown
+    word_count: 2
+  sections:
+  - heading: Hello
+    level: 1
+    content: ''

@@ -541,6 +541,7 @@ class ScientificMatrixRequest(BaseModel):
 class CircuitRequest(BaseModel):
     """Generic quantum circuit execution request."""
     model_config = ConfigDict(str_strip_whitespace=True)
+    circuit_type: str = Field(default="bell", max_length=50, description="Circuit type identifier")
     num_qubits: int = Field(..., ge=1, le=30)
     gates: list[dict[str, Any]] = Field(default_factory=list)
     shots: int = Field(default=1024, ge=1, le=100_000)
@@ -564,8 +565,8 @@ class QAOARequest(BaseModel):
     """Quantum Approximate Optimization Algorithm request."""
     model_config = ConfigDict(str_strip_whitespace=True)
     num_qubits: int = Field(..., ge=1, le=30)
-    problem: dict[str, Any] = Field(default_factory=dict)
-    p_layers: int = Field(default=1, ge=1, le=20)
+    cost_matrix: list[list[float]] = Field(default_factory=list, description="Cost matrix for QAOA")
+    num_layers: int = Field(default=1, ge=1, le=20, description="Number of QAOA layers (p)")
     optimizer: str = Field(default="cobyla", max_length=50)
     shots: int = Field(default=1024, ge=1, le=100_000)
     backend: str = Field(default="aer_simulator", max_length=50)
@@ -575,8 +576,11 @@ class QMLRequest(BaseModel):
     """Quantum Machine Learning request."""
     model_config = ConfigDict(str_strip_whitespace=True)
     num_qubits: int = Field(..., ge=1, le=30)
-    data: list[list[float]] = Field(default_factory=list)
-    labels: list[float] = Field(default_factory=list)
+    training_data: list[list[float]] = Field(default_factory=list, description="Training data matrix")
+    training_labels: list[float] = Field(default_factory=list, description="Training labels")
+    test_data: list[list[float]] = Field(default_factory=list, description="Test data matrix")
+    feature_map: str = Field(default="ZZFeatureMap", max_length=50, description="Quantum feature map")
+    ansatz: str = Field(default="RealAmplitudes", max_length=50, description="Variational ansatz")
     model_type: str = Field(default="variational_classifier", max_length=50)
     epochs: int = Field(default=50, ge=1, le=1000)
     shots: int = Field(default=1024, ge=1, le=100_000)

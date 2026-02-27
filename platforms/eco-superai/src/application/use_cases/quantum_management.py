@@ -10,6 +10,7 @@ from src.application.dto import QuantumJobDTO
 from src.application.events import get_event_bus
 from src.domain.entities.quantum_job import JobStatus, QuantumAlgorithm, QuantumJob
 from src.domain.exceptions import EntityNotFoundException, BusinessRuleViolation
+from src.quantum.runtime.executor import QuantumExecutor
 
 logger = structlog.get_logger(__name__)
 
@@ -17,9 +18,10 @@ logger = structlog.get_logger(__name__)
 class SubmitQuantumJobUseCase:
     """Submit a new quantum circuit for execution."""
 
-    def __init__(self, repo: Any) -> None:
+    def __init__(self, repo: Any, executor: QuantumExecutor | None = None) -> None:
         self._repo = repo
         self._bus = get_event_bus()
+        self._executor = executor or QuantumExecutor()
 
     async def execute(
         self,
@@ -41,13 +43,9 @@ class SubmitQuantumJobUseCase:
 
         await self._bus.publish_all(job.collect_events())
 
-        # Execute via quantum runtime
-        from src.quantum.runtime.executor import QuantumExecutor
-        executor = QuantumExecutor()
-
         job.start()
         try:
-            result = await executor.run_circuit(
+            result = await self._executor.run_circuit(
                 num_qubits=num_qubits,
                 circuit_type=algorithm,
                 shots=shots,
@@ -59,7 +57,7 @@ class SubmitQuantumJobUseCase:
                     execution_time_ms=result.get("execution_time_ms", 0.0),
                 )
             else:
-                job.fail(result.get("result", {}).get("error", "Unknown error"))
+                job.fail(result.get("error", "Unknown error"))
         except Exception as e:
             job.fail(str(e))
 
@@ -166,7 +164,6 @@ class ListQuantumBackendsUseCase:
     """List available quantum computing backends."""
 
     async def execute(self) -> list[dict[str, Any]]:
-        from src.quantum.runtime.executor import QuantumExecutor
         executor = QuantumExecutor()
         return executor.list_backends()
 

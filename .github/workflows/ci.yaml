@@ -1,7 +1,7 @@
 name: eco-base CI/CD
 # eco-base Unified CI/CD Pipeline
 # URI: eco-base://github/workflows/ci
-# Last updated: 2026-02-26 - Codacy coverage integration
+# Last updated: 2026-02-26 - Coverage threshold raised to 100%
 
 permissions:
   contents: read
@@ -55,7 +55,7 @@ jobs:
   # Gate 3: Platform Tests & Codacy Coverage
   # ================================================================
   test-eco-superai:
-    name: "Test: eco-superai"
+    name: "Test: eco-superai (unit)"
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -77,30 +77,119 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest pytest-cov pytest-asyncio pydantic "pydantic[email]" pydantic-settings structlog python-jose cryptography httpx fastapi uvicorn bcrypt email-validator
+          pip install pytest pytest-cov pytest-asyncio pydantic "pydantic[email]" pydantic-settings structlog python-jose cryptography httpx fastapi uvicorn bcrypt email-validator aiosqlite sqlalchemy[asyncio] numpy scipy
           if [ -f pyproject.toml ]; then
             pip install -e ".[dev]" --no-deps 2>/dev/null || true
           fi
 
-      - name: Run tests with coverage
+      - name: Run unit tests with coverage
         run: |
-          python -m pytest tests/ \
+          python -m pytest tests/unit/ \
             --cov=src \
-            --cov-report=xml:coverage.xml \
+            --cov-report=xml:coverage-unit.xml \
             --cov-report=term-missing \
+            --cov-fail-under=100 \
             --tb=short \
             -q \
-            --ignore=tests/integration \
-            --ignore=tests/e2e \
             2>&1
-          ls -la coverage.xml 2>/dev/null && echo "Coverage report generated" || echo "No coverage report"
+          ls -la coverage-unit.xml 2>/dev/null && echo "Unit coverage report generated" || echo "No coverage report"
 
-      - name: Upload coverage to Codacy
+      - name: Upload unit coverage to Codacy
         if: always()
         uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699 # v1
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: coverage.xml
+          coverage-reports: coverage-unit.xml
+        continue-on-error: true
+
+  test-eco-superai-integration:
+    name: "Test: eco-superai (integration)"
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: superai_test
+          POSTGRES_USER: superai_test
+          POSTGRES_PASSWORD: superai_test_secret
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6380:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 3s
+          --health-timeout 3s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: platforms/eco-superai
+    env:
+      APP_ENV: testing
+      DATABASE_URL: postgresql+asyncpg://superai_test:superai_test_secret@localhost:5433/superai_test
+      DATABASE_URL_SYNC: postgresql://superai_test:superai_test_secret@localhost:5433/superai_test
+      REDIS_URL: redis://localhost:6380/15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov pytest-asyncio pydantic "pydantic[email]" pydantic-settings structlog python-jose cryptography httpx fastapi uvicorn bcrypt email-validator asyncpg psycopg2-binary sqlalchemy[asyncio] alembic redis numpy scipy respx
+          if [ -f pyproject.toml ]; then
+            pip install -e ".[dev]" --no-deps 2>/dev/null || true
+          fi
+
+      - name: Wait for services
+        run: |
+          echo "Waiting for PostgreSQL..."
+          for i in $(seq 1 30); do
+            pg_isready -h localhost -p 5433 -U superai_test && break
+            echo "Attempt $i: PostgreSQL not ready, waiting..."
+            sleep 2
+          done
+          echo "Waiting for Redis..."
+          for i in $(seq 1 20); do
+            redis-cli -h localhost -p 6380 ping && break
+            echo "Attempt $i: Redis not ready, waiting..."
+            sleep 1
+          done
+
+      - name: Run integration tests with coverage
+        run: |
+          python -m pytest tests/integration/ \
+            --cov=src \
+            --cov-report=xml:coverage-integration.xml \
+            --cov-report=term-missing \
+            --tb=short \
+            -q \
+            2>&1
+          ls -la coverage-integration.xml 2>/dev/null && echo "Integration coverage report generated" || echo "No coverage report"
+
+      - name: Upload integration coverage to Codacy
+        if: always()
+        uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699 # v1
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: coverage-integration.xml
         continue-on-error: true
 
   test-eco-govops:
@@ -137,6 +226,7 @@ jobs:
             --cov=src \
             --cov-report=xml:coverage.xml \
             --cov-report=term-missing \
+            --cov-fail-under=100 \
             --tb=short \
             -q \
             --ignore=tests/integration \
@@ -185,6 +275,7 @@ jobs:
             --cov=src \
             --cov-report=xml:coverage.xml \
             --cov-report=term-missing \
+            --cov-fail-under=100 \
             --tb=short \
             -q \
             --ignore=tests/integration \
@@ -233,6 +324,7 @@ jobs:
             --cov=src \
             --cov-report=xml:coverage.xml \
             --cov-report=term-missing \
+            --cov-fail-under=100 \
             --tb=short \
             -q \
             --ignore=tests/integration \
@@ -281,6 +373,7 @@ jobs:
             --cov=src \
             --cov-report=xml:coverage.xml \
             --cov-report=term-missing \
+            --cov-fail-under=100 \
             --tb=short \
             -q \
             --ignore=tests/integration \
@@ -329,6 +422,7 @@ jobs:
             --cov=src \
             --cov-report=xml:coverage.xml \
             --cov-report=term-missing \
+            --cov-fail-under=100 \
             --tb=short \
             -q \
             --ignore=tests/integration \

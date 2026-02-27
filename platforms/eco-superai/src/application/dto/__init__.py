@@ -62,7 +62,9 @@ class PaginatedDTO(BaseModel):
 
     @property
     def total_pages(self) -> int:
-        return max(1, -(-self.total // self.limit))
+        if self.total == 0:
+            return 0
+        return -(-self.total // self.limit) if self.limit > 0 else 1
 
 
 class QuantumJobDTO(BaseModel):

@@ -15,7 +15,7 @@ eco-base is an enterprise cloud-native AI inference platform monorepo with Pytho
 
 ### Testing
 
-- **Root Python tests**: `PYTHONPATH=. pytest tests/ -v` (609 pass; 32 pre-existing failures due to missing web frontend source files and workflow files)
+- **Root Python tests**: `PYTHONPATH=. pytest tests/ -v` (625 pass; 16 pre-existing failures due to missing web frontend source files)
 - **CI validator**: `python3 tools/ci-validator/validate.py` (has pre-existing validation errors in workflow files)
 - **Platform-specific tests** (run from each platform directory):
   - `cd platforms/eco-govops && python3 -m pytest tests/ --ignore=tests/integration --ignore=tests/e2e -q` (159 pass)
@@ -36,3 +36,14 @@ eco-base is an enterprise cloud-native AI inference platform monorepo with Pytho
 - The web frontend (`platforms/web/`) is scaffolding only — no React source files exist under `app/src/`. Tests referencing those paths (test_web_frontend.py, test_yaml_studio.py) fail.
 - pnpm warns about `"workspaces"` field in `package.json` (pnpm prefers `pnpm-workspace.yaml`), but install succeeds.
 - `$HOME/.local/bin` must be on `PATH` for ruff, mypy, and other pip-installed scripts.
+
+### Deployment (Third-Party Platforms)
+
+Five platform deploy workflows exist in `.github/workflows/`:
+- **GitHub CI/CD**: 27 workflows total; `release.yml` + `publish-{npm,docker,pypi}.yml` handle releases
+- **Supabase**: `supabase-deploy.yml` runs migrations and deploys 4 edge functions. Seed data in `supabase/seed.sql`
+- **Vercel**: `vercel-deploy.yml` deploys `platforms/web/` (static landing page) with preview on PRs. Config: `platforms/web/vercel.json`
+- **GKE**: `gke-deploy.yml` does Helm deploy to staging/production. Argo CD apps in `k8s/argocd/`. Helm chart in `helm/`
+- **Cloudflare**: `cloudflare-deploy.yml` deploys webhook router Worker. Config: `backend/cloudflare/wrangler.toml`
+
+All deploy workflows require secrets configured in GitHub repository settings. See `platform_config_summary.log` or each workflow file for required secret names.

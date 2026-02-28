@@ -18,7 +18,7 @@ eco-base is an enterprise cloud-native AI platform monorepo with multi-engine in
 
 ### Important gotchas
 
-- **`.env.local` inline comments break Redis**: The `.env.local.example` has inline comments (e.g. `REDIS_PASSWORD=  # comment`). Docker Compose passes these as literal values. When creating `.env.local`, strip inline comments. Set `REDIS_PASSWORD=redis` (not empty) since the docker-compose uses `--requirepass ${REDIS_PASSWORD:-}` which fails with an empty string.
+- **`.env.local` inline comments break Redis**: The `.env.local.example` has inline comments (e.g. `REDIS_PASSWORD=  # comment`). Docker Compose passes these as literal values. When creating `.env.local`, strip inline comments. Set a non-empty password (for example, `REDIS_PASSWORD=change-me`) since the docker-compose uses `--requirepass ${REDIS_PASSWORD:-}` which fails with an empty string.
 - **`pip install -e ".[dev]"` fails**: The root `pyproject.toml` uses hatchling but lacks `tool.hatch.build.targets.wheel.packages` config. Install Python deps directly: `pip install pydantic fastapi httpx pytest pytest-asyncio jsonschema pyyaml numpy pytest-cov ruff mypy uvicorn pydantic-settings prometheus-client PyJWT redis python-multipart`.
 - **pnpm workspaces warning**: The root `package.json` uses the `workspaces` field, but pnpm requires `pnpm-workspace.yaml` (which doesn't exist). Root `pnpm install` installs only root devDependencies (eslint, typescript, prettier). Workspace packages (`backend/api`, `platforms/web`) need individual `npm install --no-workspaces` calls.
 - **API Docker dev target issue**: The `docker-compose.yml` api service uses `target: builder` which has no CMD. Run the Express API locally with `ts-node` instead of via Docker for dev.

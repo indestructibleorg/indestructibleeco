@@ -46,6 +46,9 @@ jobs:
         run: |
           if [ -f "tools/ci-validator/validate.py" ]; then
             python3 tools/ci-validator/validate.py
+          else
+            echo "::error::CI validator script tools/ci-validator/validate.py is missing; failing gate."
+            exit 1
           fi
 
       - name: Run core tests

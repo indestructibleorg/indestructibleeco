@@ -15,14 +15,14 @@ eco-base is an enterprise cloud-native AI inference platform monorepo with Pytho
 
 ### Testing
 
-- **Root Python tests**: `PYTHONPATH=. pytest tests/ -v` (625 pass; 16 pre-existing failures due to missing web frontend source files)
+- **Root Python tests**: `PYTHONPATH=. pytest tests/ -v` (may report pre-existing failures related to missing web frontend source files)
 - **CI validator**: `python3 tools/ci-validator/validate.py` (may report validation errors for some workflow files)
 - **Platform-specific tests** (run from each platform directory):
-  - `cd platforms/eco-govops && python3 -m pytest tests/ --ignore=tests/integration --ignore=tests/e2e -q` (159 pass)
-  - `cd platforms/eco-core && python3 -m pytest tests/ --ignore=tests/integration --ignore=tests/e2e -q` (32 pass)
-  - `cd platforms/eco-observops && python3 -m pytest tests/ --ignore=tests/integration --ignore=tests/e2e -q` (22 pass)
-  - `cd platforms/eco-seccompops && python3 -m pytest tests/ --ignore=tests/integration --ignore=tests/e2e -q` (6 pass)
-  - `cd platforms/eco-dataops && python3 -m pytest tests/ --ignore=tests/integration --ignore=tests/e2e -q` (18 pass)
+  - `cd platforms/eco-govops && python3 -m pytest tests/ --ignore=tests/integration --ignore=tests/e2e -q` (runs unit tests for eco-govops; integration and e2e tests are excluded)
+  - `cd platforms/eco-core && python3 -m pytest tests/ --ignore=tests/integration --ignore=tests/e2e -q` (runs unit tests for eco-core; integration and e2e tests are excluded)
+  - `cd platforms/eco-observops && python3 -m pytest tests/ --ignore=tests/integration --ignore=tests/e2e -q` (runs unit tests for eco-observops; integration and e2e tests are excluded)
+  - `cd platforms/eco-seccompops && python3 -m pytest tests/ --ignore=tests/integration --ignore=tests/e2e -q` (runs unit tests for eco-seccompops; integration and e2e tests are excluded)
+  - `cd platforms/eco-dataops && python3 -m pytest tests/ --ignore=tests/integration --ignore=tests/e2e -q` (runs unit tests for eco-dataops; integration and e2e tests are excluded)
   - `cd platforms/eco-superai && python3 -m pytest tests/unit/ -q` (many tests passing; some pre-existing failures needing optional deps like celery, openai, chromadb)
 
 ### Linting

@@ -30,7 +30,8 @@ jobs:
         run: |
           echo "::add-mask::${CURSOR_API}"
           if [ -z "${CURSOR_API}" ]; then
-            echo "::warning::CURSOR_API secret not configured in CURSOR environment"
+            echo "::error::CURSOR_API secret not configured in CURSOR environment; failing gate."
+            exit 1
           else
             echo "CURSOR_API is set (masked)."
           fi

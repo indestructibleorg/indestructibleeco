@@ -64,7 +64,7 @@ artifacts/
 ├── runbooks/           # replay/rollback scripts
 │   ├── verify.sh
 │   └── rollback.sh
-├── manifests/          # artifact index + checksums
+├── manifests/          # artifact index
 │   └── run.manifest.yaml
 ├── patches/            # generated patches
 └── tasks/              # generated task files

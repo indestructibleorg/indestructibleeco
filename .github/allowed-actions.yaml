@@ -5,7 +5,7 @@
 policy:
   # Require all actions to be from approved organizations
   require_org_ownership: false
-  
+
   # List of allowed organizations
   allowed_organizations:
     - indestructibleorg
@@ -14,16 +14,20 @@ policy:
     - azure
     - docker
     - github
-  
+    - codacy
+    - aquasecurity
+    - trufflesecurity
+    - sigstore
+
   # Require all actions to be pinned to full-length commit SHAs
   require_sha_pinning: false
-  
+
   # Block tag references (e.g., @v1, @v2, @main)
   block_tag_references: false
-  
+
   # Require Docker actions to be pinned to SHA256 digests
   require_docker_digest_pinning: false
-  
+
   # Enforcement level: error | warning
   enforcement_level: warning
 
@@ -32,6 +36,7 @@ blocked_actions: []
 
 # Approved GitHub-owned actions (exempt from org ownership check)
 approved_actions:
+  # Core GitHub Actions
   - actions/checkout
   - actions/upload-artifact
   - actions/download-artifact
@@ -47,3 +52,23 @@ approved_actions:
   - actions/attest-build-provenance
   - actions/upload-pages-artifact
   - actions/deploy-pages
+
+  # GitHub CodeQL Actions
+  - github/codeql-action/init
+  - github/codeql-action/analyze
+  - github/codeql-action/upload-sarif
+  - github/codeql-action/autobuild
+
+  # Google GitHub Actions (explicitly approved)
+  - google-github-actions/auth
+  - google-github-actions/get-gke-credentials
+  - google-github-actions/setup-gcloud
+
+  # Security Scanning Actions
+  - codacy/codacy-analysis-cli-action
+  - codacy/codacy-coverage-reporter-action
+  - aquasecurity/trivy-action
+  - trufflesecurity/trufflehog
+
+  # Supply Chain Security
+  - sigstore/cosign-installer

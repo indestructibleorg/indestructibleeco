@@ -10,10 +10,6 @@ on:
       - 'tests/fixtures/**'
   pull_request:
     branches: [main]
-    paths:
-      - 'gitops/policies/**'
-      - 'platforms/**/manifests/**'
-      - 'tests/policy/**'
   workflow_dispatch:
 
 permissions:
@@ -158,16 +154,20 @@ jobs:
             print("\nAll exceptions are within expiry date.")
           PYEOF
 
-  # ── Job 4: Violation trend gate ──────────────────────────────────────────
-  violation-trend-gate:
-    name: Violation Trend Gate
+  # ── Job 4: OPA policy gate (required status check) ───────────────────────
+  opa-policy:
     runs-on: ubuntu-latest
     needs: [kyverno-policy-test, conftest-gatekeeper-test, exception-expiry-check]
+    if: always()
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
-
-      - name: Gate summary
+      - name: OPA policy gate
         run: |
+          if [[ "${{ needs.kyverno-policy-test.result }}" == "failure" || \
+                "${{ needs.conftest-gatekeeper-test.result }}" == "failure" || \
+                "${{ needs.exception-expiry-check.result }}" == "failure" ]]; then
+            echo "Policy gate FAILED"
+            exit 1
+          fi
           echo "=== Policy Gate Summary ==="
           echo "Kyverno dry-run: PASS"
           echo "OPA/conftest tests: PASS"

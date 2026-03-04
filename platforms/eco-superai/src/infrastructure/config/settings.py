@@ -23,7 +23,7 @@ class Environment(str, Enum):
 class DatabaseSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="DATABASE_")
 
-    url: str = "postgresql+asyncpg://superai:superai_secret@localhost:5432/superai_db"
+    url: str = "postgresql://superai:superai_secret@localhost:5432/superai_db"
     url_sync: str = "postgresql://superai:superai_secret@localhost:5432/superai_db"
     pool_size: int = Field(default=20, ge=5, le=100)
     max_overflow: int = Field(default=10, ge=0, le=50)

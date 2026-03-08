@@ -1,0 +1,33 @@
+name: Dependabot PR Rescuer
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+
+permissions:
+  pull-requests: write
+  contents: write
+  actions: write
+
+jobs:
+  dispatch_to_repair_factory:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch to Central Repair Factory
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.ORG_RUNNER_MANAGER_PAT }}
+          script: |
+            await github.rest.repos.createDispatchEvent({
+              owner: 'codevantaos',
+              repo: 'codevantaos-repair-factory',
+              event_type: 'dependabot-pr-stuck',
+              client_payload: {
+                repository: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                pull_request_head_sha: context.payload.pull_request.head.sha
+              }
+            });
+            console.log(`Dispatched dependabot-pr-stuck event for PR #${context.payload.pull_request.number} to codevantaos-repair-factory.`);

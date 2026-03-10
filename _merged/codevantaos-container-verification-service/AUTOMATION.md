@@ -1,3 +1,0 @@
-# Automation Operating Model
-
-機器治理自治中...

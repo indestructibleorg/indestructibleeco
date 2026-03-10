@@ -1,1 +1,0 @@
-# codevantaos-db-schemas

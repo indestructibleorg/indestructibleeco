@@ -1,5 +1,0 @@
-parser:
-  max_recursion_depth: 1000
-  error_recovery_mode: lax
-  comment_preserve: true
-  whitespace_tracking: minimal

@@ -1,3 +1,0 @@
-# alembic revision id OR liquibase/flyway version
-# 必须具体值，不可用 HEAD
-a1b2c3d4e5f6

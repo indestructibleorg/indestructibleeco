@@ -1,66 +1,13 @@
-# CODEOWNERS — eco-base
-# URI: eco-base://github/codeowners
-#
-# Defense Matrix Layer 2: Human-in-the-Loop Gate
-# Sensitive paths ALWAYS require human approval — autonomous bot cannot bypass.
-#
-# Format: <pattern> <owner> [<owner> ...]
-# Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# CODEOWNERS — Auto-generated from .governance/ownership.yaml
+# Repo: infra-base | Layer: infra
 
-# ── Default: all changes require platform team review ──────────────────────
-*                                       @indestructiblemachinen @indestructibleorg/platform-team
+# Default owner
+* @codevantaos/infra-team
 
-# ── CRITICAL: Secrets & Encryption (ALWAYS require human review) ───────────
-secrets/                                @indestructiblemachinen
-*.enc.yaml                              @indestructiblemachinen
-.sops.yaml                              @indestructiblemachinen
-
-# ── CRITICAL: Security Configuration ───────────────────────────────────────
-policy/                                 @indestructiblemachinen @indestructibleorg/security-team
-SECURITY.md                             @indestructiblemachinen @indestructibleorg/security-team
-.github/workflows/security-gates.yaml  @indestructiblemachinen @indestructibleorg/security-team
-.github/workflows/supply-chain.yaml    @indestructiblemachinen @indestructibleorg/security-team
-
-# ── CRITICAL: GitHub Actions & CI/CD ───────────────────────────────────────
-.github/                                @indestructiblemachinen @indestructibleorg/devops-team
-.github/workflows/                      @indestructiblemachinen @indestructibleorg/devops-team
-.github/CODEOWNERS                      @indestructiblemachinen
-
-# ── CRITICAL: Branch Protection & Merge Rules ──────────────────────────────
-.mergify.yml                            @indestructiblemachinen
-.github/branch-protection.json         @indestructiblemachinen
-
-# ── HIGH: Kubernetes Production Manifests ──────────────────────────────────
-k8s/overlays/prod/                      @indestructiblemachinen @indestructibleorg/devops-team @indestructibleorg/sre-team
-k8s/base/                               @indestructibleorg/devops-team
-monitoring/                             @indestructibleorg/devops-team @indestructibleorg/sre-team
-
-# ── HIGH: Governance & Compliance ──────────────────────────────────────────
-GOVERNANCE.md                           @indestructiblemachinen @indestructibleorg/platform-team
-CHANGELOG.md                            @indestructibleorg/platform-team
-*.qyaml                                 @indestructiblemachinen @indestructibleorg/platform-team
-
-# ── MEDIUM: Backend & API ───────────────────────────────────────────────────
-backend/                                @indestructibleorg/backend-team
-backend/api/                            @indestructibleorg/backend-team
-backend/ai/                             @indestructibleorg/ai-team @indestructibleorg/backend-team
-backend/k8s/                            @indestructibleorg/devops-team @indestructibleorg/backend-team
-
-# ── MEDIUM: Platform Implementations ───────────────────────────────────────
-platforms/                              @indestructibleorg/platform-team
-platforms/web/                          @indestructibleorg/frontend-team
-platforms/desktop/                      @indestructibleorg/frontend-team
-platforms/im-integration/               @indestructibleorg/backend-team
-
-# ── MEDIUM: Supply Chain ────────────────────────────────────────────────────
-sbom.json                               @indestructibleorg/security-team
-.github/workflows/canary-deploy.yaml   @indestructibleorg/devops-team @indestructibleorg/sre-team
-
-# ── LOW: Tools & Scripts ────────────────────────────────────────────────────
-tools/                                  @indestructibleorg/platform-team
-ecosystem/                              @indestructibleorg/platform-team
-
-# ── AUTO-GENERATED: Bot PRs on non-sensitive paths bypass CODEOWNERS ────────
-# Files modified by github-actions[bot] autonomous-bot on non-sensitive paths
-# are exempted via branch protection bypass rules for the eco-base-bot app.
-# Sensitive paths above ALWAYS require human review regardless of bot status.
+# Governance files — require platform lead approval
+.governance/** @codevantaos/platform-lead
+.agent_hooks/** @codevantaos/infra-team @codevantaos/platform-lead
+repo.automation.yaml @codevantaos/infra-team
+METADATA.yaml @codevantaos/infra-team
+URN @codevantaos/infra-team
+SECURITY.md @codevantaos/security-team

@@ -1,0 +1,14 @@
+name: Governance Check
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  governance:
+    uses: codevantaos/.github/.github/workflows/reusable-governance-check.yml@v1
+    with:
+      strict: false
+      check_urn: true
+      check_governance_dir: true
